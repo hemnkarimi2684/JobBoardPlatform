@@ -127,9 +127,5 @@ public class UserProfile : BaseEntity
 
         if (BirthDate > DateTime.UtcNow.Date.AddYears(-18))
             throw new DomainException(DomainErrors.UserMustBeAtLeast18YearsOld);
-
-        FirstName.IsAllLetter();
-
-        LastName.IsAllLetter();
     }
 }

@@ -47,8 +47,6 @@ public class Province : BaseEntity
         if (Name.Length < 2 || Name.Length > 100)
             throw new DomainException(DomainErrors.ProvinceNameInvalidLength);
 
-        Name.IsAllLetter();
-
         if (ProvinceCode < 1)
             throw new DomainException(DomainErrors.ProvinceCodeInvalidRange);
     }

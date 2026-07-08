@@ -63,8 +63,6 @@ public class City : BaseEntity
         if (Name.Length < 2 || Name.Length > 100)
             throw new DomainException(DomainErrors.CityNameInvalidLength);
 
-        Name.IsAllLetter();
-
         if (CityCode < 1)
             throw new DomainException(DomainErrors.CityCodeInvalidRange);
 
