@@ -116,6 +116,8 @@ public static class DomainErrors
     #endregion
 
     #region Role Errors
+    public static Error RoleNameIsRequired => new Error("Name is required.", "Role_Name_Is_Required");
+    public static Error RoleNameInvalidLength => new Error("Name must be between 12 and 100 characters long.", "Role_Name_Invalid_Length");
     public static Error RoleDescriptionInvalidLength => new Error("Role description must be between 2 and 100 characters.", "Role_Description_Invalid_Length");
     #endregion
 

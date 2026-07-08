@@ -8,8 +8,9 @@ public class Role : IdentityRole<Guid>, IEntity
 {
     private Role() { }
 
-    public Role(string? description = null)
+    public Role(string name,string? description = null)
     {
+        Name = name;
         Description = description;
 
         Validate();
@@ -36,6 +37,12 @@ public class Role : IdentityRole<Guid>, IEntity
 
     private void Validate()
     {
+        if (string.IsNullOrWhiteSpace(Name))
+            throw new DomainException(DomainErrors.RoleNameInvalidLength);
+
+        if (Name.Length < 2 || Name.Length > 100)
+            throw new DomainException(DomainErrors.RoleNameInvalidLength);
+
         if (Description is not null)
         {
             if (Description.Length < 2 || Description.Length > 100)

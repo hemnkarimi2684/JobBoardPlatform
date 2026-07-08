@@ -23,7 +23,7 @@ using System.Reflection;
 namespace JobBoardPlatform.Infrastructure.Data;
 
 public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
-{
+{ 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
