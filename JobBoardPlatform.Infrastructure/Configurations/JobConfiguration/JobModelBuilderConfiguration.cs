@@ -13,6 +13,9 @@ public class JobModelBuilderConfiguration : BaseModelBuilderConfiguration<Job>
             .IsRequired()
             .HasMaxLength(100);
 
+        builder.HasIndex(j => j.Name)
+            .IsUnique();
+
         builder.HasMany(j => j.Advertisements)
             .WithOne(a => a.Job)
             .HasForeignKey(j => j.JobId)

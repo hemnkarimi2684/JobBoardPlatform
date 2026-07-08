@@ -38,6 +38,9 @@ public class CompanyModelBuilderConfiguration : BaseModelBuilderConfiguration<Co
            .HasConversion<string>()
            .HasMaxLength(25);
 
+        builder.HasIndex(c => c.Name)
+            .IsUnique();
+
         builder.HasOne(c => c.OwnedByUser)
             .WithOne(u => u.Company)
             .HasForeignKey<Company>(c => c.OwnedByUserId)
@@ -58,6 +61,6 @@ public class CompanyModelBuilderConfiguration : BaseModelBuilderConfiguration<Co
         builder.HasOne(c => c.CompanyImageFile)
             .WithOne()
             .HasForeignKey<Company>(c => c.CompanyImageFileId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

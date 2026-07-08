@@ -44,6 +44,6 @@ public class UserProfileModelBuilderConfiguration : BaseModelBuilderConfiguratio
         builder.HasOne(up => up.UserImageFile)
             .WithOne()
             .HasForeignKey<UserProfile>(up => up.UserImageFileId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
