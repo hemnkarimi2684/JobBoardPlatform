@@ -7,27 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\AdvertisementEntity\Data\" />
-    <Folder Include="Entities\AdvertisementSkillEntity\Data\" />
-    <Folder Include="Entities\AttachmentEntity\Data\" />
-    <Folder Include="Entities\CityEntity\Data\" />
-    <Folder Include="Entities\Common\Data\" />
-    <Folder Include="Entities\CompanyCityEntity\Data\" />
-    <Folder Include="Entities\CompanyEntity\Data\" />
-    <Folder Include="Entities\EducationDetailEntity\Data\" />
-    <Folder Include="Entities\ExperienceDetailEntity\Data\" />
-    <Folder Include="Entities\JobApplicationEntity\Data\" />
-    <Folder Include="Entities\JobEntity\Data\" />
-    <Folder Include="Entities\PaymentEntity\Data\" />
-    <Folder Include="Entities\ProvinceEntity\Data\" />
-    <Folder Include="Entities\ResumeEntity\Data\" />
-    <Folder Include="Entities\SkillEntity\Data\" />
-    <Folder Include="Entities\UserEntity\Data\" />
-    <Folder Include="Entities\UserProfileEntity\Data\" />
-    <Folder Include="Entities\UserSkillEntity\Data\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.16" />
   </ItemGroup>
 

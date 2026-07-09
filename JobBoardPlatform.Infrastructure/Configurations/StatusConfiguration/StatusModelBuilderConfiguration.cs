@@ -1,4 +1,4 @@
-﻿using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
+﻿using JobBoardPlatform.Core.Entities.StatusEntity.Entity;
 using JobBoardPlatform.Infrastructure.Configurations.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

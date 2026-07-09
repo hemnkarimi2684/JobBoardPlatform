@@ -1,7 +1,8 @@
 ﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
 using JobBoardPlatform.Core.Entities.Common.Entity;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 
-namespace JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
+namespace JobBoardPlatform.Core.Entities.StatusEntity.Entity;
 
 public class Status : BaseEntity
 {

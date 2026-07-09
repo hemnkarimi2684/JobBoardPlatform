@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
+using JobBoardPlatform.Core.Entities.StatusEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;

@@ -12,6 +12,7 @@ using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.SkillEntity.Entity;
+using JobBoardPlatform.Core.Entities.StatusEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserSkillEntity.Entity;
