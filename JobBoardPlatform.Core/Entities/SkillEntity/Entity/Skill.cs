@@ -38,6 +38,7 @@ public class Skill : BaseEntity
     public virtual ICollection<UserSkill> UserSkills { get; private set; } = new List<UserSkill>();
 
     #endregion
+
     protected override void Validate()
     {
         if (string.IsNullOrWhiteSpace(Name))

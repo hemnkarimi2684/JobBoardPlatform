@@ -2,7 +2,6 @@
 using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
-using System.Net.NetworkInformation;
 
 namespace JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 

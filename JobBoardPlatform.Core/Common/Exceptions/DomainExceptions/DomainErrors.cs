@@ -126,7 +126,7 @@ public static class DomainErrors
     public static Error AttachmentContentTypeIsRequired => new Error("Attachment content type is required.", "Attachment_ContentType_Is_Required");
     #endregion
 
-    #region 
+    #region Payment Errors
     public static Error PayemntAmountOutOfRange => new Error("payment amount must be Positive", "Payemnt_Amount_Out_Of_Range");
     #endregion
 }

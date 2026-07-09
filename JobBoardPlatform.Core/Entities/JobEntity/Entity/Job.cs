@@ -2,7 +2,6 @@
 using JobBoardPlatform.Core.Common.Extensions;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
-using JobBoardPlatform.Core.Entities.UserSkillEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.JobEntity.Entity;
 

@@ -1,11 +1,9 @@
 ﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
-using JobBoardPlatform.Core.Common.Extensions;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Entity;
 using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
-using System.Reflection;
 
 namespace JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
 

@@ -36,12 +36,6 @@ public class UserModelBuilderConfiguration : IEntityTypeConfiguration<User>
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
 
-        builder.HasMany(u => u.ExperienceDetails)
-            .WithOne(ed => ed.User)
-            .HasForeignKey(u => u.UserId)
-            .OnDelete(DeleteBehavior.NoAction)
-            .IsRequired();
-
         builder.HasOne(u => u.Resume)
             .WithOne(r => r.User)
             .HasForeignKey<Resume>(r => r.UserId)
