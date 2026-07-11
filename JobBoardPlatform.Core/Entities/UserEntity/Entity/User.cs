@@ -17,11 +17,12 @@ public class User : IdentityUser<Guid>, IEntity
 {
     private User() { }
 
-    public User(string email, string phoneNumber, string passwordHash)
+    public User(string email, string phoneNumber, string passwordHash, bool? isApproved = null)
     {
         Email = email;
         PhoneNumber = phoneNumber;
         PasswordHash = passwordHash;
+        IsApproved = isApproved;
 
         //Methods
         PhoneNumber.FixPhoneNumberFormat();
@@ -35,6 +36,8 @@ public class User : IdentityUser<Guid>, IEntity
     public DateTime? DeletedAt { get; private set; }
 
     public bool IsDeleted { get; private set; }
+
+    public bool? IsApproved { get; private set; }
 
     #region Navigation Properties
 

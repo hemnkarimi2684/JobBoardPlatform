@@ -1,4 +1,6 @@
-﻿using JobBoardPlatform.Infrastructure.Data;
+﻿using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Infrastructure.Data;
+using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +13,8 @@ public static class InfrastructureDependencyInjection
     {
         services.AddDbContext<ApplicationDbContext>(options => options
              .UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }
