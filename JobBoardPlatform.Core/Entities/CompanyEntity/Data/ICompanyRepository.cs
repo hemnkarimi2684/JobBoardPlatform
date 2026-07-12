@@ -1,5 +1,8 @@
 ﻿using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using Microsoft.EntityFrameworkCore.Update.Internal;
+using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 
@@ -18,4 +21,20 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <param name="ownerId"></param>
     /// <returns></returns>
     Task<bool> IsCompanyExistForOwnerId(Guid ownerId);
+
+    /// <summary>
+    /// دریافت اطلاعات شرکت کارفرما
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="ownerId"></param>
+    /// <returns></returns>
+    Task<TResult?> GetCompanyByOwnerIdAsync<TResult>(Expression<Func<Company, TResult>> projection, Guid ownerId);
+
+    /// <summary>
+    /// اپدیت اطلاعات شرکت 
+    /// </summary>
+    /// <param name="companyId"></param>
+    /// <param name="companyInfoUpdate"></param>
+    /// <returns></returns>
+    Task<bool> UpdateCompanyInfoAsync(Guid companyId, CompanyInfoUpdate companyInfoUpdate);
 }

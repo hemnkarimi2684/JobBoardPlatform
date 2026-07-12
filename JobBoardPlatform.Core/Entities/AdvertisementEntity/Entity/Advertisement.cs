@@ -7,7 +7,6 @@ using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 using JobBoardPlatform.Core.Entities.PaymentEntity.Entity;
-using System.Runtime.ConstrainedExecution;
 
 namespace JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 

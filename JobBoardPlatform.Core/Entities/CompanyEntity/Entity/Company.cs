@@ -3,6 +3,7 @@ using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
@@ -14,7 +15,7 @@ namespace JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 public class Company : BaseEntity
 {
     private Company() { }
-    
+
     public Company(string name, DateTime yearOfEstablishment, string industry, string aboutUs, string webSiteAddress, OwnershipType ownershipType, Guid ownedByUserId, CompanySizeEnum companySize, string? activityType = null, Guid? companyImageFileId = null, Guid? createdById = null)
     {
         Name = name;
@@ -141,5 +142,35 @@ public class Company : BaseEntity
 
         if (!string.IsNullOrWhiteSpace(ActivityType) && ActivityType?.Length > 120 || ActivityType?.Length < 0)
             throw new DomainException(DomainErrors.CompanyActivityTypeInvalidLength);
+    }
+
+    public void UpdateCompanyInfo(CompanyInfoUpdate companyInfoUpdate)
+    {
+        if (companyInfoUpdate.Name is not null)
+            Name = companyInfoUpdate.Name;
+
+        if (companyInfoUpdate.YearOfEstablishment is not null)
+            YearOfEstablishment = companyInfoUpdate.YearOfEstablishment.Value;
+
+        if (companyInfoUpdate.Industry is not null)
+            Industry = companyInfoUpdate.Industry;
+
+        if (companyInfoUpdate.AboutUs is not null)
+            AboutUs = companyInfoUpdate.AboutUs;
+
+        if (companyInfoUpdate.WebSiteAddress is not null)
+            WebSiteAddress = companyInfoUpdate.WebSiteAddress;
+
+        if (companyInfoUpdate.OwnershipType is not null)
+            OwnershipType = companyInfoUpdate.OwnershipType.Value;
+
+        if (companyInfoUpdate.CompanySize is not null)
+            CompanySize = companyInfoUpdate.CompanySize.Value;
+
+        ActivityType = companyInfoUpdate.ActivityType;
+
+        Update(companyInfoUpdate.ModifiedById);
+
+        Validate();
     }
 }

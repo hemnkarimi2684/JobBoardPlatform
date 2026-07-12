@@ -1,6 +1,6 @@
 ﻿using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 
-namespace JobBoardPlatform.Application.Dto.CompanyDto.Command;
+namespace JobBoardPlatform.Application.Common.Dto.CompanyDto.Command;
 
 public record CreateCompanyCommand(
     string Name,
