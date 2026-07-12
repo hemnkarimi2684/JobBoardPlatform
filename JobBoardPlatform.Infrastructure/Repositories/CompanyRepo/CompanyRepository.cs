@@ -10,4 +10,9 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
     public CompanyRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
     }
+
+    public async Task<bool> IsCompanyExistByNameAsync(string name) => await AnyAsync(c => c.Name == name);
+
+    public async Task<bool> IsCompanyExistForOwnerId(Guid ownerId) => await AnyAsync(c => c.OwnedByUserId == ownerId);
+    
 }

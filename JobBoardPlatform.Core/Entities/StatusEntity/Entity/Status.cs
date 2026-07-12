@@ -8,10 +8,11 @@ public class Status : BaseEntity
 {
     private Status() { }
     
-    public Status(string title, string description)
+    public Status(string title, string description, Guid? createdById = null)
     {
         Title = title;
         Description = description;
+        CreatedById = createdById;
 
         Validate();
     }

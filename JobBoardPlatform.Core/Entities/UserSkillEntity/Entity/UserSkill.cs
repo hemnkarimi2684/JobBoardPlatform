@@ -11,10 +11,11 @@ public class UserSkill : BaseEntity
 {
     private UserSkill() { }
     
-    public UserSkill(Guid userId, Guid skillId)
+    public UserSkill(Guid userId, Guid skillId, Guid? createdById = null)
     {
         UserId = userId;
         SkillId = skillId;
+        CreatedById = createdById;
     }
 
     #region Foreign Keys

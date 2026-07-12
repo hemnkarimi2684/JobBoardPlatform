@@ -8,10 +8,11 @@ public class AdvertisementSkill : BaseEntity
 {
     private AdvertisementSkill() { }
 
-    public AdvertisementSkill(Guid advertisementId, Guid skillId)
+    public AdvertisementSkill(Guid advertisementId, Guid skillId, Guid? createdById = null)
     {
         AdvertisementId = advertisementId;
         SkillId = skillId;
+        CreatedById = createdById;
     }
 
     #region Foreign Keys

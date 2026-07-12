@@ -18,11 +18,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         Entities = DbContext.Set<T>();
     }
 
-    public async Task<bool> AddAsync(T entity)
+    public async Task AddAsync(T entity)
     {
         await Entities.AddAsync(entity);
-
-        return DbContext.Entry(entity).State == EntityState.Added;
     }
 
     public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
@@ -84,21 +82,21 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         return await Entities.FindAsync(id);
     }
 
-    public async Task<bool> SoftDeleteAsync(int id)
+    public async Task<bool> SoftDeleteAsync(int id, Guid deletedById)
     {
         var entity = await Entities.FindAsync(id);
 
         if (entity == null)
             return false;
 
-        entity.SoftDelete();
+        entity.SoftDelete(deletedById);
 
         return DbContext.Entry(entity).State == EntityState.Modified;
     }
 
-    public bool Update(T entity)
+    public bool Update(T entity, Guid modifiedById)
     {
-        entity.Update();
+        entity.Update(modifiedById);
 
         Entities.Update(entity);
 

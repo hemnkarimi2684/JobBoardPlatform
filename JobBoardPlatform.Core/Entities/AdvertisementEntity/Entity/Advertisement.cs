@@ -7,6 +7,7 @@ using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 using JobBoardPlatform.Core.Entities.PaymentEntity.Entity;
+using System.Runtime.ConstrainedExecution;
 
 namespace JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 
@@ -17,7 +18,7 @@ public class Advertisement : BaseEntity
 {
     private Advertisement() { }
 
-    public Advertisement(string description, int minimumAge, int maximumAge, decimal minimumSalary, decimal maximumSalary, int experienceLevel, CollaborationType collaborationType, Guid jobId, Guid cityId, Guid companyId)
+    public Advertisement(string description, int minimumAge, int maximumAge, decimal minimumSalary, decimal maximumSalary, int experienceLevel, CollaborationType collaborationType, Guid jobId, Guid cityId, Guid companyId, Guid? createdById = null)
     {
         Description = description;
         MinimumAge = minimumAge;
@@ -29,6 +30,7 @@ public class Advertisement : BaseEntity
         JobId = jobId;
         CityId = cityId;
         CompanyId = companyId;
+        CreatedById = createdById;
 
         Validate();
     }

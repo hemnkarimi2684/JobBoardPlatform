@@ -10,4 +10,5 @@ public class CompanyCityRepository : GenericRepository<CompanyCity>, ICompanyCit
     public CompanyCityRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
     }
+    
 }

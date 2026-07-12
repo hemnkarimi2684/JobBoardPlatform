@@ -12,9 +12,10 @@ public class Job : BaseEntity
 {
     private Job() { }
     
-    public Job(string name)
+    public Job(string name, Guid? createdById = null)
     {
         Name = name;
+        CreatedById = createdById;
 
         Validate();
     }

@@ -14,7 +14,7 @@ public class UserProfile : BaseEntity
 {
     private UserProfile() { }
 
-    public UserProfile(string firstName, string lastName, string bio, string address, DateTime birthDate, Guid userId, Guid cityId, Gender gender, Guid? userImageFileId = null)
+    public UserProfile(string firstName, string lastName, string bio, string address, DateTime birthDate, Guid userId, Guid cityId, Gender gender, Guid? userImageFileId = null, Guid? createdById = null)
     {
         FirstName = firstName;
         LastName = lastName;
@@ -25,6 +25,7 @@ public class UserProfile : BaseEntity
         CityId = cityId;
         Gender = gender;
         UserImageFileId = userImageFileId;
+        CreatedById = createdById;
 
         Validate();
     }

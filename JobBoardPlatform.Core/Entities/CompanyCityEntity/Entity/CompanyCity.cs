@@ -9,11 +9,12 @@ public class CompanyCity : BaseEntity
 {
     private CompanyCity() { }
 
-    public CompanyCity(string location, Guid companyId, Guid cityId)
+    public CompanyCity(string location, Guid companyId, Guid cityId, Guid? createdById = null)
     {
         Location = location;
         CompanyId = companyId;
         CityId = cityId;
+        CreatedById = createdById;
 
         Validate(); 
     }

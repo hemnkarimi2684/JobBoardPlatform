@@ -12,10 +12,11 @@ public class Province : BaseEntity
 {
     private Province() { }
 
-    public Province(string name, int provinceCode)
+    public Province(string name, int provinceCode, Guid? createdById = null)
     {
         Name = name;
         ProvinceCode = provinceCode;
+        CreatedById = createdById;
 
         Validate();
     }

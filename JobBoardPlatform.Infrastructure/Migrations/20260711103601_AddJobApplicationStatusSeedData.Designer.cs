@@ -4,6 +4,7 @@ using JobBoardPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobBoardPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260711103601_AddJobApplicationStatusSeedData")]
+    partial class AddJobApplicationStatusSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,14 +47,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -87,9 +84,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
@@ -98,13 +92,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CreatedAt");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
                     b.HasIndex("JobId");
-
-                    b.HasIndex("ModifiedById");
 
                     b.ToTable("Advertisements");
                 });
@@ -123,14 +111,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -140,21 +122,12 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("SkillId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("SkillId");
 
@@ -180,18 +153,12 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<byte[]>("Data")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("FileName")
                         .IsRequired()
@@ -206,18 +173,9 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.ToTable("Attachments");
                 });
@@ -236,14 +194,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -252,9 +204,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -273,12 +222,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("ProvinceId");
 
@@ -302,14 +245,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -324,20 +261,11 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("CompanyId", "CityId")
                         .IsUnique();
@@ -373,14 +301,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Industry")
                         .IsRequired()
@@ -394,9 +316,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -427,12 +346,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CreatedAt");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
-
                     b.HasIndex("Name")
                         .IsUnique();
 
@@ -461,14 +374,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsCurrentlyStudying")
                         .HasColumnType("bit");
@@ -485,9 +392,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Percentage")
                         .ValueGeneratedOnAdd()
@@ -508,12 +412,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("UserId");
 
@@ -536,14 +434,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
@@ -569,9 +461,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("SeniorityLevel")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -586,12 +475,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("UserId");
 
@@ -612,14 +495,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -628,9 +505,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ResumeId")
                         .HasColumnType("uniqueidentifier");
@@ -646,12 +520,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("AdvertisementId");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("ResumeId");
 
@@ -673,14 +541,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -690,9 +552,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -701,12 +560,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -734,14 +587,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -750,9 +597,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -767,12 +611,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("AdvertisementId");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("UserId");
 
@@ -790,14 +628,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -806,9 +638,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -821,12 +650,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("ProvinceCode")
                         .IsUnique();
@@ -845,14 +668,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -864,9 +681,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -880,15 +694,9 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CreatedAt");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
                     b.HasIndex("LastUploadedFileId")
                         .IsUnique()
                         .HasFilter("[LastUploadedFileId] IS NOT NULL");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -911,14 +719,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasMaxLength(100)
@@ -932,9 +734,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Name")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -946,12 +745,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
@@ -998,14 +791,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -1015,9 +802,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1026,12 +810,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.ToTable("Skills");
                 });
@@ -1047,14 +825,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -1069,9 +841,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1081,18 +850,12 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CreatedAt");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
-
                     b.ToTable("Statuses");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b930e70d-3f8f-44a3-a48a-d80f351b9e6b"),
+                            Id = new Guid("b603c64c-4b9d-4bf8-a41f-5a739c7a054c"),
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "The job request is waiting for initial processing.",
                             IsDeleted = false,
@@ -1100,7 +863,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("0d835f3e-26e1-4390-9690-1ad13cd448f4"),
+                            Id = new Guid("52e1c539-a8c2-425e-a275-2b745946c1c1"),
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "The job request is currently under review.",
                             IsDeleted = false,
@@ -1108,7 +871,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("1ac04d7f-faaa-4a32-a5eb-2be9cf0e551f"),
+                            Id = new Guid("4c349779-8b90-463e-89e2-46998b714bda"),
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "The candidate has been invited to an interview.",
                             IsDeleted = false,
@@ -1116,7 +879,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("f85ed918-8c7d-4418-bb58-aa8c9126b67c"),
+                            Id = new Guid("0eeedafd-5374-47ce-a886-b0164fcbf5b7"),
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "The job request has been rejected.",
                             IsDeleted = false,
@@ -1124,7 +887,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ea15f434-f775-4399-913b-9b723b3998f7"),
+                            Id = new Guid("97da4cfc-8a13-4176-a31c-d0aaa6efefe7"),
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "The job request has been accepted.",
                             IsDeleted = false,
@@ -1150,14 +913,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -1182,9 +939,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -1216,12 +970,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -1265,14 +1013,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -1297,9 +1039,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1311,12 +1050,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -1339,14 +1072,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid?>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -1355,9 +1082,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("ModifiedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SkillId")
                         .HasColumnType("uniqueidentifier");
@@ -1368,12 +1092,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("DeletedById");
-
-                    b.HasIndex("ModifiedById");
 
                     b.HasIndex("SkillId");
 
@@ -1500,38 +1218,17 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("JobBoardPlatform.Core.Entities.JobEntity.Entity.Job", "Job")
                         .WithMany("Advertisements")
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("City");
 
                     b.Navigation("Company");
 
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
                     b.Navigation("Job");
-
-                    b.Navigation("Modifier");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Entity.AdvertisementSkill", b =>
@@ -1542,21 +1239,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("JobBoardPlatform.Core.Entities.SkillEntity.Entity.Skill", "Skill")
                         .WithMany("AdvertisementSkills")
                         .HasForeignKey("SkillId")
@@ -1565,67 +1247,16 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Navigation("Advertisement");
 
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
-
                     b.Navigation("Skill");
-                });
-
-            modelBuilder.Entity("JobBoardPlatform.Core.Entities.AttachmentEntity.Entity.Attachment", b =>
-                {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.CityEntity.Entity.City", b =>
                 {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("JobBoardPlatform.Core.Entities.ProvinceEntity.Entity.Province", "Province")
                         .WithMany("Cities")
                         .HasForeignKey("ProvinceId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
 
                     b.Navigation("Province");
                 });
@@ -1644,30 +1275,9 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("City");
 
                     b.Navigation("Company");
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.CompanyEntity.Entity.Company", b =>
@@ -1677,21 +1287,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasForeignKey("JobBoardPlatform.Core.Entities.CompanyEntity.Entity.Company", "CompanyImageFileId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "OwnedByUser")
                         .WithOne("Company")
                         .HasForeignKey("JobBoardPlatform.Core.Entities.CompanyEntity.Entity.Company", "OwnedByUserId")
@@ -1700,75 +1295,27 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Navigation("CompanyImageFile");
 
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
-
                     b.Navigation("OwnedByUser");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity.EducationDetail", b =>
                 {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "User")
                         .WithMany("EducationDetails")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
-
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity.ExperienceDetail", b =>
                 {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "User")
                         .WithMany("ExperienceDetails")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
 
                     b.Navigation("User");
                 });
@@ -1780,21 +1327,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasForeignKey("AdvertisementId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("JobBoardPlatform.Core.Entities.ResumeEntity.Entity.Resume", "Resume")
                         .WithMany("JobApplications")
@@ -1816,41 +1348,11 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Navigation("Advertisement");
 
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
-
                     b.Navigation("Resume");
 
                     b.Navigation("Status");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("JobBoardPlatform.Core.Entities.JobEntity.Entity.Job", b =>
-                {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.PaymentEntity.Entity.Payment", b =>
@@ -1861,21 +1363,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "User")
                         .WithMany("Payments")
                         .HasForeignKey("UserId")
@@ -1884,60 +1371,15 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Navigation("Advertisement");
 
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
-
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("JobBoardPlatform.Core.Entities.ProvinceEntity.Entity.Province", b =>
-                {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ResumeEntity.Entity.Resume", b =>
                 {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("JobBoardPlatform.Core.Entities.AttachmentEntity.Entity.Attachment", "LastUploadedFile")
                         .WithOne()
                         .HasForeignKey("JobBoardPlatform.Core.Entities.ResumeEntity.Entity.Resume", "LastUploadedFileId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "User")
                         .WithOne("Resume")
@@ -1945,111 +1387,9 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
                     b.Navigation("LastUploadedFile");
 
-                    b.Navigation("Modifier");
-
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("JobBoardPlatform.Core.Entities.RoleEntity.Entity.Role", b =>
-                {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
-                });
-
-            modelBuilder.Entity("JobBoardPlatform.Core.Entities.SkillEntity.Entity.Skill", b =>
-                {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
-                });
-
-            modelBuilder.Entity("JobBoardPlatform.Core.Entities.StatusEntity.Entity.Status", b =>
-                {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
-                });
-
-            modelBuilder.Entity("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", b =>
-                {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.UserProfileEntity.Entity.UserProfile", b =>
@@ -2059,21 +1399,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "User")
                         .WithOne("UserProfile")
@@ -2088,12 +1413,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Navigation("City");
 
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
-
                     b.Navigation("User");
 
                     b.Navigation("UserImageFile");
@@ -2101,21 +1420,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.UserSkillEntity.Entity.UserSkill", b =>
                 {
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
-                        .WithMany()
-                        .HasForeignKey("DeletedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
-                        .WithMany()
-                        .HasForeignKey("ModifiedById")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("JobBoardPlatform.Core.Entities.SkillEntity.Entity.Skill", "Skill")
                         .WithMany("UserSkills")
                         .HasForeignKey("SkillId")
@@ -2127,12 +1431,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.Navigation("Creator");
-
-                    b.Navigation("Deleter");
-
-                    b.Navigation("Modifier");
 
                     b.Navigation("Skill");
 

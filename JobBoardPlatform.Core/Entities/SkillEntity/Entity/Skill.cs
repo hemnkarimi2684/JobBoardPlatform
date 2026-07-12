@@ -13,9 +13,10 @@ public class Skill : BaseEntity
 {
     private Skill() { }
     
-    public Skill(string name)
+    public Skill(string name, Guid? createdById = null)
     {
         Name = name;
+        CreatedById = createdById;
 
         Validate();
     }

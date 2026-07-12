@@ -15,7 +15,7 @@ public class Company : BaseEntity
 {
     private Company() { }
     
-    public Company(string name, DateTime yearOfEstablishment, string industry, string aboutUs, string webSiteAddress, OwnershipType ownershipType, Guid ownedByUserId, CompanySizeEnum companySize, string? activityType = null, Guid? companyImageFileId = null)
+    public Company(string name, DateTime yearOfEstablishment, string industry, string aboutUs, string webSiteAddress, OwnershipType ownershipType, Guid ownedByUserId, CompanySizeEnum companySize, string? activityType = null, Guid? companyImageFileId = null, Guid? createdById = null)
     {
         Name = name;
         YearOfEstablishment = yearOfEstablishment;
@@ -27,6 +27,7 @@ public class Company : BaseEntity
         CompanySize = companySize;
         ActivityType = activityType;
         CompanyImageFileId = companyImageFileId;
+        CreatedById = createdById;
 
         Validate();
     }

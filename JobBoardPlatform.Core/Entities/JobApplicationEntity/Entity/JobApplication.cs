@@ -10,12 +10,13 @@ public class JobApplication : BaseEntity
 {
     private JobApplication() { }
     
-    public JobApplication(Guid statusId, Guid resumeId, Guid advertisementId, Guid userId)
+    public JobApplication(Guid statusId, Guid resumeId, Guid advertisementId, Guid userId, Guid? createdById = null)
     {
         StatusId = statusId;
         ResumeId = resumeId;
         AdvertisementId = advertisementId;
         UserId = userId;
+        CreatedById = createdById;
     }
 
     #region Foreign Keys

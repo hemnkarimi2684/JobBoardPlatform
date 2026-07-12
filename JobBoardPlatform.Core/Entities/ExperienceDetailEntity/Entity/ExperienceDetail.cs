@@ -12,7 +12,7 @@ public class ExperienceDetail : BaseEntity
 {
     private ExperienceDetail() { }
     
-    public ExperienceDetail(string lastJobTitle, SeniorityLevel seniorityLevel, string jobCategory, string city, DateTime startDate, DateTime? endDate, bool isCurrentJob, Guid userId)
+    public ExperienceDetail(string lastJobTitle, SeniorityLevel seniorityLevel, string jobCategory, string city, DateTime startDate, DateTime? endDate, bool isCurrentJob, Guid userId, Guid? createdById = null)
     {
         HandleCurrentlyWorkingStatus(isCurrentJob);
 
@@ -24,6 +24,7 @@ public class ExperienceDetail : BaseEntity
         EndDate = endDate;
         IsCurrentJob = isCurrentJob;
         UserId = userId;
+        CreatedById = createdById;
 
         Validate();
     }

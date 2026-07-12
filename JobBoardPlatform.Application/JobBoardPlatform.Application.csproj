@@ -8,7 +8,10 @@
 
   <ItemGroup>
     <Folder Include="Common\Extensions\" />
-    <Folder Include="Common\Exceptions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JobBoardPlatform.Core\JobBoardPlatform.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -52,19 +52,19 @@ public interface IGenericRepository<T> where T : BaseEntity
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    Task<bool> AddAsync(T entity);
+    Task AddAsync(T entity);
 
     /// <summary>
     /// اپدیت موجودیت
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    bool Update(T entity);
+    bool Update(T entity, Guid modifiedById);
 
     /// <summary>
     /// حذف نرم موجودیت 
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<bool> SoftDeleteAsync(int id);
+    Task<bool> SoftDeleteAsync(int id, Guid deletedById);
 }

@@ -12,7 +12,7 @@ public class EducationDetail : BaseEntity
 {
     private EducationDetail() { }
     
-    public EducationDetail(CertificateDegree certificateDegreeName, string major, string university, DateTime startDate, DateTime? completionDate, int? percentage, bool isCurrentlyStudying, Guid userId)
+    public EducationDetail(CertificateDegree certificateDegreeName, string major, string university, DateTime startDate, DateTime? completionDate, int? percentage, bool isCurrentlyStudying, Guid userId, Guid? createdById = null)
     {
         HandleCurrentlyStudyingStatus(isCurrentlyStudying);
 
@@ -24,6 +24,7 @@ public class EducationDetail : BaseEntity
         Percentage = percentage;
         IsCurrentlyStudying = isCurrentlyStudying;
         UserId = userId;
+        CreatedById = createdById;
 
         Validate();
     }

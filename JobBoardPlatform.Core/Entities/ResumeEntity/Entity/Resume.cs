@@ -13,11 +13,12 @@ public class Resume : BaseEntity
 {
     private Resume() { }
     
-    public Resume(string title, Guid userId, Guid? lastUploadedFileId = null)
+    public Resume(string title, Guid userId, Guid? lastUploadedFileId = null, Guid? createdById = null)
     {
         Title = title;
         UserId = userId;
         LastUploadedFileId = lastUploadedFileId;
+        CreatedById = createdById;
 
         Validate();
     }

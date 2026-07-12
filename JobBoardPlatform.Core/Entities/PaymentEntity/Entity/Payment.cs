@@ -13,12 +13,13 @@ public class Payment : BaseEntity
 {
     private Payment() { }
 
-    public Payment(decimal amount, PaymentStatus status, Guid advertisementId, Guid userId)
+    public Payment(decimal amount, PaymentStatus status, Guid advertisementId, Guid userId, Guid? createdById = null)
     {
         Amount = amount;
         Status = status;
         AdvertisementId = advertisementId;
         UserId = userId;
+        CreatedById = createdById;
 
         Validate();
     }

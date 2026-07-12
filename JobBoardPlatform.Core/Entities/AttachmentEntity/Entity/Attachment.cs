@@ -10,11 +10,12 @@ public class Attachment : BaseEntity
 {
     private Attachment() { }
 
-    public Attachment(string fileName, string contentType, byte[] data)
+    public Attachment(string fileName, string contentType, byte[] data, Guid? createdById = null)
     {
         FileName = fileName;
         ContentType = contentType;
         Data = data;
+        CreatedById = createdById;
     }
 
     /// <summary>

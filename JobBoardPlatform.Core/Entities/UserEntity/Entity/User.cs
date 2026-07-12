@@ -17,12 +17,14 @@ public class User : IdentityUser<Guid>, IEntity
 {
     private User() { }
 
-    public User(string email, string phoneNumber, string passwordHash, bool? isApproved = null)
+    public User(string email, string phoneNumber, string passwordHash, bool? isApproved = null, Guid? createdById = null)
     {
         Email = email;
         PhoneNumber = phoneNumber;
         PasswordHash = passwordHash;
+        UserName = Email;
         IsApproved = isApproved;
+        CreatedById = createdById;
 
         //Methods
         PhoneNumber.FixPhoneNumberFormat();
@@ -38,6 +40,16 @@ public class User : IdentityUser<Guid>, IEntity
     public bool IsDeleted { get; private set; }
 
     public bool? IsApproved { get; private set; }
+
+    #region Foreign Keys
+
+    public Guid? CreatedById { get; private set; }
+
+    public Guid? ModifiedById { get; private set; }
+
+    public Guid? DeletedById { get; private set; }
+
+    #endregion
 
     #region Navigation Properties
 
@@ -81,6 +93,12 @@ public class User : IdentityUser<Guid>, IEntity
     /// </summary>
     public virtual UserProfile? UserProfile { get; private set; }
 
+    public User? Creator { get; private set; }
+
+    public User? Modifier { get; private set; }
+
+    public User? Deleter { get; private set; }
+
     #endregion
 
     private void Validate()
@@ -93,13 +111,17 @@ public class User : IdentityUser<Guid>, IEntity
             throw new DomainException(DomainErrors.PasswordHashIsRequired);
     }
 
-    public void SoftDelete()
+    public void SoftDelete(Guid deletedById)
     {
         DeletedAt = DateTime.UtcNow;
         IsDeleted = true;
         ModifiedAt = DateTime.UtcNow;
+        DeletedById = deletedById;
     }
 
-    public void Update() => ModifiedAt = DateTime.UtcNow;
-
+    public void Update(Guid modifiedById)
+    {
+        ModifiedById = modifiedById;
+        ModifiedAt = DateTime.UtcNow;
+    }
 }

@@ -1,4 +1,6 @@
-﻿namespace JobBoardPlatform.Core.Entities.Common.Entity;
+﻿using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+
+namespace JobBoardPlatform.Core.Entities.Common.Entity;
 
 public abstract class BaseEntity : IEntity
 {
@@ -22,14 +24,39 @@ public abstract class BaseEntity : IEntity
 
     public bool IsDeleted { get; private set; }
 
-    public void SoftDelete()
+    #region Foreign Keys
+
+    public Guid? CreatedById { get; protected set; }
+
+    public Guid? ModifiedById { get; protected set; }
+
+    public Guid? DeletedById { get; protected set; }
+
+    #endregion
+
+    #region Navigation Properties
+
+    public User? Creator { get; private set; }
+
+    public User? Modifier { get; private set; }
+
+    public User? Deleter { get; private set; }
+
+    #endregion
+
+    public void SoftDelete(Guid deletedById)
     {
         DeletedAt = DateTime.UtcNow;
         IsDeleted = true;
         ModifiedAt = DateTime.UtcNow;
+        DeletedById = deletedById;
     }
 
-    public void Update() => ModifiedAt = DateTime.UtcNow;
+    public void Update(Guid modifiedById)
+    {
+        ModifiedById = modifiedById;
+        ModifiedAt = DateTime.UtcNow;
+    }
 
     /// <summary>
     /// متد مربوط به اعتبار سنجی کردن پراپرتی های موجودیت 
@@ -59,13 +86,51 @@ public interface IEntity
     /// </summary>
     public bool IsDeleted { get; }
 
+    #region Foreign Keys
+
+    /// <summary>
+    /// موجودیت ساخته شده توسط 
+    /// </summary>
+    public Guid? CreatedById { get; }
+
+    /// <summary>
+    /// موجودیت اپدیت شده توسط 
+    /// </summary>
+    public Guid? ModifiedById { get; }
+
+    /// <summary>
+    /// موجودیت حذف شده توسط 
+    /// </summary>
+    public Guid? DeletedById { get; }
+
+    #endregion
+
+    #region Navigation Properties
+
+    /// <summary>
+    /// جزئیات مربوط به سازنده موجودیت 
+    /// </summary>
+    public User? Creator { get; }
+
+    /// <summary>
+    /// جزئیات مربوط به اپدیت کننده موجودیت 
+    /// </summary>
+    public User? Modifier { get; }
+
+    /// <summary>
+    /// جزئیات مربوط به حذف کننده موجودیت 
+    /// </summary>
+    public User? Deleter { get; }
+
+    #endregion
+
     /// <summary>
     /// متد تغییر پراپرتی های مربوط به حذف نرم موجودیت
     /// </summary>
-    public void SoftDelete();
+    public void SoftDelete(Guid deletedById);
 
     /// <summary>
     /// متد تغییر پراپرتی مربوط به اپدیت موجودیت
     /// </summary>
-    public void Update();
+    public void Update(Guid modifiedById);
 }

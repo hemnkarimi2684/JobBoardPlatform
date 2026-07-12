@@ -10,4 +10,7 @@ public class CityRepository : GenericRepository<City>, ICityRepository
     public CityRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
     }
+
+    public async Task<bool> IsCityExistAsync(Guid cityId) => await AnyAsync(c => c.Id == cityId);
+    
 }
