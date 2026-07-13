@@ -46,9 +46,12 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
 
-    public UnitOfWork(ApplicationDbContext context)
+    public UnitOfWork(ApplicationDbContext context, UserManager<User> userManager, RoleManager<Role> roleManager, SignInManager<User> signInManager)
     {
         _context = context;
+        RoleManager = roleManager;
+        SignInManager = signInManager;
+        UserManager = userManager;
 
         AdvertisementRepository = new AdvertisementRepository(_context);
         AdvertisementSkillRepository = new AdvertisementSkillRepository(_context);

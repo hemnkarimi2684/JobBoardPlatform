@@ -4,6 +4,7 @@ using JobBoardPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobBoardPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260712163207_AddIsActivePropertyToAdvertisementTable")]
+    partial class AddIsActivePropertyToAdvertisementTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1093,6 +1096,48 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("ModifiedById");
 
                     b.ToTable("Statuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b930e70d-3f8f-44a3-a48a-d80f351b9e6b"),
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "The job request is waiting for initial processing.",
+                            IsDeleted = false,
+                            Title = "Pending"
+                        },
+                        new
+                        {
+                            Id = new Guid("0d835f3e-26e1-4390-9690-1ad13cd448f4"),
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "The job request is currently under review.",
+                            IsDeleted = false,
+                            Title = "Reviewing"
+                        },
+                        new
+                        {
+                            Id = new Guid("1ac04d7f-faaa-4a32-a5eb-2be9cf0e551f"),
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "The candidate has been invited to an interview.",
+                            IsDeleted = false,
+                            Title = "Interview"
+                        },
+                        new
+                        {
+                            Id = new Guid("f85ed918-8c7d-4418-bb58-aa8c9126b67c"),
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "The job request has been rejected.",
+                            IsDeleted = false,
+                            Title = "Rejected"
+                        },
+                        new
+                        {
+                            Id = new Guid("ea15f434-f775-4399-913b-9b723b3998f7"),
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "The job request has been accepted.",
+                            IsDeleted = false,
+                            Title = "Accepted"
+                        });
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", b =>

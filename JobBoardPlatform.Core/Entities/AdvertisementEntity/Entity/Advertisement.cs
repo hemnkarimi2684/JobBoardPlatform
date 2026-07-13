@@ -1,12 +1,16 @@
 ﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Entity;
 using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 using JobBoardPlatform.Core.Entities.PaymentEntity.Entity;
+using System.Xml.Linq;
 
 namespace JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 
@@ -30,6 +34,7 @@ public class Advertisement : BaseEntity
         CityId = cityId;
         CompanyId = companyId;
         CreatedById = createdById;
+        IsActive = true;
 
         Validate();
     }
@@ -68,6 +73,11 @@ public class Advertisement : BaseEntity
     /// نوع همکاری در کار
     /// </summary>
     public CollaborationType CollaborationType { get; private set; }
+
+    /// <summary>
+    /// وضعیت فعال یاغیر فعال بودن اگهی
+    /// </summary>
+    public bool IsActive { get; private set; }
 
     #region Foreign Keys
 
@@ -146,4 +156,43 @@ public class Advertisement : BaseEntity
             throw new DomainException(DomainErrors.ExperienceLevelOutOfRange);
     }
 
+    /// <summary>
+    /// اپدیت وضعیت فعال یا غیرذفعال بودن اگهی
+    /// </summary>
+    /// <param name="modifierId"></param>
+    /// <param name="isActive"></param>
+    public void UpdateActiveStatus(Guid? modifierId, bool isActive)
+    {
+        IsActive = isActive;
+
+        Update(modifierId);
+    }
+
+    public void UpdateAdvertisementInfo(UpdateAdvertisementInfo updateAdvertisement)
+    {
+        if (updateAdvertisement.Description is not null)
+            Description = updateAdvertisement.Description;
+
+        if (updateAdvertisement.MinimumAge is not null)
+            MinimumAge = updateAdvertisement.MinimumAge.Value;
+
+        if (updateAdvertisement.MaximumAge is not null)
+            MaximumAge = updateAdvertisement.MaximumAge.Value;
+
+        if (updateAdvertisement.MinimumSalary is not null)
+            MinimumSalary = updateAdvertisement.MinimumSalary.Value;
+
+        if (updateAdvertisement.MaximumSalary is not null)
+            MaximumSalary = updateAdvertisement.MaximumSalary.Value;
+
+        if (updateAdvertisement.ExperienceLevel is not null)
+            ExperienceLevel = updateAdvertisement.ExperienceLevel.Value;
+
+        if (updateAdvertisement.CollaborationType is not null)
+            CollaborationType = updateAdvertisement.CollaborationType.Value;
+
+        Update(updateAdvertisement.ModifiedById);
+
+        Validate();
+    }
 }

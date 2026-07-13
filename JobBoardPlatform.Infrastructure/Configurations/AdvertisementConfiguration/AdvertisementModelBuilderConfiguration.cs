@@ -23,6 +23,9 @@ public class AdvertisementModelBuilderConfiguration : BaseModelBuilderConfigurat
         builder.Property(a => a.MinimumSalary)
             .HasPrecision(10, 4);
 
+        builder.Property(a => a.IsActive)
+            .HasDefaultValue(true);
+
         builder.Property(a => a.CollaborationType)
            .IsRequired()
            .HasConversion<string>()

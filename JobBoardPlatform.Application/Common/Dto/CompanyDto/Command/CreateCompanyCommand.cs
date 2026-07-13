@@ -11,7 +11,6 @@ public record CreateCompanyCommand(
     string OwnershipType,
     Guid OwnedByUserId,
     string CompanySize,
-    Guid CreatedById,
     Guid CityId,
     string Location,
     string? ActivityType = null,

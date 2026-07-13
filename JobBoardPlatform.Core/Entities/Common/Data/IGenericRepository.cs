@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.Common.Entity;
+﻿using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.Core.Entities.Common.Entity;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Core.Entities.Common.Data;
@@ -12,7 +13,7 @@ public interface IGenericRepository<T> where T : BaseEntity
     /// <param name="selector"></param>
     /// <param name="tracking"></param>
     /// <returns></returns>
-    Task<List<TResult>> QueryAsync<TResult>(
+    Task<Pagination<TResult>> QueryAsync<TResult>(
         Expression<Func<T, TResult>> selector,
         int page = 1, int pageSize = 10,
         bool tracking = false);
@@ -27,7 +28,7 @@ public interface IGenericRepository<T> where T : BaseEntity
     /// <param name="pageSize"></param>
     /// <param name="tracking"></param>
     /// <returns></returns>
-    Task<List<TResult>> QueryAsync<TResult>(
+    Task<Pagination<TResult>> QueryAsync<TResult>(
         Expression<Func<T, TResult>> selector,
         Expression<Func<T, bool>> filter,
         int page = 1, int pageSize = 10,
@@ -45,7 +46,7 @@ public interface IGenericRepository<T> where T : BaseEntity
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<T?> GetByIdAsync(int id, bool tracking = false);
+    Task<T?> GetByIdAsync(Guid id, bool tracking = false);
 
     /// <summary>
     /// اضافه کردن موجودیت 
@@ -59,12 +60,12 @@ public interface IGenericRepository<T> where T : BaseEntity
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    bool Update(T entity, Guid modifiedById);
+    bool Update(T entity, Guid? modifiedById);
 
     /// <summary>
     /// حذف نرم موجودیت 
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<bool> SoftDeleteAsync(int id, Guid deletedById);
+    Task<bool> SoftDeleteAsync(Guid id, Guid? deletedById);
 }

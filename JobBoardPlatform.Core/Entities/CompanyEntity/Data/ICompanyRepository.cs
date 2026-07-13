@@ -37,4 +37,11 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <param name="companyInfoUpdate"></param>
     /// <returns></returns>
     Task<bool> UpdateCompanyInfoAsync(Guid companyId, CompanyInfoUpdate companyInfoUpdate);
+
+    /// <summary>
+    /// دریافتت شناسه کارفرمای شرکت توسط شناسه شرکت  
+    /// </summary>
+    /// <param name="companyId"></param>
+    /// <returns></returns>
+    Task<Guid?> GetCompanyOwnerIdByCompanyIdAsync(Guid companyId);
 }

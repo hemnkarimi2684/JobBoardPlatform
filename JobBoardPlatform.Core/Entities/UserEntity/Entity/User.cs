@@ -111,7 +111,7 @@ public class User : IdentityUser<Guid>, IEntity
             throw new DomainException(DomainErrors.PasswordHashIsRequired);
     }
 
-    public void SoftDelete(Guid deletedById)
+    public void SoftDelete(Guid? deletedById)
     {
         DeletedAt = DateTime.UtcNow;
         IsDeleted = true;
@@ -119,7 +119,7 @@ public class User : IdentityUser<Guid>, IEntity
         DeletedById = deletedById;
     }
 
-    public void Update(Guid modifiedById)
+    public void Update(Guid? modifiedById)
     {
         ModifiedById = modifiedById;
         ModifiedAt = DateTime.UtcNow;

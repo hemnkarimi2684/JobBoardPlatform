@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Extensions\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\JobBoardPlatform.Core\JobBoardPlatform.Core.csproj" />
   </ItemGroup>
 

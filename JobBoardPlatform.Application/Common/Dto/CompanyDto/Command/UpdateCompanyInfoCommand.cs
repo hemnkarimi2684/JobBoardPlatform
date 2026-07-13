@@ -12,5 +12,5 @@ public record UpdateCompanyInfoCommand(
     string? WebSiteAddress,
     string? OwnershipType,
     string? CompanySize,
-    string? ActivityType,
-    Guid ModifiedById);
+    string? ActivityType
+    );

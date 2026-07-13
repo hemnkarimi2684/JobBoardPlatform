@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Application.Common.Constants.Authentication;
+using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.CompanyDto.Command;
 using JobBoardPlatform.Application.Common.Dto.CompanyDto.Result;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
@@ -15,14 +16,17 @@ public class CompanyService : ICompanyService
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public CompanyService(IUnitOfWork unitOfWork)
+    private readonly ICurrentUser _currentUser;
+
+    public CompanyService(IUnitOfWork unitOfWork, ICurrentUser currentUser)
     {
         _unitOfWork = unitOfWork;
+        _currentUser = currentUser;
     }
 
     public async Task<bool> CreateCompanyAsync(CreateCompanyCommand createCommand)
     {
-        await CheckPermissionAsync(createCommand.CreatedById);
+        CheckPermissionOfCreate(_currentUser);
 
         var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId);
 
@@ -41,7 +45,6 @@ public class CompanyService : ICompanyService
 
         var parsedEnums = ParseEnums(createCommand.OwnershipType, createCommand.CompanySize);
 
-
         //The reason the item has a .Value property is that Enum.TryParse was used;
         //the output is a nullable enum, but I am certain the enums won't reach the service as null,
         //because the DTOs are validated in the controller,
@@ -50,12 +53,12 @@ public class CompanyService : ICompanyService
             createCommand.Name, createCommand.YearOfEstablishment, createCommand.Industry,
             createCommand.AboutUs, createCommand.WebSiteAddress, parsedEnums.Item1.Value,
             createCommand.OwnedByUserId, parsedEnums.Item2.Value, createCommand.ActivityType,
-            createCommand.CompanyImageFileId, createCommand.CreatedById
+            createCommand.CompanyImageFileId, _currentUser.UserId
             );
 
         await _unitOfWork.CompanyRepository.AddAsync(company);
 
-        var companyCity = new CompanyCity(createCommand.Location, company.Id, createCommand.CityId, createCommand.CreatedById);
+        var companyCity = new CompanyCity(createCommand.Location, company.Id, createCommand.CityId, _currentUser.UserId);
 
         await _unitOfWork.CompanyCityRepository.AddAsync(companyCity);
 
@@ -84,7 +87,12 @@ public class CompanyService : ICompanyService
 
     public async Task<bool> UpdateCompanyIdAsync(Guid companyId, UpdateCompanyInfoCommand updateCommand)
     {
-        await CheckPermissionAsync(updateCommand.ModifiedById);
+        var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId);
+
+        if (companyOwnerId == null)
+            throw new NotFoundException($"The company with id {companyId} was not found.");
+
+        CheckPermissionPerRequest(companyOwnerId, _currentUser);
 
         var updateCompanyInfoResult = await _unitOfWork.CompanyRepository.UpdateCompanyInfoAsync(companyId, MapToCompanyInfoUpdate(updateCommand));
 
@@ -132,20 +140,35 @@ public class CompanyService : ICompanyService
             parsedEnums.Item1,
             parsedEnums.Item2,
             updateCompanyInfoCommand.ActivityType,
-            updateCompanyInfoCommand.ModifiedById
+            _currentUser.UserId
         );
     }
 
-    private async Task CheckPermissionAsync(Guid requesterId)
+    private void CheckPermissionPerRequest(Guid? ownerId, ICurrentUser currentUser)
     {
-        var requester = await _unitOfWork.UserManager.FindByIdAsync(requesterId.ToString());
+        if (currentUser.UserId == null)
+            throw new ForbiddenException("User is not available.");
 
-        if (requester == null)
-            throw new NotFoundException("the modifier id not found");
+        var isOwner = ownerId == currentUser.UserId;
 
-        var requesterRoles = await _unitOfWork.UserManager.GetRolesAsync(requester);
+        var isAdmin = currentUser.UserRoles.Any(role => role == RoleConstants.AdminRoleName);
 
-        if (!requesterRoles.Any(role => role == RoleConstants.EmployerRoleName || role == RoleConstants.AdminRoleName))
-            throw new ForbiddenException("You do not have sufficient access to perform this activity.");
+        var isEmployer = currentUser.UserRoles.Any(role => role == RoleConstants.EmployerRoleName);
+
+        //این شرط برای اینه که اگر ادمینه دسترسی داره اگر ادمین نیس حالا باید چک شه که کارفرماس یا نه
+        //حالا اگر کارفرما بود ایا اونره این اگهیه یا نه                                                                  
+        if (!isAdmin && !(isOwner && isEmployer))
+            throw new ForbiddenException("You do not have sufficient access to update this advertisement.");
+    }
+
+    private void CheckPermissionOfCreate(ICurrentUser currentUser)
+    {
+        if (currentUser.UserId == null)
+            throw new ForbiddenException("User is not available.");
+
+        var isAdminOrEmployer = currentUser.UserRoles.Any(role => role == RoleConstants.EmployerRoleName || role == RoleConstants.AdminRoleName);
+
+        if (!isAdminOrEmployer)
+            throw new ForbiddenException("You do not have sufficient access to create a advertisement.");
     }
 }

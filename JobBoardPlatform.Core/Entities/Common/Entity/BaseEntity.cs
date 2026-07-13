@@ -44,7 +44,7 @@ public abstract class BaseEntity : IEntity
 
     #endregion
 
-    public void SoftDelete(Guid deletedById)
+    public void SoftDelete(Guid? deletedById)
     {
         DeletedAt = DateTime.UtcNow;
         IsDeleted = true;
@@ -52,7 +52,7 @@ public abstract class BaseEntity : IEntity
         DeletedById = deletedById;
     }
 
-    public void Update(Guid modifiedById)
+    public void Update(Guid? modifiedById)
     {
         ModifiedById = modifiedById;
         ModifiedAt = DateTime.UtcNow;
@@ -127,10 +127,10 @@ public interface IEntity
     /// <summary>
     /// متد تغییر پراپرتی های مربوط به حذف نرم موجودیت
     /// </summary>
-    public void SoftDelete(Guid deletedById);
+    public void SoftDelete(Guid? deletedById);
 
     /// <summary>
     /// متد تغییر پراپرتی مربوط به اپدیت موجودیت
     /// </summary>
-    public void Update(Guid modifiedById);
+    public void Update(Guid? modifiedById);
 }

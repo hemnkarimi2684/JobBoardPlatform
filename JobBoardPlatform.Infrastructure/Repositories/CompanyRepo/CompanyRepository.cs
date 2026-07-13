@@ -23,6 +23,15 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
                          .FirstOrDefaultAsync();
     }
 
+    public async Task<Guid?> GetCompanyOwnerIdByCompanyIdAsync(Guid companyId)
+    {
+        return await Entities
+                         .AsNoTracking()
+                         .Where(c => c.Id == companyId)
+                         .Select(c => c.Id)
+                         .FirstOrDefaultAsync();
+    }
+
     public async Task<bool> IsCompanyExistByNameAsync(string name) => await AnyAsync(c => c.Name == name);
 
     public async Task<bool> IsCompanyExistForOwnerId(Guid ownerId) => await AnyAsync(c => c.OwnedByUserId == ownerId);

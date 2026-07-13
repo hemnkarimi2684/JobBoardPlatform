@@ -11,5 +11,5 @@ public record CompanyInfoUpdate(
     OwnershipType? OwnershipType,
     CompanySizeEnum? CompanySize,
     string? ActivityType,
-    Guid ModifiedById);
+    Guid? ModifiedById);
 
