@@ -9,6 +9,11 @@ public class JobApplicationModelBuilderConfiguration : BaseModelBuilderConfigura
 {
     protected override void ApplyEntityConfiguration(EntityTypeBuilder<JobApplication> builder)
     {
+        builder.Property(a => a.Status)
+           .IsRequired()
+           .HasConversion<string>()
+           .HasMaxLength(25);
+
         builder.HasOne(ja => ja.Advertisement)
             .WithMany(a => a.JobApplications)
             .HasForeignKey(ja => ja.AdvertisementId)

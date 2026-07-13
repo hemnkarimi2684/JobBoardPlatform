@@ -31,6 +31,8 @@ public class AdvertisementModelBuilderConfiguration : BaseModelBuilderConfigurat
            .HasConversion<string>()
            .HasMaxLength(25);
 
+        builder.HasQueryFilter(a => a.IsActive);
+
         builder.HasMany(a => a.AdvertisementSkills)
             .WithOne(x => x.Advertisement)
             .HasForeignKey(x => x.AdvertisementId)

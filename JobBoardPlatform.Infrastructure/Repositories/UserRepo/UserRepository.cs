@@ -13,4 +13,8 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public async Task<bool> IsUserExistAsync(Guid userId)
+                            => await _context.Users.AnyAsync(u => u.Id == userId);
+
 }
+

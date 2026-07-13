@@ -13,7 +13,6 @@ using JobBoardPlatform.Core.Entities.ProvinceEntity.Data;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Data;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.SkillEntity.Data;
-using JobBoardPlatform.Core.Entities.StatusEntity.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Data;
@@ -38,7 +37,6 @@ public interface IUnitOfWork : IDisposable
     IProvinceRepository ProvinceRepository { get; }
     IResumeRepository ResumeRepository { get; }
     ISkillRepository SkillRepository { get; }
-    IStatusRepository StatusRepository { get; }
     IUserRepository UserRepository { get; }
     IUserProfileRepository UserProfileRepository { get; }
     IUserSkillRepository UserSkillRepository { get; }

@@ -21,7 +21,6 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// اپدیت اطلاعات اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
-    /// <param name="modifiedById"></param>
     /// <param name="updateAdvertisementInfo"></param>
     /// <returns></returns>
     Task<bool> UpdateAdvertisementInfoAsync(Guid advertisementId, UpdateAdvertisementInfo updateAdvertisementInfo);
@@ -29,8 +28,6 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <summary>
     /// دریافت اطلاعات یک اگهی
     /// </summary>
-    /// <typeparam name="TResult"></typeparam>
-    /// <param name="projection"></param>
     /// <param name="advertisementId"></param>
     /// <returns></returns>
     Task<AdvertisementDetail?> GetAdvertisementInfoByIdAsync(Guid advertisementId);
@@ -56,4 +53,13 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
                                               Guid CompanyId,
                                               int pageNumber = 1,
                                               int pageSize = 10);
+
+    /// <summary>
+    /// ایا این اگهی با عنوان کاری تکراری برای همون شرکت و همون شهر ثبت شده یا نه
+    /// </summary>
+    /// <param name="jobId"></param>
+    /// <param name="companyId"></param>
+    /// <param name="cityId"></param>
+    /// <returns></returns>
+    Task<bool> IsDuplicateAdvertisementAsync(Guid jobId, Guid companyId, Guid cityId);
 }

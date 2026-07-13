@@ -9,7 +9,7 @@ public class Role : IdentityRole<Guid>, IEntity
 {
     private Role() { }
 
-    public Role(string name,string? description = null, Guid? createdById = null)
+    public Role(string name, string? description = null, Guid? createdById = null)
     {
         Name = name;
         Description = description;
@@ -51,7 +51,7 @@ public class Role : IdentityRole<Guid>, IEntity
     private void Validate()
     {
         if (string.IsNullOrWhiteSpace(Name))
-            throw new DomainException(DomainErrors.RoleNameInvalidLength);
+            throw new DomainException(DomainErrors.RoleNameIsRequired);
 
         if (Name.Length < 2 || Name.Length > 100)
             throw new DomainException(DomainErrors.RoleNameInvalidLength);
@@ -59,7 +59,7 @@ public class Role : IdentityRole<Guid>, IEntity
         if (Description is not null)
         {
             if (Description.Length < 2 || Description.Length > 100)
-                throw new DomainException(DomainErrors.StatusDescriptionInvalidLength);
+                throw new DomainException(DomainErrors.RoleDescriptionInvalidLength);
         }
     }
 

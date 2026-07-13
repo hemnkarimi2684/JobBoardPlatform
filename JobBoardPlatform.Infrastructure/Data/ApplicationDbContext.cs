@@ -12,7 +12,6 @@ using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.SkillEntity.Entity;
-using JobBoardPlatform.Core.Entities.StatusEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserSkillEntity.Entity;
@@ -45,7 +44,6 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Skill> Skills => Set<Skill>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<UserSkill> UserSkills => Set<UserSkill>();
-    public DbSet<Status> Statuses => Set<Status>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

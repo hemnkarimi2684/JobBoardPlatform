@@ -44,4 +44,11 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <param name="companyId"></param>
     /// <returns></returns>
     Task<Guid?> GetCompanyOwnerIdByCompanyIdAsync(Guid companyId);
+    
+    /// <summary>
+    /// ایا شرکت با این شناسه وجود دارد یا نه
+    /// </summary>
+    /// <param name="companyId"></param>
+    /// <returns></returns>
+    Task<bool> IsCompanyExistAsync(Guid companyId);
 }

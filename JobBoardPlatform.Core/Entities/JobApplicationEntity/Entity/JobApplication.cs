@@ -1,7 +1,7 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
-using JobBoardPlatform.Core.Entities.StatusEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
@@ -10,21 +10,18 @@ public class JobApplication : BaseEntity
 {
     private JobApplication() { }
     
-    public JobApplication(Guid statusId, Guid resumeId, Guid advertisementId, Guid userId, Guid? createdById = null)
+    public JobApplication(JobApplicationStatus status, Guid resumeId, Guid advertisementId, Guid userId, Guid? createdById = null)
     {
-        StatusId = statusId;
+        Status = status;
         ResumeId = resumeId;
         AdvertisementId = advertisementId;
         UserId = userId;
         CreatedById = createdById;
     }
 
-    #region Foreign Keys
+    public JobApplicationStatus Status { get; set; }
 
-    /// <summary>
-    /// شناسه مربوط به وضعیت درخواست کار
-    /// </summary>
-    public Guid StatusId { get; private set; }
+    #region Foreign Keys
 
     /// <summary>
     /// شناسه مربوط به رزومه 
@@ -44,11 +41,6 @@ public class JobApplication : BaseEntity
     #endregion
 
     #region Navigation Properties
-
-    /// <summary>
-    /// جزئیات مربوط به وضعیت درخواست کار
-    /// </summary>
-    public virtual Status Status { get; private set; }
 
     /// <summary>
     /// جزئیات مربوط به رزومه

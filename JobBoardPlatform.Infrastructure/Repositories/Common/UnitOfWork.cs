@@ -14,7 +14,6 @@ using JobBoardPlatform.Core.Entities.ProvinceEntity.Data;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Data;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.SkillEntity.Data;
-using JobBoardPlatform.Core.Entities.StatusEntity.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Data;
@@ -34,7 +33,6 @@ using JobBoardPlatform.Infrastructure.Repositories.PaymentRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ProvinceRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ResumeRepo;
 using JobBoardPlatform.Infrastructure.Repositories.SkillRepo;
-using JobBoardPlatform.Infrastructure.Repositories.StatusRepo;
 using JobBoardPlatform.Infrastructure.Repositories.UserProfileRepo;
 using JobBoardPlatform.Infrastructure.Repositories.UserRepo;
 using JobBoardPlatform.Infrastructure.Repositories.UserSkillRepo;
@@ -67,7 +65,6 @@ public class UnitOfWork : IUnitOfWork
         ProvinceRepository = new ProvinceRepository(_context);
         ResumeRepository = new ResumeRepository(_context);
         SkillRepository = new SkillRepository(_context);
-        StatusRepository = new StatusRepository(_context);
         UserRepository = new UserRepository(_context);
         UserProfileRepository = new UserProfileRepository(_context);
         UserSkillRepository = new UserSkillRepository(_context);
@@ -100,8 +97,6 @@ public class UnitOfWork : IUnitOfWork
     public IResumeRepository ResumeRepository { get; }
 
     public ISkillRepository SkillRepository { get; }
-
-    public IStatusRepository StatusRepository { get; }
 
     public IUserRepository UserRepository { get; }
 

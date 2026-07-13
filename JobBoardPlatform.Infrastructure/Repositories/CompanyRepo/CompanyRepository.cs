@@ -32,6 +32,8 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
                          .FirstOrDefaultAsync();
     }
 
+    public async Task<bool> IsCompanyExistAsync(Guid companyId) => await AnyAsync(c => c.Id == companyId);
+
     public async Task<bool> IsCompanyExistByNameAsync(string name) => await AnyAsync(c => c.Name == name);
 
     public async Task<bool> IsCompanyExistForOwnerId(Guid ownerId) => await AnyAsync(c => c.OwnedByUserId == ownerId);

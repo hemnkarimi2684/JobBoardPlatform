@@ -15,6 +15,7 @@ string CompanyName,
 string JobName,
 string AboutCompany,
 string Industry,
-DateTime CreatedAt
+DateTime CreatedAt,
+List<string> SkillNames
     );
 

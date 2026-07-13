@@ -1,5 +1,4 @@
 ﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 

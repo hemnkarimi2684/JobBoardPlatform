@@ -26,7 +26,7 @@ public class CompanyService : ICompanyService
 
     public async Task<bool> CreateCompanyAsync(CreateCompanyCommand createCommand)
     {
-        CheckPermissionOfCreate(_currentUser);
+        CheckCreatePermission(_currentUser);
 
         var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId);
 
@@ -92,7 +92,7 @@ public class CompanyService : ICompanyService
         if (companyOwnerId == null)
             throw new NotFoundException($"The company with id {companyId} was not found.");
 
-        CheckPermissionPerRequest(companyOwnerId, _currentUser);
+        CheckOwnerOrAdminPermission(companyOwnerId, _currentUser);
 
         var updateCompanyInfoResult = await _unitOfWork.CompanyRepository.UpdateCompanyInfoAsync(companyId, MapToCompanyInfoUpdate(updateCommand));
 
@@ -144,7 +144,7 @@ public class CompanyService : ICompanyService
         );
     }
 
-    private void CheckPermissionPerRequest(Guid? ownerId, ICurrentUser currentUser)
+    private void CheckOwnerOrAdminPermission(Guid? ownerId, ICurrentUser currentUser)
     {
         if (currentUser.UserId == null)
             throw new ForbiddenException("User is not available.");
@@ -158,10 +158,10 @@ public class CompanyService : ICompanyService
         //این شرط برای اینه که اگر ادمینه دسترسی داره اگر ادمین نیس حالا باید چک شه که کارفرماس یا نه
         //حالا اگر کارفرما بود ایا اونره این اگهیه یا نه                                                                  
         if (!isAdmin && !(isOwner && isEmployer))
-            throw new ForbiddenException("You do not have sufficient access to update this advertisement.");
+            throw new ForbiddenException("You do not have sufficient access to manage this company.");
     }
 
-    private void CheckPermissionOfCreate(ICurrentUser currentUser)
+    private void CheckCreatePermission(ICurrentUser currentUser)
     {
         if (currentUser.UserId == null)
             throw new ForbiddenException("User is not available.");
@@ -169,6 +169,6 @@ public class CompanyService : ICompanyService
         var isAdminOrEmployer = currentUser.UserRoles.Any(role => role == RoleConstants.EmployerRoleName || role == RoleConstants.AdminRoleName);
 
         if (!isAdminOrEmployer)
-            throw new ForbiddenException("You do not have sufficient access to create a advertisement.");
+            throw new ForbiddenException("You do not have sufficient access to manage a company.");
     }
 }

@@ -10,4 +10,7 @@ public class JobRepository : GenericRepository<Job>, IJobRepository
     public JobRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
     }
+
+    public async Task<bool> IsJobExistAsync(Guid jobId) => await AnyAsync(j => j.Id == jobId);
+    
 }

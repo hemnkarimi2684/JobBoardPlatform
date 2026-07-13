@@ -1,12 +1,9 @@
-﻿using Azure;
-using JobBoardPlatform.Core.Entities.AdvertisementEntity.Data;
+﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Data;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
-using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Infrastructure.Repositories.AdvertisementRepo;
@@ -35,7 +32,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                              a.Job.Name,
                              a.Company.AboutUs,
                              a.Company.Industry,
-                             a.CreatedAt
+                             a.CreatedAt,
+                             a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
                              ))
                         .FirstOrDefaultAsync();
     }
@@ -65,6 +63,13 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                              .ToListAsync();
 
         return (result, totalDataCount);
+    }
+
+    public async Task<bool> IsDuplicateAdvertisementAsync(Guid jobId, Guid companyId, Guid cityId)
+    {
+        return await AnyAsync(a => a.JobId == jobId &&
+                                   a.CompanyId == companyId &&
+                                   a.CityId == cityId);
     }
 
     public async Task<bool> UpdateAdvertisementInfoAsync(Guid advertisementId, UpdateAdvertisementInfo updateAdvertisementInfo)

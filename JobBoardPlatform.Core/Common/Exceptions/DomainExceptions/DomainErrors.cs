@@ -108,13 +108,6 @@ public static class DomainErrors
     public static Error ExperienceLevelOutOfRange => new Error("Experience level must be Positive", "Advertisement_ExperienceLevel_Out_Of_Range");
     #endregion
 
-    #region Status Errors
-    public static Error StatusTitleIsRequired => new Error("Status title is required.", "Status_Title_Is_Required");
-    public static Error StatusTitleInvalidLength => new Error("Status title must be between 2 and 100 characters.", "Status_Title_Invalid_Length");
-    public static Error StatusDescriptionIsRequired => new Error("Status description is required.", "Status_Description_Is_Required");
-    public static Error StatusDescriptionInvalidLength => new Error("Status description must be between 2 and 150 characters.", "Status_Description_Invalid_Length");
-    #endregion
-
     #region Role Errors
     public static Error RoleNameIsRequired => new Error("Name is required.", "Role_Name_Is_Required");
     public static Error RoleNameInvalidLength => new Error("Name must be between 12 and 100 characters long.", "Role_Name_Invalid_Length");

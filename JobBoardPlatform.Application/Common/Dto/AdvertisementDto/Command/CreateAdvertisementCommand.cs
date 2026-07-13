@@ -12,4 +12,5 @@ public record CreateAdvertisementCommand(
     string CollaborationType, 
     Guid JobId, 
     Guid CityId, 
-    Guid CompanyId);
+    Guid CompanyId,
+    List<Guid> SkillsId);

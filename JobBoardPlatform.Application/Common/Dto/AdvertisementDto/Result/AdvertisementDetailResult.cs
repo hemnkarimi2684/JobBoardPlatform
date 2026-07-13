@@ -31,6 +31,8 @@ public class AdvertisementDetailResult
 
     public string Industry { get; set; } = string.Empty;
 
+    public List<string> SkillNames { get; set; } = new();
+
     public static AdvertisementDetailResult MapToResult(AdvertisementDetail advertisementDetail)
     {
         return new AdvertisementDetailResult
@@ -47,7 +49,8 @@ public class AdvertisementDetailResult
             CompanyName = advertisementDetail.CompanyName,
             ExperienceLevel = advertisementDetail.ExperienceLevel,
             Industry = advertisementDetail.Industry,
-            JobName = advertisementDetail.JobName
+            JobName = advertisementDetail.JobName,
+            SkillNames = advertisementDetail.SkillNames,
         };
     }
 }

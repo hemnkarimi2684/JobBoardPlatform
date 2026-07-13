@@ -25,7 +25,6 @@ public interface IAdvertisementService
     /// حذف نرم اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
-    /// <param name="deletedById"></param>
     /// <returns></returns>
     Task<bool> SoftDeleteAdvertisementAsync(Guid advertisementId);
 
@@ -47,7 +46,6 @@ public interface IAdvertisementService
     /// فعال کردن اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
-    /// <param name="modifiedById"></param>
     /// <returns></returns>
     Task<bool> InActivateAdvertisementAsync(Guid advertisementId);
 
@@ -55,7 +53,6 @@ public interface IAdvertisementService
     /// غیر فعال کردن اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
-    /// <param name="modifiedById"></param>
     /// <returns></returns>
     Task<bool> ActivateAdvertisementAsync(Guid advertisementId);
 }
