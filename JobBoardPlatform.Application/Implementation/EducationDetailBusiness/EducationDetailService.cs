@@ -35,7 +35,7 @@ public class EducationDetailService : IEducationDetailService
         if (!isUserExist)
             throw new NotFoundException($"user with id {createCommand.UserId} was not found");
 
-        var certificateDegreeName = ParseEnums(createCommand.CertificateDegreeName);
+        var certificateDegreeName = ParseCertificateDegreeForCreate(createCommand.CertificateDegreeName);
 
         var educationDetail = new EducationDetail(
                                            certificateDegreeName,
@@ -102,7 +102,7 @@ public class EducationDetailService : IEducationDetailService
 
     #region Private Methods
 
-    private CertificateDegree ParseEnums(string? certificateDegree)
+    private CertificateDegree ParseCertificateDegreeForCreate(string certificateDegree)
     {
         if (string.IsNullOrWhiteSpace(certificateDegree))
             throw new ValidationException("certificateDegree is required.");
@@ -113,13 +113,24 @@ public class EducationDetailService : IEducationDetailService
         return result;
     }
 
+    private CertificateDegree? ParseCertificateDegreeForUpdate(string? certificateDegree)
+    {
+        if (string.IsNullOrWhiteSpace(certificateDegree))
+            return null;
+
+        if (!Enum.TryParse<CertificateDegree>(certificateDegree, true, out var result))
+            throw new ValidationException("Invalid certificateDegree type.");
+
+        return result;
+    }
+
     private UpdateEducationDetail MapToUpdateEducationDetail(UpdateEducationDetailCommand updateCommand)
     {
-        var parsedEnum = ParseEnums(updateCommand.CertificateDegreeName);
+        var certificateDegreeName = ParseCertificateDegreeForUpdate(updateCommand.CertificateDegreeName);
 
         return new UpdateEducationDetail
         (
-           parsedEnum,
+           certificateDegreeName,
            updateCommand.Major,
            updateCommand.University,
            updateCommand.StartDate,

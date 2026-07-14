@@ -35,7 +35,7 @@ public class ExperienceDetailService : IExperienceDetailService
 
         CheckSelfOrAdminPermission(createCommand.UserId, _currentUser);
 
-        var seniorityLevel = ParseSeniorityLevel(createCommand.SeniorityLevel);
+        var seniorityLevel = ParseSeniorityLevelForCreate(createCommand.SeniorityLevel);
 
         var experienceDetail = new ExperienceDetail(
                                                     createCommand.LastJobTitle,
@@ -102,7 +102,7 @@ public class ExperienceDetailService : IExperienceDetailService
 
     #region Private Methods
 
-    private SeniorityLevel ParseSeniorityLevel(string? seniorityLevel)
+    private SeniorityLevel ParseSeniorityLevelForCreate(string seniorityLevel)
     {
         if (string.IsNullOrWhiteSpace(seniorityLevel))
             throw new ValidationException("seniorityLevel is required.");
@@ -113,14 +113,25 @@ public class ExperienceDetailService : IExperienceDetailService
         return result;
     }
 
+    private SeniorityLevel? ParseSeniorityLevelForUpdate(string? seniorityLevel)
+    {
+        if (string.IsNullOrWhiteSpace(seniorityLevel))
+            return null;
+
+        if (!Enum.TryParse<SeniorityLevel>(seniorityLevel, true, out var result))
+            throw new ValidationException("Invalid seniorityLevel type.");
+
+        return result;
+    }
+
     private UpdateExperienceDetail MapToUpdateExperienceDetail(UpdateExperienceDetailCommand updateCommand)
     {
-        var parsedEnum = ParseSeniorityLevel(updateCommand.SeniorityLevel);
+        var seniorityLevel = ParseSeniorityLevelForUpdate(updateCommand.SeniorityLevel);
 
         return new UpdateExperienceDetail
         (
            updateCommand.LastJobTitle,
-           parsedEnum,
+           seniorityLevel,
            updateCommand.JobCategory,
            updateCommand.City,
            updateCommand.StartDate,

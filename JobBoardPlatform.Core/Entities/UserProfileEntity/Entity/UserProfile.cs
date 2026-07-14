@@ -2,7 +2,9 @@
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Entity;
 using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 
 namespace JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
@@ -126,5 +128,33 @@ public class UserProfile : BaseEntity
 
         if (BirthDate > DateTime.UtcNow.Date.AddYears(-18))
             throw new DomainException(DomainErrors.UserMustBeAtLeast18YearsOld);
+    }
+
+    public void UpdateUserInfo(UpdateUserProfile updateUserProfile)
+    {
+        if (updateUserProfile.FirstName is not null)
+            FirstName = updateUserProfile.FirstName;
+
+        if (updateUserProfile.LastName is not null)
+            LastName = updateUserProfile.LastName;
+
+        if (updateUserProfile.Bio is not null)
+            Bio = updateUserProfile.Bio;
+
+        if (updateUserProfile.Address is not null)
+            Address = updateUserProfile.Address;
+
+        if (updateUserProfile.BirthDate is not null)
+            BirthDate = updateUserProfile.BirthDate.Value;
+
+        if (updateUserProfile.Gender is not null)
+            Gender = updateUserProfile.Gender.Value;
+
+        if (updateUserProfile.CityId is not null)
+            CityId = updateUserProfile.CityId.Value;
+
+        Update(updateUserProfile.ModifiedById);
+
+        Validate();
     }
 }

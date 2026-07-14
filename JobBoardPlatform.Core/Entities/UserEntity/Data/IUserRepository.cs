@@ -1,4 +1,8 @@
 ﻿
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
+using System.Linq.Expressions;
+
 namespace JobBoardPlatform.Core.Entities.UserEntity.Data;
 
 public interface IUserRepository

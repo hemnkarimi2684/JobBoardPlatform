@@ -31,7 +31,7 @@ public class AdvertisementService : IAdvertisementService
     {
         await ValidateForCreateAsync(createCommand.JobId, createCommand.CompanyId, createCommand.CityId);
 
-        var collaborationType = ParseEnums(createCommand.CollaborationType);
+        var collaborationType = ParseCollaborationTypeCreate(createCommand.CollaborationType);
 
         var advertisement = new Advertisement(createCommand.Description,
                                               createCommand.MinimumAge,
@@ -209,7 +209,7 @@ public class AdvertisementService : IAdvertisementService
             throw new ForbiddenException("You do not have sufficient access to manage a advertisement.");
     }
 
-    private CollaborationType ParseEnums(string? collaborationType)
+    private CollaborationType ParseCollaborationTypeCreate(string collaborationType)
     {
         if (string.IsNullOrWhiteSpace(collaborationType))
             throw new ValidationException("CollaborationType is required.");
@@ -220,9 +220,20 @@ public class AdvertisementService : IAdvertisementService
         return result;
     }
 
+    private CollaborationType? ParseCollaborationTypeUpdate(string? collaborationType)
+    {
+        if (string.IsNullOrWhiteSpace(collaborationType))
+            return null;
+
+        if (!Enum.TryParse<CollaborationType>(collaborationType, true, out var result))
+            throw new ValidationException("Invalid CollaborationType type.");
+
+        return result;
+    }
+
     private UpdateAdvertisementInfo MapToAdvertisementInfoUpdate(UpdateAdvertisementCommand updateAdvertisementCommand)
     {
-        var parsedEnum = ParseEnums(updateAdvertisementCommand.CollaborationType);
+        var collaborationType = ParseCollaborationTypeUpdate(updateAdvertisementCommand.CollaborationType);
 
         return new UpdateAdvertisementInfo
         (
@@ -232,7 +243,7 @@ public class AdvertisementService : IAdvertisementService
             updateAdvertisementCommand.MinimumSalary,
             updateAdvertisementCommand.MaximumSalary,
             updateAdvertisementCommand.ExperienceLevel,
-            parsedEnum,
+            collaborationType,
             _currentUser.UserId
         );
     }
