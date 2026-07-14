@@ -3,7 +3,7 @@
 namespace JobBoardPlatform.Application.Common.Dto.EducationDetailDto.Command;
 
 public record CreateEducationDetailCommand(
-    CertificateDegree CertificateDegreeName, 
+    string CertificateDegreeName, 
     string Major, 
     string University,
     DateTime StartDate,

@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
 using System.Linq.Expressions;
 
@@ -20,4 +21,19 @@ public interface IEducationDetailRepository : IGenericRepository<EducationDetail
                                             Guid userId,
                                             int pageNumber = 1,
                                             int pageSize = 10);
+
+    /// <summary>
+    /// ویرایش اطلاعات مدرک تحصیلی موجود
+    /// </summary>
+    /// <param name="educationDetailId"></param>
+    /// <param name="updateEducation"></param>
+    /// <returns></returns>
+    Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetail updateEducation);
+
+    /// <summary>
+    /// دریافت شناسه کاربری که این مدرک تحصیلی رو داره توسط شناسه مدرک
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<Guid?> GetEducationDetailUserIdAsync(Guid educationDetailId);
 }

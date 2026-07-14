@@ -184,7 +184,7 @@ public class AdvertisementService : IAdvertisementService
     private void CheckOwnerOrAdminPermission(Guid? ownerId, ICurrentUser currentUser)
     {
         if (currentUser.UserId == null)
-            throw new ForbiddenException("User is not available.");
+            throw new UnauthorizedException("User is not authenticated.");
 
         var isOwner = ownerId == currentUser.UserId;
 
@@ -201,7 +201,7 @@ public class AdvertisementService : IAdvertisementService
     private void CheckCreatePermission(ICurrentUser currentUser)
     {
         if (currentUser.UserId == null)
-            throw new ForbiddenException("User is not available.");
+            throw new UnauthorizedException("User is not authenticated.");
 
         var isAdminOrEmployer = currentUser.UserRoles.Any(role => role == RoleConstants.EmployerRoleName || role == RoleConstants.AdminRoleName);
 

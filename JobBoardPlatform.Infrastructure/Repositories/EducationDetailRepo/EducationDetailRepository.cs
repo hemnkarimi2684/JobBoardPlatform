@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Core.Entities.EducationDetailEntity.Data;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
@@ -11,6 +12,15 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
 {
     public EducationDetailRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
+    }
+
+    public async Task<Guid?> GetEducationDetailUserIdAsync(Guid educationDetailId)
+    {
+        return await Entities
+                           .AsNoTracking()
+                           .Where(ed => ed.Id == educationDetailId)
+                           .Select(ed => ed.UserId)
+                           .FirstOrDefaultAsync();
     }
 
     public async Task<(List<TResult>, int)> GetUserEducationDetailsAsync<TResult>(
@@ -33,5 +43,17 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
                              .ToListAsync();
 
         return (result, totalDataCount);
+    }
+
+    public async Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetail updateEducation)
+    {
+        var educationDetail = await Entities.FindAsync(educationDetailId);
+
+        if (educationDetail is null)
+            return false;
+
+        educationDetail.UpdateEducationDetailInfo(updateEducation);
+
+        return true;
     }
 }

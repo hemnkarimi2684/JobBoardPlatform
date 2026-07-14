@@ -1,5 +1,8 @@
 ﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Entity;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
@@ -11,7 +14,7 @@ namespace JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
 public class EducationDetail : BaseEntity
 {
     private EducationDetail() { }
-    
+
     public EducationDetail(CertificateDegree certificateDegreeName, string major, string university, DateTime startDate, DateTime? completionDate, int? percentage, bool isCurrentlyStudying, Guid userId, Guid? createdById = null)
     {
         HandleCurrentlyStudyingStatus(isCurrentlyStudying);
@@ -96,16 +99,16 @@ public class EducationDetail : BaseEntity
         if (University.Length < 2 || University.Length > 100)
             throw new DomainException(DomainErrors.EducationDetailUniversityInvalidLength);
 
-        if(StartDate > DateTime.UtcNow.AddYears(1))
+        if (StartDate > DateTime.UtcNow.AddYears(1))
             throw new DomainException(DomainErrors.EducationDetailUniversityStartDateTooFarInFuture);
 
-        if(CompletionDate is not null)
+        if (CompletionDate is not null)
         {
             if (CompletionDate <= StartDate.AddYears(1))
                 throw new DomainException(DomainErrors.EducationDetailUniversityDurationTooShort);
         }
 
-        if(Percentage is not null)
+        if (Percentage is not null)
         {
             if (Percentage < 12)
                 throw new DomainException(DomainErrors.EducationDetailFinalGradeTooLow);
@@ -123,6 +126,31 @@ public class EducationDetail : BaseEntity
             return;
 
         CompletionDate = null;
-        Percentage = null; 
+        Percentage = null;
+    }
+
+    public void UpdateEducationDetailInfo(UpdateEducationDetail updateEducation)
+    {
+        if (updateEducation.CertificateDegreeName is not null)
+            CertificateDegreeName = updateEducation.CertificateDegreeName.Value;
+
+        if (updateEducation.Major is not null)
+            Major = updateEducation.Major;
+
+        if (updateEducation.CertificateDegreeName is not null)
+            CertificateDegreeName = updateEducation.CertificateDegreeName.Value;
+
+        if (updateEducation.StartDate is not null)
+            StartDate = updateEducation.StartDate.Value;
+
+        if (updateEducation.CompletionDate is not null)
+            CompletionDate = updateEducation.CompletionDate;
+
+        if (updateEducation.Percentage is not null)
+            Percentage = updateEducation.Percentage;
+
+        Update(updateEducation.ModifiedById);
+
+        Validate();
     }
 }

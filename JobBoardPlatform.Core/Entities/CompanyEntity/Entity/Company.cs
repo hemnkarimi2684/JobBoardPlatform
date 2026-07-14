@@ -167,7 +167,8 @@ public class Company : BaseEntity
         if (companyInfoUpdate.CompanySize is not null)
             CompanySize = companyInfoUpdate.CompanySize.Value;
 
-        ActivityType = companyInfoUpdate.ActivityType;
+        if (companyInfoUpdate.ActivityType is not null)
+            ActivityType = companyInfoUpdate.ActivityType;
 
         Update(companyInfoUpdate.ModifiedById);
 
