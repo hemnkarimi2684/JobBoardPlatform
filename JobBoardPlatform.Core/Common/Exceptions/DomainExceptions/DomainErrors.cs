@@ -122,4 +122,11 @@ public static class DomainErrors
     #region Payment Errors
     public static Error PayemntAmountOutOfRange => new Error("payment amount must be Positive", "Payemnt_Amount_Out_Of_Range");
     #endregion
+
+    #region Notifier Errors
+    public static Error CodeIsRequired => new Error("phone number is required.", "Notifier_Code_Is_Required");
+    public static Error PhoneNumberOrEmailIsRequired => new Error("phone number or email must have value", "Notifier_PhoneNumberOrEmail_Is_Required");
+    public static Error CodeAlreadyExpired => new Error("the code is already expired!", "Notifier_Code_Is_Expired");
+    public static Error InvalidCodeFormatException => new Error("the code must have 6 characters", "Notifier_Code_Invalid_Format");
+    #endregion
 }
