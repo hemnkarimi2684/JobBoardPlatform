@@ -1,8 +1,8 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Application.Common.Dto.Common.Command;
-using JobBoardPlatform.Application.Common.Dto.JobApplicationDto.Command;
-using JobBoardPlatform.Application.Common.Dto.JobApplicationDto.Result;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
@@ -28,7 +28,7 @@ public class JobApplicationService : IJobApplicationService
         _advertisementService = advertisementService;
     }
 
-    public async Task<bool> CreateJobApplicationAsync(CreateJobApplicationCommand createCommand)
+    public async Task<bool> CreateJobApplicationAsync(CreateJobApplicationRequestDto createCommand)
     {
         await ValidationForCreateMethod(createCommand.ResumeId, createCommand.AdvertisementId, createCommand.UserId);
 
@@ -45,7 +45,7 @@ public class JobApplicationService : IJobApplicationService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
-    public async Task<Pagination<JobApplicationInfoResult>> GetAdvertisementJobApplicationsAsync(Guid advertisementId, PagingCommand pagingCommand)
+    public async Task<Pagination<JobApplicationInfoResponseDto>> GetAdvertisementJobApplicationsAsync(Guid advertisementId, PagingRequestDto pagingCommand)
     {
         var userId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId);
 
@@ -53,7 +53,7 @@ public class JobApplicationService : IJobApplicationService
 
         var (advertisementJobApplications, totalDataCount) = await _unitOfWork
                                                                         .JobApplicationRepository
-                                                                        .GetAdvertisementJobApplicationsAsync(ja => new JobApplicationInfoResult
+                                                                        .GetAdvertisementJobApplicationsAsync(ja => new JobApplicationInfoResponseDto
                                                                         (
                                                                             ja.JobTitle,
                                                                             ja.CompanyName,
@@ -68,14 +68,14 @@ public class JobApplicationService : IJobApplicationService
                                                                         pagingCommand.PageNumber,
                                                                         pagingCommand.PageSize);
 
-        return Pagination<JobApplicationInfoResult>.GetPagination(
+        return Pagination<JobApplicationInfoResponseDto>.GetPagination(
                                                                  advertisementJobApplications,
                                                                  pagingCommand.PageNumber,
                                                                  pagingCommand.PageSize,
                                                                  totalDataCount);
     }
 
-    public async Task<JobApplicationInfoResult> GetJobApplicationByIdAsync(Guid jobApplicationId)
+    public async Task<JobApplicationInfoResponseDto> GetJobApplicationByIdAsync(Guid jobApplicationId)
     {
         var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId);
 
@@ -89,7 +89,7 @@ public class JobApplicationService : IJobApplicationService
 
         CheckOwnerOrAdminOrEmployerPermission(ownerId, jobApplication.UserId, _currentUser);
 
-        return new JobApplicationInfoResult(jobApplication.JobTitle, jobApplication.CompanyName, jobApplication.CityName,
+        return new JobApplicationInfoResponseDto(jobApplication.JobTitle, jobApplication.CompanyName, jobApplication.CityName,
                                             jobApplication.CollaborationType, jobApplication.ExperienceLevel, jobApplication.Status,
                                             jobApplication.CreatedAt, jobApplication.UserFullName
                                             );

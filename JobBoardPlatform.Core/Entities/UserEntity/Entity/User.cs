@@ -17,11 +17,10 @@ public class User : IdentityUser<Guid>, IEntity
 {
     private User() { }
 
-    public User(string email, string phoneNumber, string passwordHash, bool? isApproved = null, Guid? createdById = null)
+    public User(string email, string phoneNumber, bool? isApproved = null, Guid? createdById = null)
     {
         Email = email;
         PhoneNumber = phoneNumber;
-        PasswordHash = passwordHash;
         UserName = Email;
         IsApproved = isApproved;
         CreatedById = createdById;
@@ -71,7 +70,7 @@ public class User : IdentityUser<Guid>, IEntity
     /// <summary>
     /// جزئیات مربوط به رزومه کاربر
     /// </summary>
-    public virtual Resume? Resume { get; private set; } 
+    public virtual Resume? Resume { get; private set; }
 
     /// <summary>
     /// جزئیات مربوط به مهارت های کاربر
@@ -106,9 +105,6 @@ public class User : IdentityUser<Guid>, IEntity
         Email?.EmailIsValid();
 
         PhoneNumber?.PhoneNumberIsValid();
-
-        if (string.IsNullOrWhiteSpace(PasswordHash))
-            throw new DomainException(DomainErrors.PasswordHashIsRequired);
     }
 
     public void SoftDelete(Guid? deletedById)
@@ -123,5 +119,11 @@ public class User : IdentityUser<Guid>, IEntity
     {
         ModifiedById = modifiedById;
         ModifiedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateIsApproved(bool isApproved, Guid? modifiedById)
+    {
+        IsApproved = isApproved;
+        Update(modifiedById);
     }
 }

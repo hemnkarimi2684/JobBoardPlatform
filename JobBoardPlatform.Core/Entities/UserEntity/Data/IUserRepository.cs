@@ -21,4 +21,11 @@ public interface IUserRepository
     /// <param name="phoneNumber"></param>
     /// <returns></returns>
     Task<User?> FindByPhoneNumberAsync(string phoneNumber);
+
+    /// <summary>
+    /// چک کردن اینکه ایا این ایمیل یا شمار تلفن تکراری است یا نه 
+    /// </summary>
+    /// <param name="emailOrPhoneNumber"></param>
+    /// <returns></returns>
+    Task<bool> IsDuplicateEmailOrPhoneNumberAsync(string email, string phoneNumber);
 }

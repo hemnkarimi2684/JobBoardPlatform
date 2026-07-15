@@ -1,5 +1,5 @@
-﻿using JobBoardPlatform.Application.Common.Dto.CompanyDto.Command;
-using JobBoardPlatform.Application.Common.Dto.CompanyDto.Result;
+﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 
 namespace JobBoardPlatform.Application.Interfaces.CompanyInterface;
 
@@ -10,14 +10,14 @@ public interface ICompanyService
     /// </summary>
     /// <param name="createCompanyCommand"></param>
     /// <returns></returns>
-    Task<bool> CreateCompanyAsync(CreateCompanyCommand createCompanyCommand);
+    Task<Guid> CreateCompanyAsync(CreateCompanyRequestDto createCompanyCommand);
 
     /// <summary>
     /// دریافت اطلاعات شرکت
     /// </summary>
     /// <param name="ownerId"></param>
     /// <returns></returns>
-    Task<CompanyInfoResult> GetCompanyInfoByOwnerIdAsync(Guid ownerId);
+    Task<CompanyInfoResponseDto> GetCompanyInfoByOwnerIdAsync(Guid ownerId);
 
     /// <summary>
     /// اپدیت اطلاعات شرکت
@@ -25,5 +25,5 @@ public interface ICompanyService
     /// <param name="companyId"></param>
     /// <param name="updateCommand"></param>
     /// <returns></returns>
-    Task<bool> UpdateCompanyIdAsync(Guid companyId, UpdateCompanyInfoCommand updateCommand);
+    Task<bool> UpdateCompanyIdAsync(Guid companyId, UpdateCompanyInfoRequestDto updateCommand);
 }

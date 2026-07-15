@@ -1,7 +1,5 @@
 ﻿using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
-using JobBoardPlatform.Core.Entities.JobApplicationEntity.Dto;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
-using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;

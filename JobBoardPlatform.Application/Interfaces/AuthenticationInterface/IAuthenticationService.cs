@@ -1,13 +1,13 @@
-﻿using JobBoardPlatform.Application.Common.Dto.AuthenticationDto.Command;
-using JobBoardPlatform.Application.Common.Dto.AuthenticationDto.Result;
+﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AuthenticationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 
 namespace JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
 
 public interface IAuthenticationService
 {
-    Task<EmployerRegisterResult> RegisterEmployerAsync(RegisterCommand registerCommand);
+    Task<EmployerRegisterResponseDto> RegisterEmployerAsync(RegisterRequestDto registerCommand);
 
-    Task<UserRegisterResult> RegisterUserAsync(RegisterCommand registerCommand);
+    Task<TokenLoginResponseDto> RegisterJobSeekerAsync(RegisterRequestDto registerCommand);
 
-    Task<TokenLoginResult> LoginByEmailOrPhoneNumberAndPassword(LoginCommand loginCommand);
+    Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(LoginRequestDto loginCommand);
 }

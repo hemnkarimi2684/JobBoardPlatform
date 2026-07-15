@@ -1,8 +1,8 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Application.Common.Dto.Common.Command;
-using JobBoardPlatform.Application.Common.Dto.EducationDetailDto.Command;
-using JobBoardPlatform.Application.Common.Dto.EducationDetailDto.Result;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
@@ -26,7 +26,7 @@ public class EducationDetailService : IEducationDetailService
         _currentUser = currentUser;
     }
 
-    public async Task<bool> CreateEducationDetailAsync(CreateEducationDetailCommand createCommand)
+    public async Task<bool> CreateEducationDetailAsync(CreateEducationDetailRequestDto createCommand)
     {
         CheckSelfOrAdminPermission(createCommand.UserId, _currentUser);
 
@@ -54,13 +54,13 @@ public class EducationDetailService : IEducationDetailService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
-    public async Task<Pagination<UserEducationDetailResult>> GetUserEducationDetailsAsync(Guid userId, PagingCommand pagingCommand)
+    public async Task<Pagination<UserEducationDetailResponseDto>> GetUserEducationDetailsAsync(Guid userId, PagingRequestDto pagingCommand)
     {
         CheckSelfOrAdminPermission(userId, _currentUser);
 
         var (userEducationDetails, totalDataCount) = await _unitOfWork.EducationDetailRepository
                                                           .GetUserEducationDetailsAsync(ed =>
-                                                          new UserEducationDetailResult
+                                                          new UserEducationDetailResponseDto
                                                           (
                                                               ed.CertificateDegreeName,
                                                               ed.Major,
@@ -74,14 +74,14 @@ public class EducationDetailService : IEducationDetailService
                                                           pagingCommand.PageNumber,
                                                           pagingCommand.PageSize);
 
-        return Pagination<UserEducationDetailResult>
+        return Pagination<UserEducationDetailResponseDto>
                     .GetPagination(userEducationDetails,
                                    pagingCommand.PageNumber,
                                    pagingCommand.PageSize,
                                    totalDataCount);
     }
 
-    public async Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailCommand updateCommand)
+    public async Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailRequestDto updateCommand)
     {
         var userId = await _unitOfWork.EducationDetailRepository.GetEducationDetailUserIdAsync(educationDetailId);
 
@@ -124,7 +124,7 @@ public class EducationDetailService : IEducationDetailService
         return result;
     }
 
-    private UpdateEducationDetail MapToUpdateEducationDetail(UpdateEducationDetailCommand updateCommand)
+    private UpdateEducationDetail MapToUpdateEducationDetail(UpdateEducationDetailRequestDto updateCommand)
     {
         var certificateDegreeName = ParseCertificateDegreeForUpdate(updateCommand.CertificateDegreeName);
 

@@ -1,5 +1,4 @@
-﻿using JobBoardPlatform.Core.Entities.UserEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserSkillEntity.Data;
+﻿using JobBoardPlatform.Core.Entities.UserSkillEntity.Data;
 using JobBoardPlatform.Core.Entities.UserSkillEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;

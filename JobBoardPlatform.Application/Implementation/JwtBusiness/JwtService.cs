@@ -1,5 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Dto.AuthenticationDto.Result;
-using JobBoardPlatform.Application.Common.Dto.AuthenticationDto.Settings;
+﻿using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
@@ -24,7 +23,7 @@ public class JwtService : IJwtService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<TokenLoginResult> GenerateTokenAsync(User user)
+    public async Task<TokenLoginResponseDto> GenerateTokenAsync(User user)
     {
         var claims = new List<Claim>
         {
@@ -75,6 +74,6 @@ public class JwtService : IJwtService
         var handler = new JwtSecurityTokenHandler();
         var token = handler.CreateToken(tokenDescriptor);
 
-        return new TokenLoginResult(handler.WriteToken(token), TimeSpan.FromMinutes(_jwtSettings.TokenLifeTime), "Bearer");
+        return new TokenLoginResponseDto(handler.WriteToken(token), TimeSpan.FromMinutes(_jwtSettings.TokenLifeTime), "Bearer");
     }
 }

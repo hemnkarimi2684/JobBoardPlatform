@@ -1,13 +1,14 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Application.Common.Dto.UserDto.Command;
-using JobBoardPlatform.Application.Common.Dto.UserDto.Result;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
+using System.Security.Claims;
 
 namespace JobBoardPlatform.Application.Implementation.UserBusiness;
 
@@ -23,7 +24,7 @@ public class UserService : IUserService
         _currentUser = currentUser;
     }
 
-    public async Task<bool> CreateProfileAsync(CreateProfileCommand createCommand)
+    public async Task<bool> CreateProfileAsync(CreateProfileRequestDto createCommand)
     {
         var doesUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId);
 
@@ -62,11 +63,11 @@ public class UserService : IUserService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
-    public async Task<UserProfileInfoResult> GetUserProfileInfoAsync(Guid userId)
+    public async Task<UserProfileInfoResponseDto> GetUserProfileInfoAsync(Guid userId)
     {
         CheckSelfOrAdminPermission(userId, _currentUser);
 
-        var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileInfoAsync(up => new UserProfileInfoResult(
+        var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileInfoAsync(up => new UserProfileInfoResponseDto(
                                                                                     up.FirstName + " " + up.LastName,
                                                                                     up.Bio,
                                                                                     up.Address,
@@ -82,7 +83,7 @@ public class UserService : IUserService
         return userProfile;
     }
 
-    public async Task<bool> UpdateProfileAsync(Guid userId, UpdateProfileCommand updateCommand)
+    public async Task<bool> UpdateProfileAsync(Guid userId, UpdateProfileRequestDto updateCommand)
     {
         CheckSelfOrAdminPermission(userId, _currentUser);
 
@@ -102,6 +103,56 @@ public class UserService : IUserService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
+    public async Task<bool> ApprovedEmployerAsync(Guid userId)
+    {
+        CheckAdminPermission(_currentUser);
+
+        var user = await _unitOfWork.UserManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            throw new NotFoundException($"user with id {userId} was not found.");
+
+        var isEmployer = await _unitOfWork.UserManager.IsInRoleAsync(user, RoleConstants.EmployerRoleName);
+
+        if (!isEmployer)
+            throw new ValidationException($"the user with id {user.Id} is not an employer");
+
+        if (user.IsApproved == true)
+            throw new ConflictException($"the employer with id {user.Id} is already approved");
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync();
+
+            user.UpdateIsApproved(true, _currentUser.UserId);
+
+            var claim = new Claim(ClaimConstants.EmployerClaimType, ClaimConstants.IsApprovedClaimValue);
+
+            var employerClaims = await _unitOfWork.UserManager.GetClaimsAsync(user);
+
+            if (!employerClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
+            {
+
+                var addClaimResult = await _unitOfWork.UserManager.AddClaimAsync(user, claim);
+
+                if (!addClaimResult.Succeeded)
+                    throw new ValidationException(string.Join(" ", addClaimResult.Errors.Select(e => e.Description)));
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            return true;
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackTransactionAsync();
+
+            throw;
+        }
+    }
+
+
     #region Private methods
 
     private void CheckSelfOrAdminPermission(Guid targetUserId, ICurrentUser currentUser)
@@ -112,9 +163,20 @@ public class UserService : IUserService
         var isSelfUser = targetUserId == currentUser.UserId.Value;
 
         var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-                                                          
+
         if (!isAdmin && !isSelfUser)
-            throw new ForbiddenException("You do not have sufficient access to manage thisuser actions.");
+            throw new ForbiddenException("You do not have sufficient access to manage this user actions.");
+    }
+
+    private void CheckAdminPermission(ICurrentUser currentUser)
+    {
+        if (currentUser.UserId == null)
+            throw new UnauthorizedException("User is not authenticated.");
+
+        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
+
+        if (!isAdmin)
+            throw new ForbiddenException("You do not have sufficient access to manage this user actions.");
     }
 
     private Gender ParseGenderForCreate(string gender)
@@ -139,7 +201,7 @@ public class UserService : IUserService
         return result;
     }
 
-    private UpdateUserProfile MapToUpdateUserProfile(UpdateProfileCommand updateCommand)
+    private UpdateUserProfile MapToUpdateUserProfile(UpdateProfileRequestDto updateCommand)
     {
         var gender = ParseGenderEnumForUpdate(updateCommand.Gender);
 

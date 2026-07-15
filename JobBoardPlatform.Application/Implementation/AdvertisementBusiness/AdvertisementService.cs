@@ -1,8 +1,8 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Application.Common.Dto.AdvertisementDto.Command;
-using JobBoardPlatform.Application.Common.Dto.AdvertisementDto.Result;
-using JobBoardPlatform.Application.Common.Dto.Common.Command;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
@@ -27,7 +27,7 @@ public class AdvertisementService : IAdvertisementService
         _currentUser = currentUser;
     }
 
-    public async Task<bool> CreateAdvertisementAsync(CreateAdvertisementCommand createCommand)
+    public async Task<bool> CreateAdvertisementAsync(CreateAdvertisementRequestDto createCommand)
     {
         await ValidateForCreateAsync(createCommand.JobId, createCommand.CompanyId, createCommand.CityId);
 
@@ -61,7 +61,7 @@ public class AdvertisementService : IAdvertisementService
     }
 
 
-    public async Task<Pagination<AdvertisementDetailResult>> GetAdvertisementsByCompanyAsync(PagingCommand pagingCommand, Guid companyId)
+    public async Task<Pagination<AdvertisementDetailResponseDto>> GetAdvertisementsByCompanyAsync(PagingRequestDto pagingCommand, Guid companyId)
     {
         var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId);
 
@@ -71,7 +71,7 @@ public class AdvertisementService : IAdvertisementService
         CheckOwnerOrAdminPermission(companyOwnerId, _currentUser);
 
         var (companyAdvertisements, totalDataCount) = await _unitOfWork.AdvertisementRepository
-                                                    .GetAdvertisementsByCompanyAsync(a => new AdvertisementDetailResult
+                                                    .GetAdvertisementsByCompanyAsync(a => new AdvertisementDetailResponseDto
                                                     {
                                                         Description = a.Description,
                                                         MinimumAge = a.MinimumAge,
@@ -92,21 +92,21 @@ public class AdvertisementService : IAdvertisementService
                                                     pagingCommand.PageNumber,
                                                     pagingCommand.PageSize);
 
-        return Pagination<AdvertisementDetailResult>.GetPagination(
+        return Pagination<AdvertisementDetailResponseDto>.GetPagination(
                                                              companyAdvertisements,
                                                              pagingCommand.PageNumber,
                                                              pagingCommand.PageSize,
                                                              totalDataCount);
 
     }
-    public async Task<AdvertisementDetailResult> GetAdvertisementInfoByIdAsync(Guid advertisementId)
+    public async Task<AdvertisementDetailResponseDto> GetAdvertisementInfoByIdAsync(Guid advertisementId)
     {
         var advertisementDetail = await _unitOfWork.AdvertisementRepository.GetAdvertisementInfoByIdAsync(advertisementId);
 
         if (advertisementDetail is null)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
 
-        return AdvertisementDetailResult.MapToResult(advertisementDetail);
+        return AdvertisementDetailResponseDto.MapToResult(advertisementDetail);
     }
 
     public async Task<bool> SoftDeleteAdvertisementAsync(Guid advertisementId)
@@ -126,9 +126,9 @@ public class AdvertisementService : IAdvertisementService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
-    public async Task<AdvertisementDisplayDto> GetAdvertisementProjectionAsync(Guid advertisementId)
+    public async Task<AdvertisementDisplayResponseDto> GetAdvertisementProjectionAsync(Guid advertisementId)
     {
-        var result = await _unitOfWork.AdvertisementRepository.GetAdvertisementProjectionAsync(a => new AdvertisementDisplayDto
+        var result = await _unitOfWork.AdvertisementRepository.GetAdvertisementProjectionAsync(a => new AdvertisementDisplayResponseDto
         (
             a.Job.Name,
             a.Company.Name,
@@ -144,7 +144,7 @@ public class AdvertisementService : IAdvertisementService
     }
 
 
-    public async Task<bool> UpdateAdvertisementAsync(Guid advertisementId, UpdateAdvertisementCommand updateCommand)
+    public async Task<bool> UpdateAdvertisementAsync(Guid advertisementId, UpdateAdvertisementRequestDto updateCommand)
     {
         var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId);
 
@@ -249,7 +249,7 @@ public class AdvertisementService : IAdvertisementService
         return result;
     }
 
-    private UpdateAdvertisementInfo MapToAdvertisementInfoUpdate(UpdateAdvertisementCommand updateAdvertisementCommand)
+    private UpdateAdvertisementInfo MapToAdvertisementInfoUpdate(UpdateAdvertisementRequestDto updateAdvertisementCommand)
     {
         var collaborationType = ParseCollaborationTypeUpdate(updateAdvertisementCommand.CollaborationType);
 

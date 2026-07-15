@@ -1,7 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Application.Common.Dto.CompanyDto.Command;
-using JobBoardPlatform.Application.Common.Dto.CompanyDto.Result;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
@@ -24,7 +24,7 @@ public class CompanyService : ICompanyService
         _currentUser = currentUser;
     }
 
-    public async Task<bool> CreateCompanyAsync(CreateCompanyCommand createCommand)
+    public async Task<Guid> CreateCompanyAsync(CreateCompanyRequestDto createCommand)
     {
         CheckEmployerOrAdminPermission(_currentUser);
 
@@ -53,7 +53,7 @@ public class CompanyService : ICompanyService
             createCommand.Name, createCommand.YearOfEstablishment, createCommand.Industry,
             createCommand.AboutUs, createCommand.WebSiteAddress, parsedEnums.Item1.Value,
             createCommand.OwnedByUserId, parsedEnums.Item2.Value, createCommand.ActivityType,
-            createCommand.CompanyImageFileId, _currentUser.UserId
+            null, _currentUser.UserId
             );
 
         await _unitOfWork.CompanyRepository.AddAsync(company);
@@ -62,12 +62,17 @@ public class CompanyService : ICompanyService
 
         await _unitOfWork.CompanyCityRepository.AddAsync(companyCity);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        var saveResult = await _unitOfWork.SaveChangesAsync() > 0;
+
+        if (!saveResult)
+            throw new ValidationException("something went wring in create companu plaese try again!");
+
+        return company.Id;
     }
 
-    public async Task<CompanyInfoResult> GetCompanyInfoByOwnerIdAsync(Guid ownerId)
+    public async Task<CompanyInfoResponseDto> GetCompanyInfoByOwnerIdAsync(Guid ownerId)
     {
-        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyInfoResult(
+        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyInfoResponseDto(
             c.Name,
             c.YearOfEstablishment,
             c.Industry,
@@ -85,7 +90,7 @@ public class CompanyService : ICompanyService
         return companyInfo;
     }
 
-    public async Task<bool> UpdateCompanyIdAsync(Guid companyId, UpdateCompanyInfoCommand updateCommand)
+    public async Task<bool> UpdateCompanyIdAsync(Guid companyId, UpdateCompanyInfoRequestDto updateCommand)
     {
         var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId);
 
@@ -126,7 +131,7 @@ public class CompanyService : ICompanyService
         return (parsedOwnershipType, parsedCompanySize);
     }
 
-    private CompanyInfoUpdate MapToCompanyInfoUpdate(UpdateCompanyInfoCommand updateCompanyInfoCommand)
+    private CompanyInfoUpdate MapToCompanyInfoUpdate(UpdateCompanyInfoRequestDto updateCompanyInfoCommand)
     {
         var parsedEnums = ParseEnums(updateCompanyInfoCommand.OwnershipType, updateCompanyInfoCommand.CompanySize);
 
@@ -154,7 +159,7 @@ public class CompanyService : ICompanyService
         var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
 
         var isEmployer = currentUser.UserRoles.Contains(RoleConstants.EmployerRoleName);
-                                                                
+
         if (!isAdmin && !(isOwner && isEmployer))
             throw new ForbiddenException("You do not have sufficient access to manage this company.");
     }

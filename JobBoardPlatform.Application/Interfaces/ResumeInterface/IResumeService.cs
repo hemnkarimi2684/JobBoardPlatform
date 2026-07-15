@@ -1,5 +1,5 @@
-﻿using JobBoardPlatform.Application.Common.Dto.ResumeDto.Command;
-using JobBoardPlatform.Application.Common.Dto.ResumeDto.Result;
+﻿using JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
+using JobBoardPlatform.Application.Common.Dto.ResumeDto.Command;
 
 namespace JobBoardPlatform.Application.Interfaces.ResumeInterface;
 
@@ -10,12 +10,12 @@ public interface IResumeService
     /// </summary>
     /// <param name="resumeCommand"></param>
     /// <returns></returns>
-    Task<bool> CreateResumeAsync(CreateResumeCommand resumeCommand);
+    Task<bool> CreateResumeAsync(CreateResumeRequestDto resumeCommand);
 
     /// <summary>
     /// دریافت رزومه با شناسه کاربر 
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Task<ResumeDetailResult> GetResumeByUserIdAsync(Guid userId);
+    Task<ResumeDetailResponseDto> GetResumeByUserIdAsync(Guid userId);
 }

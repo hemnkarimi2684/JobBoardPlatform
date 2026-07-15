@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Data;
+﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Data;
 using JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Data;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Data;
 using JobBoardPlatform.Core.Entities.CityEntity.Data;
@@ -37,6 +38,7 @@ using JobBoardPlatform.Infrastructure.Repositories.UserProfileRepo;
 using JobBoardPlatform.Infrastructure.Repositories.UserRepo;
 using JobBoardPlatform.Infrastructure.Repositories.UserSkillRepo;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace JobBoardPlatform.Infrastructure.Repositories.Common;
 
@@ -69,6 +71,8 @@ public class UnitOfWork : IUnitOfWork
         UserProfileRepository = new UserProfileRepository(_context);
         UserSkillRepository = new UserSkillRepository(_context);
     }
+
+    private IDbContextTransaction? _transaction;
 
     public IAdvertisementRepository AdvertisementRepository { get; }
 
@@ -112,22 +116,32 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task BeginTransactionAsync()
     {
-        await _context.Database.BeginTransactionAsync();
+        if (_transaction != null)
+            return;
+
+        _transaction = await _context.Database.BeginTransactionAsync();
     }
 
     public async Task CommitTransactionAsync()
     {
-        await _context.Database.CommitTransactionAsync();
-    }
+        if (_transaction is null)
+            throw new DomainException("No active transaction.", "Transaction_NoActive");
 
-    public void Dispose()
-    {
-        _context.Dispose();
+        await _transaction.CommitAsync();
+        await _transaction.DisposeAsync();
+
+        _transaction = null;
     }
 
     public async Task RollBackTransactionAsync()
     {
-        await _context.Database.RollbackTransactionAsync();
+        if (_transaction is null)
+            return;
+
+        await _transaction.RollbackAsync();
+        await _transaction.DisposeAsync();
+
+        _transaction = null;
     }
 
     public async Task<int> SaveChangesAsync()

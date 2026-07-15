@@ -1,9 +1,9 @@
-﻿using JobBoardPlatform.Application.Common.Dto.AuthenticationDto.Result;
+﻿using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Application.Interfaces.JwtInterface;
 
 public interface IJwtService
 {
-    Task<TokenLoginResult> GenerateTokenAsync(User user);
+    Task<TokenLoginResponseDto> GenerateTokenAsync(User user);
 }

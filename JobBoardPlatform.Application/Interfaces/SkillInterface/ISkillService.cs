@@ -1,5 +1,5 @@
-﻿using JobBoardPlatform.Application.Common.Dto.Common.Command;
-using JobBoardPlatform.Application.Common.Dto.SkillDto.Result;
+﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
 namespace JobBoardPlatform.Application.Interfaces.SkillInterface;
@@ -11,7 +11,7 @@ public interface ISkillService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Task<Pagination<UserSkillDetailResult>> GetUserSkillsAsync(Guid userId, PagingCommand pagingCommand);
+    Task<Pagination<UserSkillDetailResponseDto>> GetUserSkillsAsync(Guid userId, PagingRequestDto pagingCommand);
 
     /// <summary>
     /// ساخت یک مهارت 
@@ -34,5 +34,5 @@ public interface ISkillService
     /// <param name="text"></param>
     /// <param name="pagingCommand"></param>
     /// <returns></returns>
-    Task<Pagination<UserSkillDetailResult>> GetAllSkillsAsync(string text, PagingCommand pagingCommand);
+    Task<Pagination<UserSkillDetailResponseDto>> GetAllSkillsAsync(string text, PagingRequestDto pagingCommand);
 }

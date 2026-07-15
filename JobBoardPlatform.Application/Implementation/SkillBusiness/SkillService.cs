@@ -1,7 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Application.Common.Dto.Common.Command;
-using JobBoardPlatform.Application.Common.Dto.SkillDto.Result;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
@@ -61,34 +61,34 @@ public class SkillService : ISkillService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
-    public async Task<Pagination<UserSkillDetailResult>> GetAllSkillsAsync(string text, PagingCommand pagingCommand)
+    public async Task<Pagination<UserSkillDetailResponseDto>> GetAllSkillsAsync(string text, PagingRequestDto pagingCommand)
     {
-        var (skills, totalDataCount) = await _unitOfWork.SkillRepository.GetAllSkillsAsync(us => new UserSkillDetailResult
+        var (skills, totalDataCount) = await _unitOfWork.SkillRepository.GetAllSkillsAsync(us => new UserSkillDetailResponseDto
                                                                                 (
                                                                                   us.Name
                                                                                 ),
                                                                                  text, pagingCommand.PageNumber, pagingCommand.PageSize
                                                                                 );
 
-        return Pagination<UserSkillDetailResult>.GetPagination(skills,
+        return Pagination<UserSkillDetailResponseDto>.GetPagination(skills,
                                                                pagingCommand.PageNumber,
                                                                pagingCommand.PageSize,
                                                                totalDataCount
                                                                );
     }
 
-    public async Task<Pagination<UserSkillDetailResult>> GetUserSkillsAsync(Guid userId, PagingCommand pagingCommand)
+    public async Task<Pagination<UserSkillDetailResponseDto>> GetUserSkillsAsync(Guid userId, PagingRequestDto pagingCommand)
     {
         CheckSelfOrAdminPermission(userId, _currentUser);
 
-        var (userSkills, totalDataCount) = await _unitOfWork.UserSkillRepository.GetUserSkillsAsync(us => new UserSkillDetailResult
+        var (userSkills, totalDataCount) = await _unitOfWork.UserSkillRepository.GetUserSkillsAsync(us => new UserSkillDetailResponseDto
                                                                                 (
                                                                                   us.Skill.Name
                                                                                 ),
                                                                                 userId, pagingCommand.PageNumber, pagingCommand.PageSize
                                                                                 );
 
-        return Pagination<UserSkillDetailResult>.GetPagination(userSkills,
+        return Pagination<UserSkillDetailResponseDto>.GetPagination(userSkills,
                                                                pagingCommand.PageNumber,
                                                                pagingCommand.PageSize,
                                                                totalDataCount

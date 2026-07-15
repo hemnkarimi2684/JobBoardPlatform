@@ -1,6 +1,6 @@
-﻿using JobBoardPlatform.Application.Common.Dto.Common.Command;
-using JobBoardPlatform.Application.Common.Dto.EducationDetailDto.Command;
-using JobBoardPlatform.Application.Common.Dto.EducationDetailDto.Result;
+﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
 namespace JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
@@ -12,14 +12,14 @@ public interface IEducationDetailService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Task<Pagination<UserEducationDetailResult>> GetUserEducationDetailsAsync(Guid userId, PagingCommand pagingCommand);
+    Task<Pagination<UserEducationDetailResponseDto>> GetUserEducationDetailsAsync(Guid userId, PagingRequestDto pagingCommand);
 
     /// <summary>
     /// ثبت مدرک تحصیلی 
     /// </summary>
     /// <param name="createCommand"></param>
     /// <returns></returns>
-    Task<bool> CreateEducationDetailAsync(CreateEducationDetailCommand createCommand);
+    Task<bool> CreateEducationDetailAsync(CreateEducationDetailRequestDto createCommand);
 
     /// <summary>
     /// اپدیت اطلاعات مدرک تحصیلی ثبت شده 
@@ -27,5 +27,5 @@ public interface IEducationDetailService
     /// <param name="educationDetailId"></param>
     /// <param name="updateCommand"></param>
     /// <returns></returns>
-    Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailCommand updateCommand);
+    Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailRequestDto updateCommand);
 }

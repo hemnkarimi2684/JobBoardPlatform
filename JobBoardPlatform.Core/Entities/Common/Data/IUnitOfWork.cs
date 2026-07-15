@@ -21,7 +21,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace JobBoardPlatform.Core.Entities.Common.Data;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork
 {
     IAdvertisementRepository AdvertisementRepository { get; }
     IAdvertisementSkillRepository AdvertisementSkillRepository { get; }

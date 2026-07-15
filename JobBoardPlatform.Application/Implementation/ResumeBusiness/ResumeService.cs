@@ -1,7 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 using JobBoardPlatform.Application.Common.Dto.ResumeDto.Command;
-using JobBoardPlatform.Application.Common.Dto.ResumeDto.Result;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
@@ -21,7 +21,7 @@ public class ResumeService : IResumeService
         _currentUser = currentUser;
     }
 
-    public async Task<bool> CreateResumeAsync(CreateResumeCommand resumeCommand)
+    public async Task<bool> CreateResumeAsync(CreateResumeRequestDto resumeCommand)
     {
         var isExistUser = await _unitOfWork.UserRepository.IsUserExistAsync(resumeCommand.UserId);
 
@@ -47,11 +47,11 @@ public class ResumeService : IResumeService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
-    public async Task<ResumeDetailResult> GetResumeByUserIdAsync(Guid userId)
+    public async Task<ResumeDetailResponseDto> GetResumeByUserIdAsync(Guid userId)
     {
         CheckSelfOrAdminPermission(userId, _currentUser);
 
-        var result = await _unitOfWork.ResumeRepository.GetResumeByUserIdAsync(r => new ResumeDetailResult
+        var result = await _unitOfWork.ResumeRepository.GetResumeByUserIdAsync(r => new ResumeDetailResponseDto
                                                                               (
                                                                                  r.Title,
                                                                                  r.UserId

@@ -1,8 +1,8 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Application.Common.Dto.Common.Command;
-using JobBoardPlatform.Application.Common.Dto.ExperienceDetailDto.Command;
-using JobBoardPlatform.Application.Common.Dto.ExperienceDetailDto.Result;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.ExperienceDetailDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
@@ -26,7 +26,7 @@ public class ExperienceDetailService : IExperienceDetailService
         _currentUser = currentUser;
     }
 
-    public async Task<bool> CreateExperienceDetailAsync(CreateExperienceDetailCommand createCommand)
+    public async Task<bool> CreateExperienceDetailAsync(CreateExperienceDetailRequestDto createCommand)
     {
         var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId);
 
@@ -53,13 +53,13 @@ public class ExperienceDetailService : IExperienceDetailService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
-    public async Task<Pagination<UserExperienceDetailResult>> GetUserExperienceDetailsAsync(Guid userId, PagingCommand pagingCommand)
+    public async Task<Pagination<UserExperienceDetailResponseDto>> GetUserExperienceDetailsAsync(Guid userId, PagingRequestDto pagingCommand)
     {
         CheckSelfOrAdminPermission(userId, _currentUser);
 
         var (experienceDetails, totalDataCount) = await _unitOfWork
                                                                  .ExperienceDetailRepository
-                                                                 .GetUserExperienceDetailsAsync(ed => new UserExperienceDetailResult
+                                                                 .GetUserExperienceDetailsAsync(ed => new UserExperienceDetailResponseDto
                                                                  (
                                                                      ed.LastJobTitle,
                                                                      ed.SeniorityLevel,
@@ -73,7 +73,7 @@ public class ExperienceDetailService : IExperienceDetailService
                                                                   pagingCommand.PageNumber,
                                                                   pagingCommand.PageSize);
 
-        return Pagination<UserExperienceDetailResult>
+        return Pagination<UserExperienceDetailResponseDto>
                                             .GetPagination(
                                                             experienceDetails,
                                                             pagingCommand.PageNumber,
@@ -81,7 +81,7 @@ public class ExperienceDetailService : IExperienceDetailService
                                                             totalDataCount);
     }
 
-    public async Task<bool> UpdateExperienceDetailAsync(Guid experienceDetailId, UpdateExperienceDetailCommand updateCommand)
+    public async Task<bool> UpdateExperienceDetailAsync(Guid experienceDetailId, UpdateExperienceDetailRequestDto updateCommand)
     {
         var userId = await _unitOfWork.ExperienceDetailRepository.GetExperienceDetailUserIdAsync(experienceDetailId);
 
@@ -124,7 +124,7 @@ public class ExperienceDetailService : IExperienceDetailService
         return result;
     }
 
-    private UpdateExperienceDetail MapToUpdateExperienceDetail(UpdateExperienceDetailCommand updateCommand)
+    private UpdateExperienceDetail MapToUpdateExperienceDetail(UpdateExperienceDetailRequestDto updateCommand)
     {
         var seniorityLevel = ParseSeniorityLevelForUpdate(updateCommand.SeniorityLevel);
 

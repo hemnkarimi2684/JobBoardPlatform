@@ -1,6 +1,6 @@
-﻿using JobBoardPlatform.Application.Common.Dto.AdvertisementDto.Command;
-using JobBoardPlatform.Application.Common.Dto.AdvertisementDto.Result;
-using JobBoardPlatform.Application.Common.Dto.Common.Command;
+﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using System.Linq.Expressions;
@@ -14,14 +14,14 @@ public interface IAdvertisementService
     /// </summary>
     /// <param name="createCommand"></param>
     /// <returns></returns>
-    Task<bool> CreateAdvertisementAsync(CreateAdvertisementCommand createCommand);
+    Task<bool> CreateAdvertisementAsync(CreateAdvertisementRequestDto createCommand);
 
     /// <summary>
     /// ویرایش اگهی
     /// </summary>
     /// <param name="updateCommand"></param>
     /// <returns></returns>
-    Task<bool> UpdateAdvertisementAsync(Guid advertisementId, UpdateAdvertisementCommand updateCommand);
+    Task<bool> UpdateAdvertisementAsync(Guid advertisementId, UpdateAdvertisementRequestDto updateCommand);
 
     /// <summary>
     /// حذف نرم اگهی
@@ -35,14 +35,14 @@ public interface IAdvertisementService
     /// </summary>
     /// <param name="advertisementId"></param>
     /// <returns></returns>
-    Task<Pagination<AdvertisementDetailResult>> GetAdvertisementsByCompanyAsync(PagingCommand pagingCommand, Guid companyId);
+    Task<Pagination<AdvertisementDetailResponseDto>> GetAdvertisementsByCompanyAsync(PagingRequestDto pagingCommand, Guid companyId);
 
     /// <summary>
     /// دریافت اطلاعات یک اگهی 
     /// </summary>
     /// <param name="advertisementId"></param>
     /// <returns></returns>
-    Task<AdvertisementDetailResult> GetAdvertisementInfoByIdAsync(Guid advertisementId);
+    Task<AdvertisementDetailResponseDto> GetAdvertisementInfoByIdAsync(Guid advertisementId);
 
     /// <summary>
     /// فعال کردن اگهی
@@ -63,5 +63,5 @@ public interface IAdvertisementService
     /// </summary>
     /// <param name="advertisementId"></param>
     /// <returns></returns>
-    Task<AdvertisementDisplayDto> GetAdvertisementProjectionAsync(Guid advertisementId);
+    Task<AdvertisementDisplayResponseDto> GetAdvertisementProjectionAsync(Guid advertisementId);
 }

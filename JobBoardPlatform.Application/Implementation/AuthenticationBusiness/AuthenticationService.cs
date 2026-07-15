@@ -1,11 +1,13 @@
-﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Application.Common.Dto.AuthenticationDto.Command;
-using JobBoardPlatform.Application.Common.Dto.AuthenticationDto.Result;
+﻿using JobBoardPlatform.Application.Common.Constants;
+using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.AuthenticationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Application.Implementation.AuthenticationBusiness;
 
@@ -27,29 +29,96 @@ public class AuthenticationService : IAuthenticationService
         _jwtService = jwtService;
     }
 
-    public async Task<TokenLoginResult> LoginByEmailOrPhoneNumberAndPassword(LoginCommand loginCommand)
+    public async Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(LoginRequestDto loginCommand)
     {
         var user = await _unitOfWork.UserManager.FindByEmailAsync(loginCommand.EmailOrPhoneNumber) ??
                    await _unitOfWork.UserRepository.FindByPhoneNumberAsync(loginCommand.EmailOrPhoneNumber);
 
         if (user == null)
-            throw new NotFoundException("No user was found with the provided information.");
+            throw new ValidationException("Email/phone number or password is incorrect.");
+
+        if (user.IsApproved == false)
+            throw new ForbiddenException("Dear user, your account has not yet been verified; please try again later.");
 
         var isPasswordValid = await _unitOfWork.UserManager.CheckPasswordAsync(user, loginCommand.Password);
 
-        if (isPasswordValid)
-            throw new ValidationException("The login password is invalid.");
+        if (!isPasswordValid)
+            throw new ValidationException("Email/phone number or password is incorrect.");
 
         return await _jwtService.GenerateTokenAsync(user);
     }
 
-    public Task<EmployerRegisterResult> RegisterEmployerAsync(RegisterCommand registerCommand)
+    public async Task<EmployerRegisterResponseDto> RegisterEmployerAsync(RegisterRequestDto registerCommand)
     {
-        throw new NotImplementedException();
+        var isDupplicateEmailOrPhoneNumber = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(registerCommand.Email, registerCommand.PhoneNumber);
+
+        if (isDupplicateEmailOrPhoneNumber)
+            throw new ConflictException("A user with the provided email or phone number already exists.");
+
+        var user = new User(registerCommand.Email, registerCommand.PhoneNumber, false, _currentUser.UserId);
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync();
+
+            var createUserResult = await _unitOfWork.UserManager.CreateAsync(user, registerCommand.Password);
+
+            if (!createUserResult.Succeeded)
+                throw new ValidationException(string.Join(" ", createUserResult.Errors.Select(e => e.Description)));
+
+            var addToRoleResult = await _unitOfWork.UserManager.AddToRoleAsync(user, RoleConstants.EmployerRoleName);
+
+            if (!addToRoleResult.Succeeded)
+                throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
+
+            var createdCompanyId = await _companyService.CreateCompanyAsync(registerCommand.CreateCompanyRequest);
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            return new EmployerRegisterResponseDto(user.Id, createdCompanyId);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackTransactionAsync();
+
+            throw;
+        }
     }
 
-    public Task<UserRegisterResult> RegisterUserAsync(RegisterCommand registerCommand)
+    public async Task<TokenLoginResponseDto> RegisterJobSeekerAsync(RegisterRequestDto registerCommand)
     {
-        throw new NotImplementedException();
+        var isDupplicate = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(registerCommand.Email, registerCommand.PhoneNumber);
+
+        if (isDupplicate)
+            throw new ConflictException("A user with the provided email or phone number already exists.");
+
+        var user = new User(registerCommand.Email, registerCommand.PhoneNumber, null, _currentUser.UserId);
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync();
+
+            var createUserResult = await _unitOfWork.UserManager.CreateAsync(user, registerCommand.Password);
+
+            if (!createUserResult.Succeeded)
+                throw new ValidationException(string.Join(" ", createUserResult.Errors.Select(e => e.Description)));
+
+            var addToRoleResult = await _unitOfWork.UserManager.AddToRoleAsync(user, RoleConstants.JobSeekerRoleName);
+
+            if (!addToRoleResult.Succeeded)
+                throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackTransactionAsync();
+
+            throw;
+        }
+
+        return await _jwtService.GenerateTokenAsync(user);
     }
 }
