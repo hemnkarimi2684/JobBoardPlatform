@@ -1,14 +1,10 @@
-﻿using JobBoardPlatform.Application.Common.Constants.Authentication;
+﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
-using JobBoardPlatform.Application.Common.Dto.EducationDetailDto.Command;
 using JobBoardPlatform.Application.Common.Dto.UserDto.Command;
 using JobBoardPlatform.Application.Common.Dto.UserDto.Result;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
-using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
-using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
@@ -115,11 +111,10 @@ public class UserService : IUserService
 
         var isSelfUser = targetUserId == currentUser.UserId.Value;
 
-        var isAdmin = currentUser.UserRoles.Any(role => role == RoleConstants.AdminRoleName);
-
-        //اینجا چک میشه که کاربر فقط بتونه خودش اطلاعات مدرک تحصیلیش رو اپدیت کنه نه کس دیگه ای به جز ادمین                                                               
+        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
+                                                          
         if (!isAdmin && !isSelfUser)
-            throw new ForbiddenException("You do not have sufficient access to manage this advertisement.");
+            throw new ForbiddenException("You do not have sufficient access to manage thisuser actions.");
     }
 
     private Gender ParseGenderForCreate(string gender)

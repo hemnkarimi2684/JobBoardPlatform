@@ -106,7 +106,7 @@ public class UserProfile : BaseEntity
             throw new DomainException(DomainErrors.FirstNameIsRequired);
 
         if (FirstName.Length < 2 || FirstName.Length > 100)
-            throw new DomainException(DomainErrors.FistNameInvalidLength);
+            throw new DomainException(DomainErrors.FirstNameInvalidLength);
 
         if (string.IsNullOrWhiteSpace(LastName))
             throw new DomainException(DomainErrors.LastNameIsRequired);

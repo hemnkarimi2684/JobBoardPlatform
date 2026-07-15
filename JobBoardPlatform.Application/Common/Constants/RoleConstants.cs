@@ -1,4 +1,4 @@
-﻿namespace JobBoardPlatform.Application.Common.Constants.Authentication;
+﻿namespace JobBoardPlatform.Application.Common.Constants;
 
 public class RoleConstants 
 {

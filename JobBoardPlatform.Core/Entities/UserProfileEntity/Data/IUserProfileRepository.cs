@@ -28,4 +28,11 @@ public interface IUserProfileRepository : IGenericRepository<UserProfile>
     /// <param name="userId"></param>
     /// <returns></returns>
     Task<bool> IsDuplicateUserProfileAsync(Guid userId);
+
+    /// <summary>
+    /// دریافت نام و نام خانوداگی کاربر مورد نظر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<string?> GetUserFullNameByUserIdAsync(Guid userId);
 }

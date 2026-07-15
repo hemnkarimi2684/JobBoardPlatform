@@ -1,4 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants.Authentication;
+﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.AdvertisementDto.Command;
 using JobBoardPlatform.Application.Common.Dto.AdvertisementDto.Result;
@@ -126,6 +126,24 @@ public class AdvertisementService : IAdvertisementService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
+    public async Task<AdvertisementDisplayDto> GetAdvertisementProjectionAsync(Guid advertisementId)
+    {
+        var result = await _unitOfWork.AdvertisementRepository.GetAdvertisementProjectionAsync(a => new AdvertisementDisplayDto
+        (
+            a.Job.Name,
+            a.Company.Name,
+            a.City.Name,
+            a.CollaborationType,
+            a.ExperienceLevel
+        ), advertisementId);
+
+        if (result == null)
+            throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
+
+        return result;
+    }
+
+
     public async Task<bool> UpdateAdvertisementAsync(Guid advertisementId, UpdateAdvertisementCommand updateCommand)
     {
         var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId);
@@ -188,9 +206,9 @@ public class AdvertisementService : IAdvertisementService
 
         var isOwner = ownerId == currentUser.UserId;
 
-        var isAdmin = currentUser.UserRoles.Any(role => role == RoleConstants.AdminRoleName);
+        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
 
-        var isEmployer = currentUser.UserRoles.Any(role => role == RoleConstants.EmployerRoleName);
+        var isEmployer = currentUser.UserRoles.Contains(RoleConstants.EmployerRoleName);
 
         //این شرط برای اینه که اگر ادمینه دسترسی داره اگر ادمین نیس حالا باید چک شه که کارفرماس یا نه
         //حالا اگر کارفرما بود ایا اونره این اگهیه یا نه                                                                  

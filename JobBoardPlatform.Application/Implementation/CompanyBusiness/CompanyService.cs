@@ -1,4 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants.Authentication;
+﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.CompanyDto.Command;
 using JobBoardPlatform.Application.Common.Dto.CompanyDto.Result;
@@ -26,7 +26,7 @@ public class CompanyService : ICompanyService
 
     public async Task<bool> CreateCompanyAsync(CreateCompanyCommand createCommand)
     {
-        CheckCreatePermission(_currentUser);
+        CheckEmployerOrAdminPermission(_currentUser);
 
         var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId);
 
@@ -151,17 +151,15 @@ public class CompanyService : ICompanyService
 
         var isOwner = ownerId == currentUser.UserId;
 
-        var isAdmin = currentUser.UserRoles.Any(role => role == RoleConstants.AdminRoleName);
+        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
 
-        var isEmployer = currentUser.UserRoles.Any(role => role == RoleConstants.EmployerRoleName);
-
-        //این شرط برای اینه که اگر ادمینه دسترسی داره اگر ادمین نیس حالا باید چک شه که کارفرماس یا نه
-        //حالا اگر کارفرما بود ایا اونره این اگهیه یا نه                                                                  
+        var isEmployer = currentUser.UserRoles.Contains(RoleConstants.EmployerRoleName);
+                                                                
         if (!isAdmin && !(isOwner && isEmployer))
             throw new ForbiddenException("You do not have sufficient access to manage this company.");
     }
 
-    private void CheckCreatePermission(ICurrentUser currentUser)
+    private void CheckEmployerOrAdminPermission(ICurrentUser currentUser)
     {
         if (currentUser.UserId == null)
             throw new UnauthorizedException("User is not authenticated.");

@@ -154,6 +154,9 @@ public class Advertisement : BaseEntity
 
         if (ExperienceLevel < 0)
             throw new DomainException(DomainErrors.ExperienceLevelOutOfRange);
+
+        if (ExperienceLevel < 0)
+            throw new DomainException(DomainErrors.ExperienceLevelOutOfRange);
     }
 
     /// <summary>

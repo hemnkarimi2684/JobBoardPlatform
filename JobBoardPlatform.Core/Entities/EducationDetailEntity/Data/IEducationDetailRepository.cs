@@ -36,4 +36,11 @@ public interface IEducationDetailRepository : IGenericRepository<EducationDetail
     /// <param name="userId"></param>
     /// <returns></returns>
     Task<Guid?> GetEducationDetailUserIdAsync(Guid educationDetailId);
+
+    /// <summary>
+    /// ایا مدرک تحصیلی دارد یا نه 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<bool> UserHasEducationDetailAsync(Guid userId);
 }

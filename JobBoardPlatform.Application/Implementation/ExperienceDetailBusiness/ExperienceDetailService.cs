@@ -1,4 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants.Authentication;
+﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.Common.Command;
 using JobBoardPlatform.Application.Common.Dto.ExperienceDetailDto.Command;
@@ -148,11 +148,11 @@ public class ExperienceDetailService : IExperienceDetailService
 
         var isSelfUser = targetUserId == currentUser.UserId;
 
-        var isAdmin = currentUser.UserRoles.Any(role => role == RoleConstants.AdminRoleName);
+        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
 
-        //اینجا چک میشه که کاربر فقط بتونه خودش اطلاعات مدرک تحصیلیش رو اپدیت کنه نه کس دیگه ای به جز ادمین                                                               
+        //اینجا چک میشه که کاربر فقط بتونه خودش اطلاعات تجربه کاریش رو اپدیت کنه نه کس دیگه ای به جز ادمین                                                               
         if (!isAdmin && !isSelfUser)
-            throw new ForbiddenException("You do not have sufficient access to manage this advertisement.");
+            throw new ForbiddenException("You do not have sufficient access to manage this ExperienceDetail.");
     }
 
     #endregion

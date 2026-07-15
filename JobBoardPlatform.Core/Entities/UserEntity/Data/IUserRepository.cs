@@ -1,4 +1,5 @@
 ﻿
+using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
 using System.Linq.Expressions;
@@ -13,4 +14,11 @@ public interface IUserRepository
     /// <param name="userId"></param>
     /// <returns></returns>
     Task<bool> IsUserExistAsync(Guid userId);
+
+    /// <summary>
+    /// دریافت کاربر توسط شماره تلفن
+    /// </summary>
+    /// <param name="phoneNumber"></param>
+    /// <returns></returns>
+    Task<User?> FindByPhoneNumberAsync(string phoneNumber);
 }

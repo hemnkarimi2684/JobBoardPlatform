@@ -285,6 +285,9 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.HasIndex("ProvinceId");
 
                     b.ToTable("Cities");
@@ -612,6 +615,21 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<Guid>("AdvertisementId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CityName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("CollaborationType")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -626,10 +644,18 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<Guid?>("DeletedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("ExperienceLevel")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
@@ -645,6 +671,11 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
+                    b.Property<string>("UserFullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -652,11 +683,20 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("AdvertisementId");
 
+                    b.HasIndex("CityName")
+                        .IsUnique();
+
+                    b.HasIndex("CompanyName")
+                        .IsUnique();
+
                     b.HasIndex("CreatedAt");
 
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeletedById");
+
+                    b.HasIndex("JobTitle")
+                        .IsUnique();
 
                     b.HasIndex("ModifiedById");
 

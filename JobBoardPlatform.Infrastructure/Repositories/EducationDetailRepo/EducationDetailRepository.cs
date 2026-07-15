@@ -56,4 +56,7 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
 
         return true;
     }
+
+    public Task<bool> UserHasEducationDetailAsync(Guid userId) => AnyAsync(ed => ed.UserId == userId);
+
 }

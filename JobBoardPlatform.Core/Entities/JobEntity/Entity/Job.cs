@@ -41,7 +41,5 @@ public class Job : BaseEntity
 
         if (Name.Length < 2 || Name.Length > 100)
             throw new DomainException(DomainErrors.JobNameInvalidLength);
-
-        Name.IsAllLetter();
     }
 }

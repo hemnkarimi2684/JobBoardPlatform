@@ -14,6 +14,15 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
     }
 
+    public async Task<TResult?> GetAdvertisementProjectionAsync<TResult>(Expression<Func<Advertisement, TResult>> projection, Guid advertisementId)
+    {
+        return await Entities
+                          .AsNoTracking()
+                          .Where(a => a.Id == advertisementId)
+                          .Select(projection)
+                          .FirstOrDefaultAsync();
+    }
+
     public async Task<AdvertisementDetail?> GetAdvertisementInfoByIdAsync(Guid advertisementId)
     {
         return await Entities
@@ -64,6 +73,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
         return (result, totalDataCount);
     }
+
+    public async Task<bool> IsAdvertisementExistAsync(Guid advertisementId) => await AnyAsync(a => a.Id == advertisementId);
 
     public async Task<bool> IsDuplicateAdvertisementAsync(Guid jobId, Guid companyId, Guid cityId)
     {

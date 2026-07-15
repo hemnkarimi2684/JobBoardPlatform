@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Application.Common.Dto.JobApplicationDto.Command;
+﻿using JobBoardPlatform.Application.Common.Dto.Common.Command;
+using JobBoardPlatform.Application.Common.Dto.JobApplicationDto.Command;
 using JobBoardPlatform.Application.Common.Dto.JobApplicationDto.Result;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
@@ -25,7 +26,7 @@ public interface IJobApplicationService
     /// </summary>
     /// <param name="advertisementId"></param>
     /// <returns></returns>
-    Task<Pagination<JobApplicationInfoResult>> GetAdvertisementJobApplicationsAsync(Guid advertisementId);
+    Task<Pagination<JobApplicationInfoResult>> GetAdvertisementJobApplicationsAsync(Guid advertisementId, PagingCommand pagingCommand);
 
     /// <summary>
     /// تغییر وضعیت درخواست

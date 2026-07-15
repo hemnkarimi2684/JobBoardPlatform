@@ -1,7 +1,9 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.AdvertisementDto.Command;
 using JobBoardPlatform.Application.Common.Dto.AdvertisementDto.Result;
 using JobBoardPlatform.Application.Common.Dto.Common.Command;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 
@@ -55,4 +57,11 @@ public interface IAdvertisementService
     /// <param name="advertisementId"></param>
     /// <returns></returns>
     Task<bool> ActivateAdvertisementAsync(Guid advertisementId);
+
+    /// <summary>
+    /// دریافت اطلاعات مورد نیاز یک اگهی
+    /// </summary>
+    /// <param name="advertisementId"></param>
+    /// <returns></returns>
+    Task<AdvertisementDisplayDto> GetAdvertisementProjectionAsync(Guid advertisementId);
 }

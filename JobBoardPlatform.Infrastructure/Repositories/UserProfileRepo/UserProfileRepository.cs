@@ -14,6 +14,15 @@ public class UserProfileRepository : GenericRepository<UserProfile>, IUserProfil
     {
     }
 
+    public async Task<string?> GetUserFullNameByUserIdAsync(Guid userId)
+    {
+        return await Entities
+                          .AsNoTracking()
+                          .Where(up => up.UserId == userId)
+                          .Select(up => up.FirstName + " " + up.LastName)
+                          .FirstOrDefaultAsync();
+    }
+
     public async Task<TResult?> GetUserProfileInfoAsync<TResult>(Expression<Func<UserProfile, TResult>> projection, Guid userId)
     {
         return await Entities

@@ -62,4 +62,20 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="cityId"></param>
     /// <returns></returns>
     Task<bool> IsDuplicateAdvertisementAsync(Guid jobId, Guid companyId, Guid cityId);
+
+    /// <summary>
+    /// ایا این اگهی موجود است یا نه 
+    /// </summary>
+    /// <param name="advertisementId"></param>
+    /// <returns></returns>
+    Task<bool> IsAdvertisementExistAsync(Guid advertisementId);
+
+    /// <summary>
+    /// دریافت اطلاعات مورد نیاز یک اگهی
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="advertisementId"></param>
+    /// <returns></returns>
+    Task<TResult?> GetAdvertisementProjectionAsync<TResult>(Expression<Func<Advertisement, TResult>> projection, Guid advertisementId);
 }

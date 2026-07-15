@@ -18,7 +18,7 @@ public static class DomainErrors
     #region UserProfile Errors
     public static Error FirstNameIsRequired => new Error("user first name is required", "User_FirstName_Is_Required");
     public static Error LastNameIsRequired => new Error("user last name is required", "User_LastName_Is_Required");
-    public static Error FistNameInvalidLength => new Error("user first name length must be between 3 and 100 characters", "User_FirstName_Invalid_Length");
+    public static Error FirstNameInvalidLength => new Error("user first name length must be between 3 and 100 characters", "User_FirstName_Invalid_Length");
     public static Error LastNameInvalidLength => new Error("user last name length must be between 3 and 100 characters", "User_LastName_Invalid_Length");
     public static Error BioIsRequired => new Error("user bio is required", "User_Bio_Is_Required");
     public static Error AddressIsRequired => new Error("user address is required", "User_Address_Is_Required");
@@ -129,4 +129,18 @@ public static class DomainErrors
     public static Error CodeAlreadyExpired => new Error("the code is already expired!", "Notifier_Code_Is_Expired");
     public static Error InvalidCodeFormatException => new Error("the code must have 6 characters", "Notifier_Code_Invalid_Format");
     #endregion
+
+    #region JobApplication Errors
+    public static Error JobTitleIsRequired => new Error("JobTitle is required.", "JobApplication_JobTitle_Is_Required");
+    public static Error JobTitleInvalidLength => new Error("JobTitle must be between 100 and 2000 characters long.", "JobApplication_JobTitle_Invalid_Length");
+    public static Error JobApplicationCompanyNameIsRequired => new Error("company name is required", "JobApplication_CompanyName_Is_Required");
+    public static Error JobApplicationCompanyNameInvalidLength => new Error("company name length must be between 2 and 120 characters", "JobApplication_CompanyName_Invalid_Length");
+    public static Error JobApplicationCityNameIsRequired => new Error("city name is required", "JobApplication_CityName_Is_Required");
+    public static Error JobApplicationCityNameInvalidRange => new Error("city code cannot be negative ", "JobApplication_CityName_Invalid_Range");
+    public static Error FullNameIsRequired => new Error("user full name is required", "JobApplication_UserFullName_Is_Required");
+    public static Error FullNameInvalidLength => new Error("user full name length must be between 3 and 200 characters", "JobApplication_UserFullName_Invalid_Length");
+    public static Error JobApplicationExperienceLevelOutOfRange => new Error("Experience level must be Positive", "JobApplication_ExperienceLevel_Out_Of_Range");
+    #endregion
+
+
 }
