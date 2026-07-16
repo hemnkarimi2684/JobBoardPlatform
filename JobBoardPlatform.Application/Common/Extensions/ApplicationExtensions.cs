@@ -2,6 +2,7 @@
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdminDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
+using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Implementation.AdvertisementBusiness;
 using JobBoardPlatform.Application.Implementation.AttachmentBusiness;
 using JobBoardPlatform.Application.Implementation.AuthenticationBusiness;
@@ -59,9 +60,9 @@ public static class ApplicationExtensions
         var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
         if (roleManager.Roles.Any()) return;
 
-        var adminRole = new Role(RoleConstants.AdminRoleName);
-        var employerRole = new Role(RoleConstants.EmployerRoleName);
-        var jobSeekerRole = new Role(RoleConstants.JobSeekerRoleName);
+        var adminRole = new Role(RoleConstants.AdminRoleName, "A system administrator who manages users, jobs, and platform settings.");
+        var employerRole = new Role(RoleConstants.EmployerRoleName, "A company representative who creates job postings and reviews applicants.");
+        var jobSeekerRole = new Role(RoleConstants.JobSeekerRoleName, "A user who searches and applies for jobs.");
 
         await roleManager.CreateAsync(adminRole);
         await roleManager.CreateAsync(employerRole);
@@ -72,17 +73,30 @@ public static class ApplicationExtensions
     {
         var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-        var adminsData = configuration.GetSection("AdminData").Get<List<AdminData>>();
+        var adminData = configuration.GetSection("AdminData").Get<AdminData>();
 
-        if (!adminsData?.Any() ?? true) return;
+        if (adminData == null)
+            return;
 
-        var adminData = adminsData.FirstOrDefault(d => d.Role == RoleConstants.AdminRoleName);
+        var adminUser = await userManager.FindByEmailAsync(adminData.Email);
 
-        if (adminData != null)
+        if (adminUser == null)
         {
-            var adminUser = new User(adminData.Email, adminData.PhoneNumber, true);
-            await userManager.CreateAsync(adminUser, adminData.Password);
-            await userManager.AddToRoleAsync(adminUser, RoleConstants.AdminRoleName);
+            adminUser = new User(adminData.Email, adminData.PhoneNumber, true);
+            var createUserResult = await userManager.CreateAsync(adminUser, adminData.Password);
+
+            if (!createUserResult.Succeeded)
+                throw new ValidationException(string.Join(" ", createUserResult.Errors.Select(e => e.Description)));
+        }
+
+        var isInRole = await userManager.IsInRoleAsync(adminUser, RoleConstants.AdminRoleName);
+
+        if (!isInRole)
+        {
+            var addUserToRoleResult = await userManager.AddToRoleAsync(adminUser, RoleConstants.AdminRoleName);
+
+            if (!addUserToRoleResult.Succeeded)
+                throw new ValidationException(string.Join(" ", addUserToRoleResult.Errors.Select(e => e.Description)));
         }
     }
 

@@ -17,7 +17,7 @@ public class User : IdentityUser<Guid>, IEntity
 {
     private User() { }
 
-    public User(string email, string phoneNumber, bool? isApproved = null, Guid? createdById = null)
+    public User(string email, string phoneNumber, bool isApproved, Guid? createdById = null)
     {
         Email = email;
         PhoneNumber = phoneNumber;
@@ -38,7 +38,7 @@ public class User : IdentityUser<Guid>, IEntity
 
     public bool IsDeleted { get; private set; }
 
-    public bool? IsApproved { get; private set; }
+    public bool IsApproved { get; private set; }
 
     #region Foreign Keys
 

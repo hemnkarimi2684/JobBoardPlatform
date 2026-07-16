@@ -93,7 +93,7 @@ public class AuthenticationService : IAuthenticationService
         if (isDupplicate)
             throw new ConflictException("A user with the provided email or phone number already exists.");
 
-        var user = new User(registerCommand.Email, registerCommand.PhoneNumber, null, _currentUser.UserId);
+        var user = new User(registerCommand.Email, registerCommand.PhoneNumber, true, _currentUser.UserId);
 
         try
         {
