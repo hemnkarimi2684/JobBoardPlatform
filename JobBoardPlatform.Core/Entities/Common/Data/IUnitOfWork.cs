@@ -41,10 +41,6 @@ public interface IUnitOfWork
     IUserProfileRepository UserProfileRepository { get; }
     IUserSkillRepository UserSkillRepository { get; }
 
-    UserManager<User> UserManager { get; }
-    RoleManager<Role> RoleManager { get; }
-    SignInManager<User> SignInManager { get; }
-
     Task<int> SaveChangesAsync();
 
     Task BeginTransactionAsync();

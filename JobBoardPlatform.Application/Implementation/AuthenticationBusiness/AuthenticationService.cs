@@ -8,6 +8,7 @@ using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using Microsoft.AspNetCore.Identity;
 
 namespace JobBoardPlatform.Application.Implementation.AuthenticationBusiness;
 
@@ -21,17 +22,20 @@ public class AuthenticationService : IAuthenticationService
 
     private readonly IJwtService _jwtService;
 
-    public AuthenticationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICompanyService companyService, IJwtService jwtService)
+    private readonly UserManager<User> _userManager;
+
+    public AuthenticationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICompanyService companyService, IJwtService jwtService, UserManager<User> userManager)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _companyService = companyService;
         _jwtService = jwtService;
+        _userManager = userManager;
     }
 
     public async Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(LoginRequestDto loginCommand)
     {
-        var user = await _unitOfWork.UserManager.FindByEmailAsync(loginCommand.EmailOrPhoneNumber) ??
+        var user = await _userManager.FindByEmailAsync(loginCommand.EmailOrPhoneNumber) ??
                    await _unitOfWork.UserRepository.FindByPhoneNumberAsync(loginCommand.EmailOrPhoneNumber);
 
         if (user == null)
@@ -40,7 +44,7 @@ public class AuthenticationService : IAuthenticationService
         if (user.IsApproved == false)
             throw new ForbiddenException("Dear user, your account has not yet been verified; please try again later.");
 
-        var isPasswordValid = await _unitOfWork.UserManager.CheckPasswordAsync(user, loginCommand.Password);
+        var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginCommand.Password);
 
         if (!isPasswordValid)
             throw new ValidationException("Email/phone number or password is incorrect.");
@@ -61,12 +65,12 @@ public class AuthenticationService : IAuthenticationService
         {
             await _unitOfWork.BeginTransactionAsync();
 
-            var createUserResult = await _unitOfWork.UserManager.CreateAsync(user, registerCommand.Password);
+            var createUserResult = await _userManager.CreateAsync(user, registerCommand.Password);
 
             if (!createUserResult.Succeeded)
                 throw new ValidationException(string.Join(" ", createUserResult.Errors.Select(e => e.Description)));
 
-            var addToRoleResult = await _unitOfWork.UserManager.AddToRoleAsync(user, RoleConstants.EmployerRoleName);
+            var addToRoleResult = await _userManager.AddToRoleAsync(user, RoleConstants.EmployerRoleName);
 
             if (!addToRoleResult.Succeeded)
                 throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
@@ -99,12 +103,12 @@ public class AuthenticationService : IAuthenticationService
         {
             await _unitOfWork.BeginTransactionAsync();
 
-            var createUserResult = await _unitOfWork.UserManager.CreateAsync(user, registerCommand.Password);
+            var createUserResult = await _userManager.CreateAsync(user, registerCommand.Password);
 
             if (!createUserResult.Succeeded)
                 throw new ValidationException(string.Join(" ", createUserResult.Errors.Select(e => e.Description)));
 
-            var addToRoleResult = await _unitOfWork.UserManager.AddToRoleAsync(user, RoleConstants.JobSeekerRoleName);
+            var addToRoleResult = await _userManager.AddToRoleAsync(user, RoleConstants.JobSeekerRoleName);
 
             if (!addToRoleResult.Succeeded)
                 throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));

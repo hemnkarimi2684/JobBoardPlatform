@@ -5,9 +5,11 @@ using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
 namespace JobBoardPlatform.Application.Implementation.UserBusiness;
@@ -18,10 +20,13 @@ public class UserService : IUserService
 
     private readonly ICurrentUser _currentUser;
 
-    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser)
+    private readonly UserManager<User> _userManager;
+
+    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, UserManager<User> userManager)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
+        _userManager = userManager;
     }
 
     public async Task<bool> CreateProfileAsync(CreateProfileRequestDto createCommand)
@@ -107,12 +112,12 @@ public class UserService : IUserService
     {
         CheckAdminPermission(_currentUser);
 
-        var user = await _unitOfWork.UserManager.FindByIdAsync(userId.ToString());
+        var user = await _userManager.FindByIdAsync(userId.ToString());
 
         if (user == null)
             throw new NotFoundException($"user with id {userId} was not found.");
 
-        var isEmployer = await _unitOfWork.UserManager.IsInRoleAsync(user, RoleConstants.EmployerRoleName);
+        var isEmployer = await _userManager.IsInRoleAsync(user, RoleConstants.EmployerRoleName);
 
         if (!isEmployer)
             throw new ValidationException($"the user with id {user.Id} is not an employer");
@@ -128,12 +133,12 @@ public class UserService : IUserService
 
             var claim = new Claim(ClaimConstants.EmployerClaimType, ClaimConstants.IsApprovedClaimValue);
 
-            var employerClaims = await _unitOfWork.UserManager.GetClaimsAsync(user);
+            var employerClaims = await _userManager.GetClaimsAsync(user);
 
             if (!employerClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
             {
 
-                var addClaimResult = await _unitOfWork.UserManager.AddClaimAsync(user, claim);
+                var addClaimResult = await _userManager.AddClaimAsync(user, claim);
 
                 if (!addClaimResult.Succeeded)
                     throw new ValidationException(string.Join(" ", addClaimResult.Errors.Select(e => e.Description)));

@@ -46,12 +46,9 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
 
-    public UnitOfWork(ApplicationDbContext context, UserManager<User> userManager, RoleManager<Role> roleManager, SignInManager<User> signInManager)
+    public UnitOfWork(ApplicationDbContext context)
     {
         _context = context;
-        RoleManager = roleManager;
-        SignInManager = signInManager;
-        UserManager = userManager;
 
         AdvertisementRepository = new AdvertisementRepository(_context);
         AdvertisementSkillRepository = new AdvertisementSkillRepository(_context);
@@ -107,12 +104,6 @@ public class UnitOfWork : IUnitOfWork
     public IUserProfileRepository UserProfileRepository { get; }
 
     public IUserSkillRepository UserSkillRepository { get; }
-
-    public UserManager<User> UserManager { get; }
-
-    public RoleManager<Role> RoleManager { get; }
-
-    public SignInManager<User> SignInManager { get; }
 
     public async Task BeginTransactionAsync()
     {
