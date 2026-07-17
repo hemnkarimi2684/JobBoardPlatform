@@ -26,4 +26,12 @@ public interface ICompanyService
     /// <param name="updateCommand"></param>
     /// <returns></returns>
     Task<bool> UpdateCompanyIdAsync(Guid companyId, UpdateCompanyInfoRequestDto updateCommand);
+
+    /// <summary>
+    /// اپلود عکس شرکت
+    /// </summary>
+    /// <param name="companyId"></param>
+    /// <param name="imageRequestDto"></param>
+    /// <returns></returns>
+    Task UploadCompanyImageAsync(Guid companyId, UploadCompanyImageRequestDto imageRequestDto);
 }

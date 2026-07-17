@@ -5,9 +5,9 @@ namespace JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
 
 public interface IAuthenticationService
 {
-    Task<EmployerRegisterResponseDto> RegisterEmployerAsync(RegisterRequestDto registerCommand);
+    Task<EmployerRegisterResponseDto> RegisterEmployerAsync(RegisterEmployerRequestDto registerCommand);
 
-    Task<TokenLoginResponseDto> RegisterJobSeekerAsync(RegisterRequestDto registerCommand);
+    Task<TokenLoginResponseDto> RegisterJobSeekerAsync(RegisterJobSeekerRequestDto registerCommand);
 
     Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(LoginRequestDto loginCommand);
 }

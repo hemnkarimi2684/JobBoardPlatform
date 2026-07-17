@@ -106,7 +106,7 @@ public class AdvertisementService : IAdvertisementService
         if (advertisementDetail is null)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
 
-        return AdvertisementDetailResponseDto.MapToResult(advertisementDetail);
+        return AdvertisementDetailResponseDto.MapToResponseDto(advertisementDetail);
     }
 
     public async Task<bool> SoftDeleteAdvertisementAsync(Guid advertisementId)
@@ -201,9 +201,6 @@ public class AdvertisementService : IAdvertisementService
 
     private void CheckOwnerOrAdminPermission(Guid? ownerId, ICurrentUser currentUser)
     {
-        if (currentUser.UserId == null)
-            throw new UnauthorizedException("User is not authenticated.");
-
         var isOwner = ownerId == currentUser.UserId;
 
         var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
@@ -218,9 +215,6 @@ public class AdvertisementService : IAdvertisementService
 
     private void CheckCreatePermission(ICurrentUser currentUser)
     {
-        if (currentUser.UserId == null)
-            throw new UnauthorizedException("User is not authenticated.");
-
         var isAdminOrEmployer = currentUser.UserRoles.Any(role => role == RoleConstants.EmployerRoleName || role == RoleConstants.AdminRoleName);
 
         if (!isAdminOrEmployer)
@@ -256,11 +250,11 @@ public class AdvertisementService : IAdvertisementService
         return new UpdateAdvertisementInfo
         (
             updateAdvertisementCommand.Description,
-            updateAdvertisementCommand.MinimumAge,
-            updateAdvertisementCommand.MaximumAge,
-            updateAdvertisementCommand.MinimumSalary,
-            updateAdvertisementCommand.MaximumSalary,
-            updateAdvertisementCommand.ExperienceLevel,
+            updateAdvertisementCommand.MinimumAge < 0 ? null : updateAdvertisementCommand.MinimumAge,
+            updateAdvertisementCommand.MaximumAge < 0 ? null : updateAdvertisementCommand.MaximumAge,
+            updateAdvertisementCommand.MinimumSalary < 0 ? null : updateAdvertisementCommand.MinimumSalary,
+            updateAdvertisementCommand.MaximumSalary < 0 ? null : updateAdvertisementCommand.MaximumSalary,
+            updateAdvertisementCommand.ExperienceLevel < 0 ? null : updateAdvertisementCommand.ExperienceLevel,
             collaborationType,
             _currentUser.UserId
         );

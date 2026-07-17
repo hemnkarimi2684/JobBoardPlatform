@@ -143,9 +143,6 @@ public class ExperienceDetailService : IExperienceDetailService
 
     private void CheckSelfOrAdminPermission(Guid? targetUserId, ICurrentUser currentUser)
     {
-        if (currentUser.UserId == null)
-            throw new UnauthorizedException("User is not authenticated.");
-
         var isSelfUser = targetUserId == currentUser.UserId;
 
         var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);

@@ -6,8 +6,6 @@ using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Update.Internal;
 
 
 namespace JobBoardPlatform.Application.Implementation.AttachmentBusiness;
@@ -39,6 +37,17 @@ public class AttachmentService : IAttachmentService
         return attachment;
     }
 
+    public async Task<bool> HardDeleteAttachmentAsync(Guid attachmentId)
+    {
+
+        var result = await _unitOfWork.AttachmentRepository.HardDeleteAttachmentAsync(attachmentId);
+
+        if (!result)
+            throw new NotFoundException($"the attachment with id {attachmentId} was not found");
+
+        return await _unitOfWork.SaveChangesAsync() > 0;
+    }
+
     public async Task<Guid> UploadAsync(IFormFile formFile)
     {
         if (formFile == null)
@@ -48,9 +57,11 @@ public class AttachmentService : IAttachmentService
 
         await formFile.CopyToAsync(stream);
 
-        var attachment = new Attachment(formFile.FileName, formFile.ContentType, stream.ToArray());
+        var attachment = new Attachment(formFile.FileName, formFile.ContentType, stream.ToArray(), _currentUser.UserId);
 
         await _unitOfWork.AttachmentRepository.AddAsync(attachment);
+
+        await _unitOfWork.SaveChangesAsync();
 
         return attachment.Id;
     }

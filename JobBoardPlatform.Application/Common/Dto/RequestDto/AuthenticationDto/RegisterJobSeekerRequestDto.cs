@@ -1,11 +1,10 @@
-﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.AuthenticationDto;
 
-public record RegisterRequestDto(
+public record RegisterJobSeekerRequestDto(
                                 [Required(ErrorMessage = "Email is required.")]
-                                [ EmailAddress(ErrorMessage = "Email format is invalid.")]
+                                [EmailAddress(ErrorMessage = "Email format is invalid.")]
                                 string Email,
 
                                  [Required(ErrorMessage = "Phone number is required.")]
@@ -21,7 +20,6 @@ public record RegisterRequestDto(
                                     @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).+$",
                                     ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
                                 )]
-                                string Password,
-
-                                CreateCompanyRequestDto CreateCompanyRequest);
+                                string Password
+ );
 

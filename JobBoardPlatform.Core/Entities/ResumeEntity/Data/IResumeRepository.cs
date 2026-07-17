@@ -29,4 +29,11 @@ public interface IResumeRepository : IGenericRepository<Resume>
     /// <returns></returns>
     Task<TResult?> GetResumeByUserIdAsync<TResult>(Expression<Func<Resume,TResult>> projection,
                                                    Guid userId);
+
+    /// <summary>
+    /// دریافت ایدی فایل اپلود شده رزومه
+    /// </summary>
+    /// <param name="resumeFileId"></param>
+    /// <returns></returns>
+    Task<Guid?> GetResumeFileIdAsync(Guid resumeId);
 }

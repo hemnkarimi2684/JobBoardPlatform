@@ -33,7 +33,7 @@ public class AdvertisementDetailResponseDto
 
     public List<string> SkillNames { get; set; } = new();
 
-    public static AdvertisementDetailResponseDto MapToResult(AdvertisementDetail advertisementDetail)
+    public static AdvertisementDetailResponseDto MapToResponseDto(AdvertisementDetail advertisementDetail)
     {
         return new AdvertisementDetailResponseDto
         {

@@ -52,7 +52,7 @@ public class AuthenticationService : IAuthenticationService
         return await _jwtService.GenerateTokenAsync(user);
     }
 
-    public async Task<EmployerRegisterResponseDto> RegisterEmployerAsync(RegisterRequestDto registerCommand)
+    public async Task<EmployerRegisterResponseDto> RegisterEmployerAsync(RegisterEmployerRequestDto registerCommand)
     {
         var isDupplicateEmailOrPhoneNumber = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(registerCommand.Email, registerCommand.PhoneNumber);
 
@@ -75,7 +75,7 @@ public class AuthenticationService : IAuthenticationService
             if (!addToRoleResult.Succeeded)
                 throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
 
-            var createdCompanyId = await _companyService.CreateCompanyAsync(registerCommand.CreateCompanyRequest);
+            var createdCompanyId = await _companyService.CreateCompanyAsync(registerCommand.ToCreateCompanyRequestDto());
 
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
@@ -90,7 +90,7 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
-    public async Task<TokenLoginResponseDto> RegisterJobSeekerAsync(RegisterRequestDto registerCommand)
+    public async Task<TokenLoginResponseDto> RegisterJobSeekerAsync(RegisterJobSeekerRequestDto registerCommand)
     {
         var isDupplicate = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(registerCommand.Email, registerCommand.PhoneNumber);
 

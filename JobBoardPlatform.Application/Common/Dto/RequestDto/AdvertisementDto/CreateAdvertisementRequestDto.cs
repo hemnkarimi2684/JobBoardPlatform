@@ -38,5 +38,4 @@ public record CreateAdvertisementRequestDto(
                                             [Required(ErrorMessage = "the CompanyId is required", AllowEmptyStrings = false)]
                                             Guid CompanyId,
 
-                                            [Required(ErrorMessage = "the SkillsId is required")]
                                             List<Guid> SkillsId);

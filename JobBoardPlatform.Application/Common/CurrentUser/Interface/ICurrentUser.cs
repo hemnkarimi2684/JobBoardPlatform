@@ -2,7 +2,7 @@
 
 public interface ICurrentUser
 {
-    public Guid? UserId { get; }
+    public Guid UserId { get; }
 
     List<string> UserRoles { get; }
 }

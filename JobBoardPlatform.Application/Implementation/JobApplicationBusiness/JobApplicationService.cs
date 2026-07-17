@@ -172,9 +172,6 @@ public class JobApplicationService : IJobApplicationService
 
     private void CheckOwnerOrAdminPermission(Guid? ownerId, ICurrentUser currentUser)
     {
-        if (currentUser.UserId == null)
-            throw new UnauthorizedException("User is not authenticated.");
-
         var isOwner = ownerId == currentUser.UserId;
 
         var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
@@ -187,9 +184,6 @@ public class JobApplicationService : IJobApplicationService
 
     private void CheckOwnerOrAdminOrEmployerPermission(Guid? ownerId, Guid? userId, ICurrentUser currentUser)
     {
-        if (currentUser.UserId == null)
-            throw new UnauthorizedException("User is not authenticated.");
-
         var isOwner = ownerId == currentUser.UserId;
 
         var isSelf = userId == currentUser.UserId;
@@ -204,9 +198,6 @@ public class JobApplicationService : IJobApplicationService
 
     private void CheckSelfOrAdminPermission(Guid? targetUserId, ICurrentUser currentUser)
     {
-        if (currentUser.UserId == null)
-            throw new UnauthorizedException("User is not authenticated.");
-
         var isSelfUser = targetUserId == currentUser.UserId;
 
         var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);

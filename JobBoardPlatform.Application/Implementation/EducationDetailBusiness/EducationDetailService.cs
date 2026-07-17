@@ -135,7 +135,7 @@ public class EducationDetailService : IEducationDetailService
            updateCommand.University,
            updateCommand.StartDate,
            updateCommand.CompletionDate,
-           updateCommand.Percentage,
+           updateCommand.Percentage < 0 ? null : updateCommand.Percentage,
            updateCommand.IsCurrentlyStudying,
            _currentUser.UserId
         );
@@ -143,9 +143,6 @@ public class EducationDetailService : IEducationDetailService
 
     private void CheckSelfOrAdminPermission(Guid? targetUserId, ICurrentUser currentUser)
     {
-        if (currentUser.UserId == null)
-            throw new UnauthorizedException("User is not authenticated.");
-
         var isSelfUser = targetUserId == currentUser.UserId;
 
         var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);

@@ -20,4 +20,11 @@ public interface IAttachmentService
     /// <param name="attachmentId"></param>
     /// <returns></returns>
     Task<AttachmentResponseDto> DownloadAsync(Guid attachmentId);
+
+    /// <summary>
+    /// حذف فایل ذخیره شده در دیتابیس 
+    /// </summary>
+    /// <param name="attachmentId"></param>
+    /// <returns></returns>
+    Task<bool> HardDeleteAttachmentAsync(Guid attachmentId);
 }

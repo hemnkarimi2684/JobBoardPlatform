@@ -162,10 +162,7 @@ public class UserService : IUserService
 
     private void CheckSelfOrAdminPermission(Guid targetUserId, ICurrentUser currentUser)
     {
-        if (currentUser.UserId == null)
-            throw new UnauthorizedException("User is not authenticated.");
-
-        var isSelfUser = targetUserId == currentUser.UserId.Value;
+        var isSelfUser = targetUserId == currentUser.UserId;
 
         var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
 
@@ -175,9 +172,6 @@ public class UserService : IUserService
 
     private void CheckAdminPermission(ICurrentUser currentUser)
     {
-        if (currentUser.UserId == null)
-            throw new UnauthorizedException("User is not authenticated.");
-
         var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
 
         if (!isAdmin)

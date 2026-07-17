@@ -2,13 +2,15 @@
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
 using JobBoardPlatform.WebApi.ResultPattern;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Authentications
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]s")]
     [ApiController]
+    [Authorize]
     public class AuthenticationController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
@@ -19,7 +21,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Authentications
         }
 
         [HttpPost("register-employer")]
-        public async Task<IActionResult> RegisterEmployerAsync(RegisterRequestDto register)
+        public async Task<IActionResult> RegisterEmployerAsync(RegisterEmployerRequestDto register)
         {
             var result = await _authenticationService.RegisterEmployerAsync(register);
 
@@ -27,7 +29,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Authentications
         }
 
         [HttpPost("register-jobSeeker")]
-        public async Task<IActionResult> RegisterJobSeekerAsync(RegisterRequestDto register)
+        public async Task<IActionResult> RegisterJobSeekerAsync(RegisterJobSeekerRequestDto register)
         {
             var result = await _authenticationService.RegisterJobSeekerAsync(register);
 

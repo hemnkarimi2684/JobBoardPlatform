@@ -3,25 +3,25 @@
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 
 public record UpdateAdvertisementRequestDto(
-                                            [MinLength(100, ErrorMessage = "the Description characteers cannot be lower than 100")]
-                                            [MaxLength(2000, ErrorMessage = "the Description characteers cannot be higher than 2000")]
-                                            string? Description,
+    [MinLength(100, ErrorMessage = "The description cannot be less than 100 characters.")]
+    [MaxLength(2000, ErrorMessage = "The description cannot be more than 2000 characters.")]
+    string? Description,
 
-                                            [Range(18, 55, ErrorMessage = "Minimum age must be between 18 and 55.")]
-                                            int? MinimumAge,
+    [Range(18, 55, ErrorMessage = "Minimum age must be between 18 and 55.")]
+    int? MinimumAge,
 
-                                            [Range(18, 65, ErrorMessage = "Maximum age must be between 18 and 65.")]
-                                            int? MaximumAge,
+    [Range(18, 65, ErrorMessage = "Maximum age must be between 18 and 65.")]
+    int? MaximumAge,
 
-                                            [Range(0, double.MaxValue, ErrorMessage = "the MinimumSalary must be in the range")]
-                                            decimal? MinimumSalary,
+    [Range(typeof(decimal), "0.01", "79228162514264337593543950335", ErrorMessage = "MinimumSalary must be greater than 0.")]
+    decimal? MinimumSalary,
 
-                                            [Range(0, double.MaxValue, ErrorMessage = "the MaximumSalary must be in the range")]
-                                            decimal? MaximumSalary,
+    [Range(typeof(decimal), "0.01", "79228162514264337593543950335", ErrorMessage = "MaximumSalary must be greater than 0.")]
+    decimal? MaximumSalary,
 
-                                            [Range(0, 50, ErrorMessage = "the ExperienceLevel must be in the range")]
-                                            int? ExperienceLevel,
+    [Range(1, 50, ErrorMessage = "ExperienceLevel must be between 1 and 50.")]
+    int? ExperienceLevel,
 
-                                            [MinLength(0, ErrorMessage = "the CollaborationType characteers cannot be lower than 0")]
-                                            [MaxLength(25, ErrorMessage = "the CollaborationType characteers cannot be higher than 25")]
-                                            string? CollaborationType);  
+    [MaxLength(25, ErrorMessage = "CollaborationType cannot be more than 25 characters.")]
+    string? CollaborationType
+);

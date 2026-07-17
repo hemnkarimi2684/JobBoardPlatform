@@ -22,6 +22,15 @@ public class ResumeRepository : GenericRepository<Resume>, IResumeRepository
                            .FirstOrDefaultAsync();
     }
 
+    public async Task<Guid?> GetResumeFileIdAsync(Guid resumeId)
+    {
+        return await Entities
+                            .AsNoTracking()
+                            .Where(r => r.Id == resumeId)
+                            .Select(r => r.LastUploadedFileId)
+                            .FirstOrDefaultAsync();
+    }
+
     public async Task<bool> IsDuplicateResumeForUserAsync(Guid userId) => await AnyAsync(r => r.UserId == userId);
 
     public async Task<bool> IsResumeExistAsync(Guid resumeId) => await AnyAsync(r => r.Id == resumeId);

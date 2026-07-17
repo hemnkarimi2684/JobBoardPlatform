@@ -15,4 +15,11 @@ public interface IAttachmentRepository : IGenericRepository<Attachment>
     /// <param name="attachmentId"></param>
     /// <returns></returns>
     Task<TResult?> GetAttachmentByIdAsync<TResult>(Expression<Func<Attachment, TResult>> projection, Guid attachmentId);
+
+    /// <summary>
+    /// حذف کامل فایل ذخیره شده 
+    /// </summary>
+    /// <param name="attachmentId"></param>
+    /// <returns></returns>
+    Task<bool> HardDeleteAttachmentAsync(Guid attachmentId);
 }

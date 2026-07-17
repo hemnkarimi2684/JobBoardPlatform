@@ -2,32 +2,37 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
 using JobBoardPlatform.Application.Implementation.AdvertisementBusiness;
+using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.WebApi.ResultPattern;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Advertisements;
 
 [Route("api/[controller]s")]
 [ApiController]
+[Authorize]
 public class AdvertisementController : ControllerBase
 {
-    private readonly AdvertisementService _advertisementService;
+    private readonly IAdvertisementService _advertisementService;
 
-    public AdvertisementController(AdvertisementService advertisementService)
+    public AdvertisementController(IAdvertisementService advertisementService)
     {
         _advertisementService = advertisementService;
     }
 
     [HttpPost]
+    [Authorize(Roles = "Employer")]
     public async Task<IActionResult> CreateAdvertisementAsync([FromBody] CreateAdvertisementRequestDto createAdvertisement)
     {
         await _advertisementService.CreateAdvertisementAsync(createAdvertisement);
 
-        return NoContent();
+        return Ok(Result.Success());
     }
 
     [HttpPut("{advertisementId:guid}")]
+    [Authorize(Roles = "Employer")]
     public async Task<IActionResult> UpdateAdvertisementAsync([FromRoute] Guid advertisementId, [FromBody] UpdateAdvertisementRequestDto updateAdvertisement)
     {
         await _advertisementService.UpdateAdvertisementAsync(advertisementId, updateAdvertisement);
@@ -36,22 +41,25 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpDelete("{advertisementId:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> SoftDeleteAdvertisementAsync([FromRoute] Guid advertisementId)
     {
-        var result = await _advertisementService.SoftDeleteAdvertisementAsync(advertisementId);
+        await _advertisementService.SoftDeleteAdvertisementAsync(advertisementId);
 
-        return NoContent();
+        return Ok(Result.Success());
     }
 
-    [HttpGet("by-company")]
-    public async Task<IActionResult> GetAdvertisementsByCompanyAsync([FromQuery] Guid companyId, [FromQuery] PagingRequestDto pagingRequestDto)
+    [HttpGet("by-company/{companyId:guid}")]
+    [Authorize(Roles = "Employer,Admin")]
+    public async Task<IActionResult> GetAdvertisementsByCompanyAsync([FromRoute] Guid companyId, [FromQuery] PagingRequestDto pagingRequestDto)
     {
         var result = await _advertisementService.GetAdvertisementsByCompanyAsync(pagingRequestDto, companyId);
 
         return Ok(Result<Pagination<AdvertisementDetailResponseDto>>.Success(result));
     }
 
-    [HttpPatch("in-activate/{advertisementId:guid}")]
+    [HttpPatch("{advertisementId:guid}/in-activate")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> InActivateAdvertisementAsync([FromRoute] Guid advertisementId)
     {
         await _advertisementService.InActivateAdvertisementAsync(advertisementId);
@@ -59,7 +67,8 @@ public class AdvertisementController : ControllerBase
         return Ok(Result.Success());
     }
 
-    [HttpPatch("activate/{advertisementId:guid}")]
+    [HttpPatch("{advertisementId:guid}/activate")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ActivateAdvertisementAsync([FromRoute] Guid advertisementId)
     {
         var result = await _advertisementService.ActivateAdvertisementAsync(advertisementId);
@@ -68,6 +77,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpGet("{advertisementId:guid}")]
+    [Authorize(Roles = "Employer,Admin")]
     public async Task<IActionResult> GetAdvertisementInfoByIdAsync(Guid advertisementId)
     {
         var result = await _advertisementService.GetAdvertisementInfoByIdAsync(advertisementId);

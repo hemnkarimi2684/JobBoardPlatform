@@ -174,4 +174,10 @@ public class Company : BaseEntity
 
         Validate();
     }
+
+    public void UpdateImage(Guid? newImageId)
+    {
+        CompanyImageFileId = newImageId;
+    }
+
 }
