@@ -68,6 +68,9 @@ public class Resume : BaseEntity
 
         if (Title.Length < 2 || Title.Length > 100)
             throw new DomainException(DomainErrors.ResumeTitleInvalidLength);
+
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.ResumeUserIdIsRequired);
     }
 
     public void UpdateFile(Guid? newFileId)

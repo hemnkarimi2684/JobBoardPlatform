@@ -15,5 +15,10 @@ public class AttachmentModelBuilderConfiguration : BaseModelBuilderConfiguration
         builder.Property(a => a.ContentType)
             .IsRequired()
             .HasMaxLength(256);
+
+        builder.Property(a => a.AttachmentType)
+           .IsRequired()
+           .HasConversion<string>()
+           .HasMaxLength(25);
     }
 }

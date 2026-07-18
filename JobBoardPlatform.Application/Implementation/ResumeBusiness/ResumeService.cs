@@ -7,6 +7,7 @@ using JobBoardPlatform.Application.Common.Dto.ResumeDto.Command;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
+using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using Microsoft.Extensions.Logging;
@@ -94,7 +95,7 @@ public class ResumeService : IResumeService
         {
             await _unitOfWork.BeginTransactionAsync();
 
-            newFileId = await _attachmentService.UploadAsync(uploadResumeFile.File);
+            newFileId = await _attachmentService.UploadAsync(uploadResumeFile.File, AttachmentType.Document);
 
             resume.UpdateFile(newFileId);
 
@@ -118,12 +119,12 @@ public class ResumeService : IResumeService
             await DeleteAttachmentAsync(oldFileId.Value);
     }
 
-    public async Task<AttachmentResponseDto> GetResumeFileAsync(Guid resumeId)
+    public async Task<AttachmentResponseDto> DownloadResumeFileAsync(Guid resumeId)
     {
         var resumeFileId = await _unitOfWork.ResumeRepository.GetResumeFileIdAsync(resumeId);
 
         if (resumeFileId == null)
-            throw new NotFoundException($"the resume file with id {resumeFileId} not found");
+            throw new NotFoundException($"The resume with id '{resumeId}' does not have an attached file.");
 
         return await _attachmentService.DownloadAsync(resumeFileId.Value);
     }

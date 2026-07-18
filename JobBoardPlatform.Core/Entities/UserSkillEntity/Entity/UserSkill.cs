@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.Common.Entity;
+﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
+using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.SkillEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
@@ -10,7 +11,7 @@ namespace JobBoardPlatform.Core.Entities.UserSkillEntity.Entity;
 public class UserSkill : BaseEntity
 {
     private UserSkill() { }
-    
+
     public UserSkill(Guid userId, Guid skillId, Guid? createdById = null)
     {
         UserId = userId;
@@ -47,5 +48,12 @@ public class UserSkill : BaseEntity
 
     #endregion
 
-    protected override void Validate() => throw new NotImplementedException();
+    protected override void Validate()
+    {
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.UserSkillUserIdIsRequired);
+
+        if (SkillId == Guid.Empty)
+            throw new DomainException(DomainErrors.UserSkillSkillIdIsRequired);
+    }
 }

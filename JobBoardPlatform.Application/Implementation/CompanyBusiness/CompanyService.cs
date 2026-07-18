@@ -5,6 +5,7 @@ using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
+using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
@@ -34,8 +35,6 @@ public class CompanyService : ICompanyService
 
     public async Task<Guid> CreateCompanyAsync(CreateCompanyRequestDto createCommand)
     {
-        CheckEmployerOrAdminPermission(_currentUser);
-
         var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId);
 
         if (!doesCityExist)
@@ -61,7 +60,7 @@ public class CompanyService : ICompanyService
             createCommand.Name, createCommand.YearOfEstablishment, createCommand.Industry,
             createCommand.AboutUs, createCommand.WebSiteAddress, parsedEnums.Item1.Value,
             createCommand.OwnedByUserId, parsedEnums.Item2.Value, createCommand.ActivityType,
-            null, _currentUser.UserId
+            null
             );
 
         await _unitOfWork.CompanyRepository.AddAsync(company);
@@ -135,7 +134,7 @@ public class CompanyService : ICompanyService
         {
             await _unitOfWork.BeginTransactionAsync();
 
-            newImageId = await _attachmentService.UploadAsync(imageRequestDto.File);
+            newImageId = await _attachmentService.UploadAsync(imageRequestDto.File, AttachmentType.Image);
 
             company.UpdateImage(newImageId);
 
@@ -215,7 +214,7 @@ public class CompanyService : ICompanyService
             _currentUser.UserId
         );
     }
-                         
+
     private void CheckOwnerOrAdminPermission(Guid? ownerId, ICurrentUser currentUser)
     {
         var isOwner = ownerId == currentUser.UserId;

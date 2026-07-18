@@ -250,11 +250,11 @@ public class AdvertisementService : IAdvertisementService
         return new UpdateAdvertisementInfo
         (
             updateAdvertisementCommand.Description,
-            updateAdvertisementCommand.MinimumAge < 0 ? null : updateAdvertisementCommand.MinimumAge,
-            updateAdvertisementCommand.MaximumAge < 0 ? null : updateAdvertisementCommand.MaximumAge,
-            updateAdvertisementCommand.MinimumSalary < 0 ? null : updateAdvertisementCommand.MinimumSalary,
-            updateAdvertisementCommand.MaximumSalary < 0 ? null : updateAdvertisementCommand.MaximumSalary,
-            updateAdvertisementCommand.ExperienceLevel < 0 ? null : updateAdvertisementCommand.ExperienceLevel,
+            updateAdvertisementCommand.MinimumAge < 1 ? null : updateAdvertisementCommand.MinimumAge,
+            updateAdvertisementCommand.MaximumAge < 1 ? null : updateAdvertisementCommand.MaximumAge,
+            updateAdvertisementCommand.MinimumSalary < 1 ? null : updateAdvertisementCommand.MinimumSalary,
+            updateAdvertisementCommand.MaximumSalary < 1 ? null : updateAdvertisementCommand.MaximumSalary,
+            updateAdvertisementCommand.ExperienceLevel < 1 ? null : updateAdvertisementCommand.ExperienceLevel,
             collaborationType,
             _currentUser.UserId
         );

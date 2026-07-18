@@ -22,6 +22,7 @@ namespace JobBoardPlatform.WebApi.Controllers.ExperienceDetails
         }
 
         [HttpGet("{userId:guid}/experience-details")]
+        [Authorize(Roles = "Admin,Employer,JobSeeker")]
         public async Task<IActionResult> GetUserExperienceDetailsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
         {
             var result = await _experienceDetailService.GetUserExperienceDetailsAsync(userId, pagingRequest);

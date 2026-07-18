@@ -1,10 +1,12 @@
 ﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Entity;
+using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
@@ -142,6 +144,9 @@ public class Company : BaseEntity
 
         if (!string.IsNullOrWhiteSpace(ActivityType) && ActivityType?.Length > 120 || ActivityType?.Length < 0)
             throw new DomainException(DomainErrors.CompanyActivityTypeInvalidLength);
+
+        if (OwnedByUserId == Guid.Empty)
+            throw new DomainException(DomainErrors.CompanyOwnedByUserIdIsRequired);
     }
 
     public void UpdateCompanyInfo(CompanyInfoUpdate companyInfoUpdate)

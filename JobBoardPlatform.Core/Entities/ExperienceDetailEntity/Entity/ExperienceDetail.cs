@@ -113,6 +113,9 @@ public class ExperienceDetail : BaseEntity
             if (EndDate < StartDate)
                 throw new DomainException(DomainErrors.ExperienceDetailJobEndTimeLowerThanStartTime);
         }
+
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.ExperienceDetailUserIdIsRequired);
     }
 
     /// <summary>

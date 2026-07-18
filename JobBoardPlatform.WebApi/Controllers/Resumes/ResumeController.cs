@@ -38,7 +38,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Resumesک
             return Ok(Result<ResumeDetailResponseDto>.Success(resume));
         }
 
-        [HttpPatch("{resumeId:guid}/file")]
+        [HttpPatch("{resumeId:guid}/upload-file")]
         [Authorize(Roles = "JobSeeker")]
         public async Task<IActionResult> UploadResumeFileAsync([FromRoute] Guid resumeId, [FromForm] UploadResumeFileRequestDto uploadResumeFile)
         {
@@ -50,7 +50,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Resumesک
         [HttpPatch("{resumeId:guid}/download")]
         public async Task<IActionResult> DownloadResumeFileAsync([FromRoute] Guid resumeId)
         {
-            var result = await _resumeService.GetResumeFileAsync(resumeId);
+            var result = await _resumeService.DownloadResumeFileAsync(resumeId);
 
             return File(result.Data, result.ContentType, result.FileName);
         }

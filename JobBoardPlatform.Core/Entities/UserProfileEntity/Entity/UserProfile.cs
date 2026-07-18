@@ -128,6 +128,12 @@ public class UserProfile : BaseEntity
 
         if (BirthDate > DateTime.UtcNow.Date.AddYears(-18))
             throw new DomainException(DomainErrors.UserMustBeAtLeast18YearsOld);
+
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.UserProfileUserIdIsRequired);
+
+        if (CityId == Guid.Empty)
+            throw new DomainException(DomainErrors.UserProfileCityIdIsRequired);
     }
 
     public void UpdateUserInfo(UpdateUserProfile updateUserProfile)

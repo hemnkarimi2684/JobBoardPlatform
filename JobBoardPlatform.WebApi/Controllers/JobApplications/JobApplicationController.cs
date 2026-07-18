@@ -31,7 +31,7 @@ public class JobApplicationController : ControllerBase
     }
 
     [HttpPatch("{jobApplicationId:guid}")]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Roles = "Admin,Employer")]
     public async Task<IActionResult> UpdateJobApplicationStatusAsync([FromRoute] Guid jobApplicationId, [FromBody] string statusName)
     {
         await _jobApplicationService.UpdateJobApplicationStatusAsync(jobApplicationId, statusName);

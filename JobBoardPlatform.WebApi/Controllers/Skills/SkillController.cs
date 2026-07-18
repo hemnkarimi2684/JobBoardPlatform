@@ -21,6 +21,7 @@ public class SkillController : ControllerBase
     }
 
     [HttpGet("by-user/{userId:guid}")]
+    [Authorize(Roles = "Admin,Employer,JobSeeker")]
     public async Task<IActionResult> GetUserSkillsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
     {
         var result = await _skillService.GetUserSkillsAsync(userId, pagingRequest);

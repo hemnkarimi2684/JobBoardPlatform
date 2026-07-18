@@ -10,7 +10,6 @@ namespace JobBoardPlatform.WebApi.Controllers.Authentications
 {
     [Route("api/[controller]s")]
     [ApiController]
-    [Authorize]
     public class AuthenticationController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;

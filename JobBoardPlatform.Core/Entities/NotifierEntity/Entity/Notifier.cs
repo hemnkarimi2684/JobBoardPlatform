@@ -1,74 +1,97 @@
 ﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
-using JobBoardPlatform.Core.Common.Extensions;
 using JobBoardPlatform.Core.Entities.Common.Entity;
-using System.Security.Cryptography;
+using JobBoardPlatform.Core.Entities.NotifierEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.NotifierEntity.Entity;
 
+/// <summary>
+/// برای اطلاع رسانی 
+/// </summary>
 public class Notifier : BaseEntity
 {
     private Notifier() { }
 
-    public Notifier(string? toEmail, string? toPhoneNumber, string code)
+    public Notifier(string title, string message, NoticeType noticeType, Guid recipientUserId)
     {
-        ToEmail = toEmail;
-        ToPhoneNumber = toPhoneNumber;
-        Code = code;
-        IsUsed = false;
+        Title = title;
+        Message = message;
+        NoticeType = noticeType;
+        IsRead = false;
+        RecipientUserId = recipientUserId;
 
         Validate();
-        SetExpiredAt();
     }
 
     /// <summary>
-    /// فرستاده شده برا ایمیل 
+    /// عنوان اعلان
     /// </summary>
-    public string? ToEmail { get; private set; }
+    public string Title { get; private set; }
 
     /// <summary>
-    /// فرستاده شده برای شماره تلفن
+    /// پیام اعلان
     /// </summary>
-    public string? ToPhoneNumber { get; private set; }
+    public string Message { get; private set; }
 
     /// <summary>
-    /// کد جنریت شده برای کاربر 
+    /// نوع اعلان
     /// </summary>
-    public string Code { get; private set; }
+    public NoticeType NoticeType { get; private set; }
 
     /// <summary>
-    /// تایم اکسپایر
+    /// ایا خونده شده یا نه 
     /// </summary>
-    public DateTime ExpiredAt { get; private set; }
+    public bool IsRead { get; private set; }
 
     /// <summary>
-    /// ایا استفاده شده یا نه
+    /// در چه زمانی خونده شده
     /// </summary>
-    public bool IsUsed { get; private set; }
+    public DateTime? ReadAt { get; private set; }
+
+    #region Foreign Keys
+
+    /// <summary>
+    /// این اعلان به کدوم شناسه کاربر رفته؟
+    /// </summary>
+    public Guid RecipientUserId { get; private set; }
+
+    #endregion
+
+    #region Navigation Properties
+
+    /// <summary>
+    /// جزئیات مربوط به کاربری که این اعلان رو داره
+    /// </summary>
+    public virtual User RecipientUser { get; private set; }
+
+    #endregion
 
     protected override void Validate()
     {
-        if (string.IsNullOrWhiteSpace(Code))
-            throw new DomainException(DomainErrors.CodeIsRequired);
+        if (string.IsNullOrWhiteSpace(Title))
+            throw new DomainException(DomainErrors.NotifierTitleIsRequired);
 
-        //if (Code.Length != 6)
-        //    throw new DomainException(DomainErrors.InvalidCodeFormatException);
+        if (Title.Length < 2 || Title.Length > 150)
+            throw new DomainException(DomainErrors.NotifierTitleInvalidLength);
 
-        if (string.IsNullOrWhiteSpace(ToPhoneNumber) && string.IsNullOrWhiteSpace(ToEmail))
-            throw new DomainException(DomainErrors.PhoneNumberOrEmailIsRequired);
+        if (string.IsNullOrWhiteSpace(Message))
+            throw new DomainException(DomainErrors.NotifierMessageIsRequired);
 
-        if (!string.IsNullOrWhiteSpace(ToPhoneNumber))
-            ToPhoneNumber.PhoneNumberIsValid();
+        if (Message.Length < 10 || Message.Length > 250)
+            throw new DomainException(DomainErrors.NotifierMessageInvalidLength);
 
-        if (!string.IsNullOrWhiteSpace(ToEmail))
-            ToEmail.EmailIsValid();
+        if (RecipientUserId == Guid.Empty)
+            throw new DomainException(DomainErrors.NotifierRecipientUserIdIsRequired);
     }
 
-    private void SetExpiredAt() => ExpiredAt = DateTime.UtcNow.AddMinutes(5);
+    public void Read(Guid modifiedById)
+    {
+        if (IsRead)
+            return;
 
-    //public void GenerateCode()
-    //{
-    //    var random = RandomNumberGenerator.GetInt32(100000, 1000000);
+        IsRead = true;
+        ReadAt = DateTime.UtcNow;
 
-    //    Code = random.ToString();
-    //}
+        Update(modifiedById);
+    }
 }

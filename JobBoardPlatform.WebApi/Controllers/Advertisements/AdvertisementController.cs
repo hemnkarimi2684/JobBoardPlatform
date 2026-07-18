@@ -59,7 +59,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpPatch("{advertisementId:guid}/in-activate")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Employer")]
     public async Task<IActionResult> InActivateAdvertisementAsync([FromRoute] Guid advertisementId)
     {
         await _advertisementService.InActivateAdvertisementAsync(advertisementId);
@@ -68,7 +68,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpPatch("{advertisementId:guid}/activate")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Employer")]
     public async Task<IActionResult> ActivateAdvertisementAsync([FromRoute] Guid advertisementId)
     {
         var result = await _advertisementService.ActivateAdvertisementAsync(advertisementId);

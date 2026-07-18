@@ -23,6 +23,7 @@ namespace JobBoardPlatform.WebApi.Controllers.EducationDetails
         }
 
         [HttpGet("{userId:guid}/educations-detail")]
+        [Authorize(Roles = "Admin,Employer,JobSeeker")]
         public async Task<IActionResult> GetUserEducationDetailsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
         {
             var result = await _educationDetailService.GetUserEducationDetailsAsync(userId, pagingRequest);

@@ -4,13 +4,10 @@ using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Entity;
 using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
-using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
-using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 using JobBoardPlatform.Core.Entities.PaymentEntity.Entity;
-using System.Xml.Linq;
 
 namespace JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 
@@ -154,6 +151,15 @@ public class Advertisement : BaseEntity
 
         if (ExperienceLevel < 0)
             throw new DomainException(DomainErrors.ExperienceLevelOutOfRange);
+
+        if (JobId == Guid.Empty)
+            throw new DomainException(DomainErrors.AdvertisementJobIdIsRequired);
+
+        if (CityId == Guid.Empty)
+            throw new DomainException(DomainErrors.AdvertisementCityIdIsRequired);
+
+        if (CompanyId == Guid.Empty)
+            throw new DomainException(DomainErrors.AdvertisementCompanyIdIsRequired);
     }
 
     /// <summary>

@@ -34,5 +34,5 @@ public interface IResumeService
     /// </summary>
     /// <param name="resumeFileId"></param>
     /// <returns></returns>
-    Task<AttachmentResponseDto> GetResumeFileAsync(Guid resumeFileId);
+    Task<AttachmentResponseDto> DownloadResumeFileAsync(Guid resumeFileId);
 }

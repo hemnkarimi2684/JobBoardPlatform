@@ -4,6 +4,7 @@ using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Entity;
+using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using Microsoft.AspNetCore.Http;
 
@@ -48,7 +49,7 @@ public class AttachmentService : IAttachmentService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
-    public async Task<Guid> UploadAsync(IFormFile formFile)
+    public async Task<Guid> UploadAsync(IFormFile formFile, AttachmentType attachmentType)
     {
         if (formFile == null)
             throw new ValidationException("file is required");
@@ -57,7 +58,7 @@ public class AttachmentService : IAttachmentService
 
         await formFile.CopyToAsync(stream);
 
-        var attachment = new Attachment(formFile.FileName, formFile.ContentType, stream.ToArray(), _currentUser.UserId);
+        var attachment = new Attachment(formFile.FileName, attachmentType, formFile.ContentType, stream.ToArray(), _currentUser.UserId);
 
         await _unitOfWork.AttachmentRepository.AddAsync(attachment);
 

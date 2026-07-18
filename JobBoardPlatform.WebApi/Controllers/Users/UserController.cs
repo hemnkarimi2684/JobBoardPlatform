@@ -39,6 +39,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Users
         }
 
         [HttpGet("{userId:guid}/info")]
+        [Authorize(Roles = "Admin,Employer,JobSeeker")]
         public async Task<IActionResult> GetUserProfileInfoAsync([FromRoute] Guid userId)
         {
             var result = await _userService.GetUserProfileInfoAsync(userId);

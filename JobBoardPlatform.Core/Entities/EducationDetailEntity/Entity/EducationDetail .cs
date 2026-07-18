@@ -4,6 +4,7 @@ using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
+using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
@@ -114,6 +115,8 @@ public class EducationDetail : BaseEntity
                 throw new DomainException(DomainErrors.EducationDetailFinalGradeTooLow);
         }
 
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.EducationDetailUserIdIsRequired);
     }
 
     /// <summary>

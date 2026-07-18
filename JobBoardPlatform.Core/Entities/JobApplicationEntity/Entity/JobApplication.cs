@@ -133,6 +133,14 @@ public class JobApplication : BaseEntity
         if(ExperienceLevel < 0)
             throw new DomainException(DomainErrors.JobApplicationExperienceLevelOutOfRange);
 
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.JobApplicationUserIdIsRequired);
+
+        if (ResumeId == Guid.Empty)
+            throw new DomainException(DomainErrors.JobApplicationResumeIdIsRequired);
+
+        if (AdvertisementId == Guid.Empty)
+            throw new DomainException(DomainErrors.JobApplicationAdvertisementIdIsRequired);
     }
 
     public void UpdateStatus(JobApplicationStatus status, Guid? modifiedById)

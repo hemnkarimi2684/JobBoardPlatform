@@ -69,5 +69,8 @@ public class City : BaseEntity
 
         if (ProvinceCode < 1)
             throw new DomainException(DomainErrors.CityProvinceCodeInvalidRange);
+
+        if (ProvinceId == Guid.Empty)
+            throw new DomainException(DomainErrors.CityProvinceIdIsRequired);
     }
 }

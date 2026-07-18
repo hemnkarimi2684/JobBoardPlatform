@@ -20,7 +20,6 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Employer")]
     public async Task<IActionResult> CreateCompanyAsync([FromBody] CreateCompanyRequestDto createCompany)
     {
         await _companyService.CreateCompanyAsync(createCompany);
@@ -46,7 +45,7 @@ public class CompanyController : ControllerBase
         return Ok(Result.Success());
     }
 
-    [HttpPatch("{companyId:guid}/image")]
+    [HttpPatch("{companyId:guid}/upload-image")]
     [Authorize(Roles = "Employer")]
     public async Task<IActionResult> UploadCompanyImageAsync([FromRoute] Guid companyId, [FromForm] UploadCompanyImageRequestDto imageRequestDto)
     {

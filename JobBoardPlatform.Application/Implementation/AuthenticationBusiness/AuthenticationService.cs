@@ -24,13 +24,16 @@ public class AuthenticationService : IAuthenticationService
 
     private readonly UserManager<User> _userManager;
 
-    public AuthenticationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICompanyService companyService, IJwtService jwtService, UserManager<User> userManager)
+    private readonly SignInManager<User> _signInManager;
+
+    public AuthenticationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICompanyService companyService, IJwtService jwtService, UserManager<User> userManager, SignInManager<User> signInManager)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _companyService = companyService;
         _jwtService = jwtService;
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     public async Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(LoginRequestDto loginCommand)
@@ -41,13 +44,19 @@ public class AuthenticationService : IAuthenticationService
         if (user == null)
             throw new ValidationException("Email/phone number or password is incorrect.");
 
+        var result = await _signInManager.PasswordSignInAsync(user, loginCommand.Password, false, true);
+
+        if (result.IsLockedOut)
+            throw new UnauthorizedException("User is locked out. Please try again 15 minutes later.");
+
+        if (result.IsNotAllowed)
+            throw new ForbiddenException("Login is not allowed for this account.");
+
+        if (!result.Succeeded)
+            throw new ValidationException("Email/phone number or password is incorrect.");
+
         if (user.IsApproved == false)
             throw new ForbiddenException("Dear user, your account has not yet been verified; please try again later.");
-
-        var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginCommand.Password);
-
-        if (!isPasswordValid)
-            throw new ValidationException("Email/phone number or password is incorrect.");
 
         return await _jwtService.GenerateTokenAsync(user);
     }

@@ -135,7 +135,7 @@ public class EducationDetailService : IEducationDetailService
            updateCommand.University,
            updateCommand.StartDate,
            updateCommand.CompletionDate,
-           updateCommand.Percentage < 0 ? null : updateCommand.Percentage,
+           updateCommand.Percentage < 1 ? null : updateCommand.Percentage,
            updateCommand.IsCurrentlyStudying,
            _currentUser.UserId
         );
