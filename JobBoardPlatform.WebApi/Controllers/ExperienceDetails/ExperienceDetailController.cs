@@ -3,6 +3,7 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ExperienceDetailDto;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ namespace JobBoardPlatform.WebApi.Controllers.ExperienceDetails
 
         [HttpGet("{userId:guid}/experience-details")]
         [Authorize(Roles = "Admin,Employer,JobSeeker")]
+        [RequestModelValidationFilter]
         public async Task<IActionResult> GetUserExperienceDetailsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
         {
             var result = await _experienceDetailService.GetUserExperienceDetailsAsync(userId, pagingRequest);
@@ -32,6 +34,7 @@ namespace JobBoardPlatform.WebApi.Controllers.ExperienceDetails
 
         [HttpPost]
         [Authorize(Roles = "JobSeeker")]
+        [RequestModelValidationFilter]
         public async Task<IActionResult> CreateExperienceDetailAsync([FromBody] CreateExperienceDetailRequestDto createExperience)
         {
             await _experienceDetailService.CreateExperienceDetailAsync(createExperience);

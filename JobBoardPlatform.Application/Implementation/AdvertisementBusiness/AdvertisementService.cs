@@ -123,6 +123,11 @@ public class AdvertisementService : IAdvertisementService
         if (!advertisementDeleteResult)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
 
+        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(advertisementId, _currentUser.UserId, false);
+
+        if (!updateAdvertisementStatusResult)
+            throw new NotFoundException($"the advertisement with this id {advertisementId} not found ");
+
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
@@ -278,13 +283,6 @@ public class AdvertisementService : IAdvertisementService
 
         if (!isCityExist)
             throw new NotFoundException($"the city with id {cityId} was not found");
-
-        var isDuplicateAdvertisement = await _unitOfWork.AdvertisementRepository.IsDuplicateAdvertisementAsync(jobId,
-                                                                                                               companyId,
-                                                                                                               cityId);
-
-        if (isDuplicateAdvertisement)
-            throw new ConflictException($"this Advertisement is already exist for this job {jobId} in this company {companyId} and city {cityId} ");
     }
 
     #endregion

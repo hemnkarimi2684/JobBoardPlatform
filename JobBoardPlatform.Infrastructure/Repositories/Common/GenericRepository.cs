@@ -88,12 +88,12 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         if (!tracking)
             query = query.AsNoTracking();
 
-        return await Entities.FindAsync(id);
+        return await Entities.FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public async Task<bool> SoftDeleteAsync(Guid id, Guid? deletedById)
     {
-        var entity = await Entities.FindAsync(id);
+        var entity = await Entities.FirstOrDefaultAsync(e => e.Id == id);
 
         if (entity == null)
             return false;

@@ -4,6 +4,7 @@ using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
 using JobBoardPlatform.Application.Implementation.AdvertisementBusiness;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpPost]
+    [RequestModelValidationFilter]
     [Authorize(Roles = "Employer")]
     public async Task<IActionResult> CreateAdvertisementAsync([FromBody] CreateAdvertisementRequestDto createAdvertisement)
     {
@@ -32,6 +34,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpPut("{advertisementId:guid}")]
+    [RequestModelValidationFilter]
     [Authorize(Roles = "Employer")]
     public async Task<IActionResult> UpdateAdvertisementAsync([FromRoute] Guid advertisementId, [FromBody] UpdateAdvertisementRequestDto updateAdvertisement)
     {

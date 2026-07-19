@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
+using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Users
 
         [HttpPost]
         [Authorize(Roles = "JobSeeker")]
+        [RequestModelValidationFilter]
         public async Task<IActionResult> CreateProfileAsync([FromBody] CreateProfileRequestDto createProfile)
         {
             await _userService.CreateProfileAsync(createProfile);
@@ -31,6 +33,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Users
 
         [HttpPut("{userId:guid}")]
         [Authorize(Roles = "JobSeeker")]
+        [RequestModelValidationFilter]
         public async Task<IActionResult> UpdateProfileAsync([FromRoute] Guid userId, [FromBody] UpdateProfileRequestDto updateProfile)
         {
             await _userService.UpdateProfileAsync(userId, updateProfile);

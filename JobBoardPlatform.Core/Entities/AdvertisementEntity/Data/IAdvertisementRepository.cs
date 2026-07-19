@@ -55,15 +55,6 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
                                               int pageSize = 10);
 
     /// <summary>
-    /// ایا این اگهی با عنوان کاری تکراری برای همون شرکت و همون شهر ثبت شده یا نه
-    /// </summary>
-    /// <param name="jobId"></param>
-    /// <param name="companyId"></param>
-    /// <param name="cityId"></param>
-    /// <returns></returns>
-    Task<bool> IsDuplicateAdvertisementAsync(Guid jobId, Guid companyId, Guid cityId);
-
-    /// <summary>
     /// ایا این اگهی موجود است یا نه 
     /// </summary>
     /// <param name="advertisementId"></param>

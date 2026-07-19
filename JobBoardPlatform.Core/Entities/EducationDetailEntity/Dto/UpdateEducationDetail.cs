@@ -8,7 +8,7 @@ public record UpdateEducationDetail(
     string? University,
     DateTime? StartDate,
     DateTime? CompletionDate,
-    int? Percentage,
+    double? Percentage,
     bool? IsCurrentlyStudying,
     Guid? ModifiedById = null
 );

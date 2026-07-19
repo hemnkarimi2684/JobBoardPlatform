@@ -13,13 +13,13 @@ public record UpdateAdvertisementRequestDto(
     [Range(18, 65, ErrorMessage = "Maximum age must be between 18 and 65.")]
     int? MaximumAge,
 
-    [Range(typeof(decimal), "0.01", "79228162514264337593543950335", ErrorMessage = "MinimumSalary must be greater than 0.")]
+    [Range(0, double.MaxValue, ErrorMessage = "MinimumSalary must be greater than 0.")]
     decimal? MinimumSalary,
 
-    [Range(typeof(decimal), "0.01", "79228162514264337593543950335", ErrorMessage = "MaximumSalary must be greater than 0.")]
+    [Range(0,  double.MaxValue, ErrorMessage = "MaximumSalary must be greater than 0.")]
     decimal? MaximumSalary,
 
-    [Range(1, 50, ErrorMessage = "ExperienceLevel must be between 1 and 50.")]
+    [Range(0, 50, ErrorMessage = "ExperienceLevel must be between 1 and 50.")]
     int? ExperienceLevel,
 
     [MaxLength(25, ErrorMessage = "CollaborationType cannot be more than 25 characters.")]

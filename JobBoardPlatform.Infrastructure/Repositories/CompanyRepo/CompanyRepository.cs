@@ -4,6 +4,7 @@ using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Infrastructure.Repositories.CompanyRepo;
@@ -18,7 +19,7 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
     {
         return await Entities
                          .AsNoTracking()
-                         .Where(c => c.OwnedByUserId == ownerId)
+                         .Where(c => c.OwnedByUserId == ownerId && !c.IsDeleted && c.DeletedAt == null)
                          .Select(projection)
                          .FirstOrDefaultAsync();
     }
@@ -27,7 +28,7 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
     {
         return await Entities
                          .AsNoTracking()
-                         .Where(c => c.Id == companyId)
+                         .Where(c => c.Id == companyId && !c.IsDeleted && c.DeletedAt == null)
                          .Select(c => c.Id)
                          .FirstOrDefaultAsync();
     }
@@ -40,7 +41,7 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
 
     public async Task<bool> UpdateCompanyInfoAsync(Guid companyId, CompanyInfoUpdate companyInfoUpdate)
     {
-        var company = await Entities.FindAsync(companyId);
+        var company = await Entities.FirstOrDefaultAsync(c => c.Id == companyId);
 
         if (company == null)
             return false;

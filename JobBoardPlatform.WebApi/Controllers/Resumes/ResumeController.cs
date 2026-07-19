@@ -2,6 +2,7 @@
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 using JobBoardPlatform.Application.Common.Dto.ResumeDto.Command;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
+using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Resumesک
 
         [HttpPost]
         [Authorize(Roles = "JobSeeker")]
+        [RequestModelValidationFilter]
         public async Task<IActionResult> CreateResumeAsync([FromBody] CreateResumeRequestDto resumeRequest)
         {
             await _resumeService.CreateResumeAsync(resumeRequest);
@@ -48,6 +50,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Resumesک
         }
 
         [HttpPatch("{resumeId:guid}/download")]
+        [Authorize(Roles = "Admin,Employer,JobSeeker")]
         public async Task<IActionResult> DownloadResumeFileAsync([FromRoute] Guid resumeId)
         {
             var result = await _resumeService.DownloadResumeFileAsync(resumeId);

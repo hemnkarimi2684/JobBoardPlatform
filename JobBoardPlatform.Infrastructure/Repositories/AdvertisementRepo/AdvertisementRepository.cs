@@ -18,7 +18,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
         return await Entities
                           .AsNoTracking()
-                          .Where(a => a.Id == advertisementId)
+                          .Where(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null && a.IsActive)
                           .Select(projection)
                           .FirstOrDefaultAsync();
     }
@@ -27,7 +27,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
         return await Entities
                         .AsNoTracking()
-                        .Where(a => a.Id == advertisementId)
+                        .Where(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null)
                         .Select(a => new AdvertisementDetail(
                              a.Description,
                              a.MinimumAge,
@@ -51,7 +51,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
         return await Entities
                         .AsNoTracking()
-                        .Where(a => a.Id == advertisementId)
+                        .Include(a => a.Company.OwnedByUser)
+                        .Where(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null)
                         .Select(a => a.Company.OwnedByUserId)
                         .FirstOrDefaultAsync();
     }
@@ -60,7 +61,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
         var query = Entities
                          .AsNoTracking()
-                         .Where(a => a.CompanyId == companyId);
+                         .Where(a => a.CompanyId == companyId && !a.IsDeleted && a.DeletedAt == null && a.IsActive);
 
         var totalDataCount = await query.CountAsync();
 
@@ -76,16 +77,9 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
     public async Task<bool> IsAdvertisementExistAsync(Guid advertisementId) => await AnyAsync(a => a.Id == advertisementId);
 
-    public async Task<bool> IsDuplicateAdvertisementAsync(Guid jobId, Guid companyId, Guid cityId)
-    {
-        return await AnyAsync(a => a.JobId == jobId &&
-                                   a.CompanyId == companyId &&
-                                   a.CityId == cityId);
-    }
-
     public async Task<bool> UpdateAdvertisementInfoAsync(Guid advertisementId, UpdateAdvertisementInfo updateAdvertisementInfo)
     {
-        var advertisement = await Entities.FindAsync(advertisementId);
+        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null && a.IsActive);
 
         if (advertisement is null)
             return false;
@@ -97,12 +91,12 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
     public async Task<bool> UpdateAdvertisementStatusAsync(Guid advertisementId, Guid? modifiedById, bool isActive)
     {
-        var company = await Entities.FindAsync(advertisementId);
+        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null && a.IsActive);
 
-        if (company is null)
+        if (advertisement is null)
             return false;
 
-        company.UpdateActiveStatus(modifiedById, isActive);
+        advertisement.UpdateActiveStatus(modifiedById, isActive);
 
         return true;
     }

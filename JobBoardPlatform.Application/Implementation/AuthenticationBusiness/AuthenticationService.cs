@@ -68,7 +68,7 @@ public class AuthenticationService : IAuthenticationService
         if (isDupplicateEmailOrPhoneNumber)
             throw new ConflictException("A user with the provided email or phone number already exists.");
 
-        var user = new User(registerCommand.Email, registerCommand.PhoneNumber, false, _currentUser.UserId);
+        var user = new User(registerCommand.Email, registerCommand.PhoneNumber, false);
 
         try
         {
@@ -84,7 +84,7 @@ public class AuthenticationService : IAuthenticationService
             if (!addToRoleResult.Succeeded)
                 throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
 
-            var createdCompanyId = await _companyService.CreateCompanyAsync(registerCommand.ToCreateCompanyRequestDto());
+            var createdCompanyId = await _companyService.CreateCompanyAsync(registerCommand.ToCreateCompanyRequestDto(user.Id));
 
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
@@ -106,7 +106,7 @@ public class AuthenticationService : IAuthenticationService
         if (isDupplicate)
             throw new ConflictException("A user with the provided email or phone number already exists.");
 
-        var user = new User(registerCommand.Email, registerCommand.PhoneNumber, true, _currentUser.UserId);
+        var user = new User(registerCommand.Email, registerCommand.PhoneNumber, true);
 
         try
         {

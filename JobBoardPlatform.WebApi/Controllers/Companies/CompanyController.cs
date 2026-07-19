@@ -28,7 +28,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpGet("{ownerId:guid}")]
-    [Authorize(Roles = "Employer,Admin")]
+   // [Authorize(Roles = "Employer,Admin")]
     public async Task<IActionResult> GetCompanyInfoByOwnerIdAsync([FromRoute] Guid ownerId)
     {
         var result = await _companyService.GetCompanyInfoByOwnerIdAsync(ownerId);
@@ -37,7 +37,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPut("{companyId:guid}")]
-    [Authorize(Roles = "Employer")]
+    //[Authorize(Roles = "Employer")]
     public async Task<IActionResult> UpdateCompanyIdAsync([FromRoute] Guid companyId, [FromBody] UpdateCompanyInfoRequestDto update)
     {
         await _companyService.UpdateCompanyIdAsync(companyId, update);
@@ -46,7 +46,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPatch("{companyId:guid}/upload-image")]
-    [Authorize(Roles = "Employer")]
+    //[Authorize(Roles = "Employer")]
     public async Task<IActionResult> UploadCompanyImageAsync([FromRoute] Guid companyId, [FromForm] UploadCompanyImageRequestDto imageRequestDto)
     {
         await _companyService.UploadCompanyImageAsync(companyId, imageRequestDto);

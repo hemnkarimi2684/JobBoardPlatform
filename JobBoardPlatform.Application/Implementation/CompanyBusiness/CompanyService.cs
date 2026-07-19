@@ -65,7 +65,7 @@ public class CompanyService : ICompanyService
 
         await _unitOfWork.CompanyRepository.AddAsync(company);
 
-        var companyCity = new CompanyCity(createCommand.Location, company.Id, createCommand.CityId, _currentUser.UserId);
+        var companyCity = new CompanyCity(createCommand.Location, company.Id, createCommand.CityId);
 
         await _unitOfWork.CompanyCityRepository.AddAsync(companyCity);
 

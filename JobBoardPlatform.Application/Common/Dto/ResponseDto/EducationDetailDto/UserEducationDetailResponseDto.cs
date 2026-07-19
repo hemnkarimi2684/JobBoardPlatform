@@ -8,7 +8,7 @@ public record UserEducationDetailResponseDto(
     string University,
     DateTime StartDate,
     DateTime? CompletionDate,
-    int? Percentage,
+    double? Percentage,
     bool IsCurrentlyStudying
 );
 

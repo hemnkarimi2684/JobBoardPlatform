@@ -13,22 +13,13 @@ public class JobApplicationModelBuilderConfiguration : BaseModelBuilderConfigura
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.HasIndex(ja => ja.JobTitle)
-            .IsUnique();
-
         builder.Property(ja => ja.CompanyName)
              .IsRequired()
              .HasMaxLength(120);
 
-        builder.HasIndex(ja => ja.CompanyName)
-            .IsUnique();
-
         builder.Property(ja => ja.CityName)
              .IsRequired()
              .HasMaxLength(120);
-
-        builder.HasIndex(ja => ja.CityName)
-            .IsUnique();
 
         builder.Property(ja => ja.UserFullName)
             .IsRequired()

@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
+using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -20,6 +21,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Authentications
         }
 
         [HttpPost("register-employer")]
+        [RequestModelValidationFilter]
         public async Task<IActionResult> RegisterEmployerAsync(RegisterEmployerRequestDto register)
         {
             var result = await _authenticationService.RegisterEmployerAsync(register);
@@ -28,6 +30,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Authentications
         }
 
         [HttpPost("register-jobSeeker")]
+        [RequestModelValidationFilter]
         public async Task<IActionResult> RegisterJobSeekerAsync(RegisterJobSeekerRequestDto register)
         {
             var result = await _authenticationService.RegisterJobSeekerAsync(register);
@@ -36,6 +39,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Authentications
         }
 
         [HttpPost("login")]
+        [RequestModelValidationFilter]
         public async Task<IActionResult> LoginByEmailOrPhoneNumberAndPassword(LoginRequestDto login)
         {
             var result = await _authenticationService.LoginByEmailOrPhoneNumberAndPassword(login);

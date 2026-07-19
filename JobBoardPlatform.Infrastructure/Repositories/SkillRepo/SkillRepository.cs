@@ -23,7 +23,7 @@ public class SkillRepository : GenericRepository<Skill>, ISkillRepository
 
         var query = Entities
                          .AsNoTracking()
-                         .Where(us => EF.Functions.Like(us.Name, $"%{trimmedText}%"));
+                         .Where(us => EF.Functions.Like(us.Name, $"%{trimmedText}%") && !us.IsDeleted && us.DeletedAt == null);
 
         var totalDataCount = await query.CountAsync();
 
@@ -37,6 +37,6 @@ public class SkillRepository : GenericRepository<Skill>, ISkillRepository
         return (result, totalDataCount);
     }
 
-    public async Task<bool> IsDuplicateSkillAsync(string skillName) => await AnyAsync(s => s.Name == skillName);
+    public async Task<bool> IsDuplicateSkillAsync(string skillName) => await AnyAsync(s => s.Name == skillName && !s.IsDeleted && s.DeletedAt == null);
 
 }

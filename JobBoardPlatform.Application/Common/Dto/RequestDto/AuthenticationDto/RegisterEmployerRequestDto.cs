@@ -54,9 +54,6 @@ public class RegisterEmployerRequestDto
     [MaxLength(25, ErrorMessage = "the OwnershipType characteers cannot be higher than 25")]
     public string OwnershipType { get; set; } = default!;
 
-    [Required(ErrorMessage = "the OwnedByUserId is required", AllowEmptyStrings = false)]
-    public Guid OwnedByUserId { get; set; }
-
     [Required(ErrorMessage = "the CompanySize is required", AllowEmptyStrings = false)]
     [MinLength(1, ErrorMessage = "the CompanySize characteers cannot be lower than 1")]
     [MaxLength(25, ErrorMessage = "the CompanySize characteers cannot be higher than 25")]
@@ -70,12 +67,11 @@ public class RegisterEmployerRequestDto
     [MaxLength(2000, ErrorMessage = "the Location characteers cannot be higher than 200")]
     public string Location { get; set; } = default!;
 
-    [Required(ErrorMessage = "the ActivityType is required", AllowEmptyStrings = false)]
     [MinLength(2, ErrorMessage = "the ActivityType characteers cannot be lower than 100")]
     [MaxLength(120, ErrorMessage = "the ActivityType characteers cannot be higher than 2000")]
     public string? ActivityType { get; set; } = null;
 
-    public CreateCompanyRequestDto ToCreateCompanyRequestDto()
+    public CreateCompanyRequestDto ToCreateCompanyRequestDto(Guid ownerByUserId)
     {
         return new CreateCompanyRequestDto(
             Name,
@@ -84,7 +80,7 @@ public class RegisterEmployerRequestDto
             AboutUs,
             WebSiteAddress,
             OwnershipType,
-            OwnedByUserId,
+            ownerByUserId,
             CompanySize,
             CityId,
             Location,

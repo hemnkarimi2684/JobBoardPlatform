@@ -3,6 +3,7 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ public class JobApplicationController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "JobSeeker")]
+    [RequestModelValidationFilter]
     public async Task<IActionResult> CreateJobApplicationAsync([FromBody] CreateJobApplicationRequestDto createJobApplication)
     {
         await _jobApplicationService.CreateJobApplicationAsync(createJobApplication);
@@ -32,6 +34,7 @@ public class JobApplicationController : ControllerBase
 
     [HttpPatch("{jobApplicationId:guid}")]
     [Authorize(Roles = "Admin,Employer")]
+    [RequestModelValidationFilter]
     public async Task<IActionResult> UpdateJobApplicationStatusAsync([FromRoute] Guid jobApplicationId, [FromBody] string statusName)
     {
         await _jobApplicationService.UpdateJobApplicationStatusAsync(jobApplicationId, statusName);

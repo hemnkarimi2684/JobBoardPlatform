@@ -16,7 +16,7 @@ public class EducationDetail : BaseEntity
 {
     private EducationDetail() { }
 
-    public EducationDetail(CertificateDegree certificateDegreeName, string major, string university, DateTime startDate, DateTime? completionDate, int? percentage, bool isCurrentlyStudying, Guid userId, Guid? createdById = null)
+    public EducationDetail(CertificateDegree certificateDegreeName, string major, string university, DateTime startDate, DateTime? completionDate, double? percentage, bool isCurrentlyStudying, Guid userId, Guid? createdById = null)
     {
         HandleCurrentlyStudyingStatus(isCurrentlyStudying);
 
@@ -61,7 +61,7 @@ public class EducationDetail : BaseEntity
     /// <summary>
     /// معدل
     /// </summary>
-    public int? Percentage { get; private set; }
+    public double? Percentage { get; private set; }
 
     /// <summary>
     /// ایا هنوز در حال تحصیل است؟

@@ -4,6 +4,7 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,7 @@ namespace JobBoardPlatform.WebApi.Controllers.EducationDetails
         }
 
         [HttpPost]
+        [RequestModelValidationFilter]
         [Authorize(Roles = "JobSeeker")]
         public async Task<IActionResult> CreateEducationDetailAsync([FromBody] CreateEducationDetailRequestDto createEducation)
         {
@@ -41,6 +43,7 @@ namespace JobBoardPlatform.WebApi.Controllers.EducationDetails
         }
 
         [HttpPut("{educationDetailId:guid}")]
+        [RequestModelValidationFilter]
         [Authorize(Roles = "JobSeeker")]
         public async Task<IActionResult> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailRequestDto updateEducation)
         {

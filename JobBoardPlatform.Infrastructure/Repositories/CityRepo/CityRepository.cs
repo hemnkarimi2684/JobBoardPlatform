@@ -17,7 +17,7 @@ public class CityRepository : GenericRepository<City>, ICityRepository
     {
         var query = Entities
                         .AsNoTracking()
-                        .Where(c => c.ProvinceId == provinceId);
+                        .Where(c => c.ProvinceId == provinceId && !c.IsDeleted && c.DeletedAt == null);
 
         var totalDataCount = await query.CountAsync();
 
