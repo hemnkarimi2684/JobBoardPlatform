@@ -20,7 +20,7 @@ public class CompanyCityRepository : GenericRepository<CompanyCity>, ICompanyCit
     {
         var query = Entities
                         .AsNoTracking()
-                        .Where(cc => cc.CityId == cityId && !cc.IsDeleted && cc.DeletedAt == null);
+                        .Where(cc => cc.CityId == cityId);
 
         var totalDataCount = await query.CountAsync();
 

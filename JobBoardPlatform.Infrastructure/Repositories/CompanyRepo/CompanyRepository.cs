@@ -19,7 +19,7 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
     {
         return await Entities
                          .AsNoTracking()
-                         .Where(c => c.OwnedByUserId == ownerId && !c.IsDeleted && c.DeletedAt == null)
+                         .Where(c => c.OwnedByUserId == ownerId)
                          .Select(projection)
                          .FirstOrDefaultAsync();
     }
@@ -28,7 +28,7 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
     {
         return await Entities
                          .AsNoTracking()
-                         .Where(c => c.Id == companyId && !c.IsDeleted && c.DeletedAt == null)
+                         .Where(c => c.Id == companyId)
                          .Select(c => c.Id)
                          .FirstOrDefaultAsync();
     }

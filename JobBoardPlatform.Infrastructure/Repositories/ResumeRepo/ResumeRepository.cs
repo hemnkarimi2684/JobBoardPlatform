@@ -17,7 +17,7 @@ public class ResumeRepository : GenericRepository<Resume>, IResumeRepository
     {
         return await Entities
                            .AsNoTracking()
-                           .Where(r => r.UserId == userId && !r.IsDeleted && r.DeletedAt == null)
+                           .Where(r => r.UserId == userId)
                            .Select(projection)
                            .FirstOrDefaultAsync();
     }
@@ -26,13 +26,13 @@ public class ResumeRepository : GenericRepository<Resume>, IResumeRepository
     {
         return await Entities
                             .AsNoTracking()
-                            .Where(r => r.Id == resumeId && !r.IsDeleted && r.DeletedAt == null)
+                            .Where(r => r.Id == resumeId)
                             .Select(r => r.LastUploadedFileId)
                             .FirstOrDefaultAsync();
     }
 
-    public async Task<bool> IsDuplicateResumeForUserAsync(Guid userId) => await AnyAsync(r => r.UserId == userId && !r.IsDeleted && r.DeletedAt == null);
+    public async Task<bool> IsDuplicateResumeForUserAsync(Guid userId) => await AnyAsync(r => r.UserId == userId);
 
-    public async Task<bool> IsResumeExistAsync(Guid resumeId) => await AnyAsync(r => r.Id == resumeId && !r.IsDeleted && r.DeletedAt == null);
+    public async Task<bool> IsResumeExistAsync(Guid resumeId) => await AnyAsync(r => r.Id == resumeId);
 
 }

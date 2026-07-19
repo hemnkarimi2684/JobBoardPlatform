@@ -18,7 +18,7 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
     {
         return await Entities
                            .AsNoTracking()
-                           .Where(ed => ed.Id == educationDetailId && !ed.IsDeleted && ed.DeletedAt == null)
+                           .Where(ed => ed.Id == educationDetailId)
                            .Select(ed => ed.UserId)
                            .FirstOrDefaultAsync();
     }
@@ -31,7 +31,7 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
     {
         var query = Entities
                          .AsNoTracking()
-                         .Where(ed => ed.UserId == userId && !ed.IsDeleted && ed.DeletedAt == null);
+                         .Where(ed => ed.UserId == userId);
 
         var totalDataCount = await query.CountAsync();
 
@@ -47,7 +47,7 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
 
     public async Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetail updateEducation)
     {
-        var educationDetail = await Entities.FirstOrDefaultAsync(ed => ed.Id == educationDetailId && !ed.IsDeleted && ed.DeletedAt == null);
+        var educationDetail = await Entities.FirstOrDefaultAsync(ed => ed.Id == educationDetailId);
 
         if (educationDetail is null)
             return false;

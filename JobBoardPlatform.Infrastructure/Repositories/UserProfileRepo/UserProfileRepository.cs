@@ -18,7 +18,7 @@ public class UserProfileRepository : GenericRepository<UserProfile>, IUserProfil
     {
         return await Entities
                           .AsNoTracking()
-                          .Where(up => up.UserId == userId && !up.IsDeleted && up.DeletedAt == null)
+                          .Where(up => up.UserId == userId)
                           .Select(up => up.FirstName + " " + up.LastName)
                           .FirstOrDefaultAsync();
     }
@@ -27,7 +27,7 @@ public class UserProfileRepository : GenericRepository<UserProfile>, IUserProfil
     {
         return await Entities
                            .AsNoTracking()
-                           .Where(up => up.UserId == userId && !up.IsDeleted && up.DeletedAt == null)
+                           .Where(up => up.UserId == userId)
                            .Select(projection)
                            .FirstOrDefaultAsync();
     }
@@ -36,7 +36,7 @@ public class UserProfileRepository : GenericRepository<UserProfile>, IUserProfil
 
     public async Task<bool> UpdateProfileAsync(Guid userId, UpdateUserProfile updateProfile)
     {
-        var userProfile = await Entities.FirstOrDefaultAsync(up => up.UserId == userId && !up.IsDeleted && up.DeletedAt == null);
+        var userProfile = await Entities.FirstOrDefaultAsync(up => up.UserId == userId);
 
         if (userProfile == null)
             return false;

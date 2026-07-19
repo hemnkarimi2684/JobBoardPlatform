@@ -20,7 +20,7 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
     {
         var query = Entities
                       .AsNoTracking()
-                      .Where(ja => ja.AdvertisementId == advertisementId && !ja.IsDeleted && ja.DeletedAt == null);
+                      .Where(ja => ja.AdvertisementId == advertisementId);
 
         var totalDataCount = await query.CountAsync();
 
@@ -38,7 +38,7 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
     {
         return await Entities
                           .AsNoTracking()
-                          .Where(ja => ja.Id == jobApplicationId && !ja.IsDeleted && ja.DeletedAt == null)
+                          .Where(ja => ja.Id == jobApplicationId)
                           .Select(projection)
                           .FirstOrDefaultAsync();
     }
@@ -47,7 +47,7 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
     {
         return await Entities
                          .AsNoTracking()
-                         .Where(ja => ja.Id == jobApplicationId && !ja.IsDeleted && ja.DeletedAt == null)
+                         .Where(ja => ja.Id == jobApplicationId)
                          .Select(ja => ja.UserId)
                          .FirstOrDefaultAsync();
     }

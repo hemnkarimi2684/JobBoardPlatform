@@ -18,7 +18,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
         return await Entities
                           .AsNoTracking()
-                          .Where(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null && a.IsActive)
+                          .Where(a => a.Id == advertisementId && a.IsActive)
                           .Select(projection)
                           .FirstOrDefaultAsync();
     }
@@ -27,7 +27,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
         return await Entities
                         .AsNoTracking()
-                        .Where(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null)
+                        .Where(a => a.Id == advertisementId)
                         .Select(a => new AdvertisementDetail(
                              a.Description,
                              a.MinimumAge,
@@ -61,7 +61,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
         var query = Entities
                          .AsNoTracking()
-                         .Where(a => a.CompanyId == companyId && !a.IsDeleted && a.DeletedAt == null && a.IsActive);
+                         .Where(a => a.CompanyId == companyId && a.IsActive);
 
         var totalDataCount = await query.CountAsync();
 
@@ -79,7 +79,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
     public async Task<bool> UpdateAdvertisementInfoAsync(Guid advertisementId, UpdateAdvertisementInfo updateAdvertisementInfo)
     {
-        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null && a.IsActive);
+        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive);
 
         if (advertisement is null)
             return false;
@@ -91,7 +91,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
     public async Task<bool> UpdateAdvertisementStatusAsync(Guid advertisementId, Guid? modifiedById, bool isActive)
     {
-        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null && a.IsActive);
+        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive);
 
         if (advertisement is null)
             return false;

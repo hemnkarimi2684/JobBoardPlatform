@@ -19,7 +19,7 @@ public class ExperienceDetailRepository : GenericRepository<ExperienceDetail>, I
     {
         return await Entities
                            .AsNoTracking()
-                           .Where(ed => ed.Id == experienceDetailId && !ed.IsDeleted && ed.DeletedAt == null)
+                           .Where(ed => ed.Id == experienceDetailId)
                            .Select(ed => ed.UserId)
                            .FirstOrDefaultAsync();
     }
@@ -28,7 +28,7 @@ public class ExperienceDetailRepository : GenericRepository<ExperienceDetail>, I
     {
         var query = Entities
                          .AsNoTracking()
-                         .Where(ed => ed.UserId == userId && !ed.IsDeleted && ed.DeletedAt == null);
+                         .Where(ed => ed.UserId == userId);
 
         var totalDataCount = await query.CountAsync();
 
@@ -44,7 +44,7 @@ public class ExperienceDetailRepository : GenericRepository<ExperienceDetail>, I
 
     public async Task<bool> UpdateExperienceDetailAsync(Guid experienceDetailId, UpdateExperienceDetail updateExperienceDetail)
     {
-        var experienceDetail = await Entities.FirstOrDefaultAsync(ed => ed.Id == experienceDetailId && !ed.IsDeleted && ed.DeletedAt == null);
+        var experienceDetail = await Entities.FirstOrDefaultAsync(ed => ed.Id == experienceDetailId);
 
         if (experienceDetail is null)
             return false;

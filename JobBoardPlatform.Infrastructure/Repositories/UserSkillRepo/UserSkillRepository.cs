@@ -20,7 +20,7 @@ public class UserSkillRepository : GenericRepository<UserSkill>, IUserSkillRepos
     {
         var query = Entities
                         .AsNoTracking()
-                        .Where(us => us.UserId == userId && !us.IsDeleted && us.DeletedAt == null);
+                        .Where(us => us.UserId == userId);
 
         var totalDataCount = await query.CountAsync();
 
