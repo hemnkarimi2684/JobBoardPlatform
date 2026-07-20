@@ -9,47 +9,46 @@ using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace JobBoardPlatform.WebApi.Controllers.EducationDetails
+namespace JobBoardPlatform.WebApi.Controllers.EducationDetails;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class EducationDetailController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class EducationDetailController : ControllerBase
+    private readonly IEducationDetailService _educationDetailService;
+
+    public EducationDetailController(IEducationDetailService educationDetailService)
     {
-        private readonly IEducationDetailService _educationDetailService;
+        _educationDetailService = educationDetailService;
+    }
 
-        public EducationDetailController(IEducationDetailService educationDetailService)
-        {
-            _educationDetailService = educationDetailService;
-        }
+    [HttpGet("{userId:guid}/educations-detail")]
+    [Authorize(Roles = "Admin,Employer,JobSeeker")]
+    public async Task<IActionResult> GetUserEducationDetailsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
+    {
+        var result = await _educationDetailService.GetUserEducationDetailsAsync(userId, pagingRequest);
 
-        [HttpGet("{userId:guid}/educations-detail")]
-        [Authorize(Roles = "Admin,Employer,JobSeeker")]
-        public async Task<IActionResult> GetUserEducationDetailsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
-        {
-            var result = await _educationDetailService.GetUserEducationDetailsAsync(userId, pagingRequest);
+        return Ok(Result<Pagination<UserEducationDetailResponseDto>>.Success(result));
+    }
 
-            return Ok(Result<Pagination<UserEducationDetailResponseDto>>.Success(result));
-        }
+    [HttpPost]
+    [RequestModelValidationFilter]
+    [Authorize(Roles = "JobSeeker")]
+    public async Task<IActionResult> CreateEducationDetailAsync([FromBody] CreateEducationDetailRequestDto createEducation)
+    {
+        await _educationDetailService.CreateEducationDetailAsync(createEducation);
 
-        [HttpPost]
-        [RequestModelValidationFilter]
-        [Authorize(Roles = "JobSeeker")]
-        public async Task<IActionResult> CreateEducationDetailAsync([FromBody] CreateEducationDetailRequestDto createEducation)
-        {
-            await _educationDetailService.CreateEducationDetailAsync(createEducation);
+        return Ok(Result.Success());
+    }
 
-            return Ok(Result.Success());
-        }
+    [HttpPut("{educationDetailId:guid}")]
+    [RequestModelValidationFilter]
+    [Authorize(Roles = "JobSeeker")]
+    public async Task<IActionResult> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailRequestDto updateEducation)
+    {
+        await _educationDetailService.UpdateEducationDetailAsync(educationDetailId, updateEducation);
 
-        [HttpPut("{educationDetailId:guid}")]
-        [RequestModelValidationFilter]
-        [Authorize(Roles = "JobSeeker")]
-        public async Task<IActionResult> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailRequestDto updateEducation)
-        {
-            await _educationDetailService.UpdateEducationDetailAsync(educationDetailId, updateEducation);
-
-            return Ok(Result.Success());
-        }
+        return Ok(Result.Success());
     }
 }

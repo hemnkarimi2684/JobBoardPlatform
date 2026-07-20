@@ -36,6 +36,8 @@ public class AuthenticationService : IAuthenticationService
         _signInManager = signInManager;
     }
 
+    #region Login methods
+
     public async Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(LoginRequestDto loginCommand)
     {
         var user = await _userManager.FindByEmailAsync(loginCommand.EmailOrPhoneNumber) ??
@@ -60,6 +62,10 @@ public class AuthenticationService : IAuthenticationService
 
         return await _jwtService.GenerateTokenAsync(user);
     }
+
+    #endregion
+
+    #region Register methods
 
     public async Task<EmployerRegisterResponseDto> RegisterEmployerAsync(RegisterEmployerRequestDto registerCommand)
     {
@@ -134,4 +140,6 @@ public class AuthenticationService : IAuthenticationService
 
         return await _jwtService.GenerateTokenAsync(user);
     }
+
+    #endregion
 }

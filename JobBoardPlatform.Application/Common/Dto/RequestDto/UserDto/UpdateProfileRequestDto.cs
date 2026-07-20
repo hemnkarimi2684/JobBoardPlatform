@@ -5,24 +5,21 @@ namespace JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 
 public record UpdateProfileRequestDto(
     [StringLength(100, MinimumLength = 2, ErrorMessage = "First name must be between 2 and 100 characters.")]
-    string FirstName,
+    string? FirstName,
 
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Last name must be between 2 and 100 characters.")]
-    string LastName,
+    string? LastName,
 
     [StringLength(1000, ErrorMessage = "Bio must not exceed 1000 characters.")]
-    string Bio,
+    string? Bio,
 
     [StringLength(300, MinimumLength = 5, ErrorMessage = "Address must be between 5 and 300 characters.")]
-    string Address,
+    string? Address,
 
-    DateTime BirthDate,
+    DateTime? BirthDate,
 
-    Guid CityId,
+    Guid? CityId,
 
-    Guid UserId,
-
-    [StringLength(20, MinimumLength = 2, ErrorMessage = "Gender must be between 2 and 20 characters.")]
-    string Gender
+    Gender? Gender
 );
 

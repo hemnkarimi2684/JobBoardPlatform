@@ -16,6 +16,9 @@ string JobName,
 string AboutCompany,
 string Industry,
 DateTime CreatedAt,
-List<string> SkillNames
-    );
+List<string> SkillNames,
+Guid AdvertisementId,
+Guid CityId,
+Guid CompanyId
+);
 

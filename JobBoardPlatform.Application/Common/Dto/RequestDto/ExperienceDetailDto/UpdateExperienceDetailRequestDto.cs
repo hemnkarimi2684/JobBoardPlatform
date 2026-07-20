@@ -7,8 +7,7 @@ public record UpdateExperienceDetailRequestDto(
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Last job title must be between 2 and 100 characters.")]
     string? LastJobTitle,
 
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "Seniority level must be between 2 and 50 characters.")]
-    string? SeniorityLevel,
+    SeniorityLevel? SeniorityLevel,
 
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Job category must be between 2 and 100 characters.")]
     string? JobCategory,

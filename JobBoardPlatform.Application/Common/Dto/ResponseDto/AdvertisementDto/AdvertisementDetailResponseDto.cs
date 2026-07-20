@@ -5,6 +5,12 @@ namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
 
 public class AdvertisementDetailResponseDto
 {
+    public Guid AdvertisementId { get; set; }
+
+    public Guid CityId { get; set; }
+
+    public Guid CompanyId { get; set; }
+
     public string Description { get; set; } = string.Empty;
 
     public int MinimumAge { get; set; }
@@ -51,6 +57,9 @@ public class AdvertisementDetailResponseDto
             Industry = advertisementDetail.Industry,
             JobName = advertisementDetail.JobName,
             SkillNames = advertisementDetail.SkillNames,
+            AdvertisementId = advertisementDetail.AdvertisementId,
+            CityId = advertisementDetail.CityId,
+            CompanyId = advertisementDetail.CompanyId,
         };
     }
 }

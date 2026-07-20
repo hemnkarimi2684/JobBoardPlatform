@@ -4,9 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
 
 public record CreateEducationDetailRequestDto(
-    [Required(ErrorMessage = "Certificate degree name is required.")]
-    [StringLength(100, MinimumLength = 2, ErrorMessage = "Certificate degree name must be between 2 and 100 characters.")]
-    string CertificateDegreeName,
+    CertificateDegree CertificateDegree,
 
     [Required(ErrorMessage = "Major is required.")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Major must be between 2 and 100 characters.")]

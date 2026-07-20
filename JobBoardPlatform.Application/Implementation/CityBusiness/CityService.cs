@@ -20,15 +20,20 @@ public class CityService : ICityService
         _currentUser = currentUser;
     }
 
+    #region Get Methods
+
     public async Task<Pagination<CompanyDetailResponseDto>> GetCityCompaniesAsync(Guid cityId, PagingRequestDto pagingCommand)
     {
         var (cityCompanies, totalDataCount) = await _unitOfWork.CompanyCityRepository.GetCityCompaniesAsync(cc => new CompanyDetailResponseDto
                                                                                          (
+                                                                                           cc.Id,
+                                                                                           cc.Company.OwnedByUserId,
                                                                                            cc.City.Name,
                                                                                            cc.Company.Name,
                                                                                            cc.Company.YearOfEstablishment,
                                                                                            cc.Company.Industry,
-                                                                                           cc.Company.AboutUs
+                                                                                           cc.Company.AboutUs,
+                                                                                           cc.Company.CompanyImageFileId
                                                                                          ),
                                                                                          cityId,
                                                                                          pagingCommand.PageNumber,
@@ -44,9 +49,11 @@ public class CityService : ICityService
     {
         var (provinceCities, totalDataCount) = await _unitOfWork.CityRepository.GetProvinceCitiesAsync(c => new CityDetailResponseDto
                                                                                          (
+                                                                                           c.Id,
                                                                                            c.Name,
                                                                                            c.CityCode,
                                                                                            c.Province.Name,
+                                                                                           c.ProvinceId,
                                                                                            c.ProvinceCode
                                                                                          ),
                                                                                          provinceId,
@@ -58,4 +65,6 @@ public class CityService : ICityService
                                                              pagingCommand.PageSize,
                                                              totalDataCount);
     }
+
+    #endregion
 }

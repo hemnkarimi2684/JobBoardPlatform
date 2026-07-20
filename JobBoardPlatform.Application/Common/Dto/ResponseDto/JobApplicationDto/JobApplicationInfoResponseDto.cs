@@ -4,6 +4,7 @@ using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 
 public record JobApplicationInfoResponseDto(
+    Guid JobApplicationId,
     string JobTitle,
     string CompanyName,
     string CityName,
@@ -11,5 +12,8 @@ public record JobApplicationInfoResponseDto(
     int ExperienceLevel,
     JobApplicationStatus Status,
     DateTime CreatedAt,
-    string UserProfileName
+    string UserProfileName,
+    Guid ResumeId,
+    Guid AdvertisementId,
+    Guid UserId
     );

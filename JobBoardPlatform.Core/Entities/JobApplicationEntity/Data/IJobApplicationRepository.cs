@@ -44,4 +44,12 @@ public interface IJobApplicationRepository : IGenericRepository<JobApplication>
     /// <param name="jobApplication"></param>
     /// <returns></returns>
     Task<Guid?> GetJobApplicationUserIdAsync(Guid jobApplicationId);
+
+    /// <summary>
+    /// بررسی اینکه برای ایننکه ایا کارفرما متعلق به این درخواست با این رزومه هست یا نه
+    /// </summary>
+    /// <param name="resumeId"></param>
+    /// <param name="currentUserId"></param>
+    /// <returns></returns>
+    Task<bool> CheckOwnerHasJobApplicationForResumeAsync(Guid resumeId, Guid employerId);
 }

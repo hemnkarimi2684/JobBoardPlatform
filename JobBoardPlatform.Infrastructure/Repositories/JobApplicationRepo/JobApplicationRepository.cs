@@ -13,6 +13,12 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
     {
     }
 
+    public async Task<bool> CheckOwnerHasJobApplicationForResumeAsync(Guid resumeId, Guid employerId)
+    {
+        return await Entities
+                           .AnyAsync(ja => ja.ResumeId == resumeId && ja.Advertisement.Company.OwnedByUserId == employerId);
+    }
+
     public async Task<(List<TResult>, int)> GetAdvertisementJobApplicationsAsync<TResult>(Expression<Func<JobApplication, TResult>> projection,
                                                                                           Guid advertisementId,
                                                                                           int pageNumber = 1,

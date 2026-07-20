@@ -3,12 +3,14 @@
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 
 public record CompanyInfoResponseDto(
-    string Name, 
+    string Name,
+    Guid UserId,
     DateTime YearOfEstablishment,
-    string Industry, 
+    string Industry,
     string AboutUs,
     string WebSiteAddress,
-    OwnershipType OwnershipType, 
+    OwnershipType OwnershipType,
     CompanySizeEnum CompanySize,
-    string? ActivityType);
+    string? ActivityType,
+    Guid? CompanyImageFileId);
 

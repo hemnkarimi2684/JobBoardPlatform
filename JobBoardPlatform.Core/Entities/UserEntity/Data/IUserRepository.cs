@@ -1,4 +1,5 @@
 ﻿
+using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
@@ -28,4 +29,13 @@ public interface IUserRepository
     /// <param name="emailOrPhoneNumber"></param>
     /// <returns></returns>
     Task<bool> IsDuplicateEmailOrPhoneNumberAsync(string email, string phoneNumber);
+
+    /// <summary>
+    /// دریافت اطلاعات رزومه کاربر 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<TResult?> GetResumeDetailAsync<TResult>(Expression<Func<User, TResult>> projection, Guid userId);
 }

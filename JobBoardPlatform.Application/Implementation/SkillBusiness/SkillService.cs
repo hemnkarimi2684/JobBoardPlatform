@@ -3,6 +3,7 @@ using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -17,10 +18,13 @@ public class SkillService : ISkillService
 
     private readonly ICurrentUser _currentUser;
 
-    public SkillService(IUnitOfWork unitOfWork, ICurrentUser currentUser)
+    private readonly IAccessControlService _accessControlService;
+
+    public SkillService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
+        _accessControlService = accessControlService;
     }
 
     public async Task<bool> AddSkillsToUserAsync(Guid userId, List<Guid> skillsId)
@@ -30,7 +34,7 @@ public class SkillService : ISkillService
         if (!isUserExist)
             throw new NotFoundException($"the user with id {userId} was not found");
 
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         if (skillsId is not null && skillsId.Any())
         {
@@ -47,7 +51,7 @@ public class SkillService : ISkillService
 
     public async Task<bool> CreateSkillAsync(string name)
     {
-        CheckAdminPermission(_currentUser);
+        _accessControlService.EnsureAdmin(_currentUser);
 
         var isDuplicateSkill = await _unitOfWork.SkillRepository.IsDuplicateSkillAsync(name);
 
@@ -61,16 +65,17 @@ public class SkillService : ISkillService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
-    public async Task<Pagination<UserSkillDetailResponseDto>> GetAllSkillsAsync(string text, PagingRequestDto pagingCommand)
+    public async Task<Pagination<SkillDetailResponseDto>> GetAllSkillsAsync(string text, PagingRequestDto pagingCommand)
     {
-        var (skills, totalDataCount) = await _unitOfWork.SkillRepository.GetAllSkillsAsync(us => new UserSkillDetailResponseDto
+        var (skills, totalDataCount) = await _unitOfWork.SkillRepository.GetAllSkillsAsync(us => new SkillDetailResponseDto
                                                                                 (
+                                                                                  us.Id,
                                                                                   us.Name
                                                                                 ),
                                                                                  text, pagingCommand.PageNumber, pagingCommand.PageSize
                                                                                 );
 
-        return Pagination<UserSkillDetailResponseDto>.GetPagination(skills,
+        return Pagination<SkillDetailResponseDto>.GetPagination(skills,
                                                                pagingCommand.PageNumber,
                                                                pagingCommand.PageSize,
                                                                totalDataCount
@@ -79,11 +84,13 @@ public class SkillService : ISkillService
 
     public async Task<Pagination<UserSkillDetailResponseDto>> GetUserSkillsAsync(Guid userId, PagingRequestDto pagingCommand)
     {
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         var (userSkills, totalDataCount) = await _unitOfWork.UserSkillRepository.GetUserSkillsAsync(us => new UserSkillDetailResponseDto
                                                                                 (
-                                                                                  us.Skill.Name
+                                                                                  us.Id,
+                                                                                  us.Skill.Name,
+                                                                                  us.UserId
                                                                                 ),
                                                                                 userId, pagingCommand.PageNumber, pagingCommand.PageSize
                                                                                 );
@@ -94,27 +101,4 @@ public class SkillService : ISkillService
                                                                totalDataCount
                                                                );
     }
-
-    #region Private Methods
-
-    private void CheckSelfOrAdminPermission(Guid? targetUserId, ICurrentUser currentUser)
-    {
-        var isSelfUser = targetUserId == currentUser.UserId;
-
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        //اینجا چک میشه که کاربر فقط بتونه خودش اطلاعات مدرک تحصیلیش رو اپدیت کنه نه کس دیگه ای به جز ادمین                                                               
-        if (!isAdmin && !isSelfUser)
-            throw new ForbiddenException("You do not have sufficient access to manage this skill.");
-    }
-
-    private void CheckAdminPermission(ICurrentUser currentUser)
-    {
-        var isAdminOrEmployer = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        if (!isAdminOrEmployer)
-            throw new ForbiddenException("You do not have sufficient access to manage a skill.");
-    }
-
-    #endregion
 }

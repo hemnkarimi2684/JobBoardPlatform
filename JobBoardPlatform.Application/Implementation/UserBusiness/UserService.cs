@@ -3,6 +3,7 @@ using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
@@ -20,12 +21,15 @@ public class UserService : IUserService
 
     private readonly ICurrentUser _currentUser;
 
+    private readonly IAccessControlService _accessControlService;
+
     private readonly UserManager<User> _userManager;
 
-    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, UserManager<User> userManager)
+    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, UserManager<User> userManager)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
+        _accessControlService = accessControlService;
         _userManager = userManager;
     }
 
@@ -36,7 +40,7 @@ public class UserService : IUserService
         if (!doesUserExist)
             throw new NotFoundException($"User with id {createCommand.UserId} was not found.");
 
-        CheckSelfOrAdminPermission(createCommand.UserId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(createCommand.UserId, _currentUser);
 
         var isDuplicateUserProfile = await _unitOfWork.UserProfileRepository.IsDuplicateUserProfileAsync(createCommand.UserId);
 
@@ -48,8 +52,6 @@ public class UserService : IUserService
         if (!doesCityExist)
             throw new NotFoundException($"City with id {createCommand.CityId} was not found.");
 
-        var gender = ParseGenderForCreate(createCommand.Gender);
-
         var userProfile = new UserProfile(
                                           createCommand.FirstName,
                                           createCommand.LastName,
@@ -58,7 +60,7 @@ public class UserService : IUserService
                                           createCommand.BirthDate,
                                           createCommand.UserId,
                                           createCommand.CityId,
-                                          gender,
+                                          createCommand.Gender,
                                           null,
                                           _currentUser.UserId
                                           );
@@ -70,9 +72,10 @@ public class UserService : IUserService
 
     public async Task<UserProfileInfoResponseDto> GetUserProfileInfoAsync(Guid userId)
     {
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileInfoAsync(up => new UserProfileInfoResponseDto(
+                                                                                    up.UserId,
                                                                                     up.FirstName + " " + up.LastName,
                                                                                     up.Bio,
                                                                                     up.Address,
@@ -90,7 +93,7 @@ public class UserService : IUserService
 
     public async Task<bool> UpdateProfileAsync(Guid userId, UpdateProfileRequestDto updateCommand)
     {
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         if (updateCommand.CityId != null)
         {
@@ -110,7 +113,7 @@ public class UserService : IUserService
 
     public async Task<bool> ApprovedEmployerAsync(Guid userId)
     {
-        CheckAdminPermission(_currentUser);
+        _accessControlService.EnsureAdmin(_currentUser);
 
         var user = await _userManager.FindByIdAsync(userId.ToString());
 
@@ -160,50 +163,8 @@ public class UserService : IUserService
 
     #region Private methods
 
-    private void CheckSelfOrAdminPermission(Guid targetUserId, ICurrentUser currentUser)
-    {
-        var isSelfUser = targetUserId == currentUser.UserId;
-
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        if (!isAdmin && !isSelfUser)
-            throw new ForbiddenException("You do not have sufficient access to manage this user actions.");
-    }
-
-    private void CheckAdminPermission(ICurrentUser currentUser)
-    {
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        if (!isAdmin)
-            throw new ForbiddenException("You do not have sufficient access to manage this user actions.");
-    }
-
-    private Gender ParseGenderForCreate(string gender)
-    {
-        if (string.IsNullOrWhiteSpace(gender))
-            throw new ValidationException("gender is required.");
-
-        if (!Enum.TryParse<Gender>(gender, true, out var result))
-            throw new ValidationException("Invalid gender type.");
-
-        return result;
-    }
-
-    private Gender? ParseGenderEnumForUpdate(string? gender)
-    {
-        if (string.IsNullOrWhiteSpace(gender))
-            return null;
-
-        if (!Enum.TryParse<Gender>(gender, true, out var result))
-            throw new ValidationException("Invalid gender type.");
-
-        return result;
-    }
-
     private UpdateUserProfile MapToUpdateUserProfile(UpdateProfileRequestDto updateCommand)
     {
-        var gender = ParseGenderEnumForUpdate(updateCommand.Gender);
-
         return new UpdateUserProfile
         (
           updateCommand.FirstName,
@@ -212,7 +173,7 @@ public class UserService : IUserService
           updateCommand.Address,
           updateCommand.BirthDate,
           updateCommand.CityId,
-          gender,
+          updateCommand.Gender,
           _currentUser.UserId
         );
     }

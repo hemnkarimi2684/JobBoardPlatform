@@ -4,12 +4,14 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Application.Implementation.JobApplicationBusiness;
 
@@ -21,12 +23,17 @@ public class JobApplicationService : IJobApplicationService
 
     private readonly IAdvertisementService _advertisementService;
 
-    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService)
+    private readonly IAccessControlService _accessControlService;
+
+    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _advertisementService = advertisementService;
+        _accessControlService = accessControlService;
     }
+
+    #region Create Methods
 
     public async Task<bool> CreateJobApplicationAsync(CreateJobApplicationRequestDto createCommand)
     {
@@ -45,16 +52,21 @@ public class JobApplicationService : IJobApplicationService
         return await _unitOfWork.SaveChangesAsync() > 0;
     }
 
+    #endregion
+
+    #region Get Methods 
+
     public async Task<Pagination<JobApplicationInfoResponseDto>> GetAdvertisementJobApplicationsAsync(Guid advertisementId, PagingRequestDto pagingCommand)
     {
         var userId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId);
 
-        CheckOwnerOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureOwnerEmployerOrAdmin(userId.Value, _currentUser);
 
         var (advertisementJobApplications, totalDataCount) = await _unitOfWork
                                                                         .JobApplicationRepository
                                                                         .GetAdvertisementJobApplicationsAsync(ja => new JobApplicationInfoResponseDto
                                                                         (
+                                                                            ja.Id,
                                                                             ja.JobTitle,
                                                                             ja.CompanyName,
                                                                             ja.CityName,
@@ -62,7 +74,10 @@ public class JobApplicationService : IJobApplicationService
                                                                             ja.ExperienceLevel,
                                                                             ja.Status,
                                                                             ja.CreatedAt,
-                                                                            ja.UserFullName
+                                                                            ja.UserFullName,
+                                                                            ja.ResumeId,
+                                                                            ja.AdvertisementId,
+                                                                            ja.UserId
                                                                         ),
                                                                         advertisementId,
                                                                         pagingCommand.PageNumber,
@@ -87,15 +102,20 @@ public class JobApplicationService : IJobApplicationService
         if (ownerId == null)
             throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
 
-        CheckOwnerOrAdminOrEmployerPermission(ownerId, jobApplication.UserId, _currentUser);
+        _accessControlService.EnsureApplicantOrOwnerEmployerOrAdmin(ownerId.Value, jobApplication.UserId, _currentUser);
 
-        return new JobApplicationInfoResponseDto(jobApplication.JobTitle, jobApplication.CompanyName, jobApplication.CityName,
+        return new JobApplicationInfoResponseDto(jobApplication.Id, jobApplication.JobTitle, jobApplication.CompanyName, jobApplication.CityName,
                                             jobApplication.CollaborationType, jobApplication.ExperienceLevel, jobApplication.Status,
-                                            jobApplication.CreatedAt, jobApplication.UserFullName
+                                            jobApplication.CreatedAt, jobApplication.UserFullName, jobApplication.ResumeId,
+                                            jobApplication.AdvertisementId, jobApplication.UserId
                                             );
     }
 
-    public async Task<bool> UpdateJobApplicationStatusAsync(Guid jobApplicationId, string status)
+    #endregion
+
+    #region Update Methods
+
+    public async Task<bool> UpdateJobApplicationStatusAsync(Guid jobApplicationId, JobApplicationStatus status)
     {
         var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId);
 
@@ -107,23 +127,23 @@ public class JobApplicationService : IJobApplicationService
         if (ownerId == null)
             throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
 
-        CheckOwnerOrAdminPermission(ownerId, _currentUser);
+        _accessControlService.EnsureOwnerEmployerOrAdmin(ownerId.Value, _currentUser);
 
-        var jobApplicationStatus = ParseJobApplicationStatus(status);
+        ValidateJobApplicationStatus(jobApplication, status);
 
-        ValidateJobApplicationStatus(jobApplication, jobApplicationStatus);
-
-        jobApplication.UpdateStatus(jobApplicationStatus, _currentUser.UserId);
+        jobApplication.UpdateStatus(status, _currentUser.UserId);
 
         return await _unitOfWork.SaveChangesAsync() > 0;
 
     }
 
+    #endregion
+
     #region Private Methods
 
     private async Task ValidationForCreateMethod(Guid resumeId, Guid advertisementId, Guid userId)
     {
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         var isResumeExist = await _unitOfWork.ResumeRepository.IsResumeExistAsync(resumeId);
 
@@ -168,54 +188,6 @@ public class JobApplicationService : IJobApplicationService
             if (jobApplicationStatus == JobApplicationStatus.Reviewing)
                 throw new ValidationException("The status cannot be reverted from Interviewing to Under Review, as the review has already been completed.");
         }
-    }
-
-    private void CheckOwnerOrAdminPermission(Guid? ownerId, ICurrentUser currentUser)
-    {
-        var isOwner = ownerId == currentUser.UserId;
-
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        var isEmployer = currentUser.UserRoles.Contains(RoleConstants.EmployerRoleName);
-
-        if (!isAdmin && !(isOwner && isEmployer))
-            throw new ForbiddenException("You do not have sufficient access to manage this jobApplication.");
-    }
-
-    private void CheckOwnerOrAdminOrEmployerPermission(Guid? ownerId, Guid? userId, ICurrentUser currentUser)
-    {
-        var isOwner = ownerId == currentUser.UserId;
-
-        var isSelf = userId == currentUser.UserId;
-
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        var isEmployer = currentUser.UserRoles.Contains(RoleConstants.EmployerRoleName);
-
-        if (!isAdmin && !(isOwner && isEmployer) && !isSelf)
-            throw new ForbiddenException("You do not have sufficient access to manage this jobApplication.");
-    }
-
-    private void CheckSelfOrAdminPermission(Guid? targetUserId, ICurrentUser currentUser)
-    {
-        var isSelfUser = targetUserId == currentUser.UserId;
-
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        //اینجا چک میشه که کاربر فقط بتونه خودش اطلاعات مدرک تحصیلیش رو اپدیت کنه نه کس دیگه ای به جز ادمین                                                               
-        if (!isAdmin && !isSelfUser)
-            throw new ForbiddenException("You do not have sufficient access to manage this jobApplication.");
-    }
-
-    private JobApplicationStatus ParseJobApplicationStatus(string jobApplicationStatus)
-    {
-        if (string.IsNullOrWhiteSpace(jobApplicationStatus))
-            throw new ValidationException("jobApplicationStatus is required.");
-
-        if (!Enum.TryParse<JobApplicationStatus>(jobApplicationStatus, true, out var result))
-            throw new ValidationException("Invalid jobApplicationStatus type.");
-
-        return result;
     }
 
     #endregion

@@ -2,6 +2,7 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 
 namespace JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 
@@ -34,5 +35,5 @@ public interface IJobApplicationService
     /// <param name="jobApplicationId"></param>
     /// <param name="statusName"></param>
     /// <returns></returns>
-    Task<bool> UpdateJobApplicationStatusAsync(Guid jobApplicationId, string statusName);
+    Task<bool> UpdateJobApplicationStatusAsync(Guid jobApplicationId, JobApplicationStatus status);
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 
@@ -22,6 +23,5 @@ public record UpdateAdvertisementRequestDto(
     [Range(0, 50, ErrorMessage = "ExperienceLevel must be between 1 and 50.")]
     int? ExperienceLevel,
 
-    [MaxLength(25, ErrorMessage = "CollaborationType cannot be more than 25 characters.")]
-    string? CollaborationType
+    CollaborationType? CollaborationType
 );

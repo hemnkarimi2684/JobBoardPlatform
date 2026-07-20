@@ -34,6 +34,12 @@ public class UserProfileRepository : GenericRepository<UserProfile>, IUserProfil
 
     public async Task<bool> IsDuplicateUserProfileAsync(Guid userId) => await AnyAsync(up => up.UserId == userId);
 
+    public async Task<bool> IsUserHasProfileAsync(Guid userId)
+    {
+        return await Entities
+                          .AnyAsync(up => up.UserId == userId);
+    }
+
     public async Task<bool> UpdateProfileAsync(Guid userId, UpdateUserProfile updateProfile)
     {
         var userProfile = await Entities.FirstOrDefaultAsync(up => up.UserId == userId);

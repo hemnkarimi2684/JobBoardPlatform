@@ -1,11 +1,10 @@
 ﻿using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
 
-namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.ExperienceDetailDto;
+namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 
-public record UserExperienceDetailResponseDto(
+public record ResumeExperienceDetailResponseDto(
     Guid ExperienceDetailId,
     string LastJobTitle,
-    Guid UserId,
     SeniorityLevel SeniorityLevel,
     string JobCategory,
     string City,
@@ -13,3 +12,4 @@ public record UserExperienceDetailResponseDto(
     DateTime? EndDate,
     bool IsCurrentJob
 );
+

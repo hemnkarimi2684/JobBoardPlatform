@@ -9,8 +9,7 @@ public record CreateExperienceDetailRequestDto(
     string LastJobTitle,
 
     [Required(ErrorMessage = "Seniority level is required.")]
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "Seniority level must be between 2 and 50 characters.")]
-    string SeniorityLevel,
+    SeniorityLevel SeniorityLevel,
 
     [Required(ErrorMessage = "Job category is required.")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Job category must be between 2 and 100 characters.")]

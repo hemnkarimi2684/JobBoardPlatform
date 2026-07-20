@@ -30,17 +30,13 @@ public record CreateCompanyRequestDto(
                                        string WebSiteAddress,
 
                                        [Required(ErrorMessage = "the OwnershipType is required", AllowEmptyStrings = false)]
-                                       [MinLength(1, ErrorMessage = "the OwnershipType characteers cannot be lower than 1")]
-                                       [MaxLength(25, ErrorMessage = "the OwnershipType characteers cannot be higher than 25")]
-                                       string OwnershipType,
+                                       OwnershipType OwnershipType,
 
                                        [Required(ErrorMessage = "the OwnedByUserId is required", AllowEmptyStrings = false)]
                                        Guid OwnedByUserId,
 
                                        [Required(ErrorMessage = "the CompanySize is required", AllowEmptyStrings = false)]
-                                       [MinLength(1, ErrorMessage = "the CompanySize characteers cannot be lower than 1")]
-                                       [MaxLength(25, ErrorMessage = "the CompanySize characteers cannot be higher than 25")]
-                                       string CompanySize,
+                                       CompanySizeEnum CompanySize,
 
                                        [Required(ErrorMessage = "the CityId is required", AllowEmptyStrings = false)]
                                        Guid CityId,

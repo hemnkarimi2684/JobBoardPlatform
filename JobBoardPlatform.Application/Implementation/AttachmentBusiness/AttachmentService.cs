@@ -27,6 +27,7 @@ public class AttachmentService : IAttachmentService
     {
         var attachment = await _unitOfWork.AttachmentRepository.GetAttachmentByIdAsync(a => new AttachmentResponseDto
         {
+            AttachmentId = a.Id,
             FileName = a.FileName,
             ContentType = a.ContentType,
             Data = a.Data

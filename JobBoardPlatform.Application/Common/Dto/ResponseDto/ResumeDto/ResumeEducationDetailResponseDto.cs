@@ -1,10 +1,9 @@
 ﻿using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
 
-namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
+namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 
-public record UserEducationDetailResponseDto(
+public record ResumeEducationDetailResponseDto(
     Guid EducationDetailId,
-    Guid UserId,
     CertificateDegree CertificateDegreeName,
     string Major,
     string University,

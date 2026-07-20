@@ -25,9 +25,7 @@ public record CreateAdvertisementRequestDto(
                                             int ExperienceLevel,
 
                                             [Required(ErrorMessage = "the DescriptiCollaborationTypeon is required", AllowEmptyStrings = false)]
-                                            [MinLength(0, ErrorMessage = "the CollaborationType characteers cannot be lower than 0")]
-                                            [MaxLength(25, ErrorMessage = "the CollaborationType characteers cannot be higher than 25")]
-                                            string CollaborationType,
+                                            CollaborationType CollaborationType,
 
                                             [Required(ErrorMessage = "the JobId is required", AllowEmptyStrings = false)]
                                             Guid JobId,

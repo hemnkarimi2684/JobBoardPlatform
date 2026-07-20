@@ -3,7 +3,6 @@ using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Infrastructure.Repositories.ResumeRepo;
 
@@ -13,16 +12,14 @@ public class ResumeRepository : GenericRepository<Resume>, IResumeRepository
     {
     }
 
-    public async Task<TResult?> GetResumeByUserIdAsync<TResult>(Expression<Func<Resume, TResult>> projection, Guid userId)
+    public async Task<Resume?> GetResumeByUserIdAsync(Guid userId)
     {
         return await Entities
-                           .AsNoTracking()
-                           .Where(r => r.UserId == userId)
-                           .Select(projection)
-                           .FirstOrDefaultAsync();
+                         .AsNoTracking()
+                         .FirstOrDefaultAsync(r => r.UserId == userId);
     }
 
-    public async Task<Guid?> GetResumeFileIdAsync(Guid resumeId)
+    public async Task<Guid?> GetResumeFileIdResumeIdAsync(Guid resumeId)
     {
         return await Entities
                             .AsNoTracking()
@@ -31,8 +28,25 @@ public class ResumeRepository : GenericRepository<Resume>, IResumeRepository
                             .FirstOrDefaultAsync();
     }
 
+    public async Task<Guid?> GetResumeFileIdUserIdAsync(Guid userId)
+    {
+        return await Entities
+                            .AsNoTracking()
+                            .Where(r => r.UserId == userId)
+                            .Select(r => r.LastUploadedFileId)
+                            .FirstOrDefaultAsync();
+    }
+
+    public async Task<Guid?> GetResumeIdByUserIdAsync(Guid userId)
+    {
+        return await Entities
+                        .AsNoTracking()
+                        .Where(r => r.UserId == userId)
+                        .Select(r => r.UserId)
+                        .FirstOrDefaultAsync();
+    }
+
     public async Task<bool> IsDuplicateResumeForUserAsync(Guid userId) => await AnyAsync(r => r.UserId == userId);
 
     public async Task<bool> IsResumeExistAsync(Guid resumeId) => await AnyAsync(r => r.Id == resumeId);
-
 }

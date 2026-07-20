@@ -42,7 +42,10 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                              a.Company.AboutUs,
                              a.Company.Industry,
                              a.CreatedAt,
-                             a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+                             a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
+                             a.Id,
+                             a.CityId,
+                             a.CompanyId
                              ))
                         .FirstOrDefaultAsync();
     }

@@ -35,4 +35,11 @@ public interface IUserProfileRepository : IGenericRepository<UserProfile>
     /// <param name="userId"></param>
     /// <returns></returns>
     Task<string?> GetUserFullNameByUserIdAsync(Guid userId);
+
+    /// <summary>
+    /// ایا کاربر ورد نظر پروفایل دارد یا نه
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<bool> IsUserHasProfileAsync(Guid userId);
 }

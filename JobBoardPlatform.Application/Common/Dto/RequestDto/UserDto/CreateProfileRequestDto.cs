@@ -29,6 +29,5 @@ public record CreateProfileRequestDto(
     Guid UserId,
 
     [Required(ErrorMessage = "Gender is required.")]
-    [StringLength(20, MinimumLength = 2, ErrorMessage = "Gender must be between 2 and 20 characters.")]
-    string Gender
+    Gender Gender
 );

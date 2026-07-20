@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -50,14 +51,10 @@ public class RegisterEmployerRequestDto
     public string WebSiteAddress { get; set; } = default!;
 
     [Required(ErrorMessage = "the OwnershipType is required", AllowEmptyStrings = false)]
-    [MinLength(1, ErrorMessage = "the OwnershipType characteers cannot be lower than 1")]
-    [MaxLength(25, ErrorMessage = "the OwnershipType characteers cannot be higher than 25")]
-    public string OwnershipType { get; set; } = default!;
+    public OwnershipType OwnershipType { get; set; } = default!;
 
     [Required(ErrorMessage = "the CompanySize is required", AllowEmptyStrings = false)]
-    [MinLength(1, ErrorMessage = "the CompanySize characteers cannot be lower than 1")]
-    [MaxLength(25, ErrorMessage = "the CompanySize characteers cannot be higher than 25")]
-    public string CompanySize { get; set; } = default!;
+    public CompanySizeEnum CompanySize { get; set; } = default!;
 
     [Required(ErrorMessage = "the CityId is required", AllowEmptyStrings = false)]
     public Guid CityId { get; set; }

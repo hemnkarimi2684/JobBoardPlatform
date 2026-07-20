@@ -34,5 +34,5 @@ public interface ISkillService
     /// <param name="text"></param>
     /// <param name="pagingCommand"></param>
     /// <returns></returns>
-    Task<Pagination<UserSkillDetailResponseDto>> GetAllSkillsAsync(string text, PagingRequestDto pagingCommand);
+    Task<Pagination<SkillDetailResponseDto>> GetAllSkillsAsync(string text, PagingRequestDto pagingCommand);
 }

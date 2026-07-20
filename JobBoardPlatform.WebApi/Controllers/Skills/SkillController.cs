@@ -52,6 +52,6 @@ public class SkillController : ControllerBase
     {
         var result = await _skillService.GetAllSkillsAsync(text, pagingRequest);
 
-        return Ok(Result<Pagination<UserSkillDetailResponseDto>>.Success(result));
+        return Ok(Result<Pagination<SkillDetailResponseDto>>.Success(result));
     }
 }

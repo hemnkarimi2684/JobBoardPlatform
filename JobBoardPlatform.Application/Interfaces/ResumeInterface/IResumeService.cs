@@ -2,6 +2,8 @@
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 using JobBoardPlatform.Application.Common.Dto.ResumeDto.Command;
+using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
+using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Application.Interfaces.ResumeInterface;
 
@@ -15,24 +17,46 @@ public interface IResumeService
     Task<bool> CreateResumeAsync(CreateResumeRequestDto resumeCommand);
 
     /// <summary>
-    /// دریافت رزومه با شناسه کاربر 
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <returns></returns>
-    Task<ResumeDetailResponseDto> GetResumeByUserIdAsync(Guid userId);
-
-    /// <summary>
-    /// اپلود فایل رزومه 
+    /// اپلود فایل رزومه توسط شناسه رزومه
     /// </summary>
     /// <param name="resumeId"></param>
     /// <param name="uploadResumeFile"></param>
     /// <returns></returns>
-    Task UploadResumeFileAsync(Guid resumeId, UploadResumeFileRequestDto uploadResumeFile);
+    Task UploadResumeFileByResumeIdAsync(Guid resumeId, UploadResumeFileRequestDto uploadResumeFile);
 
     /// <summary>
-    /// دریافت فایل رزومه
+    /// دریافت فایل رزومه توسط شناسه رزومه 
     /// </summary>
-    /// <param name="resumeFileId"></param>
+    /// <param name="resumeId"></param>
     /// <returns></returns>
-    Task<AttachmentResponseDto> DownloadResumeFileAsync(Guid resumeFileId);
+    Task<AttachmentResponseDto> DownloadResumeFileByResumeIdAsync(Guid resumeId);
+
+    /// <summary>
+    /// اپلود فایل رزومه توسط شناسه کاربر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="uploadResumeFile"></param>
+    /// <returns></returns>
+    Task UploadResumeFileByUserIdAsync(Guid userId, UploadResumeFileRequestDto uploadResumeFile);
+
+    /// <summary>
+    /// دریافت فایل رزومه توسط شناسه کاربر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<AttachmentResponseDto> DownloadResumeFileByUserIdAsync(Guid userId);
+
+    /// <summary>
+    /// حذف فایل رزومه 
+    /// </summary>
+    /// <param name="resumeId"></param>
+    /// <returns></returns>
+    Task<bool> DeleteResumeFileByIdAsync(Guid resumeId);
+
+    /// <summary>
+    /// دریافت اطلاعات رزومه توسط شناسه کاربر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<ResumeDetailResponseDto> GetResumeDetailAsync(Guid userId);
 }

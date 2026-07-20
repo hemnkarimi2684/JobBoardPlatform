@@ -21,19 +21,30 @@ public interface IResumeRepository : IGenericRepository<Resume>
     Task<bool> IsDuplicateResumeForUserAsync(Guid userId);
 
     /// <summary>
-    /// دریافت رزومه کاربر توسط شناسه اش 
-    /// </summary>
-    /// <typeparam name="TResult"></typeparam>
-    /// <param name="projection"></param>
-    /// <param name="userId"></param>
-    /// <returns></returns>
-    Task<TResult?> GetResumeByUserIdAsync<TResult>(Expression<Func<Resume,TResult>> projection,
-                                                   Guid userId);
-
-    /// <summary>
     /// دریافت ایدی فایل اپلود شده رزومه
     /// </summary>
-    /// <param name="resumeFileId"></param>
+    /// <param name="resumeId"></param>
     /// <returns></returns>
-    Task<Guid?> GetResumeFileIdAsync(Guid resumeId);
+    Task<Guid?> GetResumeFileIdResumeIdAsync(Guid resumeId);
+
+    /// <summary>
+    /// دریافت رزومه توسط شناسه کاربر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<Resume?> GetResumeByUserIdAsync(Guid userId);
+
+    /// <summary>
+    /// دریافت شناسه فایل رزومه توسط شناسه کاربر 
+    /// </summary>
+    /// <param name="resumeId"></param>
+    /// <returns></returns>
+    Task<Guid?> GetResumeFileIdUserIdAsync(Guid userId);
+
+    /// <summary>
+    /// دریافت شناسه رزومه توسط شناسه کاربر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<Guid?> GetResumeIdByUserIdAsync(Guid userId);
 }

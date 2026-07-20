@@ -26,13 +26,9 @@ public record UpdateCompanyInfoRequestDto(
                                          [MaxLength(100, ErrorMessage = "the WebSiteAddress characteers cannot be higher than 100")]
                                          string? WebSiteAddress,
 
-                                         [MinLength(1, ErrorMessage = "the OwnershipType characteers cannot be lower than 1")]
-                                         [MaxLength(25, ErrorMessage = "the OwnershipType characteers cannot be higher than 25")]
-                                         string? OwnershipType,
+                                         OwnershipType? OwnershipType,
 
-                                         [MinLength(1, ErrorMessage = "the CompanySize characteers cannot be lower than 1")]
-                                         [MaxLength(25, ErrorMessage = "the CompanySize characteers cannot be higher than 25")]
-                                         string? CompanySize,
+                                         CompanySizeEnum? CompanySize,
 
                                          [MinLength(2, ErrorMessage = "the ActivityType characteers cannot be lower than 100")]
                                          [MaxLength(120, ErrorMessage = "the ActivityType characteers cannot be higher than 2000")]
