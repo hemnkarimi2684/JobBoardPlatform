@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.SkillEntity.Entity;
 
@@ -8,10 +9,13 @@ public class AdvertisementSkill : BaseEntity
 {
     private AdvertisementSkill() { }
 
-    public AdvertisementSkill(Guid advertisementId, Guid skillId)
+    public AdvertisementSkill(Guid advertisementId, Guid skillId, Guid? createdById = null)
     {
         AdvertisementId = advertisementId;
         SkillId = skillId;
+        CreatedById = createdById;
+
+        Validate();
     }
 
     #region Foreign Keys
@@ -42,6 +46,13 @@ public class AdvertisementSkill : BaseEntity
 
     #endregion
 
-    protected override void Validate() => throw new NotImplementedException();
-    
+    protected override void Validate()
+    {
+        if (AdvertisementId == Guid.Empty)
+            throw new DomainException(DomainErrors.AdvertisementSkillAdvertisementIdIsRequired);
+
+        if (SkillId == Guid.Empty)
+            throw new DomainException(DomainErrors.AdvertisementSkillSkillIdIsRequired);
+    }
+
 }

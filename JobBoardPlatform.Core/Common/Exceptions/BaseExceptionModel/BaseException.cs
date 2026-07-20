@@ -12,5 +12,5 @@ public abstract class BaseException : Exception
         Code = code;
     }
 
-    protected string Code { get; private set; }
+    public string Code { get; private set; }
 }

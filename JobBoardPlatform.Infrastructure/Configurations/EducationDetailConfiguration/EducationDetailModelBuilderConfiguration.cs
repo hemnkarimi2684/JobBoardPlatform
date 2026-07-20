@@ -21,8 +21,5 @@ public class EducationDetailModelBuilderConfiguration : BaseModelBuilderConfigur
         builder.Property(ed => ed.University)
             .IsRequired()
             .HasMaxLength(100);
-
-        builder.Property(ed => ed.Percentage)
-            .HasDefaultValue(0);
     }
 }

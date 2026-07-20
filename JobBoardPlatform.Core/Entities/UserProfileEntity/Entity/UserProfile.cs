@@ -2,7 +2,9 @@
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Entity;
 using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 
 namespace JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
@@ -14,7 +16,7 @@ public class UserProfile : BaseEntity
 {
     private UserProfile() { }
 
-    public UserProfile(string firstName, string lastName, string bio, string address, DateTime birthDate, Guid userId, Guid cityId, Gender gender, Guid? userImageFileId = null)
+    public UserProfile(string firstName, string lastName, string bio, string address, DateTime birthDate, Guid userId, Guid cityId, Gender gender, Guid? userImageFileId = null, Guid? createdById = null)
     {
         FirstName = firstName;
         LastName = lastName;
@@ -25,6 +27,7 @@ public class UserProfile : BaseEntity
         CityId = cityId;
         Gender = gender;
         UserImageFileId = userImageFileId;
+        CreatedById = createdById;
 
         Validate();
     }
@@ -103,7 +106,7 @@ public class UserProfile : BaseEntity
             throw new DomainException(DomainErrors.FirstNameIsRequired);
 
         if (FirstName.Length < 2 || FirstName.Length > 100)
-            throw new DomainException(DomainErrors.FistNameInvalidLength);
+            throw new DomainException(DomainErrors.FirstNameInvalidLength);
 
         if (string.IsNullOrWhiteSpace(LastName))
             throw new DomainException(DomainErrors.LastNameIsRequired);
@@ -125,5 +128,39 @@ public class UserProfile : BaseEntity
 
         if (BirthDate > DateTime.UtcNow.Date.AddYears(-18))
             throw new DomainException(DomainErrors.UserMustBeAtLeast18YearsOld);
+
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.UserProfileUserIdIsRequired);
+
+        if (CityId == Guid.Empty)
+            throw new DomainException(DomainErrors.UserProfileCityIdIsRequired);
+    }
+
+    public void UpdateUserInfo(UpdateUserProfile updateUserProfile)
+    {
+        if (updateUserProfile.FirstName is not null)
+            FirstName = updateUserProfile.FirstName;
+
+        if (updateUserProfile.LastName is not null)
+            LastName = updateUserProfile.LastName;
+
+        if (updateUserProfile.Bio is not null)
+            Bio = updateUserProfile.Bio;
+
+        if (updateUserProfile.Address is not null)
+            Address = updateUserProfile.Address;
+
+        if (updateUserProfile.BirthDate is not null)
+            BirthDate = updateUserProfile.BirthDate.Value;
+
+        if (updateUserProfile.Gender is not null)
+            Gender = updateUserProfile.Gender.Value;
+
+        if (updateUserProfile.CityId is not null)
+            CityId = updateUserProfile.CityId.Value;
+
+        Update(updateUserProfile.ModifiedById);
+
+        Validate();
     }
 }

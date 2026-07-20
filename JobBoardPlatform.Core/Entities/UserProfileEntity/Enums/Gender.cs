@@ -10,5 +10,10 @@ public enum Gender
     /// <summary>
     /// زن
     /// </summary>
-    Women
+    Women,
+
+    /// <summary>
+    /// نامعلوم
+    /// </summary>
+    Unknown
 }

@@ -13,12 +13,13 @@ public class Payment : BaseEntity
 {
     private Payment() { }
 
-    public Payment(decimal amount, PaymentStatus status, Guid advertisementId, Guid userId)
+    public Payment(decimal amount, PaymentStatus status, Guid advertisementId, Guid userId, Guid? createdById = null)
     {
         Amount = amount;
         Status = status;
         AdvertisementId = advertisementId;
         UserId = userId;
+        CreatedById = createdById;
 
         Validate();
     }
@@ -65,5 +66,11 @@ public class Payment : BaseEntity
     {
         if (Amount < 0)
             throw new DomainException(DomainErrors.PayemntAmountOutOfRange);
+
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.PaymentUserIdIsRequired);
+
+        if (AdvertisementId == Guid.Empty)
+            throw new DomainException(DomainErrors.PaymentAdvertisementIdIsRequired);
     }
 }

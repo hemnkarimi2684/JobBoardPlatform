@@ -11,7 +11,7 @@ public class PaymentModelBuilderConfiguration : BaseModelBuilderConfiguration<Pa
     {
         builder.Property(p => p.Amount)
             .IsRequired()
-            .HasPrecision(10, 4)
+            .HasPrecision(18, 4)
             .HasDefaultValue(0);
 
         builder.Property(p => p.Status)

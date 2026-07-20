@@ -18,7 +18,7 @@ public static class DomainErrors
     #region UserProfile Errors
     public static Error FirstNameIsRequired => new Error("user first name is required", "User_FirstName_Is_Required");
     public static Error LastNameIsRequired => new Error("user last name is required", "User_LastName_Is_Required");
-    public static Error FistNameInvalidLength => new Error("user first name length must be between 3 and 100 characters", "User_FirstName_Invalid_Length");
+    public static Error FirstNameInvalidLength => new Error("user first name length must be between 3 and 100 characters", "User_FirstName_Invalid_Length");
     public static Error LastNameInvalidLength => new Error("user last name length must be between 3 and 100 characters", "User_LastName_Invalid_Length");
     public static Error BioIsRequired => new Error("user bio is required", "User_Bio_Is_Required");
     public static Error AddressIsRequired => new Error("user address is required", "User_Address_Is_Required");
@@ -26,6 +26,8 @@ public static class DomainErrors
     public static Error AddressInvalidLength => new Error("user address length must be between 3 and 250 characters", "User_Address_Invalid_Length");
     public static Error UserMustBeAtLeast18YearsOld => new Error("user must be at least 18 years old", "User_Age_AtLeast18");
     public static Error SubjectIsRequired => new Error("user first name is required", "Subject_Is_Required");
+    public static Error UserProfileCityIdIsRequired => new Error("user first name is required", "User_CityId_Is_Required");
+    public static Error UserProfileUserIdIsRequired => new Error("user first name is required", "User_UserId_Is_Required");
     public static Error SubjectAllCharactersNotLetter => new Error("the subject all characters must be letter", "Subject_Invalid_Format");
     public static Error SubjectAllCharactersNotDigit => new Error("the subject all characters must be digit", "Subject_Invalid_Format");
     #endregion
@@ -39,6 +41,7 @@ public static class DomainErrors
     #region City Errors
     public static Error CityNameInvalidLength => new Error("city name length must be between 2 and 100 characters", "City_Name_Invalid_Length");
     public static Error CityNameIsRequired => new Error("city name is required", "City_Name_Is_Required");
+    public static Error CityProvinceIdIsRequired => new Error("City ProvinceId is required", "City_ProvinceId_Is_Required");
     public static Error CityCodeInvalidRange => new Error("city code cannot be negative ", "City_Code_Invalid_Range");
     public static Error CityProvinceCodeInvalidRange => new Error("province code of city cannot be negative ", "City_ProvinceCode_Invalid_Range");
     #endregion
@@ -55,6 +58,7 @@ public static class DomainErrors
 
     #region Company Errors
     public static Error CompanyNameIsRequired => new Error("company name is required", "Company_Name_Is_Required");
+    public static Error CompanyOwnedByUserIdIsRequired => new Error("company OwnedByUserId is required", "Company_OwnedByUserId_Is_Required");
     public static Error CompanyNameInvalidLength => new Error("company name length must be between 2 and 120 characters", "Company_Name_Invalid_Length");
     public static Error CompanyIndustryIsRequired => new Error("company industry is required", "Company_Industry_Is_Required");
     public static Error CompanyIndustryInvalidLength => new Error("company industry length must be between 2 and 200 characters", "Company_Industry_Invalid_Length");
@@ -68,16 +72,20 @@ public static class DomainErrors
 
     #region CompanyCity Errors
     public static Error CompanyCityLocationIsRequired => new Error("company location is required", "CompanyCity_Location_Is_Required");
+    public static Error CompanyCityCityIdIsRequired => new Error("company CityId is required", "CompanyCity_CityId_Is_Required");
+    public static Error CompanyCityCompanyIdIsRequired => new Error("company CompanyId is required", "CompanyCity_CompanyId_Is_Required");
     public static Error CompanyCityLocationInvalidLength => new Error("company location length must be between 2 and 200 characters", "CompanyCity_Location_Invalid_Length");
     #endregion
 
     #region Resume Errors
     public static Error ResumeTitleIsRequired => new Error("resume title is required", "Resume_Title_Is_Required");
+    public static Error ResumeUserIdIsRequired => new Error("resume UserId is required", "Resume_UserId_Is_Required");
     public static Error ResumeTitleInvalidLength => new Error("resume title length must be between 2 and 100 characters", "Resume_Title_Invalid_Length");
     #endregion
 
     #region EducationDetail Errors
     public static Error EducationDetailMajorIsRequired => new Error("education detail major is required", "EducationDetail_Major_Is_Required");
+    public static Error EducationDetailUserIdIsRequired => new Error("education detail UserId is required", "EducationDetail_UserId_Is_Required");
     public static Error EducationDetailMajorInvalidLength => new Error("education detail major length must be between 2 and 120 characters", "EducationDetail_Major_Invalid_Length");
     public static Error EducationDetailUniversityIsRequired => new Error("education detail university is required", "EducationDetail_University_Is_Required");
     public static Error EducationDetailUniversityInvalidLength => new Error("education detail university length must be between 2 and 100 characters", "EducationDetail_University_Invalid_Length");
@@ -87,8 +95,8 @@ public static class DomainErrors
     #endregion
 
     #region ExperienceDetail Errors
-
     public static Error ExperienceDetailLastJobTitleIsRequired => new Error("experience detail last job title is required", "ExperienceDetail_LastJobTitle_Is_Required");
+    public static Error ExperienceDetailUserIdIsRequired => new Error("experience detail UserId is required", "ExperienceDetail_UserId_Is_Required");
     public static Error ExperienceDetailLastJobTitleInvalidLength => new Error("experience detail last job title length must be between 2 and 120 characters", "ExperienceDetail_LastJobTitle_Invalid_Length");
     public static Error ExperienceDetailJobCategoryIsRequired => new Error("experience detail job category is required", "ExperienceDetail_JobCategory_Is_Required");
     public static Error ExperienceDetailJobCategoryInvalidLength => new Error("experience detail job category length must be between 2 and 100 characters", "ExperienceDetail_JobCategory_Invalid_Length");
@@ -106,13 +114,9 @@ public static class DomainErrors
     public static Error MinimumAgeCannotExceedMaximumAge => new Error("Minimum age cannot be greater than maximum age.", "Advertisement_MinimumAge_Cannot_Exceed_MaximumAge");
     public static Error MaximumSalaryOutOfRange => new Error("Maximum salary must be between 1,000,000 and 600,000,000.", "Advertisement_MaximumSalary_Out_Of_Range");
     public static Error ExperienceLevelOutOfRange => new Error("Experience level must be Positive", "Advertisement_ExperienceLevel_Out_Of_Range");
-    #endregion
-
-    #region Status Errors
-    public static Error StatusTitleIsRequired => new Error("Status title is required.", "Status_Title_Is_Required");
-    public static Error StatusTitleInvalidLength => new Error("Status title must be between 2 and 100 characters.", "Status_Title_Invalid_Length");
-    public static Error StatusDescriptionIsRequired => new Error("Status description is required.", "Status_Description_Is_Required");
-    public static Error StatusDescriptionInvalidLength => new Error("Status description must be between 2 and 150 characters.", "Status_Description_Invalid_Length");
+    public static Error AdvertisementJobIdIsRequired => new Error("JobId is required.", "Advertisement_JobId_Is_Required");
+    public static Error AdvertisementCityIdIsRequired => new Error("CityId is required.", "Advertisement_CityId_Is_Required");
+    public static Error AdvertisementCompanyIdIsRequired => new Error("CompanyId is required.", "Advertisement_CompanyId_Is_Required");
     #endregion
 
     #region Role Errors
@@ -128,5 +132,48 @@ public static class DomainErrors
 
     #region Payment Errors
     public static Error PayemntAmountOutOfRange => new Error("payment amount must be Positive", "Payemnt_Amount_Out_Of_Range");
+    public static Error PaymentUserIdIsRequired => new Error("Payment UserId is required", "Payment_UserId_Is_Required");
+    public static Error PaymentAdvertisementIdIsRequired => new Error("Payment AdvertisementId is required", "Payment_AdvertisementId_Is_Required");
+
+    #endregion
+
+    #region Notifier Errors
+    public static Error CodeIsRequired => new Error("phone number is required.", "Notifier_Code_Is_Required");
+    public static Error PhoneNumberOrEmailIsRequired => new Error("phone number or email must have value", "Notifier_PhoneNumberOrEmail_Is_Required");
+    public static Error CodeAlreadyExpired => new Error("the code is already expired!", "Notifier_Code_Is_Expired");
+    public static Error InvalidCodeFormatException => new Error("the code must have 6 characters", "Notifier_Code_Invalid_Format");
+    #endregion
+
+    #region JobApplication Errors
+    public static Error JobTitleIsRequired => new Error("JobTitle is required.", "JobApplication_JobTitle_Is_Required");
+    public static Error JobApplicationAdvertisementIdIsRequired => new Error("AdvertisementId is required.", "JobApplication_AdvertisementId_Is_Required");
+    public static Error JobApplicationUserIdIsRequired => new Error("UserId is required.", "JobApplication_UserId_Is_Required");
+    public static Error JobApplicationResumeIdIsRequired => new Error("ResumeId is required.", "JobApplication_ResumeId_Is_Required");
+    public static Error JobTitleInvalidLength => new Error("JobTitle must be between 100 and 2000 characters long.", "JobApplication_JobTitle_Invalid_Length");
+    public static Error JobApplicationCompanyNameIsRequired => new Error("company name is required", "JobApplication_CompanyName_Is_Required");
+    public static Error JobApplicationCompanyNameInvalidLength => new Error("company name length must be between 2 and 120 characters", "JobApplication_CompanyName_Invalid_Length");
+    public static Error JobApplicationCityNameIsRequired => new Error("city name is required", "JobApplication_CityName_Is_Required");
+    public static Error JobApplicationCityNameInvalidRange => new Error("city code cannot be negative ", "JobApplication_CityName_Invalid_Range");
+    public static Error FullNameIsRequired => new Error("user full name is required", "JobApplication_UserFullName_Is_Required");
+    public static Error FullNameInvalidLength => new Error("user full name length must be between 3 and 200 characters", "JobApplication_UserFullName_Invalid_Length");
+    public static Error JobApplicationExperienceLevelOutOfRange => new Error("Experience level must be Positive", "JobApplication_ExperienceLevel_Out_Of_Range");
+    #endregion
+
+    #region Notifier Errors
+    public static Error NotifierTitleIsRequired => new Error("Title is required.", "Notifier_Title_Is_Required");
+    public static Error NotifierRecipientUserIdIsRequired => new Error("RecipientUserId is required.", "Notifier_RecipientUserId_Is_Required");
+    public static Error NotifierTitleInvalidLength => new Error("Title must be between 2 and 150 characters long.", "Notifier_Title_Invalid_Length");
+    public static Error NotifierMessageIsRequired => new Error("Message is required.", "Notifier_Message_Is_Required");
+    public static Error NotifierMessageInvalidLength => new Error("Message must be between 10 and 250 characters long.", "Notifier_Message_Invalid_Length");
+    #endregion
+
+    #region AdvertisementSkill Errors
+    public static Error AdvertisementSkillAdvertisementIdIsRequired => new Error("AdvertisementId is required.", "AdvertisementSkill_AdvertisementId_Is_Required");
+    public static Error AdvertisementSkillSkillIdIsRequired => new Error("SkillId is required.", "AdvertisementSkill_SkillId_Is_Required");
+    #endregion
+
+    #region UserSkills
+    public static Error UserSkillUserIdIsRequired => new Error("UserSkill UserId is required.", "UserSkill_UserId_Is_Required");
+    public static Error UserSkillSkillIdIsRequired => new Error("UserSkill SkillId is required.", "UserSkill_SkillId_Is_Required");
     #endregion
 }

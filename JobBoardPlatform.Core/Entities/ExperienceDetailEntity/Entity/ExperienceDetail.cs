@@ -1,5 +1,8 @@
 ﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Entity;
+using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
@@ -11,8 +14,8 @@ namespace JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
 public class ExperienceDetail : BaseEntity
 {
     private ExperienceDetail() { }
-    
-    public ExperienceDetail(string lastJobTitle, SeniorityLevel seniorityLevel, string jobCategory, string city, DateTime startDate, DateTime? endDate, bool isCurrentJob, Guid userId)
+
+    public ExperienceDetail(string lastJobTitle, SeniorityLevel seniorityLevel, string jobCategory, string city, DateTime startDate, DateTime? endDate, bool isCurrentJob, Guid userId, Guid? createdById = null)
     {
         HandleCurrentlyWorkingStatus(isCurrentJob);
 
@@ -24,6 +27,7 @@ public class ExperienceDetail : BaseEntity
         EndDate = endDate;
         IsCurrentJob = isCurrentJob;
         UserId = userId;
+        CreatedById = createdById;
 
         Validate();
     }
@@ -109,6 +113,9 @@ public class ExperienceDetail : BaseEntity
             if (EndDate < StartDate)
                 throw new DomainException(DomainErrors.ExperienceDetailJobEndTimeLowerThanStartTime);
         }
+
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.ExperienceDetailUserIdIsRequired);
     }
 
     /// <summary>
@@ -121,5 +128,33 @@ public class ExperienceDetail : BaseEntity
             return;
 
         EndDate = null;
+    }
+
+    public void UpdateExperienceDetailInfo(UpdateExperienceDetail updateExperienceDetail)
+    {
+        if (updateExperienceDetail.LastJobTitle is not null)
+            LastJobTitle = updateExperienceDetail.LastJobTitle;
+
+        if (updateExperienceDetail.SeniorityLevel is not null)
+            SeniorityLevel = updateExperienceDetail.SeniorityLevel.Value;
+
+        if (updateExperienceDetail.JobCategory is not null)
+            JobCategory = updateExperienceDetail.JobCategory;
+
+        if (updateExperienceDetail.City is not null)
+            City = updateExperienceDetail.City;
+
+        if (updateExperienceDetail.StartDate is not null)
+            StartDate = updateExperienceDetail.StartDate.Value;
+
+        if (updateExperienceDetail.EndDate is not null)
+            EndDate = updateExperienceDetail.EndDate;
+
+        if (updateExperienceDetail.IsCurrentJob is not null)
+            IsCurrentJob = updateExperienceDetail.IsCurrentJob.Value;
+
+        Update(updateExperienceDetail.ModifiedById);
+
+        Validate();
     }
 }

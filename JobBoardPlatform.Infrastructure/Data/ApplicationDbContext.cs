@@ -44,7 +44,6 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Skill> Skills => Set<Skill>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<UserSkill> UserSkills => Set<UserSkill>();
-    public DbSet<Status> Statuses => Set<Status>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

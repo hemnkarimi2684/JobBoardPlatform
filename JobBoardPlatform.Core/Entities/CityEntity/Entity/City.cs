@@ -12,12 +12,13 @@ public class City : BaseEntity
 {
     private City() { }
 
-    public City(string name, int cityCode, int provinceCode, Guid provinceId)
+    public City(string name, int cityCode, int provinceCode, Guid provinceId, Guid? createdById = null)
     {
         Name = name;
         CityCode = cityCode;
         ProvinceCode = provinceCode;
         ProvinceId = provinceId;
+        CreatedById = createdById;
 
         Validate();
     }
@@ -68,5 +69,8 @@ public class City : BaseEntity
 
         if (ProvinceCode < 1)
             throw new DomainException(DomainErrors.CityProvinceCodeInvalidRange);
+
+        if (ProvinceId == Guid.Empty)
+            throw new DomainException(DomainErrors.CityProvinceIdIsRequired);
     }
 }

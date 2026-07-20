@@ -12,9 +12,10 @@ public class Job : BaseEntity
 {
     private Job() { }
     
-    public Job(string name)
+    public Job(string name, Guid? createdById = null)
     {
         Name = name;
+        CreatedById = createdById;
 
         Validate();
     }
@@ -40,7 +41,5 @@ public class Job : BaseEntity
 
         if (Name.Length < 2 || Name.Length > 100)
             throw new DomainException(DomainErrors.JobNameInvalidLength);
-
-        Name.IsAllLetter();
     }
 }

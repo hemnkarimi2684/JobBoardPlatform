@@ -12,6 +12,9 @@ public class CityModelBuilderConfiguration : BaseModelBuilderConfiguration<City>
             .IsRequired()
             .HasMaxLength(120);
 
+        builder.HasIndex(c => c.Name)
+            .IsUnique();
+
         builder.HasIndex(c => c.CityCode)
             .IsUnique();
     }

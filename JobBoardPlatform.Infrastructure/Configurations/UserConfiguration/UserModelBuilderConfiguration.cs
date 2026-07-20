@@ -52,5 +52,20 @@ public class UserModelBuilderConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey(ja => ja.UserId)
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
+
+        builder.HasOne(x => x.Creator)
+            .WithMany()
+            .HasForeignKey(u => u.CreatedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(x => x.Deleter)
+            .WithMany()
+            .HasForeignKey(u => u.DeletedById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(x => x.Modifier)
+            .WithMany()
+            .HasForeignKey(u => u.ModifiedById)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

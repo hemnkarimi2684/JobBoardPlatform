@@ -9,6 +9,32 @@ public class JobApplicationModelBuilderConfiguration : BaseModelBuilderConfigura
 {
     protected override void ApplyEntityConfiguration(EntityTypeBuilder<JobApplication> builder)
     {
+        builder.Property(ja => ja.JobTitle)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(ja => ja.CompanyName)
+             .IsRequired()
+             .HasMaxLength(120);
+
+        builder.Property(ja => ja.CityName)
+             .IsRequired()
+             .HasMaxLength(120);
+
+        builder.Property(ja => ja.UserFullName)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(ja => ja.Status)
+           .IsRequired()
+           .HasConversion<string>()
+           .HasMaxLength(25);
+
+        builder.Property(ja => ja.CollaborationType)
+           .IsRequired()
+           .HasConversion<string>()
+           .HasMaxLength(25);
+
         builder.HasOne(ja => ja.Advertisement)
             .WithMany(a => a.JobApplications)
             .HasForeignKey(ja => ja.AdvertisementId)

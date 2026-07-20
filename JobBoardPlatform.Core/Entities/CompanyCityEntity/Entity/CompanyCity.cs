@@ -2,6 +2,7 @@
 using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 
@@ -9,11 +10,12 @@ public class CompanyCity : BaseEntity
 {
     private CompanyCity() { }
 
-    public CompanyCity(string location, Guid companyId, Guid cityId)
+    public CompanyCity(string location, Guid companyId, Guid cityId, Guid? createdById = null)
     {
         Location = location;
         CompanyId = companyId;
         CityId = cityId;
+        CreatedById = createdById;
 
         Validate(); 
     }
@@ -58,5 +60,11 @@ public class CompanyCity : BaseEntity
 
         if (Location.Length < 2 || Location.Length > 200)
             throw new DomainException(DomainErrors.CompanyCityLocationInvalidLength);
+
+        if (CompanyId == Guid.Empty)
+            throw new DomainException(DomainErrors.CompanyCityCompanyIdIsRequired);
+
+        if (CityId == Guid.Empty)
+            throw new DomainException(DomainErrors.CompanyCityCityIdIsRequired);
     }
 }

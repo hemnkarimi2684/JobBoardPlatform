@@ -12,12 +12,13 @@ namespace JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 public class Resume : BaseEntity
 {
     private Resume() { }
-    
-    public Resume(string title, Guid userId, Guid? lastUploadedFileId = null)
+
+    public Resume(string title, Guid userId, Guid? lastUploadedFileId = null, Guid? createdById = null)
     {
         Title = title;
         UserId = userId;
         LastUploadedFileId = lastUploadedFileId;
+        CreatedById = createdById;
 
         Validate();
     }
@@ -46,12 +47,12 @@ public class Resume : BaseEntity
     /// <summary>
     /// جزئیات مربوط کاربری که رزومه دارد
     /// </summary>
-    public virtual User User { get; private set; } 
+    public virtual User User { get; private set; }
 
     /// <summary>
     /// جزئیات مربوط به اخرین فایل اپلود شده رزومه 
     /// </summary>
-    public virtual Attachment? LastUploadedFile { get; private set; } 
+    public virtual Attachment? LastUploadedFile { get; private set; }
 
     /// <summary>
     /// جزئیات مربوط به درخواست هایی که با این رزومه داده شده
@@ -67,5 +68,13 @@ public class Resume : BaseEntity
 
         if (Title.Length < 2 || Title.Length > 100)
             throw new DomainException(DomainErrors.ResumeTitleInvalidLength);
+
+        if (UserId == Guid.Empty)
+            throw new DomainException(DomainErrors.ResumeUserIdIsRequired);
+    }
+
+    public void UpdateFile(Guid? newFileId)
+    {
+        LastUploadedFileId = newFileId;
     }
 }

@@ -16,10 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\JobBoardPlatform.Application\JobBoardPlatform.Application.csproj" />
     <ProjectReference Include="..\JobBoardPlatform.Infrastructure\JobBoardPlatform.Infrastructure.csproj" />
   </ItemGroup>
 

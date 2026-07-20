@@ -18,10 +18,13 @@ public class AdvertisementModelBuilderConfiguration : BaseModelBuilderConfigurat
              .HasMaxLength(100);
 
         builder.Property(a => a.MaximumSalary)
-            .HasPrecision(10, 4);
+            .HasPrecision(18, 4);
 
         builder.Property(a => a.MinimumSalary)
-            .HasPrecision(10, 4);
+            .HasPrecision(18, 4);
+
+        builder.Property(a => a.IsActive)
+            .HasDefaultValue(true);
 
         builder.Property(a => a.CollaborationType)
            .IsRequired()
