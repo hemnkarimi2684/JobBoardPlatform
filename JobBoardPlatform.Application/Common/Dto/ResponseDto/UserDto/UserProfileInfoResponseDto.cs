@@ -2,13 +2,20 @@
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 
-public record UserProfileInfoResponseDto(
-    Guid UserId,
-    string FullName,
-    string Bio,
-    string Address,
-    DateTime BirthDate,
-    string CityName,
-    Gender Gender
-    );
+public class UserProfileInfoResponseDto
+{
+    public Guid UserId { get; init; }
+
+    public string FullName { get; init; } = string.Empty;
+
+    public string Bio { get; init; } = string.Empty;
+
+    public string Address { get; init; } = string.Empty;
+
+    public DateTime BirthDate { get; init; }
+
+    public string CityName { get; init; } = string.Empty;
+
+    public Gender Gender { get; init; }
+}
 

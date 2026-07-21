@@ -2,13 +2,21 @@
 
 namespace JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Dto;
 
-public record UpdateExperienceDetail(
-    string? LastJobTitle,
-    SeniorityLevel? SeniorityLevel,
-    string? JobCategory,
-    string? City,
-    DateTime? StartDate,
-    DateTime? EndDate,
-    bool? IsCurrentJob,
-    Guid? ModifiedById = null);
+public class UpdateExperienceDetail
+{
+    public string? LastJobTitle { get; init; }
 
+    public SeniorityLevel? SeniorityLevel { get; init; }
+
+    public string? JobCategory { get; init; }
+
+    public string? City { get; init; }
+
+    public DateTime? StartDate { get; init; }
+
+    public DateTime? EndDate { get; init; }
+
+    public bool? IsCurrentJob { get; init; }
+
+    public Guid? ModifiedById { get; init; }
+}

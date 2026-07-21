@@ -4,5 +4,5 @@ namespace JobBoardPlatform.Application.Common.Dto.RequestDto.AttachmentDto;
 
 public class UploadFileRequestDto
 {
-    public IFormFile File { get; set; } = default;
+    public IFormFile File { get; set; } = default!;
 }

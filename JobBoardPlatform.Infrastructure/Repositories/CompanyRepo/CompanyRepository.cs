@@ -15,33 +15,47 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
     {
     }
 
-    public async Task<TResult?> GetCompanyByOwnerIdAsync<TResult>(Expression<Func<Company, TResult>> projection, Guid ownerId)
+    public async Task<TResult?> GetCompanyByOwnerIdAsync<TResult>(
+        Expression<Func<Company, TResult>> projection,
+        Guid ownerId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                          .AsNoTracking()
                          .Where(c => c.OwnedByUserId == ownerId)
                          .Select(projection)
-                         .FirstOrDefaultAsync();
+                         .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Guid?> GetCompanyOwnerIdByCompanyIdAsync(Guid companyId)
+    public async Task<Guid?> GetCompanyOwnerIdByCompanyIdAsync(
+        Guid companyId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                          .AsNoTracking()
                          .Where(c => c.Id == companyId)
                          .Select(c => c.Id)
-                         .FirstOrDefaultAsync();
+                         .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> IsCompanyExistAsync(Guid companyId) => await AnyAsync(c => c.Id == companyId);
+    public async Task<bool> IsCompanyExistAsync(
+        Guid companyId,
+        CancellationToken cancellationToken) => await AnyAsync(c => c.Id == companyId, cancellationToken);
 
-    public async Task<bool> IsCompanyExistByNameAsync(string name) => await AnyAsync(c => c.Name == name);
+    public async Task<bool> IsCompanyExistByNameAsync(
+        string name,
+        CancellationToken cancellationToken) => await AnyAsync(c => c.Name == name, cancellationToken);
 
-    public async Task<bool> IsCompanyExistForOwnerId(Guid ownerId) => await AnyAsync(c => c.OwnedByUserId == ownerId);
+    public async Task<bool> IsCompanyExistForOwnerId(
+        Guid ownerId,
+        CancellationToken cancellationToken) => await AnyAsync(c => c.OwnedByUserId == ownerId, cancellationToken);
 
-    public async Task<bool> UpdateCompanyInfoAsync(Guid companyId, CompanyInfoUpdate companyInfoUpdate)
+    public async Task<bool> UpdateCompanyInfoAsync(
+        Guid companyId,
+        CancellationToken cancellationToken,
+        CompanyInfoUpdate companyInfoUpdate)
     {
-        var company = await Entities.FirstOrDefaultAsync(c => c.Id == companyId);
+        var company = await Entities.FirstOrDefaultAsync(c => c.Id == companyId, cancellationToken);
 
         if (company == null)
             return false;

@@ -12,8 +12,12 @@ public interface IJobApplicationRepository : IGenericRepository<JobApplication>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="projection"></param>
     /// <param name="jobApplicationId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<TResult?> GetJobApplicationByIdAsync<TResult>(Expression<Func<JobApplication, TResult>> projection, Guid jobApplicationId);
+    Task<TResult?> GetJobApplicationByIdAsync<TResult>(
+        Expression<Func<JobApplication, TResult>> projection,
+        Guid jobApplicationId,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// دریافت درخواست های یک اگهی
@@ -21,35 +25,48 @@ public interface IJobApplicationRepository : IGenericRepository<JobApplication>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="projection"></param>
     /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetAdvertisementJobApplicationsAsync<TResult>(Expression<Func<JobApplication, TResult>> projection,
-                                                                                          Guid advertisementId,
-                                                                                          int pageNumber = 1,
-                                                                                          int pageSize = 10);
+    Task<(List<TResult>, int)> GetAdvertisementJobApplicationsAsync<TResult>(
+        Expression<Func<JobApplication, TResult>> projection,
+        Guid advertisementId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10);
 
     /// <summary>
     /// ایا درخواست کاری این کاربر برای این اگهی ثبت شده یا نه
     /// </summary>
-    /// <param name="resumeId"></param>
     /// <param name="advertisementId"></param>
     /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> IsDuplicateJobApplicationAsync(Guid advertisementId, Guid userId);
+    Task<bool> IsDuplicateJobApplicationAsync(
+        Guid advertisementId,
+        Guid userId,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// دریافت شناسه کاربری که درخواست کار داده
     /// </summary>
-    /// <param name="jobApplication"></param>
+    /// <param name="jobApplicationId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Guid?> GetJobApplicationUserIdAsync(Guid jobApplicationId);
+    Task<Guid?> GetJobApplicationUserIdAsync(
+        Guid jobApplicationId,
+        CancellationToken cancellationToken);
 
     /// <summary>
-    /// بررسی اینکه برای ایننکه ایا کارفرما متعلق به این درخواست با این رزومه هست یا نه
+    /// بررسی اینکه برای اینکه ایا کارفرما متعلق به این درخواست با این رزومه هست یا نه
     /// </summary>
     /// <param name="resumeId"></param>
-    /// <param name="currentUserId"></param>
+    /// <param name="employerId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> CheckOwnerHasJobApplicationForResumeAsync(Guid resumeId, Guid employerId);
+    Task<bool> CheckOwnerHasJobApplicationForResumeAsync(
+        Guid resumeId,
+        Guid employerId,
+        CancellationToken cancellationToken);
 }

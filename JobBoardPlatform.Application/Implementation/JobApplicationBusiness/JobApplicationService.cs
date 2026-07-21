@@ -35,51 +35,57 @@ public class JobApplicationService : IJobApplicationService
 
     #region Create Methods
 
-    public async Task<bool> CreateJobApplicationAsync(CreateJobApplicationRequestDto createCommand)
+    public async Task<bool> CreateJobApplicationAsync(
+        CreateJobApplicationRequestDto createCommand,
+        CancellationToken cancellationToken = default)
     {
-        await ValidationForCreateMethod(createCommand.ResumeId, createCommand.AdvertisementId, createCommand.UserId);
+        await ValidationForCreateMethod(createCommand.ResumeId, createCommand.AdvertisementId, createCommand.UserId, cancellationToken);
 
-        var advInformation = await _advertisementService.GetAdvertisementProjectionAsync(createCommand.AdvertisementId);
+        var advInformation = await _advertisementService.GetAdvertisementProjectionAsync(createCommand.AdvertisementId, cancellationToken);
 
-        var userFullName = await _unitOfWork.UserProfileRepository.GetUserFullNameByUserIdAsync(createCommand.UserId);
+        var userFullName = await _unitOfWork.UserProfileRepository.GetUserFullNameByUserIdAsync(createCommand.UserId, cancellationToken);
 
         var jobAplication = new JobApplication(JobApplicationStatus.Pending, advInformation.JobTitle, advInformation.CompanyName,
                                                advInformation.CityName, advInformation.CollaborationType, userFullName!, advInformation.ExperienceLevel,
                                                createCommand.ResumeId, createCommand.AdvertisementId, createCommand.UserId, _currentUser.UserId);
 
-        await _unitOfWork.JobApplicationRepository.AddAsync(jobAplication);
+        await _unitOfWork.JobApplicationRepository.AddAsync(jobAplication, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
     #endregion
 
     #region Get Methods 
 
-    public async Task<Pagination<JobApplicationInfoResponseDto>> GetAdvertisementJobApplicationsAsync(Guid advertisementId, PagingRequestDto pagingCommand)
+    public async Task<Pagination<JobApplicationInfoResponseDto>> GetAdvertisementJobApplicationsAsync(
+        Guid advertisementId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
-        var userId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId);
+        var userId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
 
         _accessControlService.EnsureOwnerEmployerOrAdmin(userId.Value, _currentUser);
 
         var (advertisementJobApplications, totalDataCount) = await _unitOfWork
                                                                         .JobApplicationRepository
                                                                         .GetAdvertisementJobApplicationsAsync(ja => new JobApplicationInfoResponseDto
-                                                                        (
-                                                                            ja.Id,
-                                                                            ja.JobTitle,
-                                                                            ja.CompanyName,
-                                                                            ja.CityName,
-                                                                            ja.CollaborationType,
-                                                                            ja.ExperienceLevel,
-                                                                            ja.Status,
-                                                                            ja.CreatedAt,
-                                                                            ja.UserFullName,
-                                                                            ja.ResumeId,
-                                                                            ja.AdvertisementId,
-                                                                            ja.UserId
-                                                                        ),
+                                                                        {
+                                                                            JobApplicationId = ja.Id,
+                                                                            JobTitle = ja.JobTitle,
+                                                                            CompanyName = ja.CompanyName,
+                                                                            CityName = ja.CityName,
+                                                                            CollaborationType = ja.CollaborationType,
+                                                                            ExperienceLevel = ja.ExperienceLevel,
+                                                                            Status = ja.Status,
+                                                                            CreatedAt = ja.CreatedAt,
+                                                                            UserProfileName = ja.UserFullName,
+                                                                            ResumeId = ja.ResumeId,
+                                                                            AdvertisementId = ja.AdvertisementId,
+                                                                            UserId = ja.UserId
+                                                                        },
                                                                         advertisementId,
+                                                                        cancellationToken,
                                                                         pagingCommand.PageNumber,
                                                                         pagingCommand.PageSize);
 
@@ -90,39 +96,54 @@ public class JobApplicationService : IJobApplicationService
                                                                  totalDataCount);
     }
 
-    public async Task<JobApplicationInfoResponseDto> GetJobApplicationByIdAsync(Guid jobApplicationId)
+    public async Task<JobApplicationInfoResponseDto> GetJobApplicationByIdAsync(
+        Guid jobApplicationId,
+        CancellationToken cancellationToken = default)
     {
-        var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId);
+        var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId, cancellationToken);
 
         if (jobApplication == null)
             throw new NotFoundException($"the job application with id {jobApplicationId} was not found");
 
-        var ownerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(jobApplication.AdvertisementId);
+        var ownerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(jobApplication.AdvertisementId, cancellationToken);
 
         if (ownerId == null)
             throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
 
         _accessControlService.EnsureApplicantOrOwnerEmployerOrAdmin(ownerId.Value, jobApplication.UserId, _currentUser);
 
-        return new JobApplicationInfoResponseDto(jobApplication.Id, jobApplication.JobTitle, jobApplication.CompanyName, jobApplication.CityName,
-                                            jobApplication.CollaborationType, jobApplication.ExperienceLevel, jobApplication.Status,
-                                            jobApplication.CreatedAt, jobApplication.UserFullName, jobApplication.ResumeId,
-                                            jobApplication.AdvertisementId, jobApplication.UserId
-                                            );
+        return new JobApplicationInfoResponseDto
+        {
+            JobApplicationId = jobApplication.Id,
+            JobTitle = jobApplication.JobTitle,
+            CompanyName = jobApplication.CompanyName,
+            CityName = jobApplication.CityName,
+            CollaborationType = jobApplication.CollaborationType,
+            ExperienceLevel = jobApplication.ExperienceLevel,
+            Status = jobApplication.Status,
+            CreatedAt = jobApplication.CreatedAt,
+            UserProfileName = jobApplication.UserFullName,
+            ResumeId = jobApplication.ResumeId,
+            AdvertisementId = jobApplication.AdvertisementId,
+            UserId = jobApplication.UserId
+        };
     }
 
     #endregion
 
     #region Update Methods
 
-    public async Task<bool> UpdateJobApplicationStatusAsync(Guid jobApplicationId, JobApplicationStatus status)
+    public async Task<bool> UpdateJobApplicationStatusAsync(
+        Guid jobApplicationId,
+        JobApplicationStatus status,
+        CancellationToken cancellationToken = default)
     {
-        var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId);
+        var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId, cancellationToken, true);
 
         if (jobApplication == null)
             throw new NotFoundException($"the job application with id {jobApplicationId} was not found");
 
-        var ownerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(jobApplication.AdvertisementId);
+        var ownerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(jobApplication.AdvertisementId, cancellationToken);
 
         if (ownerId == null)
             throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
@@ -133,7 +154,7 @@ public class JobApplicationService : IJobApplicationService
 
         jobApplication.UpdateStatus(status, _currentUser.UserId);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
 
     }
 
@@ -141,26 +162,26 @@ public class JobApplicationService : IJobApplicationService
 
     #region Private Methods
 
-    private async Task ValidationForCreateMethod(Guid resumeId, Guid advertisementId, Guid userId)
+    private async Task ValidationForCreateMethod(Guid resumeId, Guid advertisementId, Guid userId, CancellationToken cancellationToken)
     {
         _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
-        var isResumeExist = await _unitOfWork.ResumeRepository.IsResumeExistAsync(resumeId);
+        var isResumeExist = await _unitOfWork.ResumeRepository.IsResumeExistAsync(resumeId, cancellationToken);
 
         if (!isResumeExist)
             throw new NotFoundException($"the resume with id {resumeId} was not found");
 
-        var isAdvertisementExist = await _unitOfWork.AdvertisementRepository.IsAdvertisementExistAsync(advertisementId);
+        var isAdvertisementExist = await _unitOfWork.AdvertisementRepository.IsAdvertisementExistAsync(advertisementId, cancellationToken);
 
         if (!isAdvertisementExist)
             throw new NotFoundException($"the advertisement with id {advertisementId} was not found");
 
-        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId);
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId, cancellationToken);
 
         if (!isUserExist)
             throw new NotFoundException($"the user with id {userId} was not found");
 
-        var isDuplicateJobApplication = await _unitOfWork.JobApplicationRepository.IsDuplicateJobApplicationAsync(advertisementId, userId);
+        var isDuplicateJobApplication = await _unitOfWork.JobApplicationRepository.IsDuplicateJobApplicationAsync(advertisementId, userId, cancellationToken);
 
         if (isDuplicateJobApplication)
             throw new ConflictException($" the user with id {userId} for advertisement with id {advertisementId} already has jobApplication");

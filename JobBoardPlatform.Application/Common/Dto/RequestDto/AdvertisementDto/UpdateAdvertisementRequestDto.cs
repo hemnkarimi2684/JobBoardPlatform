@@ -3,25 +3,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 
-public record UpdateAdvertisementRequestDto(
-    [MinLength(100, ErrorMessage = "The description cannot be less than 100 characters.")]
-    [MaxLength(2000, ErrorMessage = "The description cannot be more than 2000 characters.")]
-    string? Description,
+public class UpdateAdvertisementRequestDto
+{
+    [MinLength(100, ErrorMessage = "Description cannot be less than 100 characters.")]
+    [MaxLength(2000, ErrorMessage = "Description cannot exceed 2000 characters.")]
+    public string? Description { get; set; }
 
     [Range(18, 55, ErrorMessage = "Minimum age must be between 18 and 55.")]
-    int? MinimumAge,
+    public int? MinimumAge { get; set; }
 
     [Range(18, 65, ErrorMessage = "Maximum age must be between 18 and 65.")]
-    int? MaximumAge,
+    public int? MaximumAge { get; set; }
 
-    [Range(0, double.MaxValue, ErrorMessage = "MinimumSalary must be greater than 0.")]
-    decimal? MinimumSalary,
+    [Range(typeof(decimal), "0", "79228162514264337593543950335",
+        ErrorMessage = "Minimum salary must be greater than or equal to 0.")]
+    public decimal? MinimumSalary { get; set; }
 
-    [Range(0,  double.MaxValue, ErrorMessage = "MaximumSalary must be greater than 0.")]
-    decimal? MaximumSalary,
+    [Range(typeof(decimal), "0", "79228162514264337593543950335",
+        ErrorMessage = "Maximum salary must be greater than or equal to 0.")]
+    public decimal? MaximumSalary { get; set; }
 
-    [Range(0, 50, ErrorMessage = "ExperienceLevel must be between 1 and 50.")]
-    int? ExperienceLevel,
+    public int? ExperienceLevel { get; set; }
 
-    CollaborationType? CollaborationType
-);
+    public CollaborationType? CollaborationType { get; set; }
+}

@@ -14,75 +14,93 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
     }
 
-    public async Task<TResult?> GetAdvertisementProjectionAsync<TResult>(Expression<Func<Advertisement, TResult>> projection, Guid advertisementId)
+    public async Task<TResult?> GetAdvertisementProjectionAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> projection,
+        Guid advertisementId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                           .AsNoTracking()
                           .Where(a => a.Id == advertisementId && a.IsActive)
                           .Select(projection)
-                          .FirstOrDefaultAsync();
+                          .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<AdvertisementDetail?> GetAdvertisementInfoByIdAsync(Guid advertisementId)
+    public async Task<AdvertisementDetail?> GetAdvertisementInfoByIdAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken)
     {
         return await Entities
-                        .AsNoTracking()
-                        .Where(a => a.Id == advertisementId)
-                        .Select(a => new AdvertisementDetail(
-                             a.Description,
-                             a.MinimumAge,
-                             a.MaximumAge,
-                             a.MinimumSalary,
-                             a.MaximumSalary,
-                             a.ExperienceLevel,
-                             a.CollaborationType,
-                             a.City.Name,
-                             a.Company.Name,
-                             a.Job.Name,
-                             a.Company.AboutUs,
-                             a.Company.Industry,
-                             a.CreatedAt,
-                             a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
-                             a.Id,
-                             a.CityId,
-                             a.CompanyId
-                             ))
-                        .FirstOrDefaultAsync();
+                         .AsNoTracking()
+                         .Where(a => a.Id == advertisementId)
+                         .Select(a => new AdvertisementDetail
+                         {
+                             AdvertisementId = a.Id,
+                             Description = a.Description,
+                             MinimumAge = a.MinimumAge,
+                             MaximumAge = a.MaximumAge,
+                             MinimumSalary = a.MinimumSalary,
+                             MaximumSalary = a.MaximumSalary,
+                             ExperienceLevel = a.ExperienceLevel,
+                             CollaborationType = a.CollaborationType,
+                             CityName = a.City.Name,
+                             CompanyName = a.Company.Name,
+                             JobName = a.Job.Name,
+                             CompanyAboutUs = a.Company.AboutUs,
+                             CompanyIndustry = a.Company.Industry,
+                             CreatedAt = a.CreatedAt,
+                             Skills = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
+                             CityId = a.CityId,
+                             CompanyId = a.CompanyId
+                         })
+                         .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Guid?> GetAdvertisementOwnerIdByIdAsync(Guid advertisementId)
+    public async Task<Guid?> GetAdvertisementOwnerIdByIdAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                         .AsNoTracking()
                         .Include(a => a.Company.OwnedByUser)
                         .Where(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null)
                         .Select(a => a.Company.OwnedByUserId)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetAdvertisementsByCompanyAsync<TResult>(Expression<Func<Advertisement, TResult>> projection, Guid companyId, int pageNumber = 1, int pageSize = 10)
+    public async Task<(List<TResult>, int)> GetAdvertisementsByCompanyAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> projection,
+        Guid companyId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
     {
         var query = Entities
                          .AsNoTracking()
                          .Where(a => a.CompanyId == companyId && a.IsActive);
 
-        var totalDataCount = await query.CountAsync();
+        var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
                              .OrderByDescending(b => b.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
-                             .ToListAsync();
+                             .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
     }
 
-    public async Task<bool> IsAdvertisementExistAsync(Guid advertisementId) => await AnyAsync(a => a.Id == advertisementId);
+    public async Task<bool> IsAdvertisementExistAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken) => await AnyAsync(a => a.Id == advertisementId, cancellationToken);
 
-    public async Task<bool> UpdateAdvertisementInfoAsync(Guid advertisementId, UpdateAdvertisementInfo updateAdvertisementInfo)
+    public async Task<bool> UpdateAdvertisementInfoAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken,
+        UpdateAdvertisementInfo updateAdvertisementInfo)
     {
-        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive);
+        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive, cancellationToken);
 
         if (advertisement is null)
             return false;
@@ -92,9 +110,13 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         return true;
     }
 
-    public async Task<bool> UpdateAdvertisementStatusAsync(Guid advertisementId, Guid? modifiedById, bool isActive)
+    public async Task<bool> UpdateAdvertisementStatusAsync(
+        Guid advertisementId,
+        Guid? modifiedById,
+        bool isActive,
+        CancellationToken cancellationToken)
     {
-        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive);
+        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive, cancellationToken);
 
         if (advertisement is null)
             return false;

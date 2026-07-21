@@ -1,13 +1,22 @@
 ﻿namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 
-public record CompanyDetailResponseDto(
-    Guid CompanyId,
-    Guid OwnedByUserId,
-    string CityName,
-    string CompanyName,
-    DateTime YearOfEstablishment,
-    string Industry,
-    string AboutUs,
-    Guid? CompanyImageFileId
-);
+public class CompanyDetailResponseDto
+{
+    public Guid CompanyId { get; init; }
 
+    public Guid OwnedByUserId { get; init; }
+
+    public string CityName { get; init; } = string.Empty;
+
+    public Guid CityId { get; init; }
+
+    public string CompanyName { get; init; } = string.Empty;
+
+    public DateTime YearOfEstablishment { get; init; }
+
+    public string Industry { get; init; } = string.Empty;
+
+    public string AboutUs { get; init; } = string.Empty;
+
+    public Guid? CompanyImageFileId { get; init; }
+}

@@ -12,28 +12,43 @@ public interface IJobApplicationService
     /// ثبت یک درخواست کار برای اگهی
     /// </summary>
     /// <param name="createCommand"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> CreateJobApplicationAsync(CreateJobApplicationRequestDto createCommand);
+    Task<bool> CreateJobApplicationAsync(
+        CreateJobApplicationRequestDto createCommand,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// دریافت درخواست توسط شناسه اش 
+    /// دریافت درخواست توسط شناسه اش
     /// </summary>
     /// <param name="jobApplicationId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<JobApplicationInfoResponseDto> GetJobApplicationByIdAsync(Guid jobApplicationId);
+    Task<JobApplicationInfoResponseDto> GetJobApplicationByIdAsync(
+        Guid jobApplicationId,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// دریافت درخواست های یک اگهی 
     /// </summary>
     /// <param name="advertisementId"></param>
+    /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<JobApplicationInfoResponseDto>> GetAdvertisementJobApplicationsAsync(Guid advertisementId, PagingRequestDto pagingCommand);
+    Task<Pagination<JobApplicationInfoResponseDto>> GetAdvertisementJobApplicationsAsync(
+        Guid advertisementId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// تغییر وضعیت درخواست
     /// </summary>
     /// <param name="jobApplicationId"></param>
-    /// <param name="statusName"></param>
+    /// <param name="status"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> UpdateJobApplicationStatusAsync(Guid jobApplicationId, JobApplicationStatus status);
+    Task<bool> UpdateJobApplicationStatusAsync(
+        Guid jobApplicationId,
+        JobApplicationStatus status,
+        CancellationToken cancellationToken = default);
 }

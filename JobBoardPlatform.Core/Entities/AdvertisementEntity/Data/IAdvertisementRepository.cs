@@ -13,53 +13,74 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// تغییر دادن وضعیت فعال یا غیرفعال بودن اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
+    /// <param name="modifiedById"></param>
     /// <param name="isActive"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> UpdateAdvertisementStatusAsync(Guid advertisementId, Guid? modifiedById, bool isActive);
+    Task<bool> UpdateAdvertisementStatusAsync(
+        Guid advertisementId,
+        Guid? modifiedById,
+        bool isActive,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// اپدیت اطلاعات اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
     /// <param name="updateAdvertisementInfo"></param>
     /// <returns></returns>
-    Task<bool> UpdateAdvertisementInfoAsync(Guid advertisementId, UpdateAdvertisementInfo updateAdvertisementInfo);
+    Task<bool> UpdateAdvertisementInfoAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken,
+        UpdateAdvertisementInfo updateAdvertisementInfo);
 
     /// <summary>
     /// دریافت اطلاعات یک اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AdvertisementDetail?> GetAdvertisementInfoByIdAsync(Guid advertisementId);
+    Task<AdvertisementDetail?> GetAdvertisementInfoByIdAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// دریافت شناسه کارفرما صاحب اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Guid?> GetAdvertisementOwnerIdByIdAsync(Guid advertisementId);
+    Task<Guid?> GetAdvertisementOwnerIdByIdAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// دریافت تعداد اگهی های یک شرکت و اگهی ها توسط شناسه شرکت
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="projection"></param>
-    /// <param name="CompanyId"></param>
+    /// <param name="companyId"></param>
+    /// <param name="cancellationToken"></param>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<(List<TResult>, int)> GetAdvertisementsByCompanyAsync<TResult>(
-                                              Expression<Func<Advertisement, TResult>> projection,
-                                              Guid CompanyId,
-                                              int pageNumber = 1,
-                                              int pageSize = 10);
+        Expression<Func<Advertisement, TResult>> projection,
+        Guid companyId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10);
 
     /// <summary>
     /// ایا این اگهی موجود است یا نه 
     /// </summary>
     /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> IsAdvertisementExistAsync(Guid advertisementId);
+    Task<bool> IsAdvertisementExistAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// دریافت اطلاعات مورد نیاز یک اگهی
@@ -67,6 +88,11 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="projection"></param>
     /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<TResult?> GetAdvertisementProjectionAsync<TResult>(Expression<Func<Advertisement, TResult>> projection, Guid advertisementId);
+    Task<TResult?> GetAdvertisementProjectionAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> projection,
+        Guid advertisementId,
+        CancellationToken cancellationToken);
 }
+

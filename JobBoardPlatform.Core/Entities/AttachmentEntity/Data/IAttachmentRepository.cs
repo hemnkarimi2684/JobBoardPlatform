@@ -13,13 +13,20 @@ public interface IAttachmentRepository : IGenericRepository<Attachment>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="projection"></param>
     /// <param name="attachmentId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<TResult?> GetAttachmentByIdAsync<TResult>(Expression<Func<Attachment, TResult>> projection, Guid attachmentId);
+    Task<TResult?> GetAttachmentByIdAsync<TResult>(
+        Expression<Func<Attachment, TResult>> projection,
+        Guid attachmentId,
+        CancellationToken cancellationToken);
 
     /// <summary>
-    /// حذف کامل فایل ذخیره شده 
+    /// حذف کامل فایل ذخیره شده
     /// </summary>
     /// <param name="attachmentId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> HardDeleteAttachmentAsync(Guid attachmentId);
+    Task<bool> HardDeleteAttachmentAsync(
+        Guid attachmentId,
+        CancellationToken cancellationToken);
 }

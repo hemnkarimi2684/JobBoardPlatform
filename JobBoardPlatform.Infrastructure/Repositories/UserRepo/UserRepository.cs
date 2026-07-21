@@ -16,22 +16,29 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public async Task<User?> FindByPhoneNumberAsync(string phoneNumber)
-                             => await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+    public async Task<User?> FindByPhoneNumberAsync(
+        string phoneNumber,
+        CancellationToken cancellationToken) => await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber, cancellationToken);
 
-    public async Task<TResult?> GetResumeDetailAsync<TResult>(Expression<Func<User, TResult>> projection, Guid userId)
+    public async Task<TResult?> GetResumeDetailAsync<TResult>(
+        Expression<Func<User, TResult>> projection,
+        Guid userId,
+        CancellationToken cancellationToken)
     {
         return await _context.Users
                                 .AsNoTracking()
                                 .Where(u => u.Id == userId)
                                 .Select(projection)
-                                .FirstOrDefaultAsync();
+                                .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> IsDuplicateEmailOrPhoneNumberAsync(string email, string phoneNumber)
-        => await _context.Users.AnyAsync(u => u.Email == email || u.PhoneNumber == phoneNumber);
+    public async Task<bool> IsDuplicateEmailOrPhoneNumberAsync(
+        string email,
+        string phoneNumber,
+        CancellationToken cancellationToken) => await _context.Users.AnyAsync(u => u.Email == email || u.PhoneNumber == phoneNumber, cancellationToken);
 
-    public async Task<bool> IsUserExistAsync(Guid userId)
-                            => await _context.Users.AnyAsync(u => u.Id == userId);
+    public async Task<bool> IsUserExistAsync(
+        Guid userId,
+        CancellationToken cancellationToken) => await _context.Users.AnyAsync(u => u.Id == userId, cancellationToken);
 }
 

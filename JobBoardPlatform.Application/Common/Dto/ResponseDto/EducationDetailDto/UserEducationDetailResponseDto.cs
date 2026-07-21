@@ -2,15 +2,24 @@
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 
-public record UserEducationDetailResponseDto(
-    Guid EducationDetailId,
-    Guid UserId,
-    CertificateDegree CertificateDegreeName,
-    string Major,
-    string University,
-    DateTime StartDate,
-    DateTime? CompletionDate,
-    double? Percentage,
-    bool IsCurrentlyStudying
-);
+public class UserEducationDetailResponseDto
+{
+    public Guid EducationDetailId { get; init; }
+
+    public Guid UserId { get; init; }
+
+    public CertificateDegree CertificateDegreeName { get; init; }
+
+    public string Major { get; init; } = string.Empty;
+
+    public string University { get; init; } = string.Empty;
+
+    public DateTime StartDate { get; init; }
+
+    public DateTime? CompletionDate { get; init; }
+
+    public double? Percentage { get; init; }
+
+    public bool IsCurrentlyStudying { get; init; }
+}
 

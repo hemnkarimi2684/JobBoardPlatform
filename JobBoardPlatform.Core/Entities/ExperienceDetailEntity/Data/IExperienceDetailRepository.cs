@@ -14,27 +14,36 @@ public interface IExperienceDetailRepository : IGenericRepository<ExperienceDeta
     /// <typeparam name="TResult"></typeparam>
     /// <param name="projection"></param>
     /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
     /// <param name="pageNumber"></param>
-    /// <param name="PageSize"></param>
+    /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<(List<TResult>, int)> GetUserExperienceDetailsAsync<TResult>(
                              Expression<Func<ExperienceDetail, TResult>> projection,
                              Guid userId,
+                             CancellationToken cancellationToken,
                              int pageNumber = 1,
                              int pageSize = 10);
 
     /// <summary>
-    /// ویرایش اطلاعات تجربه کاری ثبت شده 
+    /// ویرایش اطلاعات تجربه کاری ثبت شده
     /// </summary>
     /// <param name="experienceDetailId"></param>
+    /// <param name="cancellationToken"></param>
     /// <param name="updateExperienceDetail"></param>
     /// <returns></returns>
-    Task<bool> UpdateExperienceDetailAsync(Guid experienceDetailId, UpdateExperienceDetail updateExperienceDetail);
+    Task<bool> UpdateExperienceDetailAsync(
+        Guid experienceDetailId,
+        CancellationToken cancellationToken,
+        UpdateExperienceDetail updateExperienceDetail);
 
     /// <summary>
     /// دریافت شناسه کاربر درای تجربه کار توسط شناسه تجربه کاری 
     /// </summary>
     /// <param name="experienceDetailId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Guid?> GetExperienceDetailUserIdAsync(Guid experienceDetailId);
+    Task<Guid?> GetExperienceDetailUserIdAsync(
+        Guid experienceDetailId,
+        CancellationToken cancellationToken);
 }

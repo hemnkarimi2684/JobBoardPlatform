@@ -2,11 +2,11 @@
 
 public class AttachmentResponseDto
 {
-    public Guid AttachmentId { get; set; }
+    public Guid AttachmentId { get; init; }
 
-    public string FileName { get; set; } = string.Empty;
+    public string FileName { get; init; } = string.Empty;
 
-    public string ContentType { get; set; } = string.Empty;
+    public string ContentType { get; init; } = string.Empty;
 
-    public byte[] Data { get; set; } = [];
+    public byte[] Data { get; init; } = [];
 }

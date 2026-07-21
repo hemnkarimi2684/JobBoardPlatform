@@ -105,38 +105,38 @@ public class UnitOfWork : IUnitOfWork
 
     public IUserSkillRepository UserSkillRepository { get; }
 
-    public async Task BeginTransactionAsync()
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {
         if (_transaction != null)
             return;
 
-        _transaction = await _context.Database.BeginTransactionAsync();
+        _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
     }
 
-    public async Task CommitTransactionAsync()
+    public async Task CommitTransactionAsync(CancellationToken cancellationToken)
     {
         if (_transaction is null)
             throw new DomainException("No active transaction.", "Transaction_NoActive");
 
-        await _transaction.CommitAsync();
+        await _transaction.CommitAsync(cancellationToken);
         await _transaction.DisposeAsync();
 
         _transaction = null;
     }
 
-    public async Task RollBackTransactionAsync()
+    public async Task RollBackTransactionAsync(CancellationToken cancellationToken)
     {
         if (_transaction is null)
             return;
 
-        await _transaction.RollbackAsync();
+        await _transaction.RollbackAsync(cancellationToken);
         await _transaction.DisposeAsync();
 
         _transaction = null;
     }
 
-    public async Task<int> SaveChangesAsync()
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
     {
-        return await _context.SaveChangesAsync();
+        return await _context.SaveChangesAsync(cancellationToken);
     }
 }

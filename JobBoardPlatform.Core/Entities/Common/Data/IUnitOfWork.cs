@@ -41,11 +41,11 @@ public interface IUnitOfWork
     IUserProfileRepository UserProfileRepository { get; }
     IUserSkillRepository UserSkillRepository { get; }
 
-    Task<int> SaveChangesAsync();
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 
-    Task BeginTransactionAsync();
+    Task BeginTransactionAsync(CancellationToken cancellationToken);
 
-    Task CommitTransactionAsync();
+    Task CommitTransactionAsync(CancellationToken cancellationToken);
 
-    Task RollBackTransactionAsync();
+    Task RollBackTransactionAsync(CancellationToken cancellationToken);
 }

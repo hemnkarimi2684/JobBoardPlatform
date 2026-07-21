@@ -15,19 +15,22 @@ public class AttachmentRepository : GenericRepository<Attachment>, IAttachmentRe
     {
     }
 
-    public async Task<TResult?> GetAttachmentByIdAsync<TResult>(Expression<Func<Attachment, TResult>> projection, Guid attachmentId)
+    public async Task<TResult?> GetAttachmentByIdAsync<TResult>(
+        Expression<Func<Attachment, TResult>> projection,
+        Guid attachmentId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                           .AsNoTracking()
                           .Where(a => a.Id == attachmentId)
                           .Select(projection)
-                          .FirstOrDefaultAsync();
+                          .FirstOrDefaultAsync(cancellationToken);
 
     }
 
-    public async Task<bool> HardDeleteAttachmentAsync(Guid attachmentId)
+    public async Task<bool> HardDeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken)
     {
-        var attchment = await Entities.FindAsync(attachmentId);
+        var attchment = await Entities.FindAsync(attachmentId, cancellationToken);
 
         if (attchment == null)
             return false;

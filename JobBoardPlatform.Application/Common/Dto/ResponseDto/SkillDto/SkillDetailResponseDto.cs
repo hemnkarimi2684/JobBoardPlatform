@@ -1,3 +1,8 @@
 ﻿namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 
-public record SkillDetailResponseDto(Guid SkillId, string SkillName);
+public class SkillDetailResponseDto
+{
+    public Guid SkillId { get; init; }
+
+    public string SkillName { get; init; } = string.Empty;
+}

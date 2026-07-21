@@ -31,9 +31,13 @@ public class ExperienceDetailService : IExperienceDetailService
         _accessControlService = accessControlService;
     }
 
-    public async Task<bool> CreateExperienceDetailAsync(CreateExperienceDetailRequestDto createCommand)
+    #region Create Methods
+
+    public async Task<bool> CreateExperienceDetailAsync(
+        CreateExperienceDetailRequestDto createCommand,
+        CancellationToken cancellationToken = default)
     {
-        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId);
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId, cancellationToken);
 
         if (!isUserExist)
             throw new NotFoundException($"The user with id {createCommand.UserId} was not found.");
@@ -51,30 +55,38 @@ public class ExperienceDetailService : IExperienceDetailService
                                                     createCommand.UserId,
                                                     _currentUser.UserId);
 
-        await _unitOfWork.ExperienceDetailRepository.AddAsync(experienceDetail);
+        await _unitOfWork.ExperienceDetailRepository.AddAsync(experienceDetail, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<Pagination<UserExperienceDetailResponseDto>> GetUserExperienceDetailsAsync(Guid userId, PagingRequestDto pagingCommand)
+    #endregion
+
+    #region Get Methods
+
+    public async Task<Pagination<UserExperienceDetailResponseDto>> GetUserExperienceDetailsAsync(
+        Guid userId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
         _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         var (experienceDetails, totalDataCount) = await _unitOfWork
                                                                  .ExperienceDetailRepository
                                                                  .GetUserExperienceDetailsAsync(ed => new UserExperienceDetailResponseDto
-                                                                 (
-                                                                     ed.Id,
-                                                                     ed.LastJobTitle,
-                                                                     ed.UserId,
-                                                                     ed.SeniorityLevel,
-                                                                     ed.JobCategory,
-                                                                     ed.City,
-                                                                     ed.StartDate,
-                                                                     ed.EndDate,
-                                                                     ed.IsCurrentJob
-                                                                 ),
+                                                                 {
+                                                                     ExperienceDetailId = ed.Id,
+                                                                     LastJobTitle = ed.LastJobTitle,
+                                                                     UserId = ed.UserId,
+                                                                     SeniorityLevel = ed.SeniorityLevel,
+                                                                     JobCategory = ed.JobCategory,
+                                                                     City = ed.City,
+                                                                     StartDate = ed.StartDate,
+                                                                     EndDate = ed.EndDate,
+                                                                     IsCurrentJob = ed.IsCurrentJob
+                                                                 },
                                                                   userId,
+                                                                  cancellationToken,
                                                                   pagingCommand.PageNumber,
                                                                   pagingCommand.PageSize);
 
@@ -86,9 +98,16 @@ public class ExperienceDetailService : IExperienceDetailService
                                                             totalDataCount);
     }
 
-    public async Task<bool> UpdateExperienceDetailAsync(Guid experienceDetailId, UpdateExperienceDetailRequestDto updateCommand)
+    #endregion
+
+    #region Update Methods
+
+    public async Task<bool> UpdateExperienceDetailAsync(
+        Guid experienceDetailId,
+        UpdateExperienceDetailRequestDto updateCommand,
+        CancellationToken cancellationToken = default)
     {
-        var userId = await _unitOfWork.ExperienceDetailRepository.GetExperienceDetailUserIdAsync(experienceDetailId);
+        var userId = await _unitOfWork.ExperienceDetailRepository.GetExperienceDetailUserIdAsync(experienceDetailId, cancellationToken);
 
         if (userId == null)
             throw new NotFoundException($"The experience detail with id {experienceDetailId} was not found.");
@@ -97,29 +116,32 @@ public class ExperienceDetailService : IExperienceDetailService
 
         var result = await _unitOfWork.ExperienceDetailRepository.UpdateExperienceDetailAsync(
                                                                                               experienceDetailId,
+                                                                                              cancellationToken,
                                                                                               MapToUpdateExperienceDetail(updateCommand));
 
         if (!result)
             throw new NotFoundException($"the experienceDetail with id {experienceDetailId} was not found");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
+
+    #endregion
 
     #region Private Methods
 
     private UpdateExperienceDetail MapToUpdateExperienceDetail(UpdateExperienceDetailRequestDto updateCommand)
     {
         return new UpdateExperienceDetail
-        (
-           updateCommand.LastJobTitle,
-           updateCommand.SeniorityLevel,
-           updateCommand.JobCategory,
-           updateCommand.City,
-           updateCommand.StartDate,
-           updateCommand.EndDate,
-           updateCommand.IsCurrentJob,
-           _currentUser.UserId
-        );
+        {
+            LastJobTitle = updateCommand.LastJobTitle,
+            SeniorityLevel = updateCommand.SeniorityLevel,
+            JobCategory = updateCommand.JobCategory,
+            City = updateCommand.City,
+            StartDate = updateCommand.StartDate,
+            EndDate = updateCommand.EndDate,
+            IsCurrentJob = updateCommand.IsCurrentJob,
+            ModifiedById = _currentUser.UserId
+        };
     }
 
     #endregion

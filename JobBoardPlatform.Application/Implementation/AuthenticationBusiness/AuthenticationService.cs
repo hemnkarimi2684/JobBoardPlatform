@@ -38,10 +38,12 @@ public class AuthenticationService : IAuthenticationService
 
     #region Login methods
 
-    public async Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(LoginRequestDto loginCommand)
+    public async Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(
+        LoginRequestDto loginCommand,
+        CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByEmailAsync(loginCommand.EmailOrPhoneNumber) ??
-                   await _unitOfWork.UserRepository.FindByPhoneNumberAsync(loginCommand.EmailOrPhoneNumber);
+                   await _unitOfWork.UserRepository.FindByPhoneNumberAsync(loginCommand.EmailOrPhoneNumber, cancellationToken);
 
         if (user == null)
             throw new ValidationException("Email/phone number or password is incorrect.");
@@ -67,9 +69,14 @@ public class AuthenticationService : IAuthenticationService
 
     #region Register methods
 
-    public async Task<EmployerRegisterResponseDto> RegisterEmployerAsync(RegisterEmployerRequestDto registerCommand)
+    public async Task<EmployerRegisterResponseDto> RegisterEmployerAsync(
+        RegisterEmployerRequestDto registerCommand,
+        CancellationToken cancellationToken = default)
     {
-        var isDupplicateEmailOrPhoneNumber = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(registerCommand.Email, registerCommand.PhoneNumber);
+        var isDupplicateEmailOrPhoneNumber = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(
+            registerCommand.Email,
+            registerCommand.PhoneNumber,
+            cancellationToken);
 
         if (isDupplicateEmailOrPhoneNumber)
             throw new ConflictException("A user with the provided email or phone number already exists.");
@@ -78,7 +85,7 @@ public class AuthenticationService : IAuthenticationService
 
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var createUserResult = await _userManager.CreateAsync(user, registerCommand.Password);
 
@@ -92,22 +99,31 @@ public class AuthenticationService : IAuthenticationService
 
             var createdCompanyId = await _companyService.CreateCompanyAsync(registerCommand.ToCreateCompanyRequestDto(user.Id));
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransactionAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            return new EmployerRegisterResponseDto(user.Id, createdCompanyId);
+            return new EmployerRegisterResponseDto
+            {
+                EmployerId = user.Id,
+                CompanyId = createdCompanyId
+            };
         }
         catch (Exception)
         {
-            await _unitOfWork.RollBackTransactionAsync();
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
 
             throw;
         }
     }
 
-    public async Task<TokenLoginResponseDto> RegisterJobSeekerAsync(RegisterJobSeekerRequestDto registerCommand)
+    public async Task<TokenLoginResponseDto> RegisterJobSeekerAsync(
+        RegisterJobSeekerRequestDto registerCommand,
+        CancellationToken cancellationToken = default)
     {
-        var isDupplicate = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(registerCommand.Email, registerCommand.PhoneNumber);
+        var isDupplicate = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(
+            registerCommand.Email,
+            registerCommand.PhoneNumber,
+            cancellationToken);
 
         if (isDupplicate)
             throw new ConflictException("A user with the provided email or phone number already exists.");
@@ -116,7 +132,7 @@ public class AuthenticationService : IAuthenticationService
 
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var createUserResult = await _userManager.CreateAsync(user, registerCommand.Password);
 
@@ -128,12 +144,12 @@ public class AuthenticationService : IAuthenticationService
             if (!addToRoleResult.Succeeded)
                 throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransactionAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
         }
         catch (Exception)
         {
-            await _unitOfWork.RollBackTransactionAsync();
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
 
             throw;
         }

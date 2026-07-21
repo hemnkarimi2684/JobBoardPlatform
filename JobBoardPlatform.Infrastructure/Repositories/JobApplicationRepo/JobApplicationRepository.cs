@@ -13,52 +13,70 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
     {
     }
 
-    public async Task<bool> CheckOwnerHasJobApplicationForResumeAsync(Guid resumeId, Guid employerId)
+    public async Task<bool> CheckOwnerHasJobApplicationForResumeAsync(
+        Guid resumeId,
+        Guid employerId,
+        CancellationToken cancellationToken)
     {
         return await Entities
-                           .AnyAsync(ja => ja.ResumeId == resumeId && ja.Advertisement.Company.OwnedByUserId == employerId);
+                           .AnyAsync(ja =>
+                           ja.ResumeId == resumeId &&
+                           ja.Advertisement.Company.OwnedByUserId == employerId,
+                           cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetAdvertisementJobApplicationsAsync<TResult>(Expression<Func<JobApplication, TResult>> projection,
-                                                                                          Guid advertisementId,
-                                                                                          int pageNumber = 1,
-                                                                                          int pageSize = 10)
+    public async Task<(List<TResult>, int)> GetAdvertisementJobApplicationsAsync<TResult>(
+         Expression<Func<JobApplication, TResult>> projection,
+         Guid advertisementId,
+         CancellationToken cancellationToken,
+         int pageNumber = 1,
+         int pageSize = 10)
     {
         var query = Entities
                       .AsNoTracking()
                       .Where(ja => ja.AdvertisementId == advertisementId);
 
-        var totalDataCount = await query.CountAsync();
+        var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
                             .OrderByDescending(ja => ja.CreatedAt)
                             .Skip((pageNumber - 1) * pageSize)
                             .Take(pageSize)
                             .Select(projection)
-                            .ToListAsync();
+                            .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
     }
 
-    public async Task<TResult?> GetJobApplicationByIdAsync<TResult>(Expression<Func<JobApplication, TResult>> projection, Guid jobApplicationId)
+    public async Task<TResult?> GetJobApplicationByIdAsync<TResult>(
+        Expression<Func<JobApplication, TResult>> projection,
+        Guid jobApplicationId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                           .AsNoTracking()
                           .Where(ja => ja.Id == jobApplicationId)
                           .Select(projection)
-                          .FirstOrDefaultAsync();
+                          .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Guid?> GetJobApplicationUserIdAsync(Guid jobApplicationId)
+    public async Task<Guid?> GetJobApplicationUserIdAsync(
+        Guid jobApplicationId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                          .AsNoTracking()
                          .Where(ja => ja.Id == jobApplicationId)
                          .Select(ja => ja.UserId)
-                         .FirstOrDefaultAsync();
+                         .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> IsDuplicateJobApplicationAsync(Guid advertisementId, Guid userId)
-                                => await AnyAsync(ja => ja.AdvertisementId == advertisementId && ja.UserId == userId);
+    public async Task<bool> IsDuplicateJobApplicationAsync(
+        Guid advertisementId,
+        Guid userId,
+        CancellationToken cancellationToken)
+                                => await AnyAsync(ja =>
+                                    ja.AdvertisementId == advertisementId && ja.UserId == userId,
+                                    cancellationToken);
 
 }

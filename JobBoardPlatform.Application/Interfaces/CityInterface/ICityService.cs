@@ -12,14 +12,22 @@ public interface ICityService
     /// </summary>
     /// <param name="cityId"></param>
     /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<CompanyDetailResponseDto>> GetCityCompaniesAsync(Guid cityId, PagingRequestDto pagingCommand);
+    Task<Pagination<CompanyDetailResponseDto>> GetCityCompaniesAsync(
+        Guid cityId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// دریافت شهر های مربوط به یک استان 
     /// </summary>
     /// <param name="provinceId"></param>
     /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<CityDetailResponseDto>> GetProvinceCitiesAsync(Guid provinceId, PagingRequestDto pagingCommand);
+    Task<Pagination<CityDetailResponseDto>> GetProvinceCitiesAsync(
+        Guid provinceId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
 }

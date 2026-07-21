@@ -3,28 +3,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
 
-public record CreateEducationDetailRequestDto(
-    CertificateDegree CertificateDegree,
+public class CreateEducationDetailRequestDto
+{
+    public CertificateDegree CertificateDegree { get; set; }
 
     [Required(ErrorMessage = "Major is required.")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Major must be between 2 and 100 characters.")]
-    string Major,
+    public string Major { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "University is required.")]
     [StringLength(200, MinimumLength = 2, ErrorMessage = "University must be between 2 and 200 characters.")]
-    string University,
+    public string University { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Start date is required.")]
-    DateTime StartDate,
+    public DateTime StartDate { get; set; }
 
-    DateTime? CompletionDate,
+    public DateTime? CompletionDate { get; set; }
 
     [Range(0, 100, ErrorMessage = "Percentage must be between 0 and 100.")]
-    double? Percentage,
+    public double? Percentage { get; set; }
 
-    [Required(ErrorMessage = "IsCurrentlyStudying is required.")]
-    bool IsCurrentlyStudying,
+    public bool IsCurrentlyStudying { get; set; }
 
-    [Required(ErrorMessage = "UserId is required.")]
-    Guid UserId
-);
+    public Guid UserId { get; set; }
+}

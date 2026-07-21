@@ -2,10 +2,12 @@
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 
-public record PagingRequestDto(
-                                [Range(0, 100, ErrorMessage = "the PageNumber must be in the range")]
-                                int PageNumber = 1,
+public class PagingRequestDto
+{
+    [Range(1, int.MaxValue, ErrorMessage = "Page number must be greater than or equal to 1.")]
+    public int PageNumber { get; set; } = 1;
 
-                                [Range(0, 1000, ErrorMessage = "the PageSize must be in the range")]
-                                int PageSize = 10);
+    [Range(1, 100, ErrorMessage = "Page size must be between 1 and 100.")]
+    public int PageSize { get; set; } = 10;
+}
 

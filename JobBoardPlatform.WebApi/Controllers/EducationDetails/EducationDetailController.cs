@@ -25,9 +25,12 @@ public class EducationDetailController : ControllerBase
 
     [HttpGet("{userId:guid}/educations-detail")]
     [Authorize(Roles = "Admin,Employer,JobSeeker")]
-    public async Task<IActionResult> GetUserEducationDetailsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
+    public async Task<IActionResult> GetUserEducationDetailsAsync(
+        [FromRoute] Guid userId,
+        [FromQuery] PagingRequestDto pagingRequest,
+        CancellationToken cancellationToken)
     {
-        var result = await _educationDetailService.GetUserEducationDetailsAsync(userId, pagingRequest);
+        var result = await _educationDetailService.GetUserEducationDetailsAsync(userId, pagingRequest, cancellationToken);
 
         return Ok(Result<Pagination<UserEducationDetailResponseDto>>.Success(result));
     }
@@ -35,9 +38,11 @@ public class EducationDetailController : ControllerBase
     [HttpPost]
     [RequestModelValidationFilter]
     [Authorize(Roles = "JobSeeker")]
-    public async Task<IActionResult> CreateEducationDetailAsync([FromBody] CreateEducationDetailRequestDto createEducation)
+    public async Task<IActionResult> CreateEducationDetailAsync(
+        [FromBody] CreateEducationDetailRequestDto createEducation,
+        CancellationToken cancellationToken)
     {
-        await _educationDetailService.CreateEducationDetailAsync(createEducation);
+        await _educationDetailService.CreateEducationDetailAsync(createEducation, cancellationToken);
 
         return Ok(Result.Success());
     }
@@ -45,9 +50,12 @@ public class EducationDetailController : ControllerBase
     [HttpPut("{educationDetailId:guid}")]
     [RequestModelValidationFilter]
     [Authorize(Roles = "JobSeeker")]
-    public async Task<IActionResult> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailRequestDto updateEducation)
+    public async Task<IActionResult> UpdateEducationDetailAsync(
+        [FromRoute] Guid educationDetailId,
+        [FromBody] UpdateEducationDetailRequestDto updateEducation,
+        CancellationToken cancellationToken)
     {
-        await _educationDetailService.UpdateEducationDetailAsync(educationDetailId, updateEducation);
+        await _educationDetailService.UpdateEducationDetailAsync(educationDetailId, updateEducation, cancellationToken);
 
         return Ok(Result.Success());
     }

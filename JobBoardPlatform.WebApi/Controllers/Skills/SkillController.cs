@@ -22,16 +22,21 @@ public class SkillController : ControllerBase
 
     [HttpGet("by-user/{userId:guid}")]
     [Authorize(Roles = "Admin,Employer,JobSeeker")]
-    public async Task<IActionResult> GetUserSkillsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
+    public async Task<IActionResult> GetUserSkillsAsync(
+        [FromRoute] Guid userId,
+        [FromQuery] PagingRequestDto pagingRequest,
+        CancellationToken cancellationToken)
     {
-        var result = await _skillService.GetUserSkillsAsync(userId, pagingRequest);
+        var result = await _skillService.GetUserSkillsAsync(userId, pagingRequest, cancellationToken);
 
         return Ok(Result<Pagination<UserSkillDetailResponseDto>>.Success(result));
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateSkillAsync(string name)
+    public async Task<IActionResult> CreateSkillAsync(
+        string name,
+        CancellationToken cancellationToken)
     {
         await _skillService.CreateSkillAsync(name);
 
@@ -40,17 +45,23 @@ public class SkillController : ControllerBase
 
     [HttpPost("assign-to-user/{userId:guid}")]
     [Authorize(Roles = "Admin,JobSeeker")]
-    public async Task<IActionResult> AddSkillsToUserAsync([FromRoute] Guid userId, [FromBody] List<Guid> skillsId)
+    public async Task<IActionResult> AddSkillsToUserAsync(
+        [FromRoute] Guid userId,
+        [FromBody] List<Guid> skillsId,
+        CancellationToken cancellationToken)
     {
-        await _skillService.AddSkillsToUserAsync(userId, skillsId);
+        await _skillService.AddSkillsToUserAsync(userId, skillsId, cancellationToken);
 
         return Ok(Result.Success());
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllSkillsAsync([FromQuery] string text, [FromQuery] PagingRequestDto pagingRequest)
+    public async Task<IActionResult> GetAllSkillsAsync(
+        [FromQuery] string text,
+        [FromQuery] PagingRequestDto pagingRequest,
+        CancellationToken cancellationToken)
     {
-        var result = await _skillService.GetAllSkillsAsync(text, pagingRequest);
+        var result = await _skillService.GetAllSkillsAsync(text, pagingRequest, cancellationToken);
 
         return Ok(Result<Pagination<SkillDetailResponseDto>>.Success(result));
     }

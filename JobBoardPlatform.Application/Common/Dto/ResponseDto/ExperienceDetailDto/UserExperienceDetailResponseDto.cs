@@ -2,14 +2,23 @@
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.ExperienceDetailDto;
 
-public record UserExperienceDetailResponseDto(
-    Guid ExperienceDetailId,
-    string LastJobTitle,
-    Guid UserId,
-    SeniorityLevel SeniorityLevel,
-    string JobCategory,
-    string City,
-    DateTime StartDate,
-    DateTime? EndDate,
-    bool IsCurrentJob
-);
+public class UserExperienceDetailResponseDto
+{
+    public Guid ExperienceDetailId { get; init; }
+
+    public string LastJobTitle { get; init; } = string.Empty;
+
+    public Guid UserId { get; init; }
+
+    public SeniorityLevel SeniorityLevel { get; init; }
+
+    public string JobCategory { get; init; } = string.Empty;
+
+    public string City { get; init; } = string.Empty;
+
+    public DateTime StartDate { get; init; }
+
+    public DateTime? EndDate { get; init; }
+
+    public bool IsCurrentJob { get; init; }
+}

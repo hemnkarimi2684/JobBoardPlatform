@@ -39,19 +39,21 @@ public class CompanyService : ICompanyService
 
     #region Create Methods
 
-    public async Task<Guid> CreateCompanyAsync(CreateCompanyRequestDto createCommand)
+    public async Task<Guid> CreateCompanyAsync(
+        CreateCompanyRequestDto createCommand,
+        CancellationToken cancellationToken = default)
     {
-        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId);
+        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId, cancellationToken);
 
         if (!doesCityExist)
             throw new NotFoundException($"City with id {createCommand.CityId} was not found.");
 
-        var companyExistsByName = await _unitOfWork.CompanyRepository.IsCompanyExistByNameAsync(createCommand.Name);
+        var companyExistsByName = await _unitOfWork.CompanyRepository.IsCompanyExistByNameAsync(createCommand.Name, cancellationToken);
 
         if (companyExistsByName)
             throw new ConflictException($"the company with this name {createCommand.Name} already exist");
 
-        var companyExistsForOwner = await _unitOfWork.CompanyRepository.IsCompanyExistForOwnerId(createCommand.OwnedByUserId);
+        var companyExistsForOwner = await _unitOfWork.CompanyRepository.IsCompanyExistForOwnerId(createCommand.OwnedByUserId, cancellationToken);
 
         if (companyExistsForOwner)
             throw new ConflictException($"this owner already has company");
@@ -67,13 +69,13 @@ public class CompanyService : ICompanyService
             null
             );
 
-        await _unitOfWork.CompanyRepository.AddAsync(company);
+        await _unitOfWork.CompanyRepository.AddAsync(company, cancellationToken);
 
         var companyCity = new CompanyCity(createCommand.Location, company.Id, createCommand.CityId);
 
-        await _unitOfWork.CompanyCityRepository.AddAsync(companyCity);
+        await _unitOfWork.CompanyCityRepository.AddAsync(companyCity, cancellationToken);
 
-        var saveResult = await _unitOfWork.SaveChangesAsync() > 0;
+        var saveResult = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
 
         if (!saveResult)
             throw new ValidationException("something went wring in create companu plaese try again!");
@@ -85,21 +87,25 @@ public class CompanyService : ICompanyService
 
     #region Get Methods
 
-    public async Task<CompanyInfoResponseDto> GetCompanyInfoByOwnerIdAsync(Guid ownerId)
+    public async Task<CompanyInfoResponseDto> GetCompanyInfoByOwnerIdAsync(
+        Guid ownerId,
+        CancellationToken cancellationToken = default)
     {
-        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyInfoResponseDto(
-            c.Name,
-            c.OwnedByUserId,
-            c.YearOfEstablishment,
-            c.Industry,
-            c.AboutUs,
-            c.WebSiteAddress,
-            c.OwnershipType,
-            c.CompanySize,
-            c.ActivityType,
-            c.CompanyImageFileId
-            ),
-            ownerId);
+        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyInfoResponseDto
+        {
+            Name = c.Name,
+            UserId = c.OwnedByUserId,
+            YearOfEstablishment = c.YearOfEstablishment,
+            Industry = c.Industry,
+            AboutUs = c.AboutUs,
+            WebSiteAddress = c.WebSiteAddress,
+            OwnershipType = c.OwnershipType,
+            CompanySize = c.CompanySize,
+            ActivityType = c.ActivityType,
+            CompanyImageFileId = c.CompanyImageFileId
+        },
+          ownerId,
+          cancellationToken);
 
         if (companyInfo is null)
             throw new NotFoundException($"the company with this ownerId {ownerId} not found");
@@ -111,29 +117,38 @@ public class CompanyService : ICompanyService
 
     #region Update Methods
 
-    public async Task<bool> UpdateCompanyIdAsync(Guid companyId, UpdateCompanyInfoRequestDto updateCommand)
+    public async Task<bool> UpdateCompanyIdAsync(
+        Guid companyId,
+        UpdateCompanyInfoRequestDto updateCommand,
+        CancellationToken cancellationToken = default)
     {
-        var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId);
+        var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId, cancellationToken);
 
         if (companyOwnerId == null)
             throw new NotFoundException($"The company with id {companyId} was not found.");
 
         _accessControlService.EnsureOwnerEmployerOrAdmin(companyOwnerId.Value, _currentUser);
 
-        var updateCompanyInfoResult = await _unitOfWork.CompanyRepository.UpdateCompanyInfoAsync(companyId, MapToCompanyInfoUpdate(updateCommand));
+        var updateCompanyInfoResult = await _unitOfWork.CompanyRepository.UpdateCompanyInfoAsync(
+                                                                                companyId,
+                                                                                cancellationToken,
+                                                                                MapToCompanyInfoUpdate(updateCommand));
 
         if (!updateCompanyInfoResult)
             throw new NotFoundException($"the company with this id {companyId} not found");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task UploadCompanyImageAsync(Guid companyId, UploadCompanyImageRequestDto imageRequestDto)
+    public async Task UploadCompanyImageAsync(
+        Guid companyId,
+        UploadCompanyImageRequestDto imageRequestDto,
+        CancellationToken cancellationToken = default)
     {
         if (imageRequestDto?.File is null)
             throw new ValidationException("Image file is required.");
 
-        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId);
+        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken, true);
 
         if (company == null)
             throw new NotFoundException($"The company with id {companyId} was not found.");
@@ -146,41 +161,41 @@ public class CompanyService : ICompanyService
 
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            newImageId = await _attachmentService.UploadAsync(imageRequestDto.File, AttachmentType.Image);
+            newImageId = await _attachmentService.UploadAsync(imageRequestDto.File, AttachmentType.Image, cancellationToken);
 
             company.UpdateImage(newImageId);
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransactionAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
         }
         catch (Exception)
         {
-            await _unitOfWork.RollBackTransactionAsync();
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
 
             //اینجا برای این ترای کچ کذاشتم که اگه توی فلو اضافه کردن و اپدیت کردن عکس به شرکت به اکسپشن و مشکلی خورد....
             //و عکس جدیدی اپلود شده بود اما بدون اینکه به شرکت اختصاص داشته باشه اینو بیام حذف کنم 
             if (newImageId != null)
-                await DeleteAttachmentAsync(newImageId.Value);
+                await DeleteAttachmentAsync(newImageId.Value, cancellationToken);
 
             throw;
         }
 
         //حالا اگه عکس جدیدی سیو شد و اپدیت شد بیا اون عکس قدیمی رو حذف کن 
         if (oldImageId != null)
-            await DeleteAttachmentAsync(oldImageId.Value);
+            await DeleteAttachmentAsync(oldImageId.Value, cancellationToken);
     }
 
     #endregion
 
     #region Private Methods
 
-    private async Task DeleteAttachmentAsync(Guid attachmentId)
+    private async Task DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken)
     {
         try
         {
-            await _attachmentService.HardDeleteAttachmentAsync(attachmentId);
+            await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
         }
         catch (Exception ex)
         {

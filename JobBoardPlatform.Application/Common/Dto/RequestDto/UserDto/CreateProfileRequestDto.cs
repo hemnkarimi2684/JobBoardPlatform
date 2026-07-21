@@ -3,31 +3,28 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 
-public record CreateProfileRequestDto(
+public class CreateProfileRequestDto
+{
     [Required(ErrorMessage = "First name is required.")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "First name must be between 2 and 100 characters.")]
-    string FirstName,
+    public string FirstName { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Last name is required.")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Last name must be between 2 and 100 characters.")]
-    string LastName,
+    public string LastName { get; set; } = string.Empty;
 
     [StringLength(1000, ErrorMessage = "Bio must not exceed 1000 characters.")]
-    string Bio,
+    public string Bio { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Address is required.")]
     [StringLength(300, MinimumLength = 5, ErrorMessage = "Address must be between 5 and 300 characters.")]
-    string Address,
+    public string Address { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Birth date is required.")]
-    DateTime BirthDate,
+    public Guid UserId { get; set; }
 
-    [Required(ErrorMessage = "CityId is required.")]
-    Guid CityId,
+    public DateTime BirthDate { get; set; }
 
-    [Required(ErrorMessage = "UserId is required.")]
-    Guid UserId,
+    public Guid CityId { get; set; }
 
-    [Required(ErrorMessage = "Gender is required.")]
-    Gender Gender
-);
+    public Gender Gender { get; set; }
+}

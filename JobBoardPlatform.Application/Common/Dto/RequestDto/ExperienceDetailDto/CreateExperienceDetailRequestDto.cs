@@ -3,27 +3,28 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
 
-public record CreateExperienceDetailRequestDto(
+public class CreateExperienceDetailRequestDto
+{
     [Required(ErrorMessage = "Last job title is required.")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Last job title must be between 2 and 100 characters.")]
-    string LastJobTitle,
+    public string LastJobTitle { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Seniority level is required.")]
-    SeniorityLevel SeniorityLevel,
+    [EnumDataType(typeof(SeniorityLevel), ErrorMessage = "Invalid seniority level.")]
+    public SeniorityLevel SeniorityLevel { get; set; }
 
     [Required(ErrorMessage = "Job category is required.")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Job category must be between 2 and 100 characters.")]
-    string JobCategory,
+    public string JobCategory { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "City is required.")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "City must be between 2 and 100 characters.")]
-    string City,
+    public string City { get; set; } = string.Empty;
 
-    DateTime StartDate,
+    public Guid UserId { get; set; }
 
-    DateTime? EndDate,
+    public DateTime StartDate { get; set; }
 
-    bool IsCurrentJob,
+    public DateTime? EndDate { get; set; }
 
-    Guid UserId
-);
+    public bool IsCurrentJob { get; set; }
+}

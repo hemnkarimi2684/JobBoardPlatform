@@ -13,12 +13,14 @@ public interface IEducationDetailRepository : IGenericRepository<EducationDetail
     /// <typeparam name="TResult"></typeparam>
     /// <param name="projection"></param>
     /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<(List<TResult>, int)> GetUserEducationDetailsAsync<TResult>(
                                             Expression<Func<EducationDetail, TResult>> projection,
                                             Guid userId,
+                                            CancellationToken cancellationToken,
                                             int pageNumber = 1,
                                             int pageSize = 10);
 
@@ -26,21 +28,31 @@ public interface IEducationDetailRepository : IGenericRepository<EducationDetail
     /// ویرایش اطلاعات مدرک تحصیلی موجود
     /// </summary>
     /// <param name="educationDetailId"></param>
+    /// <param name="cancellationToken"></param>
     /// <param name="updateEducation"></param>
     /// <returns></returns>
-    Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetail updateEducation);
+    Task<bool> UpdateEducationDetailAsync(
+        Guid educationDetailId,
+        CancellationToken cancellationToken,
+        UpdateEducationDetail updateEducation);
 
     /// <summary>
     /// دریافت شناسه کاربری که این مدرک تحصیلی رو داره توسط شناسه مدرک
     /// </summary>
-    /// <param name="userId"></param>
+    /// <param name="educationDetailId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Guid?> GetEducationDetailUserIdAsync(Guid educationDetailId);
+    Task<Guid?> GetEducationDetailUserIdAsync(
+        Guid educationDetailId,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// ایا مدرک تحصیلی دارد یا نه 
     /// </summary>
     /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> UserHasEducationDetailAsync(Guid userId);
+    Task<bool> UserHasEducationDetailAsync(
+        Guid userId,
+        CancellationToken cancellationToken);
 }

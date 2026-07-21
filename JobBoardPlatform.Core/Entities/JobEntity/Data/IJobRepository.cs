@@ -9,6 +9,10 @@ public interface IJobRepository : IGenericRepository<Job>
     /// ایا این کار وجود داره یا نه
     /// </summary>
     /// <param name="jobId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> IsJobExistAsync(Guid jobId);
+    Task<bool> IsJobExistAsync(
+        Guid jobId,
+        CancellationToken cancellationToken);
+
 }

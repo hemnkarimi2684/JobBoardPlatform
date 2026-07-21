@@ -27,9 +27,12 @@ public class SkillService : ISkillService
         _accessControlService = accessControlService;
     }
 
-    public async Task<bool> AddSkillsToUserAsync(Guid userId, List<Guid> skillsId)
+    public async Task<bool> AddSkillsToUserAsync(
+        Guid userId,
+        List<Guid> skillsId,
+        CancellationToken cancellationToken = default)
     {
-        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId);
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId, cancellationToken);
 
         if (!isUserExist)
             throw new NotFoundException($"the user with id {userId} was not found");
@@ -42,38 +45,46 @@ public class SkillService : ISkillService
             {
                 var userSkill = new UserSkill(userId, skillId, _currentUser.UserId);
 
-                await _unitOfWork.UserSkillRepository.AddAsync(userSkill);
+                await _unitOfWork.UserSkillRepository.AddAsync(userSkill, cancellationToken);
             }
         }
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<bool> CreateSkillAsync(string name)
+    public async Task<bool> CreateSkillAsync(
+        string name,
+        CancellationToken cancellationToken = default)
     {
         _accessControlService.EnsureAdmin(_currentUser);
 
-        var isDuplicateSkill = await _unitOfWork.SkillRepository.IsDuplicateSkillAsync(name);
+        var isDuplicateSkill = await _unitOfWork.SkillRepository.IsDuplicateSkillAsync(name, cancellationToken);
 
         if (isDuplicateSkill)
             throw new ConflictException($"the skill with name {name} is already exist");
 
         var skill = new Skill(name, _currentUser.UserId);
 
-        await _unitOfWork.SkillRepository.AddAsync(skill);
+        await _unitOfWork.SkillRepository.AddAsync(skill, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<Pagination<SkillDetailResponseDto>> GetAllSkillsAsync(string text, PagingRequestDto pagingCommand)
+    public async Task<Pagination<SkillDetailResponseDto>> GetAllSkillsAsync(
+        string text,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
         var (skills, totalDataCount) = await _unitOfWork.SkillRepository.GetAllSkillsAsync(us => new SkillDetailResponseDto
-                                                                                (
-                                                                                  us.Id,
-                                                                                  us.Name
-                                                                                ),
-                                                                                 text, pagingCommand.PageNumber, pagingCommand.PageSize
-                                                                                );
+        {
+            SkillId = us.Id,
+            SkillName = us.Name
+        },
+          text,
+          cancellationToken,
+          pagingCommand.PageNumber,
+          pagingCommand.PageSize
+        );
 
         return Pagination<SkillDetailResponseDto>.GetPagination(skills,
                                                                pagingCommand.PageNumber,
@@ -82,18 +93,23 @@ public class SkillService : ISkillService
                                                                );
     }
 
-    public async Task<Pagination<UserSkillDetailResponseDto>> GetUserSkillsAsync(Guid userId, PagingRequestDto pagingCommand)
+    public async Task<Pagination<UserSkillDetailResponseDto>> GetUserSkillsAsync(
+        Guid userId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
         _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         var (userSkills, totalDataCount) = await _unitOfWork.UserSkillRepository.GetUserSkillsAsync(us => new UserSkillDetailResponseDto
-                                                                                (
-                                                                                  us.Id,
-                                                                                  us.Skill.Name,
-                                                                                  us.UserId
-                                                                                ),
-                                                                                userId, pagingCommand.PageNumber, pagingCommand.PageSize
-                                                                                );
+        {
+            SkillId = us.Id,
+            SkillName = us.Skill.Name,
+            UserId = us.UserId
+        },
+        userId,
+        cancellationToken,
+        pagingCommand.PageNumber,
+        pagingCommand.PageSize);
 
         return Pagination<UserSkillDetailResponseDto>.GetPagination(userSkills,
                                                                pagingCommand.PageNumber,

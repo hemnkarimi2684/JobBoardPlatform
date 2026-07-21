@@ -16,6 +16,7 @@ public class SkillRepository : GenericRepository<Skill>, ISkillRepository
 
     public async Task<(List<TResult>, int)> GetAllSkillsAsync<TResult>(Expression<Func<Skill, TResult>> projection,
                                                              string text,
+                                                             CancellationToken cancellationToken,
                                                              int pageNumber = 1,
                                                              int pageSize = 10)
     {
@@ -25,18 +26,20 @@ public class SkillRepository : GenericRepository<Skill>, ISkillRepository
                          .AsNoTracking()
                          .Where(us => EF.Functions.Like(us.Name, $"%{trimmedText}%"));
 
-        var totalDataCount = await query.CountAsync();
+        var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
                              .OrderByDescending(us => us.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
-                             .ToListAsync();
+                             .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
     }
 
-    public async Task<bool> IsDuplicateSkillAsync(string skillName) => await AnyAsync(s => s.Name == skillName);
+    public async Task<bool> IsDuplicateSkillAsync(
+        string skillName,
+        CancellationToken cancellationToken) => await AnyAsync(s => s.Name == skillName, cancellationToken);
 
 }

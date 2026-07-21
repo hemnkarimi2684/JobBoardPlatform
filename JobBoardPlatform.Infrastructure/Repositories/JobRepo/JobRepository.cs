@@ -11,6 +11,8 @@ public class JobRepository : GenericRepository<Job>, IJobRepository
     {
     }
 
-    public async Task<bool> IsJobExistAsync(Guid jobId) => await AnyAsync(j => j.Id == jobId);
-    
+    public async Task<bool> IsJobExistAsync(
+        Guid jobId,
+        CancellationToken cancellationToken) => await AnyAsync(j => j.Id == jobId, cancellationToken);
+
 }

@@ -44,7 +44,7 @@ public class AdvertisementDetailResponseDto
         return new AdvertisementDetailResponseDto
         {
             Description = advertisementDetail.Description,
-            AboutCompany = advertisementDetail.AboutCompany,
+            AboutCompany = advertisementDetail.CompanyAboutUs,
             CreatedAt = advertisementDetail.CreatedAt,
             MaximumAge = advertisementDetail.MaximumAge,
             MinimumAge = advertisementDetail.MinimumAge,
@@ -54,9 +54,9 @@ public class AdvertisementDetailResponseDto
             MinimumSalary = advertisementDetail.MinimumSalary,
             CompanyName = advertisementDetail.CompanyName,
             ExperienceLevel = advertisementDetail.ExperienceLevel,
-            Industry = advertisementDetail.Industry,
+            Industry = advertisementDetail.CompanyIndustry,
             JobName = advertisementDetail.JobName,
-            SkillNames = advertisementDetail.SkillNames,
+            SkillNames = advertisementDetail.Skills,
             AdvertisementId = advertisementDetail.AdvertisementId,
             CityId = advertisementDetail.CityId,
             CompanyId = advertisementDetail.CompanyId,

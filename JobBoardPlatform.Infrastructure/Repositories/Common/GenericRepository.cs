@@ -20,20 +20,21 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         Entities = DbContext.Set<T>();
     }
 
-    public async Task AddAsync(T entity)
+    public async Task AddAsync(T entity, CancellationToken cancellationToken)
     {
-        await Entities.AddAsync(entity);
+        await Entities.AddAsync(entity, cancellationToken);
     }
 
-    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
         var query = Entities.AsQueryable();
 
-        return await query.AnyAsync(predicate);
+        return await query.AnyAsync(predicate, cancellationToken);
     }
 
     public async Task<Pagination<TResult>> QueryAsync<TResult>(
             Expression<Func<T, TResult>> selector,
+            CancellationToken cancellationToken,
             int page = 1, int pageSize = 10,
             bool tracking = false)
     {
@@ -49,7 +50,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         .OrderByDescending(b => b.CreatedAt)
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
-        .Select(selector).ToListAsync();
+        .Select(selector).ToListAsync(cancellationToken);
 
         return Pagination<TResult>.GetPagination(result, page, pageSize, result.Count());
     }
@@ -57,6 +58,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     public async Task<Pagination<TResult>> QueryAsync<TResult>(
         Expression<Func<T, TResult>> selector,
         Expression<Func<T, bool>> filter,
+        CancellationToken cancellationToken,
         int page = 1, int pageSize = 10,
         bool tracking = false)
     {
@@ -70,30 +72,30 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 
         var conditionResult = query.Where(filter);
 
-        var totalDataCount = await conditionResult.CountAsync();
+        var totalDataCount = await conditionResult.CountAsync(cancellationToken);
 
         var result = await conditionResult
         .OrderByDescending(b => b.CreatedAt)
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
-        .Select(selector).ToListAsync();
+        .Select(selector).ToListAsync(cancellationToken);
 
         return Pagination<TResult>.GetPagination(result, page, pageSize, totalDataCount);
     }
 
-    public async Task<T?> GetByIdAsync(Guid id, bool tracking = false)
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken, bool tracking = false)
     {
         var query = Entities.AsQueryable();
 
         if (!tracking)
             query = query.AsNoTracking();
 
-        return await Entities.FirstOrDefaultAsync(e => e.Id == id);
+        return await Entities.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    public async Task<bool> SoftDeleteAsync(Guid id, Guid? deletedById)
+    public async Task<bool> SoftDeleteAsync(Guid id, Guid? deletedById, CancellationToken cancellationToken)
     {
-        var entity = await Entities.FirstOrDefaultAsync(e => e.Id == id);
+        var entity = await Entities.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (entity == null)
             return false;

@@ -10,9 +10,6 @@ using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
-using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
-using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Application.Implementation.EducationDetailBusiness;
 
@@ -33,11 +30,13 @@ public class EducationDetailService : IEducationDetailService
 
     #region Create Methods
 
-    public async Task<bool> CreateEducationDetailAsync(CreateEducationDetailRequestDto createCommand)
+    public async Task<bool> CreateEducationDetailAsync(
+        CreateEducationDetailRequestDto createCommand,
+        CancellationToken cancellationToken = default)
     {
         _accessControlService.EnsureApplicantOrAdmin(createCommand.UserId, _currentUser);
 
-        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId);
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId, cancellationToken);
 
         if (!isUserExist)
             throw new NotFoundException($"user with id {createCommand.UserId} was not found");
@@ -54,34 +53,38 @@ public class EducationDetailService : IEducationDetailService
                                            _currentUser.UserId
                                            );
 
-        await _unitOfWork.EducationDetailRepository.AddAsync(educationDetail);
+        await _unitOfWork.EducationDetailRepository.AddAsync(educationDetail, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
     #endregion
 
     #region Get Methods 
 
-    public async Task<Pagination<UserEducationDetailResponseDto>> GetUserEducationDetailsAsync(Guid userId, PagingRequestDto pagingCommand)
+    public async Task<Pagination<UserEducationDetailResponseDto>> GetUserEducationDetailsAsync(
+        Guid userId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
         _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         var (userEducationDetails, totalDataCount) = await _unitOfWork.EducationDetailRepository
                                                           .GetUserEducationDetailsAsync(ed =>
                                                           new UserEducationDetailResponseDto
-                                                          (
-                                                              ed.Id,
-                                                              ed.UserId,
-                                                              ed.CertificateDegreeName,
-                                                              ed.Major,
-                                                              ed.University,
-                                                              ed.StartDate,
-                                                              ed.CompletionDate,
-                                                              ed.Percentage,
-                                                              ed.IsCurrentlyStudying
-                                                          ),
+                                                          {
+                                                              EducationDetailId = ed.Id,
+                                                              UserId = ed.UserId,
+                                                              CertificateDegreeName = ed.CertificateDegreeName,
+                                                              Major = ed.Major,
+                                                              University = ed.University,
+                                                              StartDate = ed.StartDate,
+                                                              CompletionDate = ed.CompletionDate,
+                                                              Percentage = ed.Percentage,
+                                                              IsCurrentlyStudying = ed.IsCurrentlyStudying
+                                                          },
                                                           userId,
+                                                          cancellationToken,
                                                           pagingCommand.PageNumber,
                                                           pagingCommand.PageSize);
 
@@ -96,9 +99,12 @@ public class EducationDetailService : IEducationDetailService
 
     #region Update Methods
 
-    public async Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailRequestDto updateCommand)
+    public async Task<bool> UpdateEducationDetailAsync(
+        Guid educationDetailId,
+        UpdateEducationDetailRequestDto updateCommand,
+        CancellationToken cancellationToken = default)
     {
-        var userId = await _unitOfWork.EducationDetailRepository.GetEducationDetailUserIdAsync(educationDetailId);
+        var userId = await _unitOfWork.EducationDetailRepository.GetEducationDetailUserIdAsync(educationDetailId, cancellationToken);
 
         if (userId == null)
             throw new NotFoundException($"The education detail with id {educationDetailId} was not found.");
@@ -107,12 +113,13 @@ public class EducationDetailService : IEducationDetailService
 
         var result = await _unitOfWork.EducationDetailRepository.UpdateEducationDetailAsync(
                                                                                             educationDetailId,
+                                                                                            cancellationToken,
                                                                                             MapToUpdateEducationDetail(updateCommand));
 
         if (!result)
             throw new NotFoundException($"the educationDetail with id {educationDetailId} was not found");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
     #endregion
@@ -122,16 +129,16 @@ public class EducationDetailService : IEducationDetailService
     private UpdateEducationDetail MapToUpdateEducationDetail(UpdateEducationDetailRequestDto updateCommand)
     {
         return new UpdateEducationDetail
-        (
-           updateCommand.CertificateDegree,
-           updateCommand.Major,
-           updateCommand.University,
-           updateCommand.StartDate,
-           updateCommand.CompletionDate,
-           updateCommand.Percentage < 1 ? null : updateCommand.Percentage,
-           updateCommand.IsCurrentlyStudying,
-           _currentUser.UserId
-        );
+        {
+            CertificateDegreeName = updateCommand.CertificateDegree,
+            Major = updateCommand.Major,
+            University = updateCommand.University,
+            StartDate = updateCommand.StartDate,
+            CompletionDate = updateCommand.CompletionDate,
+            Percentage = updateCommand.Percentage < 1 ? null : updateCommand.Percentage,
+            IsCurrentlyStudying = updateCommand.IsCurrentlyStudying,
+            ModifiedById = _currentUser.UserId
+        };
     }
 
     #endregion

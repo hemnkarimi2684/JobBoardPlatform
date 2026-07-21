@@ -81,6 +81,11 @@ public class JwtService : IJwtService
         var handler = new JwtSecurityTokenHandler();
         var token = handler.CreateToken(tokenDescriptor);
 
-        return new TokenLoginResponseDto(handler.WriteToken(token), TimeSpan.FromMinutes(_jwtSettings.TokenLifeTime), "Bearer");
+        return new TokenLoginResponseDto
+        {
+            AccessToken = handler.WriteToken(token),
+            ExpiryTime = TimeSpan.FromMinutes(_jwtSettings.TokenLifeTime),
+            TokenType = "Bearer"
+        };
     }
 }

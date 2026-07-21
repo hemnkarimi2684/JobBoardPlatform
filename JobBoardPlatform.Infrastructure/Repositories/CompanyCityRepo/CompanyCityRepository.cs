@@ -13,23 +13,25 @@ public class CompanyCityRepository : GenericRepository<CompanyCity>, ICompanyCit
     {
     }
 
-    public async Task<(List<TResult>, int)> GetCityCompaniesAsync<TResult>(Expression<Func<CompanyCity, TResult>> projection,
-                                                                           Guid cityId,
-                                                                           int pageNumber = 1,
-                                                                           int pageSize = 10)
+    public async Task<(List<TResult>, int)> GetCityCompaniesAsync<TResult>(
+        Expression<Func<CompanyCity, TResult>> projection,
+        Guid cityId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
     {
         var query = Entities
                         .AsNoTracking()
                         .Where(cc => cc.CityId == cityId);
 
-        var totalDataCount = await query.CountAsync();
+        var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
                              .OrderByDescending(us => us.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
-                             .ToListAsync();
+                             .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
     }

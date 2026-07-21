@@ -22,22 +22,27 @@ public class CityService : ICityService
 
     #region Get Methods
 
-    public async Task<Pagination<CompanyDetailResponseDto>> GetCityCompaniesAsync(Guid cityId, PagingRequestDto pagingCommand)
+    public async Task<Pagination<CompanyDetailResponseDto>> GetCityCompaniesAsync(
+        Guid cityId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
         var (cityCompanies, totalDataCount) = await _unitOfWork.CompanyCityRepository.GetCityCompaniesAsync(cc => new CompanyDetailResponseDto
-                                                                                         (
-                                                                                           cc.Id,
-                                                                                           cc.Company.OwnedByUserId,
-                                                                                           cc.City.Name,
-                                                                                           cc.Company.Name,
-                                                                                           cc.Company.YearOfEstablishment,
-                                                                                           cc.Company.Industry,
-                                                                                           cc.Company.AboutUs,
-                                                                                           cc.Company.CompanyImageFileId
-                                                                                         ),
-                                                                                         cityId,
-                                                                                         pagingCommand.PageNumber,
-                                                                                         pagingCommand.PageSize);
+        {
+            CompanyId = cc.CompanyId,
+            CityId = cc.CityId,
+            OwnedByUserId = cc.Company.OwnedByUserId,
+            CityName = cc.City.Name,
+            CompanyName = cc.Company.Name,
+            YearOfEstablishment = cc.Company.YearOfEstablishment,
+            Industry = cc.Company.Industry,
+            AboutUs = cc.Company.AboutUs,
+            CompanyImageFileId = cc.Company.CompanyImageFileId
+        },
+          cityId,
+          cancellationToken,
+          pagingCommand.PageNumber,
+          pagingCommand.PageSize);
 
         return Pagination<CompanyDetailResponseDto>.GetPagination(cityCompanies,
                                                              pagingCommand.PageNumber,
@@ -45,20 +50,24 @@ public class CityService : ICityService
                                                              totalDataCount);
     }
 
-    public async Task<Pagination<CityDetailResponseDto>> GetProvinceCitiesAsync(Guid provinceId, PagingRequestDto pagingCommand)
+    public async Task<Pagination<CityDetailResponseDto>> GetProvinceCitiesAsync(
+        Guid provinceId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
         var (provinceCities, totalDataCount) = await _unitOfWork.CityRepository.GetProvinceCitiesAsync(c => new CityDetailResponseDto
-                                                                                         (
-                                                                                           c.Id,
-                                                                                           c.Name,
-                                                                                           c.CityCode,
-                                                                                           c.Province.Name,
-                                                                                           c.ProvinceId,
-                                                                                           c.ProvinceCode
-                                                                                         ),
-                                                                                         provinceId,
-                                                                                         pagingCommand.PageNumber,
-                                                                                         pagingCommand.PageSize);
+        {
+            CityId = c.Id,
+            CityName = c.Name,
+            CityCode = c.CityCode,
+            ProvinceName = c.Province.Name,
+            ProvinceId = c.ProvinceId,
+            ProvinceCode = c.ProvinceCode
+        },
+          provinceId,
+          cancellationToken,
+          pagingCommand.PageNumber,
+          pagingCommand.PageSize);
 
         return Pagination<CityDetailResponseDto>.GetPagination(provinceCities,
                                                              pagingCommand.PageNumber,

@@ -25,9 +25,12 @@ public class ExperienceDetailController : ControllerBase
     [HttpGet("{userId:guid}/experience-details")]
     [Authorize(Roles = "Admin,Employer,JobSeeker")]
     [RequestModelValidationFilter]
-    public async Task<IActionResult> GetUserExperienceDetailsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
+    public async Task<IActionResult> GetUserExperienceDetailsAsync(
+        [FromRoute] Guid userId,
+        [FromQuery] PagingRequestDto pagingRequest,
+        CancellationToken cancellationToken)
     {
-        var result = await _experienceDetailService.GetUserExperienceDetailsAsync(userId, pagingRequest);
+        var result = await _experienceDetailService.GetUserExperienceDetailsAsync(userId, pagingRequest, cancellationToken);
 
         return Ok(Result<Pagination<UserExperienceDetailResponseDto>>.Success(result));
     }
@@ -35,18 +38,23 @@ public class ExperienceDetailController : ControllerBase
     [HttpPost]
     [Authorize(Roles = "JobSeeker")]
     [RequestModelValidationFilter]
-    public async Task<IActionResult> CreateExperienceDetailAsync([FromBody] CreateExperienceDetailRequestDto createExperience)
+    public async Task<IActionResult> CreateExperienceDetailAsync(
+        [FromBody] CreateExperienceDetailRequestDto createExperience,
+        CancellationToken cancellationToken)
     {
-        await _experienceDetailService.CreateExperienceDetailAsync(createExperience);
+        await _experienceDetailService.CreateExperienceDetailAsync(createExperience, cancellationToken);
 
         return Ok(Result.Success());
     }
 
     [HttpPut("{experienceDetailId:guid}")]
     [Authorize(Roles = "JobSeeker")]
-    public async Task<IActionResult> UpdateExperienceDetailAsync([FromRoute] Guid experienceDetailId, [FromBody] UpdateExperienceDetailRequestDto updateExperience)
+    public async Task<IActionResult> UpdateExperienceDetailAsync(
+        [FromRoute] Guid experienceDetailId,
+        [FromBody] UpdateExperienceDetailRequestDto updateExperience,
+        CancellationToken cancellationToken)
     {
-        await _experienceDetailService.UpdateExperienceDetailAsync(experienceDetailId, updateExperience);
+        await _experienceDetailService.UpdateExperienceDetailAsync(experienceDetailId, updateExperience, cancellationToken);
 
         return Ok(Result.Success());
     }

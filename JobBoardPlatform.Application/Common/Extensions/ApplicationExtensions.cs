@@ -3,6 +3,7 @@ using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdminDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Implementation.AccessControlBusiness;
 using JobBoardPlatform.Application.Implementation.AdvertisementBusiness;
 using JobBoardPlatform.Application.Implementation.AttachmentBusiness;
 using JobBoardPlatform.Application.Implementation.AuthenticationBusiness;
@@ -18,6 +19,7 @@ using JobBoardPlatform.Application.Implementation.ProvinceBusiness;
 using JobBoardPlatform.Application.Implementation.ResumeBusiness;
 using JobBoardPlatform.Application.Implementation.SkillBusiness;
 using JobBoardPlatform.Application.Implementation.UserBusiness;
+using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
@@ -118,6 +120,7 @@ public static class ApplicationExtensions
         services.AddScoped<ISkillService, SkillService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICurrentUser, CurrentUser.Implementation.CurrentUser>();
+        services.AddScoped<IAccessControlService, AccessControlService>();
 
         services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
         var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();

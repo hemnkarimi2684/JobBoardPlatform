@@ -34,9 +34,11 @@ public class AdvertisementService : IAdvertisementService
 
     #region Create Methods
 
-    public async Task<bool> CreateAdvertisementAsync(CreateAdvertisementRequestDto createCommand)
+    public async Task<bool> CreateAdvertisementAsync(
+        CreateAdvertisementRequestDto createCommand,
+        CancellationToken cancellationToken = default)
     {
-        await ValidateForCreateAsync(createCommand.JobId, createCommand.CompanyId, createCommand.CityId);
+        await ValidateForCreateAsync(createCommand.JobId, createCommand.CompanyId, createCommand.CityId, cancellationToken);
 
         var advertisement = new Advertisement(createCommand.Description,
                                               createCommand.MinimumAge,
@@ -50,7 +52,7 @@ public class AdvertisementService : IAdvertisementService
                                               createCommand.CompanyId,
                                               _currentUser.UserId);
 
-        await _unitOfWork.AdvertisementRepository.AddAsync(advertisement);
+        await _unitOfWork.AdvertisementRepository.AddAsync(advertisement, cancellationToken);
 
         if (createCommand.SkillsId is not null && createCommand.SkillsId.Any())
         {
@@ -58,20 +60,23 @@ public class AdvertisementService : IAdvertisementService
             {
                 var advertisementSkill = new AdvertisementSkill(advertisement.Id, skillId, _currentUser.UserId);
 
-                await _unitOfWork.AdvertisementSkillRepository.AddAsync(advertisementSkill);
+                await _unitOfWork.AdvertisementSkillRepository.AddAsync(advertisementSkill, cancellationToken);
             }
         }
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
     #endregion
 
     #region Get Methods
 
-    public async Task<Pagination<AdvertisementDetailResponseDto>> GetAdvertisementsByCompanyAsync(PagingRequestDto pagingCommand, Guid companyId)
+    public async Task<Pagination<AdvertisementDetailResponseDto>> GetAdvertisementsByCompanyAsync(
+        PagingRequestDto pagingCommand,
+        Guid companyId,
+        CancellationToken cancellationToken = default)
     {
-        var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId);
+        var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId, cancellationToken);
 
         if (companyOwnerId == null)
             throw new NotFoundException($"The company with id {companyId} was not found.");
@@ -100,6 +105,7 @@ public class AdvertisementService : IAdvertisementService
                                                         SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
                                                     },
                                                     companyId,
+                                                    cancellationToken,
                                                     pagingCommand.PageNumber,
                                                     pagingCommand.PageSize);
 
@@ -111,16 +117,18 @@ public class AdvertisementService : IAdvertisementService
 
     }
 
-    public async Task<AdvertisementDisplayResponseDto> GetAdvertisementProjectionAsync(Guid advertisementId)
+    public async Task<AdvertisementDisplayResponseDto> GetAdvertisementProjectionAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default)
     {
         var result = await _unitOfWork.AdvertisementRepository.GetAdvertisementProjectionAsync(a => new AdvertisementDisplayResponseDto
-        (
-            a.Job.Name,
-            a.Company.Name,
-            a.City.Name,
-            a.CollaborationType,
-            a.ExperienceLevel
-        ), advertisementId);
+        {
+            CityName = a.City.Name,
+            CollaborationType = a.CollaborationType,
+            CompanyName = a.Company.Name,
+            ExperienceLevel = a.ExperienceLevel,
+            JobTitle = a.Job.Name
+        }, advertisementId, cancellationToken);
 
         if (result == null)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
@@ -128,9 +136,11 @@ public class AdvertisementService : IAdvertisementService
         return result;
     }
 
-    public async Task<AdvertisementDetailResponseDto> GetAdvertisementInfoByIdAsync(Guid advertisementId)
+    public async Task<AdvertisementDetailResponseDto> GetAdvertisementInfoByIdAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default)
     {
-        var advertisementDetail = await _unitOfWork.AdvertisementRepository.GetAdvertisementInfoByIdAsync(advertisementId);
+        var advertisementDetail = await _unitOfWork.AdvertisementRepository.GetAdvertisementInfoByIdAsync(advertisementId, cancellationToken);
 
         if (advertisementDetail is null)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
@@ -138,39 +148,79 @@ public class AdvertisementService : IAdvertisementService
         return AdvertisementDetailResponseDto.MapToResponseDto(advertisementDetail);
     }
 
+    public async Task<Pagination<AdvertisementDetailResponseDto>> GetActiveAdvertisementsAsync(
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.AdvertisementRepository.QueryAsync(a => new AdvertisementDetailResponseDto
+        {
+            Description = a.Description,
+            MinimumAge = a.MinimumAge,
+            MaximumAge = a.MaximumAge,
+            MinimumSalary = a.MinimumSalary,
+            MaximumSalary = a.MaximumSalary,
+            ExperienceLevel = a.ExperienceLevel,
+            CollaborationType = a.CollaborationType,
+            CityName = a.City.Name,
+            CompanyName = a.Company.Name,
+            JobName = a.Job.Name,
+            AboutCompany = a.Company.AboutUs,
+            Industry = a.Company.Industry,
+            CreatedAt = a.CreatedAt,
+            AdvertisementId = a.Id,
+            CityId = a.CityId,
+            CompanyId = a.CompanyId,
+            SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+        },
+        a => a.IsActive,
+        cancellationToken,
+        pagingCommand.PageNumber,
+        pagingCommand.PageSize);
+    }
+
+
     #endregion
 
     #region Delete Methods
 
-    public async Task<bool> SoftDeleteAdvertisementAsync(Guid advertisementId)
+    public async Task<bool> SoftDeleteAdvertisementAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default)
     {
-        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId);
+        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
 
         if (advertisementOwnerId == null)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
 
         _accessControlService.EnsureOwnerEmployerOrAdmin(advertisementOwnerId.Value, _currentUser);
 
-        var advertisementDeleteResult = await _unitOfWork.AdvertisementRepository.SoftDeleteAsync(advertisementId, _currentUser.UserId);
+        var advertisementDeleteResult = await _unitOfWork.AdvertisementRepository.SoftDeleteAsync(advertisementId, _currentUser.UserId, cancellationToken);
 
         if (!advertisementDeleteResult)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
 
-        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(advertisementId, _currentUser.UserId, false);
+        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(
+            advertisementId,
+            _currentUser.UserId,
+            false,
+            cancellationToken);
 
         if (!updateAdvertisementStatusResult)
             throw new NotFoundException($"the advertisement with this id {advertisementId} not found ");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
     #endregion
 
     #region Update Methods
 
-    public async Task<bool> UpdateAdvertisementAsync(Guid advertisementId, UpdateAdvertisementRequestDto updateCommand)
+    public async Task<bool> UpdateAdvertisementAsync(
+        Guid advertisementId,
+        UpdateAdvertisementRequestDto updateCommand,
+        CancellationToken cancellationToken = default)
     {
-        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId);
+        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
 
         if (advertisementOwnerId == null)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
@@ -179,45 +229,58 @@ public class AdvertisementService : IAdvertisementService
 
         var updateAdvertisementInfoResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementInfoAsync(
                                                                                                    advertisementId,
+                                                                                                   cancellationToken,
                                                                                                    MapToAdvertisementInfoUpdate(updateCommand));
         if (!updateAdvertisementInfoResult)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<bool> InActivateAdvertisementAsync(Guid advertisementId)
+    public async Task<bool> InActivateAdvertisementAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default)
     {
-        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId);
+        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
 
         if (advertisementOwnerId == null)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
 
         _accessControlService.EnsureOwnerEmployerOrAdmin(advertisementOwnerId.Value, _currentUser);
 
-        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(advertisementId, _currentUser.UserId, false);
+        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(
+            advertisementId,
+            _currentUser.UserId,
+            false,
+            cancellationToken);
 
         if (!updateAdvertisementStatusResult)
             throw new NotFoundException($"the advertisement with this id {advertisementId} not found ");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<bool> ActivateAdvertisementAsync(Guid advertisementId)
+    public async Task<bool> ActivateAdvertisementAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default)
     {
-        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId);
+        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
 
         if (advertisementOwnerId == null)
             throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
 
         _accessControlService.EnsureOwnerEmployerOrAdmin(advertisementOwnerId.Value, _currentUser);
 
-        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(advertisementId, _currentUser.UserId, true);
+        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(
+            advertisementId,
+            _currentUser.UserId,
+            true,
+            cancellationToken);
 
         if (!updateAdvertisementStatusResult)
             throw new NotFoundException($"the advertisement with this id {advertisementId} not found ");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
     #endregion
@@ -227,33 +290,33 @@ public class AdvertisementService : IAdvertisementService
     private UpdateAdvertisementInfo MapToAdvertisementInfoUpdate(UpdateAdvertisementRequestDto updateAdvertisementCommand)
     {
         return new UpdateAdvertisementInfo
-        (
-            updateAdvertisementCommand.Description,
-            updateAdvertisementCommand.MinimumAge < 1 ? null : updateAdvertisementCommand.MinimumAge,
-            updateAdvertisementCommand.MaximumAge < 1 ? null : updateAdvertisementCommand.MaximumAge,
-            updateAdvertisementCommand.MinimumSalary < 1 ? null : updateAdvertisementCommand.MinimumSalary,
-            updateAdvertisementCommand.MaximumSalary < 1 ? null : updateAdvertisementCommand.MaximumSalary,
-            updateAdvertisementCommand.ExperienceLevel < 1 ? null : updateAdvertisementCommand.ExperienceLevel,
-            updateAdvertisementCommand.CollaborationType,
-            _currentUser.UserId
-        );
+        {
+            Description = updateAdvertisementCommand.Description,
+            MinimumAge = updateAdvertisementCommand.MinimumAge < 1 ? null : updateAdvertisementCommand.MinimumAge,
+            MaximumAge = updateAdvertisementCommand.MaximumAge < 1 ? null : updateAdvertisementCommand.MaximumAge,
+            MinimumSalary = updateAdvertisementCommand.MinimumSalary < 1 ? null : updateAdvertisementCommand.MinimumSalary,
+            MaximumSalary = updateAdvertisementCommand.MaximumSalary < 1 ? null : updateAdvertisementCommand.MaximumSalary,
+            ExperienceLevel = updateAdvertisementCommand.ExperienceLevel < 1 ? null : updateAdvertisementCommand.ExperienceLevel,
+            CollaborationType = updateAdvertisementCommand.CollaborationType,
+            ModifiedById = _currentUser.UserId
+        };
     }
 
-    private async Task ValidateForCreateAsync(Guid jobId, Guid companyId, Guid cityId)
+    private async Task ValidateForCreateAsync(Guid jobId, Guid companyId, Guid cityId, CancellationToken cancellationToken)
     {
-        var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId);
+        var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId, cancellationToken);
 
         if (companyOwnerId == null)
             throw new NotFoundException($"The company with id {companyId} was not found.");
 
         _accessControlService.EnsureOwnerEmployerOrAdmin(companyOwnerId.Value, _currentUser);
 
-        var isJobExist = await _unitOfWork.JobRepository.IsJobExistAsync(jobId);
+        var isJobExist = await _unitOfWork.JobRepository.IsJobExistAsync(jobId, cancellationToken);
 
         if (!isJobExist)
             throw new NotFoundException($"the job with id {jobId} was not found");
 
-        var isCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(cityId);
+        var isCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(cityId, cancellationToken);
 
         if (!isCityExist)
             throw new NotFoundException($"the city with id {cityId} was not found");

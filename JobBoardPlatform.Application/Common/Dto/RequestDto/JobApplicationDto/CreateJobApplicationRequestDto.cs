@@ -2,14 +2,12 @@
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
 
-public record CreateJobApplicationRequestDto(
-                                             [Required(ErrorMessage = "the ResumeId is required", AllowEmptyStrings = false)]
-                                             Guid ResumeId,
+public class CreateJobApplicationRequestDto
+{
+    public Guid ResumeId { get; set; }
 
-                                             [Required(ErrorMessage = "the AdvertisementId is required", AllowEmptyStrings = false)]
-                                             Guid AdvertisementId,
+    public Guid AdvertisementId { get; set; }
 
-                                             [Required(ErrorMessage = "the UserId is required", AllowEmptyStrings = false)]
-                                             Guid UserId
-);
+    public Guid UserId { get; set; }
+}
 

@@ -14,35 +14,47 @@ public class UserProfileRepository : GenericRepository<UserProfile>, IUserProfil
     {
     }
 
-    public async Task<string?> GetUserFullNameByUserIdAsync(Guid userId)
+    public async Task<string?> GetUserFullNameByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                           .AsNoTracking()
                           .Where(up => up.UserId == userId)
                           .Select(up => up.FirstName + " " + up.LastName)
-                          .FirstOrDefaultAsync();
+                          .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<TResult?> GetUserProfileInfoAsync<TResult>(Expression<Func<UserProfile, TResult>> projection, Guid userId)
+    public async Task<TResult?> GetUserProfileInfoAsync<TResult>(
+        Expression<Func<UserProfile, TResult>> projection,
+        Guid userId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                            .AsNoTracking()
                            .Where(up => up.UserId == userId)
                            .Select(projection)
-                           .FirstOrDefaultAsync();
+                           .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> IsDuplicateUserProfileAsync(Guid userId) => await AnyAsync(up => up.UserId == userId);
+    public async Task<bool> IsDuplicateUserProfileAsync(
+        Guid userId,
+        CancellationToken cancellationToken) => await AnyAsync(up => up.UserId == userId, cancellationToken);
 
-    public async Task<bool> IsUserHasProfileAsync(Guid userId)
+    public async Task<bool> IsUserHasProfileAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
     {
         return await Entities
-                          .AnyAsync(up => up.UserId == userId);
+                          .AnyAsync(up => up.UserId == userId, cancellationToken);
     }
 
-    public async Task<bool> UpdateProfileAsync(Guid userId, UpdateUserProfile updateProfile)
+    public async Task<bool> UpdateProfileAsync(
+        Guid userId,
+        CancellationToken cancellationToken,
+        UpdateUserProfile updateProfile)
     {
-        var userProfile = await Entities.FirstOrDefaultAsync(up => up.UserId == userId);
+        var userProfile = await Entities.FirstOrDefaultAsync(up => up.UserId == userId, cancellationToken);
 
         if (userProfile == null)
             return false;

@@ -1,4 +1,11 @@
 ﻿namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 
-public record TokenLoginResponseDto(string AccessToken, TimeSpan ExpieryTime, string TokenType);
+public class TokenLoginResponseDto
+{
+    public string AccessToken { get; init; } = string.Empty;
+
+    public TimeSpan ExpiryTime { get; init; }
+
+    public string TokenType { get; init; } = string.Empty;
+}
 

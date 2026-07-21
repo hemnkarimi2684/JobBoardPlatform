@@ -33,21 +33,25 @@ public class UserService : IUserService
         _userManager = userManager;
     }
 
-    public async Task<bool> CreateProfileAsync(CreateProfileRequestDto createCommand)
+    #region Create Methods
+
+    public async Task<bool> CreateProfileAsync(
+        CreateProfileRequestDto createCommand,
+        CancellationToken cancellationToken = default)
     {
-        var doesUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId);
+        var doesUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId, cancellationToken);
 
         if (!doesUserExist)
             throw new NotFoundException($"User with id {createCommand.UserId} was not found.");
 
         _accessControlService.EnsureApplicantOrAdmin(createCommand.UserId, _currentUser);
 
-        var isDuplicateUserProfile = await _unitOfWork.UserProfileRepository.IsDuplicateUserProfileAsync(createCommand.UserId);
+        var isDuplicateUserProfile = await _unitOfWork.UserProfileRepository.IsDuplicateUserProfileAsync(createCommand.UserId, cancellationToken);
 
         if (isDuplicateUserProfile)
             throw new ConflictException($"User with id {createCommand.UserId} already has profile");
 
-        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId);
+        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId, cancellationToken);
 
         if (!doesCityExist)
             throw new NotFoundException($"City with id {createCommand.CityId} was not found.");
@@ -65,25 +69,32 @@ public class UserService : IUserService
                                           _currentUser.UserId
                                           );
 
-        await _unitOfWork.UserProfileRepository.AddAsync(userProfile);
+        await _unitOfWork.UserProfileRepository.AddAsync(userProfile, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<UserProfileInfoResponseDto> GetUserProfileInfoAsync(Guid userId)
+    #endregion
+
+    #region Get methods
+
+    public async Task<UserProfileInfoResponseDto> GetUserProfileInfoAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
         _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
-        var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileInfoAsync(up => new UserProfileInfoResponseDto(
-                                                                                    up.UserId,
-                                                                                    up.FirstName + " " + up.LastName,
-                                                                                    up.Bio,
-                                                                                    up.Address,
-                                                                                    up.BirthDate,
-                                                                                    up.City.Name,
-                                                                                    up.Gender
-                                                                                    ),
-                                                                                      userId);
+        var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileInfoAsync(up => new UserProfileInfoResponseDto
+        {
+            UserId = up.UserId,
+            FullName = up.FirstName + " " + up.LastName,
+            Bio = up.Bio,
+            Address = up.Address,
+            BirthDate = up.BirthDate,
+            CityName = up.City.Name,
+            Gender = up.Gender
+        },
+          userId, cancellationToken);
 
         if (userProfile is null)
             throw new NotFoundException($"the user profile with id {userId} was not found");
@@ -91,27 +102,39 @@ public class UserService : IUserService
         return userProfile;
     }
 
-    public async Task<bool> UpdateProfileAsync(Guid userId, UpdateProfileRequestDto updateCommand)
+    #endregion
+
+    #region Update Methods
+
+    public async Task<bool> UpdateProfileAsync(
+        Guid userId,
+        UpdateProfileRequestDto updateCommand,
+        CancellationToken cancellationToken = default)
     {
         _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         if (updateCommand.CityId != null)
         {
-            var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(updateCommand.CityId.Value);
+            var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(updateCommand.CityId.Value, cancellationToken);
 
             if (!doesCityExist)
                 throw new NotFoundException($"City with id {updateCommand.CityId} was not found.");
         }
 
-        var result = await _unitOfWork.UserProfileRepository.UpdateProfileAsync(userId, MapToUpdateUserProfile(updateCommand));
+        var result = await _unitOfWork.UserProfileRepository.UpdateProfileAsync(
+                                                                                userId,
+                                                                                cancellationToken,
+                                                                                MapToUpdateUserProfile(updateCommand));
 
         if (!result)
             throw new NotFoundException($"the user profile with id {userId} was not found");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<bool> ApprovedEmployerAsync(Guid userId)
+    public async Task<bool> ApprovedEmployerAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
         _accessControlService.EnsureAdmin(_currentUser);
 
@@ -130,7 +153,7 @@ public class UserService : IUserService
 
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             user.UpdateIsApproved(true, _currentUser.UserId);
 
@@ -147,35 +170,36 @@ public class UserService : IUserService
                     throw new ValidationException(string.Join(" ", addClaimResult.Errors.Select(e => e.Description)));
             }
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransactionAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             return true;
         }
         catch (Exception)
         {
-            await _unitOfWork.RollBackTransactionAsync();
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
 
             throw;
         }
     }
 
+    #endregion
 
     #region Private methods
 
     private UpdateUserProfile MapToUpdateUserProfile(UpdateProfileRequestDto updateCommand)
     {
         return new UpdateUserProfile
-        (
-          updateCommand.FirstName,
-          updateCommand.LastName,
-          updateCommand.Bio,
-          updateCommand.Address,
-          updateCommand.BirthDate,
-          updateCommand.CityId,
-          updateCommand.Gender,
-          _currentUser.UserId
-        );
+        {
+            FirstName = updateCommand.FirstName,
+            LastName = updateCommand.LastName,
+            Bio = updateCommand.Bio,
+            Address = updateCommand.Address,
+            BirthDate = updateCommand.BirthDate,
+            CityId = updateCommand.CityId,
+            Gender = updateCommand.Gender,
+            ModifiedById = _currentUser.UserId
+        };
     }
 
     #endregion

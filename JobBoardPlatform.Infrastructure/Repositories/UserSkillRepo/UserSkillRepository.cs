@@ -15,6 +15,7 @@ public class UserSkillRepository : GenericRepository<UserSkill>, IUserSkillRepos
 
     public async Task<(List<TResult>, int)> GetUserSkillsAsync<TResult>(Expression<Func<UserSkill, TResult>> projection,
                                                                         Guid userId,
+                                                                        CancellationToken cancellationToken,
                                                                         int pageNumber = 1,
                                                                         int pageSize = 10)
     {
@@ -22,14 +23,14 @@ public class UserSkillRepository : GenericRepository<UserSkill>, IUserSkillRepos
                         .AsNoTracking()
                         .Where(us => us.UserId == userId);
 
-        var totalDataCount = await query.CountAsync();
+        var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
                              .OrderByDescending(us => us.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
-                             .ToListAsync();
+                             .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
     }

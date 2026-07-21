@@ -15,6 +15,7 @@ public interface IGenericRepository<T> where T : BaseEntity
     /// <returns></returns>
     Task<Pagination<TResult>> QueryAsync<TResult>(
         Expression<Func<T, TResult>> selector,
+        CancellationToken cancellationToken,
         int page = 1, int pageSize = 10,
         bool tracking = false);
 
@@ -31,6 +32,7 @@ public interface IGenericRepository<T> where T : BaseEntity
     Task<Pagination<TResult>> QueryAsync<TResult>(
         Expression<Func<T, TResult>> selector,
         Expression<Func<T, bool>> filter,
+        CancellationToken cancellationToken,
         int page = 1, int pageSize = 10,
         bool tracking = false);
 
@@ -39,21 +41,21 @@ public interface IGenericRepository<T> where T : BaseEntity
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
+    Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken);
 
     /// <summary>
     /// دریافت یک موجودیت با ایدی 
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<T?> GetByIdAsync(Guid id, bool tracking = false);
+    Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken, bool tracking = false);
 
     /// <summary>
     /// اضافه کردن موجودیت 
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    Task AddAsync(T entity);
+    Task AddAsync(T entity, CancellationToken cancellationToken);
 
     /// <summary>
     /// اپدیت موجودیت
@@ -67,5 +69,5 @@ public interface IGenericRepository<T> where T : BaseEntity
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<bool> SoftDeleteAsync(Guid id, Guid? deletedById);
+    Task<bool> SoftDeleteAsync(Guid id, Guid? deletedById, CancellationToken cancellationToken);
 }

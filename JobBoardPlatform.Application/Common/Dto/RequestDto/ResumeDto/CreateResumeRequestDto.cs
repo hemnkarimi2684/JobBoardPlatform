@@ -2,12 +2,12 @@
 
 namespace JobBoardPlatform.Application.Common.Dto.ResumeDto.Command;
 
-public record CreateResumeRequestDto(
-                                     [Required(ErrorMessage = "the Title is required", AllowEmptyStrings = false)]
-                                     [MinLength(2, ErrorMessage = "the Title characteers cannot be lower than 2")]
-                                     [MaxLength(100, ErrorMessage = "the Title characteers cannot be higher than 100")]
-                                     string Title,
+public class CreateResumeRequestDto
+{
+    [Required(ErrorMessage = "Title is required.")]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "Title must be between 2 and 100 characters.")]
+    public string Title { get; set; } = string.Empty;
 
-                                     [Required(ErrorMessage = "the UserId is required", AllowEmptyStrings = false)]
-                                     Guid UserId);
+    public Guid UserId { get; set; }
+}
 

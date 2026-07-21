@@ -24,9 +24,11 @@ public class UserController : ControllerBase
     [HttpPost]
     [Authorize(Roles = "JobSeeker")]
     [RequestModelValidationFilter]
-    public async Task<IActionResult> CreateProfileAsync([FromBody] CreateProfileRequestDto createProfile)
+    public async Task<IActionResult> CreateProfileAsync(
+        [FromBody] CreateProfileRequestDto createProfile,
+        CancellationToken cancellationToken)
     {
-        await _userService.CreateProfileAsync(createProfile);
+        await _userService.CreateProfileAsync(createProfile, cancellationToken);
 
         return Ok(Result.Success());
     }
@@ -34,27 +36,34 @@ public class UserController : ControllerBase
     [HttpPut("{userId:guid}")]
     [Authorize(Roles = "JobSeeker")]
     [RequestModelValidationFilter]
-    public async Task<IActionResult> UpdateProfileAsync([FromRoute] Guid userId, [FromBody] UpdateProfileRequestDto updateProfile)
+    public async Task<IActionResult> UpdateProfileAsync(
+        [FromRoute] Guid userId,
+        [FromBody] UpdateProfileRequestDto updateProfile,
+        CancellationToken cancellationToken)
     {
-        await _userService.UpdateProfileAsync(userId, updateProfile);
+        await _userService.UpdateProfileAsync(userId, updateProfile, cancellationToken);
 
         return Ok(Result.Success());
     }
 
     [HttpGet("{userId:guid}/info")]
     [Authorize(Roles = "Admin,Employer,JobSeeker")]
-    public async Task<IActionResult> GetUserProfileInfoAsync([FromRoute] Guid userId)
+    public async Task<IActionResult> GetUserProfileInfoAsync(
+        [FromRoute] Guid userId,
+        CancellationToken cancellationToken)
     {
-        var result = await _userService.GetUserProfileInfoAsync(userId);
+        var result = await _userService.GetUserProfileInfoAsync(userId, cancellationToken);
 
         return Ok(Result<UserProfileInfoResponseDto>.Success(result));
     }
 
     [HttpPatch("{employerId:guid}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> ApprovedEmployerAsync([FromRoute] Guid employerId)
+    public async Task<IActionResult> ApprovedEmployerAsync(
+        [FromRoute] Guid employerId,
+        CancellationToken cancellationToken)
     {
-        await _userService.ApprovedEmployerAsync(employerId);
+        await _userService.ApprovedEmployerAsync(employerId, cancellationToken);
 
         return Ok(Result.Success());
     }
