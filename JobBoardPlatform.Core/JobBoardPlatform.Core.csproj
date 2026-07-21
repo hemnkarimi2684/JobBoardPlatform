@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Entities\JobCategoryEntity\Data\" />
     <Folder Include="Entities\NotifierEntity\Data\" />
+    <Folder Include="Entities\RefreshTokenEntity\Data\" />
   </ItemGroup>
 
 </Project>

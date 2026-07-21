@@ -4,7 +4,6 @@ using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Users;

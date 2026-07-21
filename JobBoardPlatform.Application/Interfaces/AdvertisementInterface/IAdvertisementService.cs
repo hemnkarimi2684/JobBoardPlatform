@@ -102,4 +102,21 @@ public interface IAdvertisementService
     Task<Pagination<AdvertisementDetailResponseDto>> GetActiveAdvertisementsAsync(
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
+
+    ///// <summary>
+    ///// جستجو در اگهی
+    ///// </summary>
+    ///// <param name="searchDto"></param>
+    ///// <param name="cancellationToken"></param>
+    ///// <returns></returns>
+    //Task<Pagination<AdvertisementDetailResponseDto>> SearchAdvertisementsAsync(
+    //    AdvertisementSearchRequestDto searchDto,
+    //    CancellationToken cancellationToken = default);
+
+    //Task<Pagination<AdvertisementDetailResponseDto>> FilterAdvertisementsAsync(
+    //    AdvertisementFilterRequestDto filterDto,
+    //    CancellationToken cancellationToken = default);
+
+
+
 }

@@ -176,4 +176,10 @@ public static class DomainErrors
     public static Error UserSkillUserIdIsRequired => new Error("UserSkill UserId is required.", "UserSkill_UserId_Is_Required");
     public static Error UserSkillSkillIdIsRequired => new Error("UserSkill SkillId is required.", "UserSkill_SkillId_Is_Required");
     #endregion
+
+    #region JobCategory Errors
+    public static Error JobCategoryNameIsRequired => new Error("job category name UserId is required.", "JobCategory_Name_Is_Required");
+    public static Error JobCategoryNameInvalidLength => new Error("job categoty name must be between 2 and 150 characters long.", "JobCategory_Name_Invalid_Length");
+
+    #endregion
 }
