@@ -86,6 +86,7 @@ public class AdvertisementService : IAdvertisementService
                                                     .GetAdvertisementsByCompanyAsync(a => new AdvertisementDetailResponseDto
                                                     {
                                                         Description = a.Description,
+                                                        JobId = a.JobId,
                                                         MinimumAge = a.MinimumAge,
                                                         MaximumAge = a.MaximumAge,
                                                         MinimumSalary = a.MinimumSalary,
@@ -154,6 +155,7 @@ public class AdvertisementService : IAdvertisementService
         return await _unitOfWork.AdvertisementRepository.QueryAsync(a => new AdvertisementDetailResponseDto
         {
             Description = a.Description,
+            JobId = a.JobId,
             MinimumAge = a.MinimumAge,
             MaximumAge = a.MaximumAge,
             MinimumSalary = a.MinimumSalary,
@@ -197,6 +199,7 @@ public class AdvertisementService : IAdvertisementService
             a => new AdvertisementDetailResponseDto
             {
                 Description = a.Description,
+                JobId = a.JobId,
                 MinimumAge = a.MinimumAge,
                 MaximumAge = a.MaximumAge,
                 MinimumSalary = a.MinimumSalary,
@@ -233,6 +236,7 @@ public class AdvertisementService : IAdvertisementService
             a => new AdvertisementDetailResponseDto
             {
                 Description = a.Description,
+                JobId = a.JobId,
                 MinimumAge = a.MinimumAge,
                 MaximumAge = a.MaximumAge,
                 MinimumSalary = a.MinimumSalary,

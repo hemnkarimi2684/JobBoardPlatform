@@ -36,6 +36,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                          .Select(a => new AdvertisementDetail
                          {
                              AdvertisementId = a.Id,
+                             JobId = a.JobId,
                              Description = a.Description,
                              MinimumAge = a.MinimumAge,
                              MaximumAge = a.MaximumAge,
@@ -202,5 +203,17 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                              .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
+    }
+
+    public async Task<TResult?> GetJobAdvertisementsAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> projection,
+        Guid jobId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                          .AsNoTracking()
+                          .Where(a => a.JobId == jobId)
+                          .Select(projection)
+                          .FirstOrDefaultAsync(cancellationToken);
     }
 }

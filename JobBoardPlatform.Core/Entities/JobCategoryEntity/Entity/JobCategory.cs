@@ -11,9 +11,10 @@ public class JobCategory : BaseEntity
 {
     private JobCategory() { }
 
-    public JobCategory(string name)
+    public JobCategory(string name, Guid? createdById = null)
     {
         Name = name;
+        CreatedById = createdById;
 
         Validate();
     }

@@ -2,6 +2,8 @@
 using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Infrastructure.Repositories.JobCategoryRepo;
 
@@ -9,5 +11,51 @@ public class JobCategoryRepository : GenericRepository<JobCategory>, IJobCategor
 {
     public JobCategoryRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
+    }
+
+    public async Task<bool> ExistAsync(Guid jobCategoryId, CancellationToken cancellationToken)
+    {
+        return await Entities
+                          .AnyAsync(jc => jc.Id == jobCategoryId, cancellationToken);
+    }
+
+    public async Task<(List<TResult>, int)> GetAllJobCategoriesAsync<TResult>(
+        Expression<Func<JobCategory, TResult>> projection,
+        string text,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        var trimmedText = text.Trim();
+
+        var query = Entities
+                         .AsNoTracking()
+                         .Where(jc => EF.Functions.Like(jc.Name, $"%{trimmedText}%"));
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
+        var result = await query
+                             .OrderByDescending(us => us.Name)
+                             .Skip((pageNumber - 1) * pageSize)
+                             .Take(pageSize)
+                             .Select(projection)
+                             .ToListAsync(cancellationToken);
+
+        return (result, totalDataCount);
+    }
+
+    public async Task<TResult?> GetJobCategoryByProjectionAsync<TResult>(Expression<Func<JobCategory, TResult>> projection, Guid jobCategoryId, CancellationToken cancellationToken)
+    {
+        return await Entities
+                          .AsNoTracking()
+                          .Where(jc => jc.Id == jobCategoryId)
+                          .Select(projection)
+                          .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<bool> IsDuplicateNameAsync(string name, CancellationToken cancellationToken)
+    {
+        return Entities
+                    .AnyAsync(jc => jc.Name == name, cancellationToken);
     }
 }

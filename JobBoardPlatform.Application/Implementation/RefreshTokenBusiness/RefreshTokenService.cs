@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
 using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
@@ -16,7 +17,7 @@ public class RefreshTokenService : IRefreshTokenService
 
     private readonly JwtSettings _jwtSettings;
 
-    public RefreshTokenService(IUnitOfWork unitOfWork, IOptions<JwtSettings> options)
+    public RefreshTokenService(IUnitOfWork unitOfWork, IOptions<JwtSettings> options, ICurrentUser currentUser)
     {
         _unitOfWork = unitOfWork;
         _jwtSettings = options.Value;

@@ -2,6 +2,7 @@
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 using System.Linq.Expressions;
 using System.Numerics;
 
@@ -95,18 +96,51 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
         Guid advertisementId,
         CancellationToken cancellationToken);
 
+    /// <summary>
+    /// فیلتر در اگهی
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="advertisementQueryFilter"></param>
+    /// <param name="projection"></param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="pageNumber"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
     Task<(List<TResult>, int)> FilterAdvertisementsAsync<TResult>(
         AdvertisementQueryFilter advertisementQueryFilter,
         Expression<Func<Advertisement, TResult>> projection,
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10);
-    
+
+    /// <summary>
+    /// سرچ در اگهی
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="searchTerm"></param>
+    /// <param name="projection"></param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="pageNumber"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
     Task<(List<TResult>, int)> SearchAdvertisementsAsync<TResult>(
         string searchTerm,
         Expression<Func<Advertisement, TResult>> projection,
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10);
+
+    /// <summary>
+    /// دریافت اگهی های یک شغل 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="jobId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<TResult?> GetJobAdvertisementsAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> projection,
+        Guid jobId,
+        CancellationToken cancellationToken);
 }
 

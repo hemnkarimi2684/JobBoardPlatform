@@ -5,6 +5,7 @@ namespace JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 public class AdvertisementDetail
 {
     public Guid AdvertisementId { get; init; }
+    public Guid JobId { get; init; }
     public string Description { get; init; } = string.Empty;
     public int MinimumAge { get; init; }
     public int MaximumAge { get; init; }

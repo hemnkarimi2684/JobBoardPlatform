@@ -8,6 +8,8 @@ public class AdvertisementDetailResponseDto
 {
     public Guid AdvertisementId { get; set; }
 
+    public Guid JobId { get; set; }
+
     public Guid CityId { get; set; }
 
     public Guid CompanyId { get; set; }
@@ -46,6 +48,7 @@ public class AdvertisementDetailResponseDto
         return new AdvertisementDetailResponseDto
         {
             Description = advertisementDetail.Description,
+            JobId = advertisementDetail.JobId,
             AboutCompany = advertisementDetail.CompanyAboutUs,
             CreatedAt = advertisementDetail.CreatedAt,
             MaximumAge = advertisementDetail.MaximumAge,
