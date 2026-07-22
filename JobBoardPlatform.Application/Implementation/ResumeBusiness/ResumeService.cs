@@ -132,7 +132,8 @@ public class ResumeService : IResumeService
                 Address = u.UserProfile.Address,
                 BirthDate = u.UserProfile.BirthDate,
                 CityName = u.UserProfile.City.Name,
-                Gender = u.UserProfile.Gender
+                Gender = u.UserProfile.Gender,
+                UserImageFileId = u.UserProfile.UserImageFileId
             } : null,
 
             ResumeEducationDetails = u.EducationDetails.Select(ed => new ResumeEducationDetailResponseDto

@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
+using JobBoardPlatform.Application.Common.CurrentUser.Implementation;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
@@ -62,7 +63,7 @@ public class EducationDetailService : IEducationDetailService
 
     #region Get Methods 
 
-    public async Task<Pagination<UserEducationDetailResponseDto>> GetUserEducationDetailsAsync(
+    public async Task<Pagination<EducationHistoryResponseDto>> GetUserEducationDetailsAsync(
         Guid userId,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
@@ -71,7 +72,7 @@ public class EducationDetailService : IEducationDetailService
 
         var (userEducationDetails, totalDataCount) = await _unitOfWork.EducationDetailRepository
                                                           .GetUserEducationDetailsAsync(ed =>
-                                                          new UserEducationDetailResponseDto
+                                                          new EducationHistoryResponseDto
                                                           {
                                                               EducationDetailId = ed.Id,
                                                               UserId = ed.UserId,
@@ -88,11 +89,36 @@ public class EducationDetailService : IEducationDetailService
                                                           pagingCommand.PageNumber,
                                                           pagingCommand.PageSize);
 
-        return Pagination<UserEducationDetailResponseDto>
+        return Pagination<EducationHistoryResponseDto>
                     .GetPagination(userEducationDetails,
                                    pagingCommand.PageNumber,
                                    pagingCommand.PageSize,
                                    totalDataCount);
+    }
+
+    public async Task<EducationHistoryResponseDto> GetEducationDetailByIdAsync(
+        Guid educationDetailId,
+        CancellationToken cancellationToken = default)
+    {
+        var educationDetail = await _unitOfWork.EducationDetailRepository.GetByIdAsync(educationDetailId, cancellationToken);
+
+        if (educationDetail == null)
+            throw new NotFoundException($"The education detail with id {educationDetailId} was not found.");
+
+        _accessControlService.EnsureApplicantOrAdmin(educationDetail.UserId, _currentUser);
+
+        return new EducationHistoryResponseDto
+        {
+            EducationDetailId = educationDetail.Id,
+            UserId = educationDetail.UserId,
+            CertificateDegreeName = educationDetail.CertificateDegreeName,
+            Major = educationDetail.Major,
+            University = educationDetail.University,
+            StartDate = educationDetail.StartDate,
+            CompletionDate = educationDetail.CompletionDate,
+            Percentage = educationDetail.Percentage,
+            IsCurrentlyStudying = educationDetail.IsCurrentlyStudying
+        };
     }
 
     #endregion

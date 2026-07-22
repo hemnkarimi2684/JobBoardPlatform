@@ -28,7 +28,7 @@ public interface IUserProfileRepository : IGenericRepository<UserProfile>
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<TResult?> GetUserProfileInfoAsync<TResult>(
+    Task<TResult?> GetUserProfileByUserIdAsync<TResult>(
         Expression<Func<UserProfile, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken);

@@ -4,6 +4,9 @@ using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
 
+/// <summary>
+/// دسته بندی شغل 
+/// </summary>
 public class JobCategory : BaseEntity
 {
     private JobCategory() { }
@@ -15,9 +18,19 @@ public class JobCategory : BaseEntity
         Validate();
     }
 
+    /// <summary>
+    /// اسم دسته بندی 
+    /// </summary>
     public string Name { get; private set; }
 
+    #region Navigation Properties
+
+    /// <summary>
+    /// جزئیات مربوط به کار هایی که در این دسته بندی  شغلی هستند 
+    /// </summary>
     public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
+
+    #endregion
 
     protected override void Validate()
     {

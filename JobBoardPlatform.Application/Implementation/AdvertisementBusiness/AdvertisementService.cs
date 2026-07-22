@@ -11,6 +11,7 @@ using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using System.Net.Http.Headers;
 
 
 namespace JobBoardPlatform.Application.Implementation.AdvertisementBusiness;
@@ -176,6 +177,87 @@ public class AdvertisementService : IAdvertisementService
         pagingCommand.PageSize);
     }
 
+
+    public async Task<Pagination<AdvertisementDetailResponseDto>> SearchAdvertisementsAsync(
+        AdvertisementSearchRequestDto searchDto,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(searchDto.SearchTerm))
+            return new Pagination<AdvertisementDetailResponseDto>()
+            {
+                Data = new List<AdvertisementDetailResponseDto>(),
+                PageNumber = pagingCommand.PageNumber,
+                PageSize = pagingCommand.PageSize,
+                TotalPageCount = 0
+            }; ;
+
+        var (result, totalDataCount) = await _unitOfWork.AdvertisementRepository.SearchAdvertisementsAsync(
+            searchDto.SearchTerm,
+            a => new AdvertisementDetailResponseDto
+            {
+                Description = a.Description,
+                MinimumAge = a.MinimumAge,
+                MaximumAge = a.MaximumAge,
+                MinimumSalary = a.MinimumSalary,
+                MaximumSalary = a.MaximumSalary,
+                ExperienceLevel = a.ExperienceLevel,
+                CollaborationType = a.CollaborationType,
+                CityName = a.City.Name,
+                CompanyName = a.Company.Name,
+                JobName = a.Job.Name,
+                AboutCompany = a.Company.AboutUs,
+                Industry = a.Company.Industry,
+                CreatedAt = a.CreatedAt,
+                AdvertisementId = a.Id,
+                CityId = a.CityId,
+                CompanyId = a.CompanyId,
+                SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+            },
+              cancellationToken, pagingCommand.PageNumber, pagingCommand.PageSize);
+
+        return Pagination<AdvertisementDetailResponseDto>.GetPagination(
+                                                            result,
+                                                            pagingCommand.PageNumber,
+                                                            pagingCommand.PageSize,
+                                                            totalDataCount);
+    }
+
+    public async Task<Pagination<AdvertisementDetailResponseDto>> FilterAdvertisementsAsync(
+        AdvertisementFilterRequestDto filterDto,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
+    {
+        var (result, totalDataCount) = await _unitOfWork.AdvertisementRepository.FilterAdvertisementsAsync(
+            filterDto.MaoToQueryFilter(),
+            a => new AdvertisementDetailResponseDto
+            {
+                Description = a.Description,
+                MinimumAge = a.MinimumAge,
+                MaximumAge = a.MaximumAge,
+                MinimumSalary = a.MinimumSalary,
+                MaximumSalary = a.MaximumSalary,
+                ExperienceLevel = a.ExperienceLevel,
+                CollaborationType = a.CollaborationType,
+                CityName = a.City.Name,
+                CompanyName = a.Company.Name,
+                JobName = a.Job.Name,
+                AboutCompany = a.Company.AboutUs,
+                Industry = a.Company.Industry,
+                CreatedAt = a.CreatedAt,
+                AdvertisementId = a.Id,
+                CityId = a.CityId,
+                CompanyId = a.CompanyId,
+                SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+            },
+              cancellationToken, pagingCommand.PageNumber, pagingCommand.PageSize);
+
+        return Pagination<AdvertisementDetailResponseDto>.GetPagination(
+                                                            result,
+                                                            pagingCommand.PageNumber,
+                                                            pagingCommand.PageSize,
+                                                            totalDataCount);
+    }
 
     #endregion
 

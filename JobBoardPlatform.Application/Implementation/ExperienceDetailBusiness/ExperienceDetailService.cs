@@ -64,7 +64,7 @@ public class ExperienceDetailService : IExperienceDetailService
 
     #region Get Methods
 
-    public async Task<Pagination<UserExperienceDetailResponseDto>> GetUserExperienceDetailsAsync(
+    public async Task<Pagination<ExperienceHistoryResponseDto>> GetUserExperienceDetailsAsync(
         Guid userId,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
@@ -73,7 +73,7 @@ public class ExperienceDetailService : IExperienceDetailService
 
         var (experienceDetails, totalDataCount) = await _unitOfWork
                                                                  .ExperienceDetailRepository
-                                                                 .GetUserExperienceDetailsAsync(ed => new UserExperienceDetailResponseDto
+                                                                 .GetUserExperienceDetailsAsync(ed => new ExperienceHistoryResponseDto
                                                                  {
                                                                      ExperienceDetailId = ed.Id,
                                                                      LastJobTitle = ed.LastJobTitle,
@@ -90,13 +90,38 @@ public class ExperienceDetailService : IExperienceDetailService
                                                                   pagingCommand.PageNumber,
                                                                   pagingCommand.PageSize);
 
-        return Pagination<UserExperienceDetailResponseDto>
+        return Pagination<ExperienceHistoryResponseDto>
                                             .GetPagination(
                                                             experienceDetails,
                                                             pagingCommand.PageNumber,
                                                             pagingCommand.PageSize,
                                                             totalDataCount);
     }
+
+
+    public async Task<ExperienceHistoryResponseDto> GetExperienceDetailByIdAsync(Guid experienceDetailId, CancellationToken cancellationToken = default)
+    {
+        var experienceDetail = await _unitOfWork.ExperienceDetailRepository.GetByIdAsync(experienceDetailId, cancellationToken);
+
+        if (experienceDetail == null)
+            throw new NotFoundException($"The experience detail with id {experienceDetailId} was not found.");
+
+        _accessControlService.EnsureApplicantOrAdmin(experienceDetail.UserId, _currentUser);
+
+        return new ExperienceHistoryResponseDto
+        {
+            ExperienceDetailId = experienceDetail.Id,
+            LastJobTitle = experienceDetail.LastJobTitle,
+            UserId = experienceDetail.UserId,
+            SeniorityLevel = experienceDetail.SeniorityLevel,
+            JobCategory = experienceDetail.JobCategory,
+            City = experienceDetail.City,
+            StartDate = experienceDetail.StartDate,
+            EndDate = experienceDetail.EndDate,
+            IsCurrentJob = experienceDetail.IsCurrentJob
+        };
+    }
+
 
     #endregion
 

@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.SkillDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
@@ -13,7 +14,7 @@ public interface ISkillService
     /// <param name="pagingCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<UserSkillDetailResponseDto>> GetUserSkillsAsync(
+    Task<Pagination<UserSkillResponseDto>> GetUserSkillsAsync(
         Guid userId,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
@@ -25,7 +26,7 @@ public interface ISkillService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> CreateSkillAsync(
-        string name,
+        CreateSkillRequestDto skillRequestDto,
         CancellationToken cancellationToken = default);
 
     /// <summary>

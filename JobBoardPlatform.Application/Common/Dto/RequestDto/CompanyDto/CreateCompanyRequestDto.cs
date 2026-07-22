@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
@@ -27,15 +28,19 @@ public class CreateCompanyRequestDto
     public string WebSiteAddress { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Ownership type is required.")]
+    [EnumDataType(typeof(OwnershipType))]
     public OwnershipType OwnershipType { get; set; }
 
-    [Required(ErrorMessage = "Owner User ID is required.")]
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
     public Guid OwnedByUserId { get; set; }
 
     [Required(ErrorMessage = "Company size is required.")]
+    [EnumDataType(typeof(CompanySizeEnum))]
     public CompanySizeEnum CompanySize { get; set; }
 
-    [Required(ErrorMessage = "City is required.")]
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
     public Guid CityId { get; set; }
 
     [Required(ErrorMessage = "Location address is required.")]

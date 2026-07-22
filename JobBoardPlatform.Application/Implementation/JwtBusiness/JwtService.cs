@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
+using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace JobBoardPlatform.Application.Implementation.JwtBusiness;
@@ -16,21 +18,21 @@ public class JwtService : IJwtService
 {
     private readonly JwtSettings _jwtSettings;
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IRefreshTokenService _refreshTokenService;
 
     private readonly RoleManager<Role> _roleManager;
 
     private readonly UserManager<User> _userManager;
 
-    public JwtService(IOptions<JwtSettings> options, IUnitOfWork unitOfWork, RoleManager<Role> roleManager, UserManager<User> userManager)
+    public JwtService(IOptions<JwtSettings> options, IRefreshTokenService refreshTokenService, RoleManager<Role> roleManager, UserManager<User> userManager)
     {
         _jwtSettings = options.Value;
-        _unitOfWork = unitOfWork;
+        _refreshTokenService = refreshTokenService;
         _roleManager = roleManager;
         _userManager = userManager;
     }
 
-    public async Task<TokenLoginResponseDto> GenerateTokenAsync(User user)
+    public async Task<TokenLoginResponseDto> GenerateTokenAsync(User user, CancellationToken cancellationToken = default)
     {
         var claims = new List<Claim>
         {
@@ -59,7 +61,7 @@ public class JwtService : IJwtService
 
         claims = claims.DistinctBy(c => (c.Type, c.Value)).ToList();
 
-        var expires = DateTime.UtcNow.AddMinutes(_jwtSettings.TokenLifeTime);
+        var expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenLifeTime);
 
         var sigingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
         var encryptKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.EncryptKey));
@@ -81,10 +83,15 @@ public class JwtService : IJwtService
         var handler = new JwtSecurityTokenHandler();
         var token = handler.CreateToken(tokenDescriptor);
 
+        var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user.Id, cancellationToken);
+
         return new TokenLoginResponseDto
         {
+            UserId = user.Id,
             AccessToken = handler.WriteToken(token),
-            ExpiryTime = TimeSpan.FromMinutes(_jwtSettings.TokenLifeTime),
+            RefreshToken = refreshToken.Token,
+            AccessTokenExpiryTime = TimeSpan.FromMinutes(_jwtSettings.AccessTokenLifeTime),
+            RefreshTokenExpiryTime = refreshToken.ExpiresAt,
             TokenType = "Bearer"
         };
     }

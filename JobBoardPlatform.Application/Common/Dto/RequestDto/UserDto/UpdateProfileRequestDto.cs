@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
+﻿using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
@@ -19,8 +20,10 @@ public class UpdateProfileRequestDto
 
     public DateTime? BirthDate { get; set; }
 
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
     public Guid? CityId { get; set; }
 
+    [EnumDataType(typeof(Gender))]
     public Gender? Gender { get; set; }
 }
 

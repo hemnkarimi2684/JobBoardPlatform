@@ -15,7 +15,7 @@ public interface IExperienceDetailService
     /// <param name="pagingCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<UserExperienceDetailResponseDto>> GetUserExperienceDetailsAsync(
+    Task<Pagination<ExperienceHistoryResponseDto>> GetUserExperienceDetailsAsync(
         Guid userId,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
@@ -40,5 +40,15 @@ public interface IExperienceDetailService
     Task<bool> UpdateExperienceDetailAsync(
         Guid experienceDetailId,
         UpdateExperienceDetailRequestDto updateCommand,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تجربه کاری توسط شناسه اش 
+    /// </summary>
+    /// <param name="experienceDetailId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<ExperienceHistoryResponseDto> GetExperienceDetailByIdAsync(
+        Guid experienceDetailId,
         CancellationToken cancellationToken = default);
 }

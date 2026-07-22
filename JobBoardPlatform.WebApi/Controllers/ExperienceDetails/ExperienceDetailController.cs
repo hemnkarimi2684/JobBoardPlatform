@@ -23,8 +23,7 @@ public class ExperienceDetailController : ControllerBase
     }
 
     [HttpGet("{userId:guid}/experience-details")]
-    [Authorize(Roles = "Admin,Employer,JobSeeker")]
-    [RequestModelValidationFilter]
+    [Authorize(Roles = "Admin,JobSeeker")]
     public async Task<IActionResult> GetUserExperienceDetailsAsync(
         [FromRoute] Guid userId,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -32,7 +31,18 @@ public class ExperienceDetailController : ControllerBase
     {
         var result = await _experienceDetailService.GetUserExperienceDetailsAsync(userId, pagingRequest, cancellationToken);
 
-        return Ok(Result<Pagination<UserExperienceDetailResponseDto>>.Success(result));
+        return Ok(result);
+    }
+
+    [HttpGet("{experienceDetailId:guid}")]
+    [Authorize(Roles = "Admin,JobSeeker")]
+    public async Task<IActionResult> GetExperienceDetailByIdAsync(
+        [FromRoute] Guid experienceDetailId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _experienceDetailService.GetExperienceDetailByIdAsync(experienceDetailId, cancellationToken);
+
+        return Ok(Result<ExperienceHistoryResponseDto>.Success(result));
     }
 
     [HttpPost]
@@ -49,6 +59,7 @@ public class ExperienceDetailController : ControllerBase
 
     [HttpPut("{experienceDetailId:guid}")]
     [Authorize(Roles = "JobSeeker")]
+    [RequestModelValidationFilter]
     public async Task<IActionResult> UpdateExperienceDetailAsync(
         [FromRoute] Guid experienceDetailId,
         [FromBody] UpdateExperienceDetailRequestDto updateExperience,

@@ -1,10 +1,12 @@
-﻿using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
+﻿using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
 
 public class UpdateEducationDetailRequestDto
 {
+    [EnumDataType(typeof(CertificateDegree))]
     public CertificateDegree? CertificateDegree { get; set; }
 
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Major must be between 2 and 100 characters.")]

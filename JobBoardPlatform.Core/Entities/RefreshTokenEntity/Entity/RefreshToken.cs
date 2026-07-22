@@ -5,7 +5,7 @@ namespace JobBoardPlatform.Core.Entities.RefreshTokenEntity.Entity;
 
 public class RefreshToken : BaseEntity
 {
-    private RefreshToken() { }    
+    private RefreshToken() { }
 
     public RefreshToken(string token, DateTime expiresAt, Guid userId)
     {
@@ -15,27 +15,53 @@ public class RefreshToken : BaseEntity
         IsRevoked = false;
     }
 
+    /// <summary>
+    /// مقدار رفرش توکن
+    /// </summary>
     public string Token { get; private set; }
 
+    /// <summary>
+    /// تاریخ انقضا رفرش توکن 
+    /// </summary>
     public DateTime ExpiresAt { get; private set; }
 
+    /// <summary>
+    /// منقضی شده یا نه
+    /// </summary>
     public bool IsRevoked { get; private set; }
 
+    /// <summary>
+    /// کی منقضی شده؟
+    /// </summary>
     public DateTime? RevokedAt { get; private set; }
 
-    #region Foriegn Keys
+    /// <summary>
+    /// ایا هنوز فعاله
+    /// </summary>
+    public bool IsActive => !IsRevoked && RevokedAt is null && DateTime.UtcNow < ExpiresAt;
 
+    #region Foreign Keys
+
+    /// <summary>
+    /// شناسه مربوط به کاربری که این رفرش توکن رو داره 
+    /// </summary>
     public Guid UserId { get; private set; }
 
     #endregion
 
     #region Navigation properties
 
+    /// <summary>
+    /// جزئیات مربوط به کاربری که این رفرش توکن رو داره 
+    /// </summary>
     public virtual User User { get; private set; }
 
     #endregion
 
-    public void Revok()
+    /// <summary>
+    /// متدی برای منقضی کردن رفرش توکن 
+    /// </summary>
+    public void Revoke()
     {
         IsRevoked = true;
         RevokedAt = DateTime.UtcNow;

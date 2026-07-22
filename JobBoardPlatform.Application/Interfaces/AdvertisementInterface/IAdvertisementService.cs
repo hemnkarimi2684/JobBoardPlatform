@@ -103,20 +103,25 @@ public interface IAdvertisementService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
 
-    ///// <summary>
-    ///// جستجو در اگهی
-    ///// </summary>
-    ///// <param name="searchDto"></param>
-    ///// <param name="cancellationToken"></param>
-    ///// <returns></returns>
-    //Task<Pagination<AdvertisementDetailResponseDto>> SearchAdvertisementsAsync(
-    //    AdvertisementSearchRequestDto searchDto,
-    //    CancellationToken cancellationToken = default);
+    /// <summary>
+    /// جستجو در اگهی
+    /// </summary>
+    /// <param name="searchDto"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Pagination<AdvertisementDetailResponseDto>> SearchAdvertisementsAsync(
+        AdvertisementSearchRequestDto searchDto,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
 
-    //Task<Pagination<AdvertisementDetailResponseDto>> FilterAdvertisementsAsync(
-    //    AdvertisementFilterRequestDto filterDto,
-    //    CancellationToken cancellationToken = default);
-
-
-
+    /// <summary>
+    /// فیلتر در اگهی
+    /// </summary>
+    /// <param name="filterDto"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Pagination<AdvertisementDetailResponseDto>> FilterAdvertisementsAsync(
+        AdvertisementFilterRequestDto filterDto,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
 }

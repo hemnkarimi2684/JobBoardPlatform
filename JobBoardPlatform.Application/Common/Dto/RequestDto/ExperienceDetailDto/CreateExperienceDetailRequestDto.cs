@@ -9,7 +9,7 @@ public class CreateExperienceDetailRequestDto
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Last job title must be between 2 and 100 characters.")]
     public string LastJobTitle { get; set; } = string.Empty;
 
-    [EnumDataType(typeof(SeniorityLevel), ErrorMessage = "Invalid seniority level.")]
+    [EnumDataType(typeof(SeniorityLevel))]
     public SeniorityLevel SeniorityLevel { get; set; }
 
     [Required(ErrorMessage = "Job category is required.")]
@@ -20,6 +20,8 @@ public class CreateExperienceDetailRequestDto
     [StringLength(100, MinimumLength = 2, ErrorMessage = "City must be between 2 and 100 characters.")]
     public string City { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
     public Guid UserId { get; set; }
 
     public DateTime StartDate { get; set; }

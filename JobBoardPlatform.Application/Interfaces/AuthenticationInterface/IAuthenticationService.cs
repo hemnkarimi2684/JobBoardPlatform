@@ -16,4 +16,13 @@ public interface IAuthenticationService
     Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(
         LoginRequestDto loginCommand,
         CancellationToken cancellationToken = default);
+
+    Task<TokenLoginResponseDto> RefreshAsync(
+        RefreshRequestDto refreshRequest,
+        CancellationToken cancellationToken = default);
+
+    Task LogoutAsync(
+        LogoutRequestDto logoutRequest,
+        CancellationToken cancellationToken = default);
+
 }

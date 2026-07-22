@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.SkillDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -29,16 +30,16 @@ public class SkillController : ControllerBase
     {
         var result = await _skillService.GetUserSkillsAsync(userId, pagingRequest, cancellationToken);
 
-        return Ok(Result<Pagination<UserSkillDetailResponseDto>>.Success(result));
+        return Ok(result);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateSkillAsync(
-        string name,
+       [FromBody] CreateSkillRequestDto skillRequestDto,
         CancellationToken cancellationToken)
     {
-        await _skillService.CreateSkillAsync(name);
+        await _skillService.CreateSkillAsync(skillRequestDto, cancellationToken);
 
         return Ok(Result.Success());
     }
@@ -63,6 +64,6 @@ public class SkillController : ControllerBase
     {
         var result = await _skillService.GetAllSkillsAsync(text, pagingRequest, cancellationToken);
 
-        return Ok(Result<Pagination<SkillDetailResponseDto>>.Success(result));
+        return Ok(result);
     }
 }

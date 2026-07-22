@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
+using System.Text.Json.Serialization;
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
 
@@ -25,6 +26,7 @@ public class AdvertisementDetailResponseDto
 
     public DateTime CreatedAt { get; set; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public CollaborationType CollaborationType { get; set; }
 
     public string CityName { get; set; } = string.Empty;

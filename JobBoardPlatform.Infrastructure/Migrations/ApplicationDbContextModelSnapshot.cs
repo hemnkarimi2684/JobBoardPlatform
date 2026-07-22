@@ -31,10 +31,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<Guid>("CityId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CollaborationType")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                    b.Property<int>("CollaborationType")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("CompanyId")
                         .HasColumnType("uniqueidentifier");
@@ -109,9 +107,13 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("JobId");
 
+                    b.HasIndex("MaximumSalary");
+
+                    b.HasIndex("MinimumSalary");
+
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("Advertisements");
+                    b.ToTable("Advertisements", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Entity.AdvertisementSkill", b =>
@@ -166,7 +168,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("AdvertisementId", "SkillId")
                         .IsUnique();
 
-                    b.ToTable("AdvertisementSkills");
+                    b.ToTable("AdvertisementSkills", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.AttachmentEntity.Entity.Attachment", b =>
@@ -229,7 +231,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("Attachments");
+                    b.ToTable("Attachments", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.CityEntity.Entity.City", b =>
@@ -295,7 +297,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("ProvinceId");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity.CompanyCity", b =>
@@ -355,7 +357,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("CompanyId", "CityId")
                         .IsUnique();
 
-                    b.ToTable("CompanyCities");
+                    b.ToTable("CompanyCities", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.CompanyEntity.Entity.Company", b =>
@@ -452,7 +454,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("OwnedByUserId")
                         .IsUnique();
 
-                    b.ToTable("Companies");
+                    b.ToTable("Companies", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity.EducationDetail", b =>
@@ -528,7 +530,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EducationDetails");
+                    b.ToTable("EducationDetails", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity.ExperienceDetail", b =>
@@ -606,7 +608,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ExperienceDetails");
+                    b.ToTable("ExperienceDetails", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity.JobApplication", b =>
@@ -698,7 +700,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("JobApplications");
+                    b.ToTable("JobApplications", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity.JobCategory", b =>
@@ -750,7 +752,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("JobCategory");
+                    b.ToTable("JobCategories", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.JobEntity.Entity.Job", b =>
@@ -807,7 +809,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Jobs");
+                    b.ToTable("Jobs", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.NotifierEntity.Entity.Notifier", b =>
@@ -879,7 +881,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("RecipientUserId");
 
-                    b.ToTable("Notifier");
+                    b.ToTable("Notifier", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.PaymentEntity.Entity.Payment", b =>
@@ -944,7 +946,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Payment");
+                    b.ToTable("Payment", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ProvinceEntity.Entity.Province", b =>
@@ -999,7 +1001,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("ProvinceCode")
                         .IsUnique();
 
-                    b.ToTable("Provinces");
+                    b.ToTable("Provinces", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.RefreshTokenEntity.Entity.RefreshToken", b =>
@@ -1064,9 +1066,11 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
+                    b.HasIndex("Token");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshToken");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ResumeEntity.Entity.Resume", b =>
@@ -1128,7 +1132,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Resumes");
+                    b.ToTable("Resumes", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.RoleEntity.Entity.Role", b =>
@@ -1268,7 +1272,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("Skills");
+                    b.ToTable("Skills", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", b =>
@@ -1464,7 +1468,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[UserImageFileId] IS NOT NULL");
 
-                    b.ToTable("UserProfiles");
+                    b.ToTable("UserProfiles", (string)null);
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.UserSkillEntity.Entity.UserSkill", b =>
@@ -1519,7 +1523,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("UserId", "SkillId")
                         .IsUnique();
 
-                    b.ToTable("UserSkills");
+                    b.ToTable("UserSkills", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

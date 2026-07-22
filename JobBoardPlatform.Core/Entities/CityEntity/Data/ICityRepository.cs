@@ -31,4 +31,16 @@ public interface ICityRepository : IGenericRepository<City>
                                                             CancellationToken cancellationToken,
                                                             int pageNumber = 1,
                                                             int pageSize = 10);
+
+    /// <summary>
+    /// چک کردن اینکه اسم یا کد شهر تکراری است یا نه 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="code"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<bool> IsDuplicateNameOrCodeAsync(
+        string name,
+        int code,
+        CancellationToken cancellationToken);
 }

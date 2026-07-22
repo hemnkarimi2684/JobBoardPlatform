@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.WebApi.ResultPattern;
@@ -29,15 +30,35 @@ public class CompanyController : ControllerBase
         return Ok(Result.Success());
     }
 
-    [HttpGet("{ownerId:guid}")]
+    [HttpGet("by-user/{ownerId:guid}")]
     // [Authorize(Roles = "Employer,Admin")]
-    public async Task<IActionResult> GetCompanyInfoByOwnerIdAsync(
+    public async Task<IActionResult> GetCompanyProfileByOwnerIdAsync(
         [FromRoute] Guid ownerId,
         CancellationToken cancellationToken)
     {
-        var result = await _companyService.GetCompanyInfoByOwnerIdAsync(ownerId, cancellationToken);
+        var result = await _companyService.GetCompanyProfileByOwnerIdAsync(ownerId, cancellationToken);
 
-        return Ok(Result<CompanyInfoResponseDto>.Success(result));
+        return Ok(Result<CompanyProfileResponseDto>.Success(result));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllCompaniesAsync(
+        [FromQuery] PagingRequestDto pagingRequestDto,
+        CancellationToken cancellationToken)
+    {
+        var result = await _companyService.GetAllCompaniesAsync(pagingRequestDto, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpGet("{companyId:guid}")]
+    public async Task<IActionResult> GetCompanyByIdAsync(
+        [FromRoute] Guid companyId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _companyService.GetCompanyByIdAsync(companyId, cancellationToken);
+
+        return Ok(Result<CompanyProfileResponseDto>.Success(result));
     }
 
     [HttpPut("{companyId:guid}")]

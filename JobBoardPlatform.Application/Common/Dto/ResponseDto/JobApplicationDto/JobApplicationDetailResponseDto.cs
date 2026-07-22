@@ -1,9 +1,10 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
+using System.Text.Json.Serialization;
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 
-public class JobApplicationInfoResponseDto
+public class JobApplicationDetailResponseDto
 {
     public Guid JobApplicationId { get; init; }
 
@@ -13,10 +14,12 @@ public class JobApplicationInfoResponseDto
 
     public string CityName { get; init; } = string.Empty;
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public CollaborationType CollaborationType { get; init; }
 
     public int ExperienceLevel { get; init; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public JobApplicationStatus Status { get; init; }
 
     public DateTime CreatedAt { get; init; }

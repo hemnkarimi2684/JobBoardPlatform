@@ -1,6 +1,6 @@
 ﻿namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 
-public class CompanyDetailResponseDto
+public class CompanyListItemResponseDto
 {
     public Guid CompanyId { get; init; }
 

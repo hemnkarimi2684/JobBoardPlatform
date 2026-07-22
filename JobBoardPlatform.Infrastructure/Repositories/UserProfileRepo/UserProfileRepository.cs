@@ -25,7 +25,7 @@ public class UserProfileRepository : GenericRepository<UserProfile>, IUserProfil
                           .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<TResult?> GetUserProfileInfoAsync<TResult>(
+    public async Task<TResult?> GetUserProfileByUserIdAsync<TResult>(
         Expression<Func<UserProfile, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken)

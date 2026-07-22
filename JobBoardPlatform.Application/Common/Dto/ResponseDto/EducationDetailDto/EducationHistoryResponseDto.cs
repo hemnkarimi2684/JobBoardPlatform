@@ -1,13 +1,15 @@
 ﻿using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
+using System.Text.Json.Serialization;
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 
-public class UserEducationDetailResponseDto
+public class EducationHistoryResponseDto
 {
     public Guid EducationDetailId { get; init; }
 
     public Guid UserId { get; init; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public CertificateDegree CertificateDegreeName { get; init; }
 
     public string Major { get; init; } = string.Empty;

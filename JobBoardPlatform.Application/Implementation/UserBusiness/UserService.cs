@@ -78,13 +78,13 @@ public class UserService : IUserService
 
     #region Get methods
 
-    public async Task<UserProfileInfoResponseDto> GetUserProfileInfoAsync(
+    public async Task<UserProfileResponseDto> GetUserProfileByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
         _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
-        var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileInfoAsync(up => new UserProfileInfoResponseDto
+        var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileByUserIdAsync(up => new UserProfileResponseDto
         {
             UserId = up.UserId,
             FullName = up.FirstName + " " + up.LastName,
@@ -92,7 +92,8 @@ public class UserService : IUserService
             Address = up.Address,
             BirthDate = up.BirthDate,
             CityName = up.City.Name,
-            Gender = up.Gender
+            Gender = up.Gender,
+            UserImageFileId = up.UserImageFileId
         },
           userId, cancellationToken);
 

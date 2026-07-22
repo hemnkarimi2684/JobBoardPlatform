@@ -94,5 +94,19 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
         Expression<Func<Advertisement, TResult>> projection,
         Guid advertisementId,
         CancellationToken cancellationToken);
+
+    Task<(List<TResult>, int)> FilterAdvertisementsAsync<TResult>(
+        AdvertisementQueryFilter advertisementQueryFilter,
+        Expression<Func<Advertisement, TResult>> projection,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10);
+    
+    Task<(List<TResult>, int)> SearchAdvertisementsAsync<TResult>(
+        string searchTerm,
+        Expression<Func<Advertisement, TResult>> projection,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10);
 }
 

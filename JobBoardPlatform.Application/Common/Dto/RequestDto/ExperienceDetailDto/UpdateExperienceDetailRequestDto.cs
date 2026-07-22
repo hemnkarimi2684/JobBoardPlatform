@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
+﻿using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
@@ -8,6 +9,7 @@ public class UpdateExperienceDetailRequestDto
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Last job title must be between 2 and 100 characters.")]
     public string? LastJobTitle { get; set; }
 
+    [EnumDataType(typeof(SeniorityLevel))]
     public SeniorityLevel? SeniorityLevel { get; set; }
 
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Job category must be between 2 and 100 characters.")]

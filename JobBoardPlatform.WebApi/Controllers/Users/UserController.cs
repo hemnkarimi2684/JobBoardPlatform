@@ -45,15 +45,15 @@ public class UserController : ControllerBase
         return Ok(Result.Success());
     }
 
-    [HttpGet("{userId:guid}/info")]
-    [Authorize(Roles = "Admin,Employer,JobSeeker")]
-    public async Task<IActionResult> GetUserProfileInfoAsync(
+    [HttpGet("by-user/{userId:guid}/profile")]
+    [Authorize(Roles = "Admin,JobSeeker")]
+    public async Task<IActionResult> GetUserProfileByUserIdAsync(
         [FromRoute] Guid userId,
         CancellationToken cancellationToken)
     {
-        var result = await _userService.GetUserProfileInfoAsync(userId, cancellationToken);
+        var result = await _userService.GetUserProfileByUserIdAsync(userId, cancellationToken);
 
-        return Ok(Result<UserProfileInfoResponseDto>.Success(result));
+        return Ok(Result<UserProfileResponseDto>.Success(result));
     }
 
     [HttpPatch("{employerId:guid}")]

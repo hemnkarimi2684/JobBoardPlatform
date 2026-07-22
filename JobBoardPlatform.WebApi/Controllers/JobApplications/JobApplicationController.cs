@@ -57,7 +57,7 @@ public class JobApplicationController : ControllerBase
     {
         var result = await _jobApplicationService.GetAdvertisementJobApplicationsAsync(advertisementId, pagingRequest, cancellationToken);
 
-        return Ok(Result<Pagination<JobApplicationInfoResponseDto>>.Success(result));
+        return Ok(result);
     }
 
     [HttpGet("{jobApplicationId:guid}")]
@@ -68,6 +68,29 @@ public class JobApplicationController : ControllerBase
     {
         var result = await _jobApplicationService.GetJobApplicationByIdAsync(jobApplicationId, cancellationToken);
 
-        return Ok(Result<JobApplicationInfoResponseDto>.Success(result));
+        return Ok(Result<JobApplicationDetailResponseDto>.Success(result));
+    }
+
+    [HttpGet("by-user/{userId:guid}")]
+    [Authorize(Roles = "JobSeeker,Admin")]
+    public async Task<IActionResult> GetJobApplicationsByUserIdAsync(
+        [FromRoute] Guid userId,
+        [FromQuery] PagingRequestDto pagingRequest,
+        CancellationToken cancellationToken)
+    {
+        var result = await _jobApplicationService.GetJobApplicationsByUserIdAsync(userId, pagingRequest, cancellationToken);
+
+        return Ok(Result<Pagination<JobApplicationDetailResponseDto>>.Success(result));
+    }
+
+    [HttpPatch("{jobApplicationId:guid}/cancel")]
+    [Authorize(Roles = "JobSeeker")]
+    public async Task<IActionResult> CancelJobApplicationAsync(
+        [FromRoute] Guid jobApplicationId,
+        CancellationToken cancellationToken)
+    {
+        await _jobApplicationService.CancelJobApplicationAsync(jobApplicationId, cancellationToken);
+
+        return Ok(Result.Success());
     }
 }

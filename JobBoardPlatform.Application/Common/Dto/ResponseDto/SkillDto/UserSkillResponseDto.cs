@@ -1,6 +1,6 @@
 ﻿namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 
-public class UserSkillDetailResponseDto
+public class UserSkillResponseDto
 {
     public Guid SkillId { get; init; }
 

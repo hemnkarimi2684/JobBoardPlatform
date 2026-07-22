@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Application.Implementation.CompanyBusiness;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using System.ComponentModel.DataAnnotations;
@@ -23,8 +24,10 @@ public class UpdateCompanyInfoRequestDto
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Website address must be between 2 and 100 characters.")]
     public string? WebSiteAddress { get; set; }
 
+    [EnumDataType(typeof(OwnershipType))]
     public OwnershipType? OwnershipType { get; set; }
 
+    [EnumDataType(typeof(CompanySizeEnum))]
     public CompanySizeEnum? CompanySize { get; set; }
 
     [StringLength(120, MinimumLength = 2, ErrorMessage = "Activity type must be between 2 and 120 characters.")]

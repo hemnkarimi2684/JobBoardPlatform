@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.CityDto;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -8,13 +9,23 @@ namespace JobBoardPlatform.Application.Interfaces.CityInterface;
 public interface ICityService
 {
     /// <summary>
+    /// ساخت شهر
+    /// </summary>
+    /// <param name="cityRequestDto"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task CreateCityAsync(
+        CreateCityRequestDto cityRequestDto,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// دریافت شرکت های در یک شهر 
     /// </summary>
     /// <param name="cityId"></param>
     /// <param name="pagingCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<CompanyDetailResponseDto>> GetCityCompaniesAsync(
+    Task<Pagination<CompanyListItemResponseDto>> GetCityCompaniesAsync(
         Guid cityId,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
@@ -29,5 +40,19 @@ public interface ICityService
     Task<Pagination<CityDetailResponseDto>> GetProvinceCitiesAsync(
         Guid provinceId,
         PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام شهرها
+    /// </summary>
+    /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Pagination<CityDetailResponseDto>> GetAllCitiesAsync(
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
+
+    Task<CityDetailResponseDto> GetCityByIdAsync(
+        Guid cityId,
         CancellationToken cancellationToken = default);
 }

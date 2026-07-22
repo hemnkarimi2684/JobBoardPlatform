@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
+using System.Text.Json.Serialization;
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 
@@ -8,6 +9,7 @@ public class ResumeExperienceDetailResponseDto
 
     public string LastJobTitle { get; init; } = string.Empty;
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public SeniorityLevel SeniorityLevel { get; init; }
 
     public string JobCategory { get; init; } = string.Empty;

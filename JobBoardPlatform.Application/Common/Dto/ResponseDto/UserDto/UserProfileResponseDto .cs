@@ -2,7 +2,7 @@
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 
-public class UserProfileInfoResponseDto
+public class UserProfileResponseDto
 {
     public Guid UserId { get; init; }
 
@@ -17,5 +17,7 @@ public class UserProfileInfoResponseDto
     public string CityName { get; init; } = string.Empty;
 
     public Gender Gender { get; init; }
+
+    public Guid? UserImageFileId { get; set; }
 }
 

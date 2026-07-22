@@ -13,7 +13,7 @@ public class Job : BaseEntity
 {
     private Job() { }
 
-    public Job(string name,Guid jobCategoryId ,Guid? createdById = null)
+    public Job(string name, Guid jobCategoryId, Guid? createdById = null)
     {
         Name = name;
         JobCategoryId = jobCategoryId;
@@ -57,5 +57,8 @@ public class Job : BaseEntity
 
         if (Name.Length < 2 || Name.Length > 100)
             throw new DomainException(DomainErrors.JobNameInvalidLength);
+
+        if (JobCategoryId == Guid.Empty)
+            throw new DomainException(DomainErrors.JobCategoryIdIsRequired);
     }
 }

@@ -13,6 +13,8 @@ public class RefreshTokenModelBuilderConfiguration : BaseModelBuilderConfigurati
             .IsRequired()
             .HasMaxLength(512);
 
+        builder.HasIndex(rt => rt.Token);
+
         builder.Property(rt => rt.IsRevoked)
             .IsRequired()
             .HasDefaultValue(false);

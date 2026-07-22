@@ -14,7 +14,7 @@ public interface IEducationDetailService
     /// <param name="pagingCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<UserEducationDetailResponseDto>> GetUserEducationDetailsAsync(
+    Task<Pagination<EducationHistoryResponseDto>> GetUserEducationDetailsAsync(
         Guid userId,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
@@ -38,6 +38,16 @@ public interface IEducationDetailService
     /// <returns></returns>
     Task<bool> UpdateEducationDetailAsync(
         Guid educationDetailId,
-        UpdateEducationDetailRequestDto updateCommand, 
+        UpdateEducationDetailRequestDto updateCommand,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت مدرک تحصیلی توسط شناسه 
+    /// </summary>
+    /// <param name="educationDetailId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<EducationHistoryResponseDto> GetEducationDetailByIdAsync(
+        Guid educationDetailId,
         CancellationToken cancellationToken = default);
 }

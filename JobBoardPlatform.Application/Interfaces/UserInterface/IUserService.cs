@@ -35,7 +35,7 @@ public interface IUserService
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserProfileInfoResponseDto> GetUserProfileInfoAsync(
+    Task<UserProfileResponseDto> GetUserProfileByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
 

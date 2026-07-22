@@ -25,5 +25,6 @@ public class UpdateAdvertisementRequestDto
 
     public int? ExperienceLevel { get; set; }
 
+    [EnumDataType(typeof(CollaborationType))]
     public CollaborationType? CollaborationType { get; set; }
 }

@@ -24,7 +24,7 @@ public interface IJobApplicationService
     /// <param name="jobApplicationId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<JobApplicationInfoResponseDto> GetJobApplicationByIdAsync(
+    Task<JobApplicationDetailResponseDto> GetJobApplicationByIdAsync(
         Guid jobApplicationId,
         CancellationToken cancellationToken = default);
 
@@ -35,7 +35,7 @@ public interface IJobApplicationService
     /// <param name="pagingCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<JobApplicationInfoResponseDto>> GetAdvertisementJobApplicationsAsync(
+    Task<Pagination<JobApplicationDetailResponseDto>> GetAdvertisementJobApplicationsAsync(
         Guid advertisementId,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
@@ -50,5 +50,22 @@ public interface IJobApplicationService
     Task<bool> UpdateJobApplicationStatusAsync(
         Guid jobApplicationId,
         JobApplicationStatus status,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// مشاهده لیست تمام درخواست های خودم 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Pagination<JobApplicationDetailResponseDto>> GetJobApplicationsByUserIdAsync(
+        Guid userId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
+
+
+    Task<bool> CancelJobApplicationAsync(
+        Guid jobApplicationId,
         CancellationToken cancellationToken = default);
 }

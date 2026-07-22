@@ -16,6 +16,7 @@ using JobBoardPlatform.Application.Implementation.JobBusiness;
 using JobBoardPlatform.Application.Implementation.JwtBusiness;
 using JobBoardPlatform.Application.Implementation.PaymentBusiness;
 using JobBoardPlatform.Application.Implementation.ProvinceBusiness;
+using JobBoardPlatform.Application.Implementation.RefreshTokenBusiness;
 using JobBoardPlatform.Application.Implementation.ResumeBusiness;
 using JobBoardPlatform.Application.Implementation.SkillBusiness;
 using JobBoardPlatform.Application.Implementation.UserBusiness;
@@ -32,6 +33,7 @@ using JobBoardPlatform.Application.Interfaces.JobInterface;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
 using JobBoardPlatform.Application.Interfaces.PaymentInterface;
 using JobBoardPlatform.Application.Interfaces.ProvinceInterface;
+using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
@@ -121,6 +123,7 @@ public static class ApplicationExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICurrentUser, CurrentUser.Implementation.CurrentUser>();
         services.AddScoped<IAccessControlService, AccessControlService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
         services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
         var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();

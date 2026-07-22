@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
+using System.Text.Json.Serialization;
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 
@@ -14,5 +15,8 @@ public class ResumeUserProfileResponseDto
 
     public string CityName { get; init; } = string.Empty;
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public Gender Gender { get; init; }
+
+    public Guid? UserImageFileId { get; set; }
 }

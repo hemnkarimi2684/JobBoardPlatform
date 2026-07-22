@@ -39,4 +39,9 @@ public class CityRepository : GenericRepository<City>, ICityRepository
         Guid cityId,
         CancellationToken cancellationToken) => await AnyAsync(c => c.Id == cityId, cancellationToken);
 
+    public async Task<bool> IsDuplicateNameOrCodeAsync(string name, int code, CancellationToken cancellationToken)
+    {
+        return await Entities
+                          .AnyAsync(c => c.Name == name || c.CityCode == code, cancellationToken);
+    }
 }

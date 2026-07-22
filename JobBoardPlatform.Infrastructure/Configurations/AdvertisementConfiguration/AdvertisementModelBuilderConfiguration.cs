@@ -23,13 +23,12 @@ public class AdvertisementModelBuilderConfiguration : BaseModelBuilderConfigurat
         builder.Property(a => a.MinimumSalary)
             .HasPrecision(18, 4);
 
+        builder.HasIndex(a => a.MinimumSalary);
+
+        builder.HasIndex(a => a.MaximumSalary);
+
         builder.Property(a => a.IsActive)
             .HasDefaultValue(true);
-
-        builder.Property(a => a.CollaborationType)
-           .IsRequired()
-           .HasConversion<string>()
-           .HasMaxLength(25);
 
         builder.HasMany(a => a.AdvertisementSkills)
             .WithOne(x => x.Advertisement)

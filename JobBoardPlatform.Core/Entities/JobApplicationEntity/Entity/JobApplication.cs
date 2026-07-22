@@ -5,6 +5,7 @@ using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
 namespace JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
@@ -130,7 +131,7 @@ public class JobApplication : BaseEntity
         if (UserFullName.Length < 2 || UserFullName.Length > 100)
             throw new DomainException(DomainErrors.FullNameInvalidLength);
 
-        if(ExperienceLevel < 0)
+        if (ExperienceLevel < 0)
             throw new DomainException(DomainErrors.JobApplicationExperienceLevelOutOfRange);
 
         if (UserId == Guid.Empty)
@@ -146,6 +147,19 @@ public class JobApplication : BaseEntity
     public void UpdateStatus(JobApplicationStatus status, Guid? modifiedById)
     {
         Status = status;
+
+        Update(modifiedById);
+    }
+
+    public void Cancel(Guid? modifiedById)
+    {
+        if (Status == JobApplicationStatus.Cancelled)
+            throw new ValidationException("The job application is already cancelled.");
+
+        if (Status != JobApplicationStatus.Pending)
+            throw new ValidationException("You can only cancel a pending job application.");
+
+        Status = JobApplicationStatus.Cancelled;
 
         Update(modifiedById);
     }

@@ -6,6 +6,7 @@ using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
+using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using Microsoft.AspNetCore.Identity;
@@ -16,22 +17,22 @@ public class AuthenticationService : IAuthenticationService
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    private readonly ICurrentUser _currentUser;
-
     private readonly ICompanyService _companyService;
 
     private readonly IJwtService _jwtService;
+
+    private readonly IRefreshTokenService _refreshTokenService;
 
     private readonly UserManager<User> _userManager;
 
     private readonly SignInManager<User> _signInManager;
 
-    public AuthenticationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICompanyService companyService, IJwtService jwtService, UserManager<User> userManager, SignInManager<User> signInManager)
+    public AuthenticationService(IUnitOfWork unitOfWork, ICompanyService companyService, IJwtService jwtService, IRefreshTokenService refreshTokenService, UserManager<User> userManager, SignInManager<User> signInManager)
     {
         _unitOfWork = unitOfWork;
-        _currentUser = currentUser;
         _companyService = companyService;
         _jwtService = jwtService;
+        _refreshTokenService = refreshTokenService;
         _userManager = userManager;
         _signInManager = signInManager;
     }
@@ -63,6 +64,46 @@ public class AuthenticationService : IAuthenticationService
             throw new ForbiddenException("Dear user, your account has not yet been verified; please try again later.");
 
         return await _jwtService.GenerateTokenAsync(user);
+    }
+
+    public async Task LogoutAsync(LogoutRequestDto logoutRequest, CancellationToken cancellationToken = default)
+    {
+        var result = await _refreshTokenService.RevokeAsync(logoutRequest.RefreshToken, cancellationToken);
+
+        if (!result)
+            throw new ValidationException("Invalid refresh token or session has already been closed.");
+    }
+
+    public async Task<TokenLoginResponseDto> RefreshAsync(RefreshRequestDto refreshRequest, CancellationToken cancellationToken = default)
+    {
+        //دریافت توکن از دیتابیس 
+        var refreshToken = await _refreshTokenService.GetRefreshTokenByTokenAsync(refreshRequest.RefreshToken, cancellationToken, true);
+
+        // بررسی فعال بودن توکن
+        if (!refreshToken.IsActive)
+        {
+            // تشخیص اینکه ایای استافده مجدد داره میشه و همینوطر برای تشخیص اتک 
+            if (refreshToken.IsRevoked && refreshToken.RevokedAt is not null)
+            {
+                await _refreshTokenService.RevokeAllActiveTokensAsync(refreshToken.UserId, cancellationToken);
+            }
+
+            throw new UnauthorizedException("Session has expired or is invalid. Please log in again.");
+        }
+
+        //پیدا کردن کاربری که دارای این توکن است 
+        var user = await _userManager.FindByIdAsync(refreshToken.UserId.ToString());
+        if (user == null)
+        {
+            throw new NotFoundException("User associated with this token was not found.");
+        }
+
+        // منقضی کردن توکن فعلی که داره استفاده میشه برای اینکه کلا یک بار مصرف باشه 
+        refreshToken.Revoke();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        //حالا تولید یه رفرش توکن و اکسس توکن جدید
+        return await _jwtService.GenerateTokenAsync(user, cancellationToken);
     }
 
     #endregion

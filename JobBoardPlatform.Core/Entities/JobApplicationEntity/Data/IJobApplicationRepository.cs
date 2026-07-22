@@ -69,4 +69,11 @@ public interface IJobApplicationRepository : IGenericRepository<JobApplication>
         Guid resumeId,
         Guid employerId,
         CancellationToken cancellationToken);
+
+    Task<(List<TResult>, int)> GetJobApplicationsByUserIdAsync<TResult>(
+        Expression<Func<JobApplication, TResult>> projection,
+        Guid userId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10);
 }

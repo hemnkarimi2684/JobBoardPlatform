@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
+﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
@@ -58,6 +59,29 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
                           .Where(ja => ja.Id == jobApplicationId)
                           .Select(projection)
                           .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<(List<TResult>, int)> GetJobApplicationsByUserIdAsync<TResult>(
+        Expression<Func<JobApplication, TResult>> projection,
+        Guid userId, 
+        CancellationToken cancellationToken, 
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        var query = Entities
+                      .AsNoTracking()
+                      .Where(ja => ja.UserId == userId);
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
+        var result = await query
+                            .OrderByDescending(ja => ja.CreatedAt)
+                            .Skip((pageNumber - 1) * pageSize)
+                            .Take(pageSize)
+                            .Select(projection)
+                            .ToListAsync(cancellationToken);
+
+        return (result, totalDataCount);
     }
 
     public async Task<Guid?> GetJobApplicationUserIdAsync(

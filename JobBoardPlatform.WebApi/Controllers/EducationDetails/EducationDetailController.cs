@@ -23,8 +23,8 @@ public class EducationDetailController : ControllerBase
         _educationDetailService = educationDetailService;
     }
 
-    [HttpGet("{userId:guid}/educations-detail")]
-    [Authorize(Roles = "Admin,Employer,JobSeeker")]
+    [HttpGet("{userId:guid}/education-details")]
+    [Authorize(Roles = "Admin,JobSeeker")]
     public async Task<IActionResult> GetUserEducationDetailsAsync(
         [FromRoute] Guid userId,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -32,7 +32,18 @@ public class EducationDetailController : ControllerBase
     {
         var result = await _educationDetailService.GetUserEducationDetailsAsync(userId, pagingRequest, cancellationToken);
 
-        return Ok(Result<Pagination<UserEducationDetailResponseDto>>.Success(result));
+        return Ok(result);
+    }
+
+    [HttpGet("{educationDetailId:guid}")]
+    [Authorize(Roles = "Admin,JobSeeker")]
+    public async Task<IActionResult> GetEducationDetailByIdAsync(
+        [FromRoute] Guid educationDetailId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _educationDetailService.GetEducationDetailByIdAsync(educationDetailId, cancellationToken);
+
+        return Ok(Result<EducationHistoryResponseDto>.Success(result));
     }
 
     [HttpPost]

@@ -27,12 +27,19 @@ public class CreateAdvertisementRequestDto
     [EnumDataType(typeof(CollaborationType))]
     public CollaborationType CollaborationType { get; set; }
 
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
     public Guid JobId { get; set; }
 
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
     public Guid CityId { get; set; }
 
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
     public Guid CompanyId { get; set; }
 
     [Required(ErrorMessage = "SkillsId is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
     public List<Guid> SkillsId { get; set; } = new();
 }

@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
+using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ public class AuthenticationController : ControllerBase
     [HttpPost("register-employer")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> RegisterEmployerAsync(
-        RegisterEmployerRequestDto register,
+      [FromBody] RegisterEmployerRequestDto register,
         CancellationToken cancellationToken)
     {
         var result = await _authenticationService.RegisterEmployerAsync(register, cancellationToken);
@@ -32,7 +33,7 @@ public class AuthenticationController : ControllerBase
     [HttpPost("register-jobSeeker")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> RegisterJobSeekerAsync(
-        RegisterJobSeekerRequestDto register,
+       [FromBody] RegisterJobSeekerRequestDto register,
         CancellationToken cancellationToken)
     {
         var result = await _authenticationService.RegisterJobSeekerAsync(register, cancellationToken);
@@ -41,13 +42,32 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("login")]
-    [RequestModelValidationFilter]
     public async Task<IActionResult> LoginByEmailOrPhoneNumberAndPassword(
-        LoginRequestDto login,
+       [FromBody] LoginRequestDto login,
         CancellationToken cancellationToken)
     {
         var result = await _authenticationService.LoginByEmailOrPhoneNumberAndPassword(login);
 
         return Ok(Result<TokenLoginResponseDto>.Success(result));
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> RefreshAsync(
+       [FromBody] RefreshRequestDto refreshRequest,
+        CancellationToken cancellationToken)
+    {
+        var result = await _authenticationService.RefreshAsync(refreshRequest, cancellationToken);
+
+        return Ok(Result<TokenLoginResponseDto>.Success(result));
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> LogoutAsync(
+       [FromBody] LogoutRequestDto logoutRequest,
+        CancellationToken cancellationToken)
+    {
+        await _authenticationService.LogoutAsync(logoutRequest, cancellationToken);
+
+        return Ok(Result.Success());
     }
 }

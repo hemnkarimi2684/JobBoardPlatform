@@ -1,5 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
@@ -11,7 +10,6 @@ using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Application.Implementation.JobApplicationBusiness;
 
@@ -58,7 +56,7 @@ public class JobApplicationService : IJobApplicationService
 
     #region Get Methods 
 
-    public async Task<Pagination<JobApplicationInfoResponseDto>> GetAdvertisementJobApplicationsAsync(
+    public async Task<Pagination<JobApplicationDetailResponseDto>> GetAdvertisementJobApplicationsAsync(
         Guid advertisementId,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
@@ -69,7 +67,7 @@ public class JobApplicationService : IJobApplicationService
 
         var (advertisementJobApplications, totalDataCount) = await _unitOfWork
                                                                         .JobApplicationRepository
-                                                                        .GetAdvertisementJobApplicationsAsync(ja => new JobApplicationInfoResponseDto
+                                                                        .GetAdvertisementJobApplicationsAsync(ja => new JobApplicationDetailResponseDto
                                                                         {
                                                                             JobApplicationId = ja.Id,
                                                                             JobTitle = ja.JobTitle,
@@ -89,14 +87,14 @@ public class JobApplicationService : IJobApplicationService
                                                                         pagingCommand.PageNumber,
                                                                         pagingCommand.PageSize);
 
-        return Pagination<JobApplicationInfoResponseDto>.GetPagination(
+        return Pagination<JobApplicationDetailResponseDto>.GetPagination(
                                                                  advertisementJobApplications,
                                                                  pagingCommand.PageNumber,
                                                                  pagingCommand.PageSize,
                                                                  totalDataCount);
     }
 
-    public async Task<JobApplicationInfoResponseDto> GetJobApplicationByIdAsync(
+    public async Task<JobApplicationDetailResponseDto> GetJobApplicationByIdAsync(
         Guid jobApplicationId,
         CancellationToken cancellationToken = default)
     {
@@ -112,7 +110,7 @@ public class JobApplicationService : IJobApplicationService
 
         _accessControlService.EnsureApplicantOrOwnerEmployerOrAdmin(ownerId.Value, jobApplication.UserId, _currentUser);
 
-        return new JobApplicationInfoResponseDto
+        return new JobApplicationDetailResponseDto
         {
             JobApplicationId = jobApplication.Id,
             JobTitle = jobApplication.JobTitle,
@@ -128,6 +126,43 @@ public class JobApplicationService : IJobApplicationService
             UserId = jobApplication.UserId
         };
     }
+
+    public async Task<Pagination<JobApplicationDetailResponseDto>> GetJobApplicationsByUserIdAsync(
+        Guid userId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+
+        var (advertisementJobApplications, totalDataCount) = await _unitOfWork
+                                                                        .JobApplicationRepository
+                                                                        .GetJobApplicationsByUserIdAsync(ja => new JobApplicationDetailResponseDto
+                                                                        {
+                                                                            JobApplicationId = ja.Id,
+                                                                            JobTitle = ja.JobTitle,
+                                                                            CompanyName = ja.CompanyName,
+                                                                            CityName = ja.CityName,
+                                                                            CollaborationType = ja.CollaborationType,
+                                                                            ExperienceLevel = ja.ExperienceLevel,
+                                                                            Status = ja.Status,
+                                                                            CreatedAt = ja.CreatedAt,
+                                                                            UserProfileName = ja.UserFullName,
+                                                                            ResumeId = ja.ResumeId,
+                                                                            AdvertisementId = ja.AdvertisementId,
+                                                                            UserId = ja.UserId
+                                                                        },
+                                                                        userId,
+                                                                        cancellationToken,
+                                                                        pagingCommand.PageNumber,
+                                                                        pagingCommand.PageSize);
+
+        return Pagination<JobApplicationDetailResponseDto>.GetPagination(
+                                                                 advertisementJobApplications,
+                                                                 pagingCommand.PageNumber,
+                                                                 pagingCommand.PageSize,
+                                                                 totalDataCount);
+    }
+
 
     #endregion
 
@@ -156,6 +191,22 @@ public class JobApplicationService : IJobApplicationService
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
 
+    }
+
+    public async Task<bool> CancelJobApplicationAsync(
+        Guid jobApplicationId,
+        CancellationToken cancellationToken = default)
+    {
+        var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId, cancellationToken, true);
+
+        if (jobApplication == null)
+            throw new NotFoundException($"the job application with id {jobApplicationId} was not found.");
+
+        _accessControlService.EnsureApplicant(jobApplication.UserId, _currentUser);
+
+        jobApplication.Cancel(_currentUser.UserId);
+
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
     #endregion

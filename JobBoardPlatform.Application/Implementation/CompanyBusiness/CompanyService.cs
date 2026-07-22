@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
@@ -8,11 +9,13 @@ using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace JobBoardPlatform.Application.Implementation.CompanyBusiness;
 
@@ -87,11 +90,13 @@ public class CompanyService : ICompanyService
 
     #region Get Methods
 
-    public async Task<CompanyInfoResponseDto> GetCompanyInfoByOwnerIdAsync(
+    public async Task<CompanyProfileResponseDto> GetCompanyProfileByOwnerIdAsync(
         Guid ownerId,
         CancellationToken cancellationToken = default)
     {
-        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyInfoResponseDto
+        _accessControlService.EnsureOwnerEmployerOrAdmin(ownerId, _currentUser);
+
+        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyProfileResponseDto
         {
             Name = c.Name,
             UserId = c.OwnedByUserId,
@@ -111,6 +116,52 @@ public class CompanyService : ICompanyService
             throw new NotFoundException($"the company with this ownerId {ownerId} not found");
 
         return companyInfo;
+    }
+
+    public async Task<Pagination<CompanyProfileResponseDto>> GetAllCompaniesAsync(
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.CompanyRepository.QueryAsync(c => new CompanyProfileResponseDto
+        {
+            Name = c.Name,
+            UserId = c.OwnedByUserId,
+            YearOfEstablishment = c.YearOfEstablishment,
+            Industry = c.Industry,
+            AboutUs = c.AboutUs,
+            WebSiteAddress = c.WebSiteAddress,
+            OwnershipType = c.OwnershipType,
+            CompanySize = c.CompanySize,
+            ActivityType = c.ActivityType,
+            CompanyImageFileId = c.CompanyImageFileId
+        },
+        cancellationToken,
+        pagingCommand.PageNumber,
+        pagingCommand.PageSize);
+    }
+
+    public async Task<CompanyProfileResponseDto> GetCompanyByIdAsync(
+        Guid companyId,
+        CancellationToken cancellationToken = default)
+    {
+        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken);
+
+        if (company is null)
+            throw new NotFoundException($"the company with this id {companyId} not found");
+
+        return new CompanyProfileResponseDto
+        {
+            Name = company.Name,
+            UserId = company.OwnedByUserId,
+            YearOfEstablishment = company.YearOfEstablishment,
+            Industry = company.Industry,
+            AboutUs = company.AboutUs,
+            WebSiteAddress = company.WebSiteAddress,
+            OwnershipType = company.OwnershipType,
+            CompanySize = company.CompanySize,
+            ActivityType = company.ActivityType,
+            CompanyImageFileId = company.CompanyImageFileId
+        };
     }
 
     #endregion

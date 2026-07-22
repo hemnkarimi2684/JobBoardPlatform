@@ -24,8 +24,8 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpPost]
-    [RequestModelValidationFilter]
     [Authorize(Roles = "Employer")]
+    [RequestModelValidationFilter]
     public async Task<IActionResult> CreateAdvertisementAsync(
         [FromBody] CreateAdvertisementRequestDto createAdvertisement,
         CancellationToken cancellationToken)
@@ -36,8 +36,8 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpPut("{advertisementId:guid}")]
-    [RequestModelValidationFilter]
     [Authorize(Roles = "Employer")]
+    [RequestModelValidationFilter]
     public async Task<IActionResult> UpdateAdvertisementAsync(
         [FromRoute] Guid advertisementId,
         [FromBody] UpdateAdvertisementRequestDto updateAdvertisement,
@@ -68,7 +68,7 @@ public class AdvertisementController : ControllerBase
     {
         var result = await _advertisementService.GetAdvertisementsByCompanyAsync(pagingRequestDto, companyId, cancellationToken);
 
-        return Ok(Result<Pagination<AdvertisementDetailResponseDto>>.Success(result));
+        return Ok(result);
     }
 
     [HttpPatch("{advertisementId:guid}/in-activate")]
@@ -96,12 +96,44 @@ public class AdvertisementController : ControllerBase
     [HttpGet("{advertisementId:guid}")]
     [Authorize(Roles = "Employer,Admin")]
     public async Task<IActionResult> GetAdvertisementInfoByIdAsync(
-        Guid advertisementId,
+       [FromRoute] Guid advertisementId,
         CancellationToken cancellationToken)
     {
         var result = await _advertisementService.GetAdvertisementInfoByIdAsync(advertisementId, cancellationToken);
 
         return Ok(Result<AdvertisementDetailResponseDto>.Success(result));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetActiveAdvertisementsAsync(
+       [FromQuery] PagingRequestDto pagingRequest,
+        CancellationToken cancellationToken)
+    {
+        var result = await _advertisementService.GetActiveAdvertisementsAsync(pagingRequest, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchAdvertisementsAsync(
+       [FromQuery] AdvertisementSearchRequestDto searchRequestDto,
+       [FromQuery] PagingRequestDto pagingRequestDto,
+        CancellationToken cancellationToken)
+    {
+        var result = await _advertisementService.SearchAdvertisementsAsync(searchRequestDto, pagingRequestDto, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpGet("filter")]
+    public async Task<IActionResult> FilterAdvertisementsAsync(
+       [FromQuery] AdvertisementFilterRequestDto filterRequestDto,
+       [FromQuery] PagingRequestDto pagingRequestDto,
+        CancellationToken cancellationToken)
+    {
+        var result = await _advertisementService.FilterAdvertisementsAsync(filterRequestDto, pagingRequestDto, cancellationToken);
+
+        return Ok(result);
     }
 
 }

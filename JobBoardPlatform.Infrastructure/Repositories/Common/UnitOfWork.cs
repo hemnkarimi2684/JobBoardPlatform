@@ -9,9 +9,11 @@ using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Data;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
+using JobBoardPlatform.Core.Entities.JobCategoryEntity.Data;
 using JobBoardPlatform.Core.Entities.JobEntity.Data;
 using JobBoardPlatform.Core.Entities.PaymentEntity.Data;
 using JobBoardPlatform.Core.Entities.ProvinceEntity.Data;
+using JobBoardPlatform.Core.Entities.RefreshTokenEntity.Data;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Data;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.SkillEntity.Data;
@@ -29,9 +31,11 @@ using JobBoardPlatform.Infrastructure.Repositories.CompanyRepo;
 using JobBoardPlatform.Infrastructure.Repositories.EducationDetailRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ExperienceDetailRepo;
 using JobBoardPlatform.Infrastructure.Repositories.JobApplicationRepo;
+using JobBoardPlatform.Infrastructure.Repositories.JobCategoryRepo;
 using JobBoardPlatform.Infrastructure.Repositories.JobRepo;
 using JobBoardPlatform.Infrastructure.Repositories.PaymentRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ProvinceRepo;
+using JobBoardPlatform.Infrastructure.Repositories.RefreshTokenRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ResumeRepo;
 using JobBoardPlatform.Infrastructure.Repositories.SkillRepo;
 using JobBoardPlatform.Infrastructure.Repositories.UserProfileRepo;
@@ -67,6 +71,8 @@ public class UnitOfWork : IUnitOfWork
         UserRepository = new UserRepository(_context);
         UserProfileRepository = new UserProfileRepository(_context);
         UserSkillRepository = new UserSkillRepository(_context);
+        JobCategoryRepository = new JobCategoryRepository(_context);
+        RefreshTokenRepository = new RefreshTokenRepository(_context);
     }
 
     private IDbContextTransaction? _transaction;
@@ -104,6 +110,10 @@ public class UnitOfWork : IUnitOfWork
     public IUserProfileRepository UserProfileRepository { get; }
 
     public IUserSkillRepository UserSkillRepository { get; }
+
+    public IJobCategoryRepository JobCategoryRepository { get; }
+
+    public IRefreshTokenRepository RefreshTokenRepository { get; }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {
