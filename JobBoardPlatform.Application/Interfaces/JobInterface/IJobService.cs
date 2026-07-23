@@ -23,8 +23,8 @@ public interface IJobService
     /// <param name="pagingCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<JobResponseDto> GetAllJobsAsync(
-        string text,
+    Task<Pagination<JobResponseDto>> GetAllJobsAsync(
+        TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
 
@@ -36,5 +36,6 @@ public interface IJobService
     /// <returns></returns>
     Task<Pagination<JobAdvertisementListItemResponseDto>> GetJobAdvertisementsAsync(
         Guid jobId,
+        PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
 }

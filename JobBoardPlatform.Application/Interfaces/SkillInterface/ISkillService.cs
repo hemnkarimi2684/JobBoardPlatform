@@ -49,7 +49,17 @@ public interface ISkillService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<Pagination<SkillDetailResponseDto>> GetAllSkillsAsync(
-        string text,
+        TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت مهارت توسط شناسه اش
+    /// </summary>
+    /// <param name="skillId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<SkillDetailResponseDto> GetSkillByIdAsync(
+        Guid skillId,
         CancellationToken cancellationToken = default);
 }

@@ -13,7 +13,6 @@ namespace JobBoardPlatform.WebApi.Controllers.JobApplications;
 
 [Route("api/[controller]s")]
 [ApiController]
-//[Authorize]
 public class JobApplicationController : ControllerBase
 {
     private readonly IJobApplicationService _jobApplicationService;

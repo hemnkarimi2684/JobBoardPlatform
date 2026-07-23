@@ -38,7 +38,7 @@ public interface IJobRepository : IGenericRepository<Job>
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<(List<TResult>, int)> GetAllJobsAsync<TResult>(
-        string text,
+        string? text,
         Expression<Func<Job, TResult>> projection,
         CancellationToken cancellationToken,
         int pageNumber = 1,

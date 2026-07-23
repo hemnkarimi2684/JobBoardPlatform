@@ -30,6 +30,9 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
         int pageNumber = 1,
         int pageSize = 10)
     {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
         var query = Entities
                          .AsNoTracking()
                          .Where(ed => ed.UserId == userId);

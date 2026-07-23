@@ -13,12 +13,16 @@ public class UserSkillRepository : GenericRepository<UserSkill>, IUserSkillRepos
     {
     }
 
-    public async Task<(List<TResult>, int)> GetUserSkillsAsync<TResult>(Expression<Func<UserSkill, TResult>> projection,
-                                                                        Guid userId,
-                                                                        CancellationToken cancellationToken,
-                                                                        int pageNumber = 1,
-                                                                        int pageSize = 10)
+    public async Task<(List<TResult>, int)> GetUserSkillsAsync<TResult>(
+        Expression<Func<UserSkill, TResult>> projection,
+        Guid userId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
     {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
         var query = Entities
                         .AsNoTracking()
                         .Where(us => us.UserId == userId);

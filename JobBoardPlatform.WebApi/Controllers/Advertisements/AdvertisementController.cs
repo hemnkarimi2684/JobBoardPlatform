@@ -1,9 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
-using JobBoardPlatform.Application.Implementation.AdvertisementBusiness;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
-using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;

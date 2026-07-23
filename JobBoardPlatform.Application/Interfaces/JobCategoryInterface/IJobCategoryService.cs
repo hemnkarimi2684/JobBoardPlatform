@@ -25,7 +25,7 @@ public interface IJobCategoryService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<Pagination<JobCategoryResponseDto>> GetAllJobCategoriesAsync(
-        string text,
+        TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
 

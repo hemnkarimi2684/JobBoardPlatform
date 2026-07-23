@@ -10,7 +10,6 @@ namespace JobBoardPlatform.WebApi.Controllers.Companies;
 
 [Route("api/companies")]
 [ApiController]
-[Authorize]
 public class CompanyController : ControllerBase
 {
     private readonly ICompanyService _companyService;
@@ -31,7 +30,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpGet("by-user/{ownerId:guid}")]
-    // [Authorize(Roles = "Employer,Admin")]
+    [Authorize(Roles = "Employer,Admin")]
     public async Task<IActionResult> GetCompanyProfileByOwnerIdAsync(
         [FromRoute] Guid ownerId,
         CancellationToken cancellationToken)
@@ -43,10 +42,11 @@ public class CompanyController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllCompaniesAsync(
+        [FromQuery] TextRequestDto textRequestDto,
         [FromQuery] PagingRequestDto pagingRequestDto,
         CancellationToken cancellationToken)
     {
-        var result = await _companyService.GetAllCompaniesAsync(pagingRequestDto, cancellationToken);
+        var result = await _companyService.GetAllCompaniesAsync(textRequestDto, pagingRequestDto, cancellationToken);
 
         return Ok(result);
     }
@@ -62,7 +62,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPut("{companyId:guid}")]
-    //[Authorize(Roles = "Employer")]
+    [Authorize(Roles = "Employer")]
     public async Task<IActionResult> UpdateCompanyIdAsync(
         [FromRoute] Guid companyId,
         [FromBody] UpdateCompanyInfoRequestDto update,
@@ -74,7 +74,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPatch("{companyId:guid}/upload-image")]
-    //[Authorize(Roles = "Employer")]
+    [Authorize(Roles = "Employer")]
     public async Task<IActionResult> UploadCompanyImageAsync(
         [FromRoute] Guid companyId,
         [FromForm] UploadCompanyImageRequestDto imageRequestDto,

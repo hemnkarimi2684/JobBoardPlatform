@@ -49,6 +49,7 @@ public interface ICityService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<Pagination<CityDetailResponseDto>> GetAllCitiesAsync(
+        TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
 

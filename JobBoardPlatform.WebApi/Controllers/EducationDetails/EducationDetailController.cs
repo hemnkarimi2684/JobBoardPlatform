@@ -13,7 +13,6 @@ namespace JobBoardPlatform.WebApi.Controllers.EducationDetails;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class EducationDetailController : ControllerBase
 {
     private readonly IEducationDetailService _educationDetailService;

@@ -76,6 +76,9 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         int pageNumber = 1,
         int pageSize = 10)
     {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
         var query = Entities
                          .AsNoTracking()
                          .Where(a => a.CompanyId == companyId && a.IsActive);
@@ -134,12 +137,12 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         int pageNumber = 1,
         int pageSize = 10)
     {
-
         pageNumber = pageNumber < 1 ? 1 : pageNumber;
         pageSize = pageSize < 1 ? 10 : pageSize;
 
         var query = Entities
-                        .AsNoTracking();
+                        .AsNoTracking()
+                        .AsQueryable();
 
         if (filter.JobCategoryId.HasValue)
         {
@@ -179,19 +182,28 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     }
 
     public async Task<(List<TResult>, int)> SearchAdvertisementsAsync<TResult>(
-        string searchTerm,
+        string? searchTerm,
         Expression<Func<Advertisement, TResult>> projection,
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10)
     {
-        var term = searchTerm.Trim();
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
 
         var query = Entities
-             .AsNoTracking()
-             .Where(a => EF.Functions.Like(a.Job.Name, $"%{term}%") ||
-                         EF.Functions.Like(a.City.Name, $"%{term}%"));
+                        .AsNoTracking()
+                        .AsQueryable();
 
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var term = searchTerm.Trim();
+
+            query = Entities
+                        .AsNoTracking()
+                        .Where(a => EF.Functions.Like(a.Job.Name, $"%{term}%") ||
+                                    EF.Functions.Like(a.City.Name, $"%{term}%"));
+        }
 
         var totalDataCount = await query.CountAsync(cancellationToken);
 
@@ -205,15 +217,29 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         return (result, totalDataCount);
     }
 
-    public async Task<TResult?> GetJobAdvertisementsAsync<TResult>(
+    public async Task<(List<TResult>, int)> GetJobAdvertisementsAsync<TResult>(
         Expression<Func<Advertisement, TResult>> projection,
         Guid jobId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
     {
-        return await Entities
-                          .AsNoTracking()
-                          .Where(a => a.JobId == jobId)
-                          .Select(projection)
-                          .FirstOrDefaultAsync(cancellationToken);
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
+        var query = Entities
+                         .AsNoTracking()
+                         .Where(a => a.JobId == jobId);
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
+        var result = await query
+                             .OrderByDescending(b => b.CreatedAt)
+                             .Skip((pageNumber - 1) * pageSize)
+                             .Take(pageSize)
+                             .Select(projection)
+                             .ToListAsync(cancellationToken);
+
+        return (result, totalDataCount);
     }
 }

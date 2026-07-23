@@ -15,7 +15,7 @@ public class JobRepository : GenericRepository<Job>, IJobRepository
     }
 
     public async Task<(List<TResult>, int)> GetAllJobsAsync<TResult>(
-        string text,
+        string? text,
         Expression<Func<Job, TResult>> projection,
         CancellationToken cancellationToken,
         int pageNumber = 1,
@@ -24,11 +24,17 @@ public class JobRepository : GenericRepository<Job>, IJobRepository
         pageNumber = pageNumber <= 0 ? 1 : pageNumber;
         pageSize = pageSize <= 0 ? 10 : pageSize;
 
-        var trimmedText = text.Trim();
-
         var query = Entities
-                         .AsNoTracking()
-                         .Where(j => EF.Functions.Like(j.Name, $"%{trimmedText}%"));
+                        .AsNoTracking()
+                        .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            var trimmedText = text.Trim();
+
+            query = query
+                       .Where(j => EF.Functions.Like(j.Name, $"%{trimmedText}%"));
+        }
 
         var totalDataCount = await query.CountAsync(cancellationToken);
 

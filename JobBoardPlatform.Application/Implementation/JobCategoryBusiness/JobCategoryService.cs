@@ -49,14 +49,17 @@ public class JobCategoryService : IJobCategoryService
 
     #region Get Methods
 
-    public async Task<Pagination<JobCategoryResponseDto>> GetAllJobCategoriesAsync(string text, PagingRequestDto pagingCommand, CancellationToken cancellationToken = default)
+    public async Task<Pagination<JobCategoryResponseDto>> GetAllJobCategoriesAsync(
+        TextRequestDto textRequestDto,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
         var (result, totalDataCount) = await _unitOfWork.JobCategoryRepository.GetAllJobCategoriesAsync(jc => new JobCategoryResponseDto
         {
             JobCategoryId = jc.Id,
             Name = jc.Name
         },
-          text,
+          textRequestDto.Text,
           cancellationToken,
           pagingCommand.PageNumber,
           pagingCommand.PageSize);
@@ -64,7 +67,9 @@ public class JobCategoryService : IJobCategoryService
         return Pagination<JobCategoryResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
     }
 
-    public async Task<JobCategoryDetailResponseDto> GetJobCategoryByIdAsync(Guid jobCategoryId, CancellationToken cancellationToken = default)
+    public async Task<JobCategoryDetailResponseDto> GetJobCategoryByIdAsync(
+        Guid jobCategoryId, 
+        CancellationToken cancellationToken = default)
     {
         var jobCategory = await _unitOfWork.JobCategoryRepository.GetJobCategoryByProjectionAsync(jc => new JobCategoryDetailResponseDto
         {

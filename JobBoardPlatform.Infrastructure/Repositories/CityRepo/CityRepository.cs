@@ -13,12 +13,50 @@ public class CityRepository : GenericRepository<City>, ICityRepository
     {
     }
 
+    public async Task<(List<TResult>, int)> GetAllCitiesAsync<TResult>(
+        Expression<Func<City, TResult>> projection,
+        string? text,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
+        var query = Entities
+                        .AsNoTracking()
+                        .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            var trimmedText = text.Trim();
+
+            query = query
+                       .Where(j => EF.Functions.Like(j.Name, $"%{trimmedText}%"));
+        }
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
+        var result = await query
+                             .OrderByDescending(us => us.Name)
+                             .Skip((pageNumber - 1) * pageSize)
+                             .Take(pageSize)
+                             .Select(projection)
+                             .ToListAsync(cancellationToken);
+
+        return (result, totalDataCount);
+    }
+
     public async Task<(List<TResult>, int)> GetProvinceCitiesAsync<TResult>(
         Expression<Func<City, TResult>> projection,
         Guid provinceId,
         CancellationToken cancellationToken,
-        int pageNumber = 1, int pageSize = 10)
+        int pageNumber = 1,
+        int pageSize = 10)
     {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
         var query = Entities
                         .AsNoTracking()
                         .Where(c => c.ProvinceId == provinceId);

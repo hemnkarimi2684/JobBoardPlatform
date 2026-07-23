@@ -28,6 +28,8 @@ public class SkillService : ISkillService
         _accessControlService = accessControlService;
     }
 
+    #region Craete Methods
+
     public async Task<bool> AddSkillsToUserAsync(
         Guid userId,
         List<Guid> skillsId,
@@ -71,8 +73,12 @@ public class SkillService : ISkillService
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
+    #endregion
+
+    #region Get Methods
+
     public async Task<Pagination<SkillDetailResponseDto>> GetAllSkillsAsync(
-        string text,
+        TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
@@ -81,7 +87,7 @@ public class SkillService : ISkillService
             SkillId = us.Id,
             SkillName = us.Name
         },
-          text,
+          textRequestDto.Text,
           cancellationToken,
           pagingCommand.PageNumber,
           pagingCommand.PageSize
@@ -92,6 +98,22 @@ public class SkillService : ISkillService
                                                                pagingCommand.PageSize,
                                                                totalDataCount
                                                                );
+    }
+
+    public async Task<SkillDetailResponseDto> GetSkillByIdAsync(
+        Guid skillId,
+        CancellationToken cancellationToken = default)
+    {
+        var skill = await _unitOfWork.SkillRepository.GetByIdAsync(skillId, cancellationToken);
+
+        if (skill is null)
+            throw new NotFoundException($"the skill with id {skillId} was not found.");
+
+        return new SkillDetailResponseDto
+        {
+            SkillId = skillId,
+            SkillName = skill.Name,
+        };
     }
 
     public async Task<Pagination<UserSkillResponseDto>> GetUserSkillsAsync(
@@ -118,4 +140,6 @@ public class SkillService : ISkillService
                                                                totalDataCount
                                                                );
     }
+
+    #endregion
 }

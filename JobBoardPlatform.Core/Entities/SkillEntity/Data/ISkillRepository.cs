@@ -28,7 +28,7 @@ public interface ISkillRepository : IGenericRepository<Skill>
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<(List<TResult>, int)> GetAllSkillsAsync<TResult>(Expression<Func<Skill, TResult>> projection,
-                                                          string text,
+                                                          string? text,
                                                           CancellationToken cancellationToken,
                                                           int pageNumber = 1,
                                                           int pageSize = 10);

@@ -43,4 +43,22 @@ public interface ICityRepository : IGenericRepository<City>
         string name,
         int code,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// دریافت تمام شهرها
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="text"></param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="pageNumber"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<(List<TResult>, int)> GetAllCitiesAsync<TResult>(
+        Expression<Func<City, TResult>> projection,
+        string? text,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10
+        );
 }

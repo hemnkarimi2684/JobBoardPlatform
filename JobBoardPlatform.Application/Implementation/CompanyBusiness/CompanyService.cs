@@ -119,10 +119,11 @@ public class CompanyService : ICompanyService
     }
 
     public async Task<Pagination<CompanyProfileResponseDto>> GetAllCompaniesAsync(
+        TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.CompanyRepository.QueryAsync(c => new CompanyProfileResponseDto
+        var (result, totalDataCount) = await _unitOfWork.CompanyRepository.GetAllCompaniesAsync(c => new CompanyProfileResponseDto
         {
             Name = c.Name,
             UserId = c.OwnedByUserId,
@@ -135,9 +136,12 @@ public class CompanyService : ICompanyService
             ActivityType = c.ActivityType,
             CompanyImageFileId = c.CompanyImageFileId
         },
+        textRequestDto.Text,
         cancellationToken,
         pagingCommand.PageNumber,
         pagingCommand.PageSize);
+
+        return Pagination<CompanyProfileResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
     }
 
     public async Task<CompanyProfileResponseDto> GetCompanyByIdAsync(

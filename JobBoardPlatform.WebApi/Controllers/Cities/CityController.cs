@@ -58,10 +58,11 @@ public class CityController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllCitiesAsync(
+        [FromQuery] TextRequestDto textRequestDto,
         [FromQuery] PagingRequestDto pagingRequest,
         CancellationToken cancellationToken)
     {
-        var result = await _cityService.GetAllCitiesAsync(pagingRequest, cancellationToken);
+        var result = await _cityService.GetAllCitiesAsync(textRequestDto, pagingRequest, cancellationToken);
 
         return Ok(result);
     }

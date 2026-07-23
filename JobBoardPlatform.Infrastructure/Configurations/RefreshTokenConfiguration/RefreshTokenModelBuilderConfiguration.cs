@@ -19,9 +19,6 @@ public class RefreshTokenModelBuilderConfiguration : BaseModelBuilderConfigurati
             .IsRequired()
             .HasDefaultValue(false);
 
-        builder.Property(rt => rt.RevokedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
         builder.HasOne(rt => rt.User)
             .WithMany()
             .HasForeignKey(rt => rt.UserId)

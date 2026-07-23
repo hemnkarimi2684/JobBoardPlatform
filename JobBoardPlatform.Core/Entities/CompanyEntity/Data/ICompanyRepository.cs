@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.Common.Data;
+﻿using JobBoardPlatform.Core.Entities.CityEntity.Entity;
+using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using Microsoft.EntityFrameworkCore.Update.Internal;
@@ -72,4 +73,22 @@ public interface ICompanyRepository : IGenericRepository<Company>
     Task<bool> IsCompanyExistAsync(
         Guid companyId,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// دریافت تمام شرکت ها 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="text"></param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="pageNumber"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<(List<TResult>, int)> GetAllCompaniesAsync<TResult>(
+        Expression<Func<Company, TResult>> projection,
+        string? text,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10
+        );
 }

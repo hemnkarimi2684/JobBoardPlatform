@@ -22,7 +22,7 @@ public class JobCategoryController : ControllerBase
     [HttpPost]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateJobCategoryAsync(
-        CreateJobCategoryRequestDto jobCategoryRequestDto,
+      [FromBody] CreateJobCategoryRequestDto jobCategoryRequestDto,
         CancellationToken cancellationToken)
     {
         await _jobCategoryService.CreateJobCategoryAsync(jobCategoryRequestDto, cancellationToken);
@@ -32,18 +32,18 @@ public class JobCategoryController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllJobCategoriesAsync(
-        string text,
-        PagingRequestDto pagingRequestDto,
+       [FromQuery] TextRequestDto textRequestDto,
+       [FromQuery] PagingRequestDto pagingRequestDto,
         CancellationToken cancellationToken)
     {
-        var result = await _jobCategoryService.GetAllJobCategoriesAsync(text, pagingRequestDto, cancellationToken);
+        var result = await _jobCategoryService.GetAllJobCategoriesAsync(textRequestDto, pagingRequestDto, cancellationToken);
 
         return Ok(result);
     }
 
-    [HttpGet("{jobCategoryId:guid}")]
+    [HttpGet("{jobCategoryId:guid}/detail")]
     public async Task<IActionResult> GetJobCategoryByIdAsync(
-        Guid jobCategoryId,
+       [FromRoute] Guid jobCategoryId,
         CancellationToken cancellationToken)
     {
         var result = await _jobCategoryService.GetJobCategoryByIdAsync(jobCategoryId, cancellationToken);

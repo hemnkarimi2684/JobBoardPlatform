@@ -21,16 +21,25 @@ public class JobCategoryRepository : GenericRepository<JobCategory>, IJobCategor
 
     public async Task<(List<TResult>, int)> GetAllJobCategoriesAsync<TResult>(
         Expression<Func<JobCategory, TResult>> projection,
-        string text,
+        string? text,
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10)
     {
-        var trimmedText = text.Trim();
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
 
         var query = Entities
                          .AsNoTracking()
-                         .Where(jc => EF.Functions.Like(jc.Name, $"%{trimmedText}%"));
+                         .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            var trimmedText = text.Trim();
+
+            query = query
+                       .Where(jc => EF.Functions.Like(jc.Name, $"%{trimmedText}%"));
+        }
 
         var totalDataCount = await query.CountAsync(cancellationToken);
 
@@ -44,7 +53,10 @@ public class JobCategoryRepository : GenericRepository<JobCategory>, IJobCategor
         return (result, totalDataCount);
     }
 
-    public async Task<TResult?> GetJobCategoryByProjectionAsync<TResult>(Expression<Func<JobCategory, TResult>> projection, Guid jobCategoryId, CancellationToken cancellationToken)
+    public async Task<TResult?> GetJobCategoryByProjectionAsync<TResult>(
+        Expression<Func<JobCategory, TResult>> projection,
+        Guid jobCategoryId, 
+        CancellationToken cancellationToken)
     {
         return await Entities
                           .AsNoTracking()

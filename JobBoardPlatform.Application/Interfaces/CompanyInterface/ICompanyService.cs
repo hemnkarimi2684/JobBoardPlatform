@@ -58,6 +58,7 @@ public interface ICompanyService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<Pagination<CompanyProfileResponseDto>> GetAllCompaniesAsync(
+        TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
 

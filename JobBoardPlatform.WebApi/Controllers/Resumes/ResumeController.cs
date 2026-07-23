@@ -11,7 +11,6 @@ namespace JobBoardPlatform.WebApi.Controllers.Resumes;
 
 [Route("api/[controller]s")]
 [ApiController]
-[Authorize]
 public class ResumeController : ControllerBase
 {
     private readonly IResumeService _resumeService;

@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
+﻿using JobBoardPlatform.Core.Entities.CityEntity.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
@@ -13,6 +14,40 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
 {
     public CompanyRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
+    }
+
+    public async Task<(List<TResult>, int)> GetAllCompaniesAsync<TResult>(
+        Expression<Func<Company, TResult>> projection,
+        string? text,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
+        var query = Entities
+                        .AsNoTracking()
+                        .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            var trimmedText = text.Trim();
+
+            query = query
+                       .Where(c => EF.Functions.Like(c.Name, $"%{trimmedText}%"));
+        }
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
+        var result = await query
+                             .OrderByDescending(us => us.Name)
+                             .Skip((pageNumber - 1) * pageSize)
+                             .Take(pageSize)
+                             .Select(projection)
+                             .ToListAsync(cancellationToken);
+
+        return (result, totalDataCount);
     }
 
     public async Task<TResult?> GetCompanyByOwnerIdAsync<TResult>(

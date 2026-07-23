@@ -58,12 +58,22 @@ public class SkillController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetAllSkillsAsync(
-        [FromQuery] string text,
+        [FromQuery] TextRequestDto textRequestDto,
         [FromQuery] PagingRequestDto pagingRequest,
         CancellationToken cancellationToken)
     {
-        var result = await _skillService.GetAllSkillsAsync(text, pagingRequest, cancellationToken);
+        var result = await _skillService.GetAllSkillsAsync(textRequestDto, pagingRequest, cancellationToken);
 
         return Ok(result);
+    }
+
+    [HttpGet("{skillId:guid}")]
+    public async Task<IActionResult> GetSkillByIdAsync(
+        [FromRoute] Guid skillId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _skillService.GetSkillByIdAsync(skillId, cancellationToken);
+
+        return Ok(Result<SkillDetailResponseDto>.Success(result));
     }
 }

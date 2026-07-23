@@ -66,7 +66,9 @@ public class AuthenticationService : IAuthenticationService
         return await _jwtService.GenerateTokenAsync(user);
     }
 
-    public async Task LogoutAsync(LogoutRequestDto logoutRequest, CancellationToken cancellationToken = default)
+    public async Task LogoutAsync(
+        LogoutRequestDto logoutRequest, 
+        CancellationToken cancellationToken = default)
     {
         var result = await _refreshTokenService.RevokeAsync(logoutRequest.RefreshToken, cancellationToken);
 
@@ -74,7 +76,9 @@ public class AuthenticationService : IAuthenticationService
             throw new ValidationException("Invalid refresh token or session has already been closed.");
     }
 
-    public async Task<TokenLoginResponseDto> RefreshAsync(RefreshRequestDto refreshRequest, CancellationToken cancellationToken = default)
+    public async Task<TokenLoginResponseDto> RefreshAsync(
+        RefreshRequestDto refreshRequest, 
+        CancellationToken cancellationToken = default)
     {
         //دریافت توکن از دیتابیس 
         var refreshToken = await _refreshTokenService.GetRefreshTokenByTokenAsync(refreshRequest.RefreshToken, cancellationToken, true);
@@ -84,19 +88,16 @@ public class AuthenticationService : IAuthenticationService
         {
             // تشخیص اینکه ایای استافده مجدد داره میشه و همینوطر برای تشخیص اتک 
             if (refreshToken.IsRevoked && refreshToken.RevokedAt is not null)
-            {
                 await _refreshTokenService.RevokeAllActiveTokensAsync(refreshToken.UserId, cancellationToken);
-            }
 
             throw new UnauthorizedException("Session has expired or is invalid. Please log in again.");
         }
 
         //پیدا کردن کاربری که دارای این توکن است 
         var user = await _userManager.FindByIdAsync(refreshToken.UserId.ToString());
+
         if (user == null)
-        {
             throw new NotFoundException("User associated with this token was not found.");
-        }
 
         // منقضی کردن توکن فعلی که داره استفاده میشه برای اینکه کلا یک بار مصرف باشه 
         refreshToken.Revoke();

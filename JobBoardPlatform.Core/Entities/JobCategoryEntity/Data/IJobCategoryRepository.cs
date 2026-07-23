@@ -29,7 +29,7 @@ public interface IJobCategoryRepository : IGenericRepository<JobCategory>
     /// <returns></returns>
     Task<(List<TResult>, int)> GetAllJobCategoriesAsync<TResult>(
         Expression<Func<JobCategory, TResult>> projection,
-        string text,
+        string? text,
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10);

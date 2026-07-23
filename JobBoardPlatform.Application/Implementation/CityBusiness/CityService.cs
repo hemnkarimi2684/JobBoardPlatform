@@ -39,13 +39,13 @@ public class CityService : ICityService
         var provinceCode = await _unitOfWork.ProvinceRepository.GetProvinceCodeAsync(cityRequestDto.ProvinceId, cancellationToken);
 
         if (provinceCode == 0)
-            throw new NotFoundException("");
+            throw new NotFoundException("The specified province was not found.");
 
         var isDuplicateNameOrCode = await _unitOfWork.CityRepository
                                                 .IsDuplicateNameOrCodeAsync(cityRequestDto.Name, cityRequestDto.Code, cancellationToken);
 
         if (isDuplicateNameOrCode)
-            throw new ConflictException("");
+            throw new ConflictException("A city with the same name or code already exists.");
 
         var city = new City(cityRequestDto.Name, cityRequestDto.Code, provinceCode, cityRequestDto.ProvinceId, _currentUser.UserId);
 
@@ -86,9 +86,12 @@ public class CityService : ICityService
                                                              totalDataCount);
     }
 
-    public async Task<Pagination<CityDetailResponseDto>> GetAllCitiesAsync(PagingRequestDto pagingCommand, CancellationToken cancellationToken = default)
+    public async Task<Pagination<CityDetailResponseDto>> GetAllCitiesAsync(
+        TextRequestDto textRequestDto,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.CityRepository.QueryAsync(c => new CityDetailResponseDto
+        var (result, totalDataCount) = await _unitOfWork.CityRepository.GetAllCitiesAsync(c => new CityDetailResponseDto
         {
             CityId = c.Id,
             CityName = c.Name,
@@ -97,9 +100,12 @@ public class CityService : ICityService
             ProvinceId = c.ProvinceId,
             ProvinceCode = c.ProvinceCode
         },
+        textRequestDto.Text,
         cancellationToken,
         pagingCommand.PageNumber,
         pagingCommand.PageSize);
+
+        return Pagination<CityDetailResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
     }
 
     public async Task<Pagination<CityDetailResponseDto>> GetProvinceCitiesAsync(

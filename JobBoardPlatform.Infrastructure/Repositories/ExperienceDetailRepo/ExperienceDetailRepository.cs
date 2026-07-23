@@ -30,8 +30,12 @@ public class ExperienceDetailRepository : GenericRepository<ExperienceDetail>, I
         Expression<Func<ExperienceDetail, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken,
-        int pageNumber = 1, int pageSize = 10)
+        int pageNumber = 1, 
+        int pageSize = 10)
     {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
         var query = Entities
                          .AsNoTracking()
                          .Where(ed => ed.UserId == userId);

@@ -137,10 +137,14 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="projection"></param>
     /// <param name="jobId"></param>
     /// <param name="cancellationToken"></param>
+    /// <param name="pageNumber"></param>
+    /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<TResult?> GetJobAdvertisementsAsync<TResult>(
+    Task<(List<TResult>, int)> GetJobAdvertisementsAsync<TResult>(
         Expression<Func<Advertisement, TResult>> projection,
         Guid jobId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10);
 }
 

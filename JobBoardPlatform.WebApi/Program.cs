@@ -1,3 +1,4 @@
+using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
 using JobBoardPlatform.WebApi.Middlewares;
@@ -51,6 +52,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 #endregion
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsApproved", policy => policy
+    .RequireClaim(ClaimConstants.EmployerClaimType, ClaimConstants.IsApprovedClaimValue));
+});
 
 var app = builder.Build();
 
