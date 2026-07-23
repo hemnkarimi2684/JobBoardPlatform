@@ -17,7 +17,6 @@ public class ResumeRepository : GenericRepository<Resume>, IResumeRepository
         CancellationToken cancellationToken)
     {
         return await Entities
-                         .AsNoTracking()
                          .FirstOrDefaultAsync(r => r.UserId == userId, cancellationToken);
     }
 

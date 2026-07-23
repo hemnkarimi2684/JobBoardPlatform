@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
@@ -47,5 +48,27 @@ public interface IUserService
     /// <returns></returns>
     Task<bool> ApprovedEmployerAsync(
         Guid employerId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دانلود عکس پروفایل کاربر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<AttachmentResponseDto> DownloadUserImageAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// اپلود عکس پروفایل کاربر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="imageRequestDto"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task UploadUserImageAsync(
+        Guid userId,
+        UploadUserImageRequestDto imageRequestDto,
         CancellationToken cancellationToken = default);
 }

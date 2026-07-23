@@ -14,6 +14,14 @@ public class UserProfileRepository : GenericRepository<UserProfile>, IUserProfil
     {
     }
 
+    public async Task<UserProfile?> GetProfileByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                          .FirstOrDefaultAsync(up => up.UserId == userId, cancellationToken);
+    }
+
     public async Task<string?> GetUserFullNameByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken)

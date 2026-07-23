@@ -62,4 +62,14 @@ public interface IUserProfileRepository : IGenericRepository<UserProfile>
     Task<bool> IsUserHasProfileAsync(
         Guid userId, 
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// دریافت پروفایل کاربر توسط شناسه اش 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<UserProfile?> GetProfileByUserIdAsync(
+        Guid userId, 
+        CancellationToken cancellationToken);
 }

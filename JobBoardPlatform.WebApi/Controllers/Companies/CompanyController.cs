@@ -84,4 +84,14 @@ public class CompanyController : ControllerBase
 
         return Ok(Result.Success());
     }
+
+    [HttpGet("{companyId:guid}/download-image")]
+    public async Task<IActionResult> DownloadCompanyImageAsync(
+        [FromRoute] Guid companyId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _companyService.DownloadCompanyImageAsync(companyId, cancellationToken);
+
+        return File(result.Data, result.ContentType, result.FileName);
+    }
 }

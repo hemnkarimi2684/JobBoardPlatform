@@ -327,7 +327,7 @@ public class ResumeService : IResumeService
             await _unitOfWork.RollBackTransactionAsync(cancellationToken);
 
             //اینجا برای این ترای کچ کذاشتم که اگه توی فلو اضافه کردن و اپدیت کردن فایل به رزومه به اکسپشن و مشکلی خورد....
-            //و فایل جدیدی اپلود شده بود اما بدون اینکه به شرکت اختصاص داشته باشه اینو بیام حذف کنم 
+            //و فایل جدیدی اپلود شده بود اما بدون اینکه به رزومه اختصاص داشته باشه اینو بیام حذف کنم 
             if (newFileId != null)
                 await DeleteAttachmentAsync(newFileId.Value, cancellationToken);
 

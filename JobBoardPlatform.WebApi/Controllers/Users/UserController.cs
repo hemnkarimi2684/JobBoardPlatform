@@ -66,4 +66,26 @@ public class UserController : ControllerBase
 
         return Ok(Result.Success());
     }
+
+    [HttpGet("{userId:guid}/download-image")]
+    public async Task<IActionResult> DownloadUserImageAsync(
+        [FromRoute] Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _userService.DownloadUserImageAsync(userId, cancellationToken);
+
+        return File(result.Data, result.ContentType, result.FileName);
+    }
+
+    [HttpPatch("{userId:guid}/upload-image")]
+    [Authorize(Roles = "JobSeeker")]
+    public async Task<IActionResult> UploadUserImageAsync(
+        [FromRoute] Guid userId,
+        [FromForm] UploadUserImageRequestDto imageRequestDto,
+        CancellationToken cancellationToken)
+    {
+        await _userService.UploadUserImageAsync(userId, imageRequestDto, cancellationToken);
+
+        return Ok(Result.Success());
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
@@ -71,4 +72,14 @@ public interface ICompanyService
     Task<CompanyProfileResponseDto> GetCompanyByIdAsync(
         Guid companyId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دانلود عکس شرکت 
+    /// </summary>
+    /// <param name="companyId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<AttachmentResponseDto> DownloadCompanyImageAsync(
+        Guid companyId,
+        CancellationToken cancellationToken = default); 
 }

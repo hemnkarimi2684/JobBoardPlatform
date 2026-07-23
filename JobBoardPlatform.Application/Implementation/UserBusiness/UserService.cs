@@ -1,16 +1,21 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
+using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
+using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
 namespace JobBoardPlatform.Application.Implementation.UserBusiness;
@@ -23,15 +28,22 @@ public class UserService : IUserService
 
     private readonly IAccessControlService _accessControlService;
 
+    private readonly IAttachmentService _attachmentService;
+
     private readonly UserManager<User> _userManager;
 
-    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, UserManager<User> userManager)
+    private readonly ILogger<UserService> _logger;
+
+    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IAttachmentService attachmentService, UserManager<User> userManager, ILogger<UserService> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _accessControlService = accessControlService;
+        _attachmentService = attachmentService;
         _userManager = userManager;
+        _logger = logger;
     }
+
 
     #region Create Methods
 
@@ -186,6 +198,54 @@ public class UserService : IUserService
 
     #endregion
 
+    #region Upload User Image 
+
+    public async Task UploadUserImageAsync(
+        Guid userId,
+        UploadUserImageRequestDto imageRequestDto,
+        CancellationToken cancellationToken = default)
+    {
+        if (imageRequestDto?.Image is null)
+            throw new ValidationException("image is required.");
+
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId, cancellationToken);
+
+        if (!isUserExist)
+            throw new NotFoundException($"the user with id {userId} was not found");
+
+        var userProfile = await _unitOfWork.UserProfileRepository.GetProfileByUserIdAsync(userId, cancellationToken);
+
+        if (userProfile is null)
+            throw new NotFoundException($"The user with id '{userId}' does not have a profile.");
+
+        _accessControlService.EnsureApplicant(userProfile.UserId, _currentUser);
+
+        await UploadImageAsync(userProfile, imageRequestDto.Image, cancellationToken);
+    }
+
+    #endregion
+
+    #region DownLoad User Image
+
+    public async Task<AttachmentResponseDto> DownloadUserImageAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+
+        var userProfile = await _unitOfWork.UserProfileRepository.GetProfileByUserIdAsync(userId, cancellationToken);
+
+        if (userProfile is null)
+            throw new NotFoundException($"The user with id '{userId}' does not have a profile.");
+
+        if (userProfile.UserImageFileId is null)
+            throw new NotFoundException($"The user with id '{userId}' does not have an attached image.");
+
+        return await _attachmentService.DownloadAsync(userProfile.UserImageFileId.Value, cancellationToken);
+    }
+
+
+    #endregion
+
     #region Private methods
 
     private UpdateUserProfile MapToUpdateUserProfile(UpdateProfileRequestDto updateCommand)
@@ -201,6 +261,52 @@ public class UserService : IUserService
             Gender = updateCommand.Gender,
             ModifiedById = _currentUser.UserId
         };
+    }
+
+    private async Task DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete attachment {AttachmentId}", attachmentId);
+        }
+    }
+
+    private async Task UploadImageAsync(UserProfile userProfile, IFormFile image, CancellationToken cancellationToken)
+    {
+        //نگه داشتن ایدی قبلی عکس اپلود شده 
+        var oldImageId = userProfile.UserImageFileId;
+        Guid? newImageId = null;
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            newImageId = await _attachmentService.UploadAsync(image, AttachmentType.Image, cancellationToken);
+
+            userProfile.UpdateImage(newImageId);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
+
+            //اینجا برای این ترای کچ کذاشتم که اگه توی فلو اضافه کردن و اپدیت کردن عکس به رزومه به اکسپشن و مشکلی خورد....
+            //وعکس جدیدی اپلود شده بود اما بدون اینکه به کاربر اختصاص داشته باشه اینو بیام حذف کنم 
+            if (newImageId != null)
+                await DeleteAttachmentAsync(newImageId.Value, cancellationToken);
+
+            throw;
+        }
+
+        //حالا اگه عکس جدیدی سیو شد و اپدیت شد بیا اون عکس قدیمی رو حذف کن 
+        if (oldImageId != null)
+            await DeleteAttachmentAsync(oldImageId.Value, cancellationToken);
     }
 
     #endregion

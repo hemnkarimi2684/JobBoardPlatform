@@ -2,6 +2,7 @@
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
@@ -14,6 +15,9 @@ using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 
@@ -195,12 +199,16 @@ public class CompanyService : ICompanyService
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
+    #endregion
+
+    #region Upload Company Image
+
     public async Task UploadCompanyImageAsync(
         Guid companyId,
         UploadCompanyImageRequestDto imageRequestDto,
         CancellationToken cancellationToken = default)
     {
-        if (imageRequestDto?.File is null)
+        if (imageRequestDto?.Image is null)
             throw new ValidationException("Image file is required.");
 
         var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken, true);
@@ -210,6 +218,48 @@ public class CompanyService : ICompanyService
 
         _accessControlService.EnsureOwnerEmployerOrAdmin(company.OwnedByUserId, _currentUser);
 
+        await UploadImageAsync(company, imageRequestDto.Image, cancellationToken);
+    }
+
+    #endregion
+
+    #region DownLoad Company Image
+
+
+    public async Task<AttachmentResponseDto> DownloadCompanyImageAsync(
+        Guid companyId,
+        CancellationToken cancellationToken = default)
+    {
+        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken);
+
+        if (company == null)
+            throw new NotFoundException($"The company with id {companyId} was not found.");
+
+        if (company.CompanyImageFileId == null)
+            throw new NotFoundException($"The company with id '{companyId}' does not have an attached image.");
+
+        return await _attachmentService.DownloadAsync(company.CompanyImageFileId.Value, cancellationToken);
+    }
+
+
+    #endregion
+
+    #region Private Methods
+
+    private async Task DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete attachment {AttachmentId}", attachmentId);
+        }
+    }
+
+    private async Task UploadImageAsync(Company company, IFormFile image, CancellationToken cancellationToken)
+    {
         //نگه داشتن ایدی عکس قبلی برای حذف شدن بعد از اپدیت عکس توسط کارفرما
         var oldImageId = company.CompanyImageFileId;
         Guid? newImageId = null;
@@ -218,7 +268,7 @@ public class CompanyService : ICompanyService
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            newImageId = await _attachmentService.UploadAsync(imageRequestDto.File, AttachmentType.Image, cancellationToken);
+            newImageId = await _attachmentService.UploadAsync(image, AttachmentType.Image, cancellationToken);
 
             company.UpdateImage(newImageId);
 
@@ -240,22 +290,6 @@ public class CompanyService : ICompanyService
         //حالا اگه عکس جدیدی سیو شد و اپدیت شد بیا اون عکس قدیمی رو حذف کن 
         if (oldImageId != null)
             await DeleteAttachmentAsync(oldImageId.Value, cancellationToken);
-    }
-
-    #endregion
-
-    #region Private Methods
-
-    private async Task DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to delete attachment {AttachmentId}", attachmentId);
-        }
     }
 
     private CompanyInfoUpdate MapToCompanyInfoUpdate(UpdateCompanyInfoRequestDto updateCompanyInfoCommand)
