@@ -10,6 +10,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Companies;
 
 [Route("api/companies")]
 [ApiController]
+[Authorize]
 public class CompanyController : ControllerBase
 {
     private readonly ICompanyService _companyService;
@@ -41,6 +42,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllCompaniesAsync(
         [FromQuery] TextRequestDto textRequestDto,
         [FromQuery] PagingRequestDto pagingRequestDto,
@@ -52,6 +54,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpGet("{companyId:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetCompanyByIdAsync(
         [FromRoute] Guid companyId,
         CancellationToken cancellationToken)
@@ -86,6 +89,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpGet("{companyId:guid}/download-image")]
+    [AllowAnonymous]
     public async Task<IActionResult> DownloadCompanyImageAsync(
         [FromRoute] Guid companyId,
         CancellationToken cancellationToken)

@@ -103,6 +103,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetActiveAdvertisementsAsync(
        [FromQuery] PagingRequestDto pagingRequest,
         CancellationToken cancellationToken)
@@ -113,6 +114,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpGet("search")]
+    [AllowAnonymous]
     public async Task<IActionResult> SearchAdvertisementsAsync(
        [FromQuery] AdvertisementSearchRequestDto searchRequestDto,
        [FromQuery] PagingRequestDto pagingRequestDto,
@@ -124,6 +126,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpGet("filter")]
+    [AllowAnonymous]
     public async Task<IActionResult> FilterAdvertisementsAsync(
        [FromQuery] AdvertisementFilterRequestDto filterRequestDto,
        [FromQuery] PagingRequestDto pagingRequestDto,

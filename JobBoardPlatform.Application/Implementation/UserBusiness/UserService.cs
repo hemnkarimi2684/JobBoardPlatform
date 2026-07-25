@@ -237,6 +237,8 @@ public class UserService : IUserService
         if (userProfile is null)
             throw new NotFoundException($"The user with id '{userId}' does not have a profile.");
 
+        _accessControlService.EnsureApplicantOrAdmin(userProfile.UserId, _currentUser);
+
         if (userProfile.UserImageFileId is null)
             throw new NotFoundException($"The user with id '{userId}' does not have an attached image.");
 

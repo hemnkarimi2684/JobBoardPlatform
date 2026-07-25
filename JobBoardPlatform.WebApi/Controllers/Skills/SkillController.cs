@@ -57,6 +57,7 @@ public class SkillController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllSkillsAsync(
         [FromQuery] TextRequestDto textRequestDto,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -68,6 +69,7 @@ public class SkillController : ControllerBase
     }
 
     [HttpGet("{skillId:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetSkillByIdAsync(
         [FromRoute] Guid skillId,
         CancellationToken cancellationToken)

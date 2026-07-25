@@ -68,6 +68,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userId:guid}/download-image")]
+    [Authorize(Roles = "Admin,JobSeeker")]
     public async Task<IActionResult> DownloadUserImageAsync(
         [FromRoute] Guid userId,
         CancellationToken cancellationToken)

@@ -12,6 +12,7 @@ namespace JobBoardPlatform.WebApi.Controllers.ExperienceDetails;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class ExperienceDetailController : ControllerBase
 {
     private readonly IExperienceDetailService _experienceDetailService;

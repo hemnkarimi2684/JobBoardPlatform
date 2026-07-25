@@ -11,6 +11,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Provinces;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class ProvinceController : ControllerBase
 {
     private readonly IProvinceService _provinceService;
@@ -32,6 +33,7 @@ public class ProvinceController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllProvincesAsync(
       [FromQuery] TextRequestDto textRequestDto,
       [FromQuery] PagingRequestDto pagingRequestDto,

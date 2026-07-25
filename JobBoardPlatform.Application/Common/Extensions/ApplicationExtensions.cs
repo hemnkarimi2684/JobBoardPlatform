@@ -124,7 +124,10 @@ public static class ApplicationExtensions
         services.AddScoped<IResumeService, ResumeService>();
         services.AddScoped<ISkillService, SkillService>();
         services.AddScoped<IUserService, UserService>();
+
+        services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser.Implementation.CurrentUser>();
+
         services.AddScoped<IAccessControlService, AccessControlService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IJobCategoryService, JobCategoryService>();

@@ -10,6 +10,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Jobs;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class JobController : ControllerBase
 {
     private readonly IJobService _jobService;
@@ -31,6 +32,7 @@ public class JobController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllJobsAsync(
       [FromQuery] TextRequestDto textRequestDto,
       [FromQuery] PagingRequestDto pagingRequestDto,
@@ -42,6 +44,7 @@ public class JobController : ControllerBase
     }
 
     [HttpGet("{jobId:guid}/advertisements")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetJobAdvertisementsAsync(
        [FromRoute] Guid jobId,
        [FromQuery] PagingRequestDto pagingRequestDto,

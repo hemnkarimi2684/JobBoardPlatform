@@ -13,6 +13,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Cities;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class CityController : ControllerBase
 {
     private readonly ICityService _cityService;
@@ -23,7 +24,7 @@ public class CityController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize("Admin")]
+    [Authorize(Roles = "Admin")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> CreateCityAsync(
         [FromBody] CreateCityRequestDto requestDto,
@@ -35,6 +36,7 @@ public class CityController : ControllerBase
     }
 
     [HttpGet("{cityId:guid}/companies")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetCityCompaniesAsync(
         [FromRoute] Guid cityId,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -46,6 +48,7 @@ public class CityController : ControllerBase
     }
 
     [HttpGet("by-province/{provinceId:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetProvinceCitiesAsync(
         [FromRoute] Guid provinceId,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -57,6 +60,7 @@ public class CityController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllCitiesAsync(
         [FromQuery] TextRequestDto textRequestDto,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -68,6 +72,7 @@ public class CityController : ControllerBase
     }
 
     [HttpGet("{cityId:guid}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetCityByIdAsync(
         [FromRoute] Guid cityId,
         CancellationToken cancellationToken)

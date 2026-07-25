@@ -10,6 +10,7 @@ namespace JobBoardPlatform.WebApi.Controllers.JobCategories;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class JobCategoryController : ControllerBase
 {
     private readonly IJobCategoryService _jobCategoryService;
@@ -31,6 +32,7 @@ public class JobCategoryController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAllJobCategoriesAsync(
        [FromQuery] TextRequestDto textRequestDto,
        [FromQuery] PagingRequestDto pagingRequestDto,
@@ -42,6 +44,7 @@ public class JobCategoryController : ControllerBase
     }
 
     [HttpGet("{jobCategoryId:guid}/detail")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetJobCategoryByIdAsync(
        [FromRoute] Guid jobCategoryId,
         CancellationToken cancellationToken)
