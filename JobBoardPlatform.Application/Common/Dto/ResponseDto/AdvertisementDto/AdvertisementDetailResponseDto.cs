@@ -39,7 +39,9 @@ public class AdvertisementDetailResponseDto
 
     public string AboutCompany { get; set; } = string.Empty;
 
-    public string Industry { get; set; } = string.Empty;
+    public Guid CompanyJobCategoryId { get; set; }
+
+    public string CompanyJobCategoryName { get; set; } = string.Empty;
 
     public List<string> SkillNames { get; set; } = new();
 
@@ -59,12 +61,13 @@ public class AdvertisementDetailResponseDto
             MinimumSalary = advertisementDetail.MinimumSalary,
             CompanyName = advertisementDetail.CompanyName,
             ExperienceLevel = advertisementDetail.ExperienceLevel,
-            Industry = advertisementDetail.CompanyIndustry,
+            CompanyJobCategoryId = advertisementDetail.CompanyJobCategoryId,
+            CompanyJobCategoryName = advertisementDetail.CompanyJobCategoryName,
             JobName = advertisementDetail.JobName,
             SkillNames = advertisementDetail.Skills,
             AdvertisementId = advertisementDetail.AdvertisementId,
             CityId = advertisementDetail.CityId,
-            CompanyId = advertisementDetail.CompanyId,
+            CompanyId = advertisementDetail.CompanyId
         };
     }
 }

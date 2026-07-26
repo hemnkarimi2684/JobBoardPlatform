@@ -97,7 +97,8 @@ public class AdvertisementService : IAdvertisementService
                                                         CompanyName = a.Company.Name,
                                                         JobName = a.Job.Name,
                                                         AboutCompany = a.Company.AboutUs,
-                                                        Industry = a.Company.Industry,
+                                                        CompanyJobCategoryId = a.Company.JobCategoryId,
+                                                        CompanyJobCategoryName = a.Company.JobCategory.Name,
                                                         CreatedAt = a.CreatedAt,
                                                         AdvertisementId = a.Id,
                                                         CityId = a.CityId,
@@ -166,7 +167,8 @@ public class AdvertisementService : IAdvertisementService
             CompanyName = a.Company.Name,
             JobName = a.Job.Name,
             AboutCompany = a.Company.AboutUs,
-            Industry = a.Company.Industry,
+            CompanyJobCategoryId = a.Company.JobCategoryId,
+            CompanyJobCategoryName = a.Company.JobCategory.Name,
             CreatedAt = a.CreatedAt,
             AdvertisementId = a.Id,
             CityId = a.CityId,
@@ -210,7 +212,8 @@ public class AdvertisementService : IAdvertisementService
                 CompanyName = a.Company.Name,
                 JobName = a.Job.Name,
                 AboutCompany = a.Company.AboutUs,
-                Industry = a.Company.Industry,
+                CompanyJobCategoryId = a.Company.JobCategoryId,
+                CompanyJobCategoryName = a.Company.JobCategory.Name,
                 CreatedAt = a.CreatedAt,
                 AdvertisementId = a.Id,
                 CityId = a.CityId,
@@ -247,7 +250,8 @@ public class AdvertisementService : IAdvertisementService
                 CompanyName = a.Company.Name,
                 JobName = a.Job.Name,
                 AboutCompany = a.Company.AboutUs,
-                Industry = a.Company.Industry,
+                CompanyJobCategoryId = a.Company.JobCategoryId,
+                CompanyJobCategoryName = a.Company.JobCategory.Name,
                 CreatedAt = a.CreatedAt,
                 AdvertisementId = a.Id,
                 CityId = a.CityId,
@@ -404,6 +408,11 @@ public class AdvertisementService : IAdvertisementService
 
         if (!isCityExist)
             throw new NotFoundException($"the city with id {cityId} was not found");
+
+        var isCompanyExistInCity = await _unitOfWork.CompanyCityRepository.IsCompanyExistInCityAsync(companyId, cityId, cancellationToken);
+
+        if (!isCompanyExistInCity)
+            throw new NotFoundException($"the company with id {companyId} not found in city with id {cityId}");
     }
 
     #endregion

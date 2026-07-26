@@ -13,10 +13,6 @@ public class CompanyModelBuilderConfiguration : BaseModelBuilderConfiguration<Co
             .IsRequired()
             .HasMaxLength(120);
 
-        builder.Property(c => c.Industry)
-            .IsRequired()
-            .HasMaxLength(200);
-
         builder.Property(c => c.AboutUs)
             .IsRequired()
             .HasMaxLength(1500);

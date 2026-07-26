@@ -38,4 +38,13 @@ public class CompanyCityRepository : GenericRepository<CompanyCity>, ICompanyCit
 
         return (result, totalDataCount);
     }
+
+    public async Task<bool> IsCompanyExistInCityAsync(
+        Guid companyId,
+        Guid cityId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                          .AnyAsync(cc => cc.CompanyId == companyId && cc.CityId == cityId, cancellationToken);
+    }
 }

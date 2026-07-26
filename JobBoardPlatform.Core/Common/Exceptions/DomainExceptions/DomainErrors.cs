@@ -61,8 +61,6 @@ public static class DomainErrors
     public static Error CompanyNameIsRequired => new Error("company name is required", "Company_Name_Is_Required");
     public static Error CompanyOwnedByUserIdIsRequired => new Error("company OwnedByUserId is required", "Company_OwnedByUserId_Is_Required");
     public static Error CompanyNameInvalidLength => new Error("company name length must be between 2 and 120 characters", "Company_Name_Invalid_Length");
-    public static Error CompanyIndustryIsRequired => new Error("company industry is required", "Company_Industry_Is_Required");
-    public static Error CompanyIndustryInvalidLength => new Error("company industry length must be between 2 and 200 characters", "Company_Industry_Invalid_Length");
     public static Error CompanyYearOfEstablishmentInvalidRange => new Error("At least one year must have elapsed since the company's establishment.", "Company_YearOfEstablishment_Invalid_Range");
     public static Error CompanyAboutUsIsRequired => new Error("company about us is required", "Company_AboutUs_Is_Required");
     public static Error CompanyAboutUsInvalidLength => new Error("company about us length must be between 50 and 1_500 characters", "Company_AboutUs_Invalid_Length");

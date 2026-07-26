@@ -13,7 +13,9 @@ public class CompanyProfileResponseDto
 
     public DateTime YearOfEstablishment { get; init; }
 
-    public string Industry { get; init; } = default!;
+    public string JobCategoryName { get; init; } = string.Empty;
+
+    public Guid JobCategoryId { get; init; }
 
     public string AboutUs { get; init; } = default!;
 

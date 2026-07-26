@@ -34,10 +34,6 @@ public class RegisterEmployerRequestDto
     [DataType(DataType.Date)]
     public DateTime YearOfEstablishment { get; set; }
 
-    [Required(ErrorMessage = "The Industry is required.")]
-    [StringLength(200, MinimumLength = 2, ErrorMessage = "The Industry characters cannot be less than 2 or more than 200.")]
-    public string Industry { get; set; } = string.Empty;
-
     [Required(ErrorMessage = "The AboutUs is required.")]
     [StringLength(1500, MinimumLength = 50, ErrorMessage = "The AboutUs characters cannot be less than 50 or more than 1500.")]
     public string AboutUs { get; set; } = string.Empty;
@@ -52,8 +48,13 @@ public class RegisterEmployerRequestDto
     [Required(ErrorMessage = "The CompanySize is required.")]
     public CompanySizeEnum CompanySize { get; set; }
 
-    [Required(ErrorMessage = "The CityId is required.")]
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
     public Guid CityId { get; set; }
+
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
+    public Guid JobCategoryId { get; set; }
 
     [Required(ErrorMessage = "The Location is required.")]
     [StringLength(2000, MinimumLength = 5, ErrorMessage = "The Location characters cannot be less than 5 or more than 2000.")]
@@ -68,7 +69,6 @@ public class RegisterEmployerRequestDto
         {
             Name = Name,
             YearOfEstablishment = YearOfEstablishment,
-            Industry = Industry,
             AboutUs = AboutUs,
             WebSiteAddress = WebSiteAddress,
             OwnershipType = OwnershipType,
@@ -77,6 +77,7 @@ public class RegisterEmployerRequestDto
             CityId = CityId,
             Location = Location,
             ActivityType = ActivityType,
+            JobCategoryId = JobCategoryId
         };
     }
 }

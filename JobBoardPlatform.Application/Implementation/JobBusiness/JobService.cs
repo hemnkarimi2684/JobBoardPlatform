@@ -98,7 +98,8 @@ public class JobService : IJobService
                 CompanyId = a.CompanyId,
                 CompanyName = a.Company.Name,
                 ExperienceLevel = a.ExperienceLevel,
-                Industry = a.Company.Industry,
+                CompanyJobCategoryId = a.Company.JobCategoryId,
+                CompanyJobCategoryName = a.Company.JobCategory.Name,
                 JobId = a.JobId,
                 JobName = a.Job.Name,
                 SkillNames = a.AdvertisementSkills.Select(x => x.Skill.Name).ToList()

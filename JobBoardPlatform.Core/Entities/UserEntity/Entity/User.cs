@@ -25,6 +25,8 @@ public class User : IdentityUser<Guid>, IEntity
         IsApproved = isApproved;
         CreatedById = createdById;
 
+        IsActive = true;
+
         //Methods
         PhoneNumber.FixPhoneNumberFormat();
         Validate();
@@ -39,6 +41,8 @@ public class User : IdentityUser<Guid>, IEntity
     public bool IsDeleted { get; private set; }
 
     public bool IsApproved { get; private set; }
+
+    public bool IsActive { get; private set; }
 
     #region Foreign Keys
 

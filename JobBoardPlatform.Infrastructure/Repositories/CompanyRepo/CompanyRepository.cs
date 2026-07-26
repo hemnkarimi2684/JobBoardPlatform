@@ -50,6 +50,18 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
         return (result, totalDataCount);
     }
 
+    public async Task<TResult?> GetCompanyByIdAsync<TResult>(
+        Expression<Func<Company, TResult>> projection, 
+        Guid companyId, 
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                           .AsNoTracking()
+                           .Where(c => c.Id == companyId)
+                           .Select(projection)
+                           .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<TResult?> GetCompanyByOwnerIdAsync<TResult>(
         Expression<Func<Company, TResult>> projection,
         Guid ownerId,

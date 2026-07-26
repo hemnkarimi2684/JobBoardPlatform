@@ -14,12 +14,8 @@ using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
-using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
 
 namespace JobBoardPlatform.Application.Implementation.CompanyBusiness;
 
@@ -70,9 +66,9 @@ public class CompanyService : ICompanyService
         //because the DTOs are validated in the controller,
         //and an exception is thrown if the input value is null.
         var company = new Company(
-            createCommand.Name, createCommand.YearOfEstablishment, createCommand.Industry,
+            createCommand.Name, createCommand.YearOfEstablishment,
             createCommand.AboutUs, createCommand.WebSiteAddress, createCommand.OwnershipType,
-            createCommand.OwnedByUserId, createCommand.CompanySize, createCommand.ActivityType,
+            createCommand.OwnedByUserId, createCommand.CompanySize, createCommand.JobCategoryId, createCommand.ActivityType,
             null
             );
 
@@ -106,7 +102,8 @@ public class CompanyService : ICompanyService
             Name = c.Name,
             UserId = c.OwnedByUserId,
             YearOfEstablishment = c.YearOfEstablishment,
-            Industry = c.Industry,
+            JobCategoryId = c.JobCategoryId,
+            JobCategoryName = c.JobCategory.Name,
             AboutUs = c.AboutUs,
             WebSiteAddress = c.WebSiteAddress,
             OwnershipType = c.OwnershipType,
@@ -135,7 +132,8 @@ public class CompanyService : ICompanyService
             Name = c.Name,
             UserId = c.OwnedByUserId,
             YearOfEstablishment = c.YearOfEstablishment,
-            Industry = c.Industry,
+            JobCategoryId = c.JobCategoryId,
+            JobCategoryName = c.JobCategory.Name,
             AboutUs = c.AboutUs,
             WebSiteAddress = c.WebSiteAddress,
             OwnershipType = c.OwnershipType,
@@ -156,26 +154,28 @@ public class CompanyService : ICompanyService
         Guid companyId,
         CancellationToken cancellationToken = default)
     {
-        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken);
+        var company = await _unitOfWork.CompanyRepository.GetCompanyByIdAsync(c => new CompanyProfileResponseDto
+        {
+            Id = c.Id,
+            Name = c.Name,
+            UserId = c.OwnedByUserId,
+            YearOfEstablishment = c.YearOfEstablishment,
+            JobCategoryId = c.JobCategoryId,
+            JobCategoryName = c.JobCategory.Name,
+            AboutUs = c.AboutUs,
+            WebSiteAddress = c.WebSiteAddress,
+            OwnershipType = c.OwnershipType,
+            CompanySize = c.CompanySize,
+            ActivityType = c.ActivityType,
+            CompanyImageFileId = c.CompanyImageFileId,
+            Cities = c.CompanyCities.Select(cc => cc.CityId).ToList()
+        },
+          companyId, cancellationToken);
 
         if (company is null)
             throw new NotFoundException($"the company with this id {companyId} not found");
 
-        return new CompanyProfileResponseDto
-        {
-            Id = company.Id,
-            Name = company.Name,
-            UserId = company.OwnedByUserId,
-            YearOfEstablishment = company.YearOfEstablishment,
-            Industry = company.Industry,
-            AboutUs = company.AboutUs,
-            WebSiteAddress = company.WebSiteAddress,
-            OwnershipType = company.OwnershipType,
-            CompanySize = company.CompanySize,
-            ActivityType = company.ActivityType,
-            CompanyImageFileId = company.CompanyImageFileId,
-            Cities = company.CompanyCities.Select(cc => cc.CityId).ToList()
-        };
+        return company;
     }
 
     #endregion
@@ -304,7 +304,7 @@ public class CompanyService : ICompanyService
         (
             updateCompanyInfoCommand.Name,
             updateCompanyInfoCommand.YearOfEstablishment,
-            updateCompanyInfoCommand.Industry,
+            updateCompanyInfoCommand.JobCategoryId,
             updateCompanyInfoCommand.AboutUs,
             updateCompanyInfoCommand.WebSiteAddress,
             updateCompanyInfoCommand.OwnershipType,

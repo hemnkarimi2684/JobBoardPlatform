@@ -6,6 +6,7 @@ using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
 using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
@@ -18,16 +19,16 @@ public class Company : BaseEntity
 {
     private Company() { }
 
-    public Company(string name, DateTime yearOfEstablishment, string industry, string aboutUs, string webSiteAddress, OwnershipType ownershipType, Guid ownedByUserId, CompanySizeEnum companySize, string? activityType = null, Guid? companyImageFileId = null, Guid? createdById = null)
+    public Company(string name, DateTime yearOfEstablishment, string aboutUs, string webSiteAddress, OwnershipType ownershipType, Guid ownedByUserId, CompanySizeEnum companySize, Guid jobCategoryId, string? activityType = null, Guid? companyImageFileId = null, Guid? createdById = null)
     {
         Name = name;
         YearOfEstablishment = yearOfEstablishment;
-        Industry = industry;
         AboutUs = aboutUs;
         WebSiteAddress = webSiteAddress;
         OwnershipType = ownershipType;
         OwnedByUserId = ownedByUserId;
         CompanySize = companySize;
+        JobCategoryId = jobCategoryId;
         ActivityType = activityType;
         CompanyImageFileId = companyImageFileId;
         CreatedById = createdById;
@@ -44,11 +45,6 @@ public class Company : BaseEntity
     /// سال تاسیس شرکت 
     /// </summary>
     public DateTime YearOfEstablishment { get; private set; }
-
-    /// <summary>
-    /// نوع صنعت شرکت 
-    /// </summary>
-    public string Industry { get; private set; }
 
     /// <summary>
     /// درباره شرکت
@@ -87,6 +83,11 @@ public class Company : BaseEntity
     /// </summary>
     public Guid? CompanyImageFileId { get; private set; }
 
+    /// <summary>
+    ///  زمینه فعالیت شرکت
+    /// </summary>
+    public Guid JobCategoryId { get; private set; }
+
     #endregion
 
     #region Navigation properties
@@ -111,6 +112,11 @@ public class Company : BaseEntity
     /// </summary>
     public virtual Attachment? CompanyImageFile { get; private set; }
 
+    /// <summary>
+    /// جزئیات مربوط به زمینه فعالیت شرکت
+    /// </summary>
+    public virtual JobCategory JobCategory { get; private set; }
+
     #endregion
 
     protected override void Validate()
@@ -123,12 +129,6 @@ public class Company : BaseEntity
 
         if (YearOfEstablishment > DateTime.UtcNow)
             throw new DomainException(DomainErrors.CompanyYearOfEstablishmentInvalidRange);
-
-        if (string.IsNullOrWhiteSpace(Industry))
-            throw new DomainException(DomainErrors.CompanyIndustryIsRequired);
-
-        if (Industry.Length < 2 || Industry.Length > 200)
-            throw new DomainException(DomainErrors.CompanyIndustryInvalidLength);
 
         if (string.IsNullOrWhiteSpace(AboutUs))
             throw new DomainException(DomainErrors.CompanyAboutUsIsRequired);
@@ -157,8 +157,8 @@ public class Company : BaseEntity
         if (companyInfoUpdate.YearOfEstablishment is not null)
             YearOfEstablishment = companyInfoUpdate.YearOfEstablishment.Value;
 
-        if (companyInfoUpdate.Industry is not null)
-            Industry = companyInfoUpdate.Industry;
+        if (companyInfoUpdate.JobCategoryId is not null)
+            JobCategoryId = companyInfoUpdate.JobCategoryId.Value;
 
         if (companyInfoUpdate.AboutUs is not null)
             AboutUs = companyInfoUpdate.AboutUs;

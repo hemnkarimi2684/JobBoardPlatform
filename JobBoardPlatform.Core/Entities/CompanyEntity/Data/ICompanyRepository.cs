@@ -91,4 +91,17 @@ public interface ICompanyRepository : IGenericRepository<Company>
         int pageNumber = 1,
         int pageSize = 10
         );
+
+    /// <summary>
+    /// دریافت شرکت توسط شناسه اش 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="companyId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<TResult?> GetCompanyByIdAsync<TResult>(
+        Expression<Func<Company, TResult>> projection,
+        Guid companyId, 
+        CancellationToken cancellationToken);
 }

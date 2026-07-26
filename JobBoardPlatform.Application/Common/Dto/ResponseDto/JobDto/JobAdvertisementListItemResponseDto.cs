@@ -38,7 +38,9 @@ public class JobAdvertisementListItemResponseDto
 
     public string AboutCompany { get; set; } = string.Empty;
 
-    public string Industry { get; set; } = string.Empty;
+    public Guid CompanyJobCategoryId { get; set; }
+
+    public string CompanyJobCategoryName { get; set; } = string.Empty;
 
     public List<string> SkillNames { get; set; } = new();
 }
