@@ -215,7 +215,7 @@ public class JobApplicationService : IJobApplicationService
 
     private async Task ValidationForCreateMethod(Guid resumeId, Guid advertisementId, Guid userId, CancellationToken cancellationToken)
     {
-        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+        _accessControlService.EnsureApplicant(userId, _currentUser);
 
         var isResumeExist = await _unitOfWork.ResumeRepository.IsResumeExistAsync(resumeId, cancellationToken);
 

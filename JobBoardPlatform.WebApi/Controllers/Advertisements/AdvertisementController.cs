@@ -136,5 +136,4 @@ public class AdvertisementController : ControllerBase
 
         return Ok(result);
     }
-
 }

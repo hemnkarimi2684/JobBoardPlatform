@@ -5,6 +5,8 @@ namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 
 public class CompanyProfileResponseDto
 {
+    public Guid Id { get; init; }
+
     public string Name { get; init; } = default!;
 
     public Guid UserId { get; init; }
@@ -26,5 +28,7 @@ public class CompanyProfileResponseDto
     public string? ActivityType { get; init; }
 
     public Guid? CompanyImageFileId { get; init; }
+
+    public List<Guid> Cities { get; init; } = new();
 }
 

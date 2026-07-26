@@ -47,6 +47,18 @@ public class CityRepository : GenericRepository<City>, ICityRepository
         return (result, totalDataCount);
     }
 
+    public async Task<TResult?> GetCityByIdAsync<TResult>(
+        Expression<Func<City, TResult>> projection,
+        Guid cityId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                          .AsNoTracking()
+                          .Where(c => c.Id == cityId)
+                          .Select(projection)
+                          .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<(List<TResult>, int)> GetProvinceCitiesAsync<TResult>(
         Expression<Func<City, TResult>> projection,
         Guid provinceId,

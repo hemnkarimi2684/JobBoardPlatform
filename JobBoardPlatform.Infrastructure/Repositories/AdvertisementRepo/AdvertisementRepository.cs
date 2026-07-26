@@ -64,7 +64,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         return await Entities
                         .AsNoTracking()
                         .Include(a => a.Company.OwnedByUser)
-                        .Where(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null)
+                        .Where(a => a.Id == advertisementId)
                         .Select(a => a.Company.OwnedByUserId)
                         .FirstOrDefaultAsync(cancellationToken);
     }
@@ -120,7 +120,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         bool isActive,
         CancellationToken cancellationToken)
     {
-        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive, cancellationToken);
+        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId, cancellationToken);
 
         if (advertisement is null)
             return false;
@@ -142,7 +142,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
         var query = Entities
                         .AsNoTracking()
-                        .AsQueryable();
+                        .Where(a => a.IsActive);
 
         if (filter.JobCategoryId.HasValue)
         {
@@ -193,15 +193,14 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
         var query = Entities
                         .AsNoTracking()
-                        .AsQueryable();
+                        .Where(a => a.IsActive);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var term = searchTerm.Trim();
 
-            query = Entities
-                        .AsNoTracking()
-                        .Where(a => EF.Functions.Like(a.Job.Name, $"%{term}%") ||
+            query = query
+                       .Where(a => EF.Functions.Like(a.Job.Name, $"%{term}%") ||
                                     EF.Functions.Like(a.City.Name, $"%{term}%"));
         }
 
