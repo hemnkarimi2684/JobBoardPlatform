@@ -102,6 +102,7 @@ public class CompanyService : ICompanyService
 
         var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyProfileResponseDto
         {
+            Id = c.Id,
             Name = c.Name,
             UserId = c.OwnedByUserId,
             YearOfEstablishment = c.YearOfEstablishment,
@@ -111,7 +112,8 @@ public class CompanyService : ICompanyService
             OwnershipType = c.OwnershipType,
             CompanySize = c.CompanySize,
             ActivityType = c.ActivityType,
-            CompanyImageFileId = c.CompanyImageFileId
+            CompanyImageFileId = c.CompanyImageFileId,
+            Cities = c.CompanyCities.Select(cc => cc.CityId).ToList()
         },
           ownerId,
           cancellationToken);
@@ -129,6 +131,7 @@ public class CompanyService : ICompanyService
     {
         var (result, totalDataCount) = await _unitOfWork.CompanyRepository.GetAllCompaniesAsync(c => new CompanyProfileResponseDto
         {
+            Id = c.Id,
             Name = c.Name,
             UserId = c.OwnedByUserId,
             YearOfEstablishment = c.YearOfEstablishment,
@@ -138,7 +141,8 @@ public class CompanyService : ICompanyService
             OwnershipType = c.OwnershipType,
             CompanySize = c.CompanySize,
             ActivityType = c.ActivityType,
-            CompanyImageFileId = c.CompanyImageFileId
+            CompanyImageFileId = c.CompanyImageFileId,
+            Cities = c.CompanyCities.Select(cc => cc.CityId).ToList()
         },
         textRequestDto.Text,
         cancellationToken,
@@ -159,6 +163,7 @@ public class CompanyService : ICompanyService
 
         return new CompanyProfileResponseDto
         {
+            Id = company.Id,
             Name = company.Name,
             UserId = company.OwnedByUserId,
             YearOfEstablishment = company.YearOfEstablishment,
@@ -168,7 +173,8 @@ public class CompanyService : ICompanyService
             OwnershipType = company.OwnershipType,
             CompanySize = company.CompanySize,
             ActivityType = company.ActivityType,
-            CompanyImageFileId = company.CompanyImageFileId
+            CompanyImageFileId = company.CompanyImageFileId,
+            Cities = company.CompanyCities.Select(cc => cc.CityId).ToList()
         };
     }
 

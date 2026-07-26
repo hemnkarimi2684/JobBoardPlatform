@@ -22,4 +22,16 @@ public interface IUserSkillRepository : IGenericRepository<UserSkill>
                                               CancellationToken cancellationToken,
                                               int pageNumber = 1,
                                               int pageSize = 10);
+
+    /// <summary>
+    /// ایا مهارت مورد نظر برای این کاربر قبلا ثبت شده یا نه 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="skillId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<bool> IsDuplicateSkillForUserAsync(
+        Guid userId,
+        Guid skillId,
+        CancellationToken cancellationToken);
 }

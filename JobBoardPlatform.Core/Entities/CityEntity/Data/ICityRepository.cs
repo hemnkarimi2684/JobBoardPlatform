@@ -61,4 +61,17 @@ public interface ICityRepository : IGenericRepository<City>
         int pageNumber = 1,
         int pageSize = 10
         );
+
+    /// <summary>
+    /// دریافت شهر توسط شناسه اش 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="cityId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<TResult?> GetCityByIdAsync<TResult>(
+        Expression<Func<City,TResult>> projection,
+        Guid cityId,
+        CancellationToken cancellationToken);
 }

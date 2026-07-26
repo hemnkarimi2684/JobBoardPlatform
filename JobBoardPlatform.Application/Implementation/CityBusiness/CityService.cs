@@ -137,20 +137,21 @@ public class CityService : ICityService
         Guid cityId,
         CancellationToken cancellationToken = default)
     {
-        var city = await _unitOfWork.CityRepository.GetByIdAsync(cityId, cancellationToken);
+        var city = await _unitOfWork.CityRepository.GetCityByIdAsync(c => new CityDetailResponseDto
+        {
+            CityId = c.Id,
+            CityName = c.Name,
+            CityCode = c.CityCode,
+            ProvinceName = c.Province.Name,
+            ProvinceId = c.ProvinceId,
+            ProvinceCode = c.ProvinceCode
+        },
+        cityId, cancellationToken);
 
         if (city == null)
             throw new NotFoundException($"teh city with id {cityId} was not found.");
 
-        return new CityDetailResponseDto
-        {
-            CityId = city.Id,
-            CityName = city.Name,
-            CityCode = city.CityCode,
-            ProvinceName = city.Province.Name,
-            ProvinceId = city.ProvinceId,
-            ProvinceCode = city.ProvinceCode
-        };
+        return city;
     }
 
     #endregion

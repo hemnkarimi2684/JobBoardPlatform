@@ -38,4 +38,12 @@ public class UserSkillRepository : GenericRepository<UserSkill>, IUserSkillRepos
 
         return (result, totalDataCount);
     }
+
+    public async Task<bool> IsDuplicateSkillForUserAsync(
+        Guid userId,
+        Guid skillId,
+        CancellationToken cancellationToken)
+    {
+        return await AnyAsync(us => us.UserId == userId && us.SkillId == skillId, cancellationToken);
+    }
 }

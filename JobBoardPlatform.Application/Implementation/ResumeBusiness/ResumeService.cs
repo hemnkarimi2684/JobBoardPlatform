@@ -51,7 +51,7 @@ public class ResumeService : IResumeService
 
         var isUserHasProfile = await _unitOfWork.UserProfileRepository.IsUserHasProfileAsync(resumeCommand.UserId, cancellationToken);
 
-        if (isUserHasProfile)
+        if (!isUserHasProfile)
             throw new NotFoundException($"The user with id '{resumeCommand.UserId}' does not have a complete profile.");
 
         _accessControlService.EnsureApplicant(resumeCommand.UserId, _currentUser);

@@ -46,6 +46,11 @@ public class SkillService : ISkillService
         {
             foreach (var skillId in skillsId.Distinct())
             {
+                var isDuplicateSkillForUser = await _unitOfWork.UserSkillRepository.IsDuplicateSkillForUserAsync(userId, skillId,cancellationToken);
+
+                if (isDuplicateSkillForUser)
+                    throw new ConflictException($"the user with id {userId} already has skill with id {skillId}");
+
                 var userSkill = new UserSkill(userId, skillId, _currentUser.UserId);
 
                 await _unitOfWork.UserSkillRepository.AddAsync(userSkill, cancellationToken);

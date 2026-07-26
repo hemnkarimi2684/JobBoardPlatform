@@ -52,6 +52,10 @@ public class GlobalExceptionHandlingMiddleware : IMiddleware
                 context.Response.StatusCode = 499;
                 await context.Response.WriteAsync(GenerateResponseBody("The request was canceled.", "request_canceled"));
                 break;
+            case FormatException formatEx when formatEx.Message.Contains("Base-64", StringComparison.OrdinalIgnoreCase):
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await context.Response.WriteAsync(GenerateResponseBody("Invalid username or password.", "Invalid_Credentials"));
+                break;
             default:
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 await context.Response.WriteAsync(GenerateResponseBody
