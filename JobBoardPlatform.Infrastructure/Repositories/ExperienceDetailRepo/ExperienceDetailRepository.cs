@@ -15,36 +15,49 @@ public class ExperienceDetailRepository : GenericRepository<ExperienceDetail>, I
     {
     }
 
-    public async Task<Guid?> GetExperienceDetailUserIdAsync(Guid experienceDetailId)
+    public async Task<Guid?> GetExperienceDetailUserIdAsync(
+        Guid experienceDetailId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                            .AsNoTracking()
                            .Where(ed => ed.Id == experienceDetailId)
                            .Select(ed => ed.UserId)
-                           .FirstOrDefaultAsync();
+                           .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetUserExperienceDetailsAsync<TResult>(Expression<Func<ExperienceDetail, TResult>> projection, Guid userId, int pageNumber = 1, int pageSize = 10)
+    public async Task<(List<TResult>, int)> GetUserExperienceDetailsAsync<TResult>(
+        Expression<Func<ExperienceDetail, TResult>> projection,
+        Guid userId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1, 
+        int pageSize = 10)
     {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
         var query = Entities
                          .AsNoTracking()
                          .Where(ed => ed.UserId == userId);
 
-        var totalDataCount = await query.CountAsync();
+        var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
                              .OrderByDescending(b => b.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
-                             .ToListAsync();
+                             .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
     }
 
-    public async Task<bool> UpdateExperienceDetailAsync(Guid experienceDetailId, UpdateExperienceDetail updateExperienceDetail)
+    public async Task<bool> UpdateExperienceDetailAsync(
+        Guid experienceDetailId,
+        CancellationToken cancellationToken,
+        UpdateExperienceDetail updateExperienceDetail)
     {
-        var experienceDetail = await Entities.FirstOrDefaultAsync(ed => ed.Id == experienceDetailId);
+        var experienceDetail = await Entities.FirstOrDefaultAsync(ed => ed.Id == experienceDetailId, cancellationToken);
 
         if (experienceDetail is null)
             return false;

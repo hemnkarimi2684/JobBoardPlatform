@@ -9,9 +9,11 @@ using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Data;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
+using JobBoardPlatform.Core.Entities.JobCategoryEntity.Data;
 using JobBoardPlatform.Core.Entities.JobEntity.Data;
 using JobBoardPlatform.Core.Entities.PaymentEntity.Data;
 using JobBoardPlatform.Core.Entities.ProvinceEntity.Data;
+using JobBoardPlatform.Core.Entities.RefreshTokenEntity.Data;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Data;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.SkillEntity.Data;
@@ -29,9 +31,11 @@ using JobBoardPlatform.Infrastructure.Repositories.CompanyRepo;
 using JobBoardPlatform.Infrastructure.Repositories.EducationDetailRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ExperienceDetailRepo;
 using JobBoardPlatform.Infrastructure.Repositories.JobApplicationRepo;
+using JobBoardPlatform.Infrastructure.Repositories.JobCategoryRepo;
 using JobBoardPlatform.Infrastructure.Repositories.JobRepo;
 using JobBoardPlatform.Infrastructure.Repositories.PaymentRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ProvinceRepo;
+using JobBoardPlatform.Infrastructure.Repositories.RefreshTokenRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ResumeRepo;
 using JobBoardPlatform.Infrastructure.Repositories.SkillRepo;
 using JobBoardPlatform.Infrastructure.Repositories.UserProfileRepo;
@@ -67,6 +71,8 @@ public class UnitOfWork : IUnitOfWork
         UserRepository = new UserRepository(_context);
         UserProfileRepository = new UserProfileRepository(_context);
         UserSkillRepository = new UserSkillRepository(_context);
+        JobCategoryRepository = new JobCategoryRepository(_context);
+        RefreshTokenRepository = new RefreshTokenRepository(_context);
     }
 
     private IDbContextTransaction? _transaction;
@@ -105,38 +111,42 @@ public class UnitOfWork : IUnitOfWork
 
     public IUserSkillRepository UserSkillRepository { get; }
 
-    public async Task BeginTransactionAsync()
+    public IJobCategoryRepository JobCategoryRepository { get; }
+
+    public IRefreshTokenRepository RefreshTokenRepository { get; }
+
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {
         if (_transaction != null)
             return;
 
-        _transaction = await _context.Database.BeginTransactionAsync();
+        _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
     }
 
-    public async Task CommitTransactionAsync()
+    public async Task CommitTransactionAsync(CancellationToken cancellationToken)
     {
         if (_transaction is null)
             throw new DomainException("No active transaction.", "Transaction_NoActive");
 
-        await _transaction.CommitAsync();
+        await _transaction.CommitAsync(cancellationToken);
         await _transaction.DisposeAsync();
 
         _transaction = null;
     }
 
-    public async Task RollBackTransactionAsync()
+    public async Task RollBackTransactionAsync(CancellationToken cancellationToken)
     {
         if (_transaction is null)
             return;
 
-        await _transaction.RollbackAsync();
+        await _transaction.RollbackAsync(cancellationToken);
         await _transaction.DisposeAsync();
 
         _transaction = null;
     }
 
-    public async Task<int> SaveChangesAsync()
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
     {
-        return await _context.SaveChangesAsync();
+        return await _context.SaveChangesAsync(cancellationToken);
     }
 }

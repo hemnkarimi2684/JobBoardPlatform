@@ -14,40 +14,47 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
     {
     }
 
-    public async Task<Guid?> GetEducationDetailUserIdAsync(Guid educationDetailId)
+    public async Task<Guid?> GetEducationDetailUserIdAsync(Guid educationDetailId, CancellationToken cancellationToken)
     {
         return await Entities
                            .AsNoTracking()
                            .Where(ed => ed.Id == educationDetailId)
                            .Select(ed => ed.UserId)
-                           .FirstOrDefaultAsync();
+                           .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<(List<TResult>, int)> GetUserEducationDetailsAsync<TResult>(
         Expression<Func<EducationDetail, TResult>> projection,
         Guid userId,
+        CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10)
     {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
         var query = Entities
                          .AsNoTracking()
                          .Where(ed => ed.UserId == userId);
 
-        var totalDataCount = await query.CountAsync();
+        var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
                              .OrderByDescending(b => b.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
-                             .ToListAsync();
+                             .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
     }
 
-    public async Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetail updateEducation)
+    public async Task<bool> UpdateEducationDetailAsync(
+        Guid educationDetailId,
+        CancellationToken cancellationToken,
+        UpdateEducationDetail updateEducation)
     {
-        var educationDetail = await Entities.FirstOrDefaultAsync(ed => ed.Id == educationDetailId);
+        var educationDetail = await Entities.FirstOrDefaultAsync(ed => ed.Id == educationDetailId, cancellationToken);
 
         if (educationDetail is null)
             return false;
@@ -57,6 +64,8 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
         return true;
     }
 
-    public Task<bool> UserHasEducationDetailAsync(Guid userId) => AnyAsync(ed => ed.UserId == userId);
+    public Task<bool> UserHasEducationDetailAsync(
+        Guid userId,
+        CancellationToken cancellationToken) => AnyAsync(ed => ed.UserId == userId, cancellationToken);
 
 }

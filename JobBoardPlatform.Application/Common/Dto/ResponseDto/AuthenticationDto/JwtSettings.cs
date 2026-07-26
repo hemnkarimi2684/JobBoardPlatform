@@ -10,5 +10,7 @@ public class JwtSettings
 
     public string EncryptKey { get; set; } = string.Empty;
 
-    public int TokenLifeTime { get; set; }
+    public int AccessTokenLifeTime { get; set; }
+
+    public int RefreshTokenLifeTime { get; set; }
 }

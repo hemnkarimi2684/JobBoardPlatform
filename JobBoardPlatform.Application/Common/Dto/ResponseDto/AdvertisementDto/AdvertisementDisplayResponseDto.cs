@@ -1,11 +1,18 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
+using System.Text.Json.Serialization;
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
 
-public record AdvertisementDisplayResponseDto(
-    string JobTitle,
-    string CompanyName,
-    string CityName,
-    CollaborationType CollaborationType,
-    int ExperienceLevel
-);
+public class AdvertisementDisplayResponseDto
+{
+    public string JobTitle { get; init; } = string.Empty;
+
+    public string CompanyName { get; init; } = string.Empty;
+
+    public string CityName { get; init; } = string.Empty;
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public CollaborationType CollaborationType { get; init; }
+
+    public int ExperienceLevel { get; init; }
+}

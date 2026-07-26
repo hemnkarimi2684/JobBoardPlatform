@@ -4,6 +4,7 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ExperienceDetailDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -11,6 +12,7 @@ using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Application.Implementation.ExperienceDetailBusiness;
 
@@ -20,26 +22,31 @@ public class ExperienceDetailService : IExperienceDetailService
 
     private readonly ICurrentUser _currentUser;
 
-    public ExperienceDetailService(IUnitOfWork unitOfWork, ICurrentUser currentUser)
+    private readonly IAccessControlService _accessControlService;
+
+    public ExperienceDetailService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
+        _accessControlService = accessControlService;
     }
 
-    public async Task<bool> CreateExperienceDetailAsync(CreateExperienceDetailRequestDto createCommand)
+    #region Create Methods
+
+    public async Task<bool> CreateExperienceDetailAsync(
+        CreateExperienceDetailRequestDto createCommand,
+        CancellationToken cancellationToken = default)
     {
-        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId);
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId, cancellationToken);
 
         if (!isUserExist)
             throw new NotFoundException($"The user with id {createCommand.UserId} was not found.");
 
-        CheckSelfOrAdminPermission(createCommand.UserId, _currentUser);
-
-        var seniorityLevel = ParseSeniorityLevelForCreate(createCommand.SeniorityLevel);
+        _accessControlService.EnsureApplicantOrAdmin(createCommand.UserId, _currentUser);
 
         var experienceDetail = new ExperienceDetail(
                                                     createCommand.LastJobTitle,
-                                                    seniorityLevel,
+                                                    createCommand.SeniorityLevel,
                                                     createCommand.JobCategory,
                                                     createCommand.City,
                                                     createCommand.StartDate,
@@ -48,32 +55,42 @@ public class ExperienceDetailService : IExperienceDetailService
                                                     createCommand.UserId,
                                                     _currentUser.UserId);
 
-        await _unitOfWork.ExperienceDetailRepository.AddAsync(experienceDetail);
+        await _unitOfWork.ExperienceDetailRepository.AddAsync(experienceDetail, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<Pagination<UserExperienceDetailResponseDto>> GetUserExperienceDetailsAsync(Guid userId, PagingRequestDto pagingCommand)
+    #endregion
+
+    #region Get Methods
+
+    public async Task<Pagination<ExperienceHistoryResponseDto>> GetUserExperienceDetailsAsync(
+        Guid userId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         var (experienceDetails, totalDataCount) = await _unitOfWork
                                                                  .ExperienceDetailRepository
-                                                                 .GetUserExperienceDetailsAsync(ed => new UserExperienceDetailResponseDto
-                                                                 (
-                                                                     ed.LastJobTitle,
-                                                                     ed.SeniorityLevel,
-                                                                     ed.JobCategory,
-                                                                     ed.City,
-                                                                     ed.StartDate,
-                                                                     ed.EndDate,
-                                                                     ed.IsCurrentJob
-                                                                 ),
+                                                                 .GetUserExperienceDetailsAsync(ed => new ExperienceHistoryResponseDto
+                                                                 {
+                                                                     ExperienceDetailId = ed.Id,
+                                                                     LastJobTitle = ed.LastJobTitle,
+                                                                     UserId = ed.UserId,
+                                                                     SeniorityLevel = ed.SeniorityLevel,
+                                                                     JobCategory = ed.JobCategory,
+                                                                     City = ed.City,
+                                                                     StartDate = ed.StartDate,
+                                                                     EndDate = ed.EndDate,
+                                                                     IsCurrentJob = ed.IsCurrentJob
+                                                                 },
                                                                   userId,
+                                                                  cancellationToken,
                                                                   pagingCommand.PageNumber,
                                                                   pagingCommand.PageSize);
 
-        return Pagination<UserExperienceDetailResponseDto>
+        return Pagination<ExperienceHistoryResponseDto>
                                             .GetPagination(
                                                             experienceDetails,
                                                             pagingCommand.PageNumber,
@@ -81,75 +98,75 @@ public class ExperienceDetailService : IExperienceDetailService
                                                             totalDataCount);
     }
 
-    public async Task<bool> UpdateExperienceDetailAsync(Guid experienceDetailId, UpdateExperienceDetailRequestDto updateCommand)
+
+    public async Task<ExperienceHistoryResponseDto> GetExperienceDetailByIdAsync(Guid experienceDetailId, CancellationToken cancellationToken = default)
     {
-        var userId = await _unitOfWork.ExperienceDetailRepository.GetExperienceDetailUserIdAsync(experienceDetailId);
+        var experienceDetail = await _unitOfWork.ExperienceDetailRepository.GetByIdAsync(experienceDetailId, cancellationToken);
+
+        if (experienceDetail == null)
+            throw new NotFoundException($"The experience detail with id {experienceDetailId} was not found.");
+
+        _accessControlService.EnsureApplicantOrAdmin(experienceDetail.UserId, _currentUser);
+
+        return new ExperienceHistoryResponseDto
+        {
+            ExperienceDetailId = experienceDetail.Id,
+            LastJobTitle = experienceDetail.LastJobTitle,
+            UserId = experienceDetail.UserId,
+            SeniorityLevel = experienceDetail.SeniorityLevel,
+            JobCategory = experienceDetail.JobCategory,
+            City = experienceDetail.City,
+            StartDate = experienceDetail.StartDate,
+            EndDate = experienceDetail.EndDate,
+            IsCurrentJob = experienceDetail.IsCurrentJob
+        };
+    }
+
+
+    #endregion
+
+    #region Update Methods
+
+    public async Task<bool> UpdateExperienceDetailAsync(
+        Guid experienceDetailId,
+        UpdateExperienceDetailRequestDto updateCommand,
+        CancellationToken cancellationToken = default)
+    {
+        var userId = await _unitOfWork.ExperienceDetailRepository.GetExperienceDetailUserIdAsync(experienceDetailId, cancellationToken);
 
         if (userId == null)
             throw new NotFoundException($"The experience detail with id {experienceDetailId} was not found.");
 
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId.Value, _currentUser);
 
         var result = await _unitOfWork.ExperienceDetailRepository.UpdateExperienceDetailAsync(
                                                                                               experienceDetailId,
+                                                                                              cancellationToken,
                                                                                               MapToUpdateExperienceDetail(updateCommand));
 
         if (!result)
             throw new NotFoundException($"the experienceDetail with id {experienceDetailId} was not found");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
+
+    #endregion
 
     #region Private Methods
 
-    private SeniorityLevel ParseSeniorityLevelForCreate(string seniorityLevel)
-    {
-        if (string.IsNullOrWhiteSpace(seniorityLevel))
-            throw new ValidationException("seniorityLevel is required.");
-
-        if (!Enum.TryParse<SeniorityLevel>(seniorityLevel, true, out var result))
-            throw new ValidationException("Invalid seniorityLevel type.");
-
-        return result;
-    }
-
-    private SeniorityLevel? ParseSeniorityLevelForUpdate(string? seniorityLevel)
-    {
-        if (string.IsNullOrWhiteSpace(seniorityLevel))
-            return null;
-
-        if (!Enum.TryParse<SeniorityLevel>(seniorityLevel, true, out var result))
-            throw new ValidationException("Invalid seniorityLevel type.");
-
-        return result;
-    }
-
     private UpdateExperienceDetail MapToUpdateExperienceDetail(UpdateExperienceDetailRequestDto updateCommand)
     {
-        var seniorityLevel = ParseSeniorityLevelForUpdate(updateCommand.SeniorityLevel);
-
         return new UpdateExperienceDetail
-        (
-           updateCommand.LastJobTitle,
-           seniorityLevel,
-           updateCommand.JobCategory,
-           updateCommand.City,
-           updateCommand.StartDate,
-           updateCommand.EndDate,
-           updateCommand.IsCurrentJob,
-           _currentUser.UserId
-        );
-    }
-
-    private void CheckSelfOrAdminPermission(Guid? targetUserId, ICurrentUser currentUser)
-    {
-        var isSelfUser = targetUserId == currentUser.UserId;
-
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        //اینجا چک میشه که کاربر فقط بتونه خودش اطلاعات تجربه کاریش رو اپدیت کنه نه کس دیگه ای به جز ادمین                                                               
-        if (!isAdmin && !isSelfUser)
-            throw new ForbiddenException("You do not have sufficient access to manage this ExperienceDetail.");
+        {
+            LastJobTitle = updateCommand.LastJobTitle,
+            SeniorityLevel = updateCommand.SeniorityLevel,
+            JobCategory = updateCommand.JobCategory,
+            City = updateCommand.City,
+            StartDate = updateCommand.StartDate,
+            EndDate = updateCommand.EndDate,
+            IsCurrentJob = updateCommand.IsCurrentJob,
+            ModifiedById = _currentUser.UserId
+        };
     }
 
     #endregion

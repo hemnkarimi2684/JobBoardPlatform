@@ -23,14 +23,17 @@ public class AttachmentService : IAttachmentService
         _currentUser = currentUser;
     }
 
-    public async Task<AttachmentResponseDto> DownloadAsync(Guid attachmentId)
+    public async Task<AttachmentResponseDto> DownloadAsync(
+        Guid attachmentId,
+        CancellationToken cancellationToken = default)
     {
         var attachment = await _unitOfWork.AttachmentRepository.GetAttachmentByIdAsync(a => new AttachmentResponseDto
         {
+            AttachmentId = a.Id,
             FileName = a.FileName,
             ContentType = a.ContentType,
             Data = a.Data
-        }, attachmentId);
+        }, attachmentId, cancellationToken);
 
         if (attachment == null)
             throw new NotFoundException($"the attachment with id {attachmentId} was not found");
@@ -38,18 +41,23 @@ public class AttachmentService : IAttachmentService
         return attachment;
     }
 
-    public async Task<bool> HardDeleteAttachmentAsync(Guid attachmentId)
+    public async Task<bool> HardDeleteAttachmentAsync(
+        Guid attachmentId,
+        CancellationToken cancellationToken = default)
     {
 
-        var result = await _unitOfWork.AttachmentRepository.HardDeleteAttachmentAsync(attachmentId);
+        var result = await _unitOfWork.AttachmentRepository.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
 
         if (!result)
             throw new NotFoundException($"the attachment with id {attachmentId} was not found");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<Guid> UploadAsync(IFormFile formFile, AttachmentType attachmentType)
+    public async Task<Guid> UploadAsync(
+        IFormFile formFile,
+        AttachmentType attachmentType,
+        CancellationToken cancellationToken = default)
     {
         if (formFile == null)
             throw new ValidationException("file is required");
@@ -60,9 +68,9 @@ public class AttachmentService : IAttachmentService
 
         var attachment = new Attachment(formFile.FileName, attachmentType, formFile.ContentType, stream.ToArray(), _currentUser.UserId);
 
-        await _unitOfWork.AttachmentRepository.AddAsync(attachment);
+        await _unitOfWork.AttachmentRepository.AddAsync(attachment, cancellationToken);
 
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return attachment.Id;
     }

@@ -6,6 +6,7 @@ using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
+using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using Microsoft.AspNetCore.Identity;
@@ -16,30 +17,34 @@ public class AuthenticationService : IAuthenticationService
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    private readonly ICurrentUser _currentUser;
-
     private readonly ICompanyService _companyService;
 
     private readonly IJwtService _jwtService;
+
+    private readonly IRefreshTokenService _refreshTokenService;
 
     private readonly UserManager<User> _userManager;
 
     private readonly SignInManager<User> _signInManager;
 
-    public AuthenticationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, ICompanyService companyService, IJwtService jwtService, UserManager<User> userManager, SignInManager<User> signInManager)
+    public AuthenticationService(IUnitOfWork unitOfWork, ICompanyService companyService, IJwtService jwtService, IRefreshTokenService refreshTokenService, UserManager<User> userManager, SignInManager<User> signInManager)
     {
         _unitOfWork = unitOfWork;
-        _currentUser = currentUser;
         _companyService = companyService;
         _jwtService = jwtService;
+        _refreshTokenService = refreshTokenService;
         _userManager = userManager;
         _signInManager = signInManager;
     }
 
-    public async Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(LoginRequestDto loginCommand)
+    #region Login methods
+
+    public async Task<TokenLoginResponseDto> LoginByEmailOrPhoneNumberAndPassword(
+        LoginRequestDto loginCommand,
+        CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByEmailAsync(loginCommand.EmailOrPhoneNumber) ??
-                   await _unitOfWork.UserRepository.FindByPhoneNumberAsync(loginCommand.EmailOrPhoneNumber);
+                   await _unitOfWork.UserRepository.FindByPhoneNumberAsync(loginCommand.EmailOrPhoneNumber, cancellationToken);
 
         if (user == null)
             throw new ValidationException("Email/phone number or password is incorrect.");
@@ -61,9 +66,59 @@ public class AuthenticationService : IAuthenticationService
         return await _jwtService.GenerateTokenAsync(user);
     }
 
-    public async Task<EmployerRegisterResponseDto> RegisterEmployerAsync(RegisterEmployerRequestDto registerCommand)
+    public async Task LogoutAsync(
+        LogoutRequestDto logoutRequest, 
+        CancellationToken cancellationToken = default)
     {
-        var isDupplicateEmailOrPhoneNumber = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(registerCommand.Email, registerCommand.PhoneNumber);
+        var result = await _refreshTokenService.RevokeAsync(logoutRequest.RefreshToken, cancellationToken);
+
+        if (!result)
+            throw new ValidationException("Invalid refresh token or session has already been closed.");
+    }
+
+    public async Task<TokenLoginResponseDto> RefreshAsync(
+        RefreshRequestDto refreshRequest, 
+        CancellationToken cancellationToken = default)
+    {
+        //دریافت توکن از دیتابیس 
+        var refreshToken = await _refreshTokenService.GetRefreshTokenByTokenAsync(refreshRequest.RefreshToken, cancellationToken, true);
+
+        // بررسی فعال بودن توکن
+        if (!refreshToken.IsActive)
+        {
+            // تشخیص اینکه ایای استافده مجدد داره میشه و همینوطر برای تشخیص اتک 
+            if (refreshToken.IsRevoked && refreshToken.RevokedAt is not null)
+                await _refreshTokenService.RevokeAllActiveTokensAsync(refreshToken.UserId, cancellationToken);
+
+            throw new UnauthorizedException("Session has expired or is invalid. Please log in again.");
+        }
+
+        //پیدا کردن کاربری که دارای این توکن است 
+        var user = await _userManager.FindByIdAsync(refreshToken.UserId.ToString());
+
+        if (user == null)
+            throw new NotFoundException("User associated with this token was not found.");
+
+        // منقضی کردن توکن فعلی که داره استفاده میشه برای اینکه کلا یک بار مصرف باشه 
+        refreshToken.Revoke();
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        //حالا تولید یه رفرش توکن و اکسس توکن جدید
+        return await _jwtService.GenerateTokenAsync(user, cancellationToken);
+    }
+
+    #endregion
+
+    #region Register methods
+
+    public async Task<EmployerRegisterResponseDto> RegisterEmployerAsync(
+        RegisterEmployerRequestDto registerCommand,
+        CancellationToken cancellationToken = default)
+    {
+        var isDupplicateEmailOrPhoneNumber = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(
+            registerCommand.Email,
+            registerCommand.PhoneNumber,
+            cancellationToken);
 
         if (isDupplicateEmailOrPhoneNumber)
             throw new ConflictException("A user with the provided email or phone number already exists.");
@@ -72,7 +127,7 @@ public class AuthenticationService : IAuthenticationService
 
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var createUserResult = await _userManager.CreateAsync(user, registerCommand.Password);
 
@@ -86,22 +141,31 @@ public class AuthenticationService : IAuthenticationService
 
             var createdCompanyId = await _companyService.CreateCompanyAsync(registerCommand.ToCreateCompanyRequestDto(user.Id));
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransactionAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            return new EmployerRegisterResponseDto(user.Id, createdCompanyId);
+            return new EmployerRegisterResponseDto
+            {
+                EmployerId = user.Id,
+                CompanyId = createdCompanyId
+            };
         }
         catch (Exception)
         {
-            await _unitOfWork.RollBackTransactionAsync();
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
 
             throw;
         }
     }
 
-    public async Task<TokenLoginResponseDto> RegisterJobSeekerAsync(RegisterJobSeekerRequestDto registerCommand)
+    public async Task<TokenLoginResponseDto> RegisterJobSeekerAsync(
+        RegisterJobSeekerRequestDto registerCommand,
+        CancellationToken cancellationToken = default)
     {
-        var isDupplicate = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(registerCommand.Email, registerCommand.PhoneNumber);
+        var isDupplicate = await _unitOfWork.UserRepository.IsDuplicateEmailOrPhoneNumberAsync(
+            registerCommand.Email,
+            registerCommand.PhoneNumber,
+            cancellationToken);
 
         if (isDupplicate)
             throw new ConflictException("A user with the provided email or phone number already exists.");
@@ -110,7 +174,7 @@ public class AuthenticationService : IAuthenticationService
 
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var createUserResult = await _userManager.CreateAsync(user, registerCommand.Password);
 
@@ -122,16 +186,18 @@ public class AuthenticationService : IAuthenticationService
             if (!addToRoleResult.Succeeded)
                 throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransactionAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
         }
         catch (Exception)
         {
-            await _unitOfWork.RollBackTransactionAsync();
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
 
             throw;
         }
 
         return await _jwtService.GenerateTokenAsync(user);
     }
+
+    #endregion
 }

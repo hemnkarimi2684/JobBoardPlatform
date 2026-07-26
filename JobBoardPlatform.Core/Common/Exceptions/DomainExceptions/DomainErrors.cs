@@ -54,6 +54,7 @@ public static class DomainErrors
     #region Job Errors
     public static Error JobNameInvalidLength => new Error("job name length must be between 2 and 100 characters", "Job_Name_Invalid_Length");
     public static Error JobNameIsRequired => new Error("job name is required", "Job_Name_Is_Required");
+    public static Error JobCategoryIdIsRequired => new Error("job job category id is required", "Job_JobCategoryId_Is_Required");
     #endregion
 
     #region Company Errors
@@ -175,5 +176,11 @@ public static class DomainErrors
     #region UserSkills
     public static Error UserSkillUserIdIsRequired => new Error("UserSkill UserId is required.", "UserSkill_UserId_Is_Required");
     public static Error UserSkillSkillIdIsRequired => new Error("UserSkill SkillId is required.", "UserSkill_SkillId_Is_Required");
+    #endregion
+
+    #region JobCategory Errors
+    public static Error JobCategoryNameIsRequired => new Error("job category name UserId is required.", "JobCategory_Name_Is_Required");
+    public static Error JobCategoryNameInvalidLength => new Error("job categoty name must be between 2 and 150 characters long.", "JobCategory_Name_Invalid_Length");
+
     #endregion
 }

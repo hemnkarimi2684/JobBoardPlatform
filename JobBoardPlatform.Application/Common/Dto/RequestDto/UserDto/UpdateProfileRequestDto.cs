@@ -1,28 +1,29 @@
-﻿using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
+﻿using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 
-public record UpdateProfileRequestDto(
+public class UpdateProfileRequestDto
+{
     [StringLength(100, MinimumLength = 2, ErrorMessage = "First name must be between 2 and 100 characters.")]
-    string FirstName,
+    public string? FirstName { get; set; }
 
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Last name must be between 2 and 100 characters.")]
-    string LastName,
+    public string? LastName { get; set; }
 
     [StringLength(1000, ErrorMessage = "Bio must not exceed 1000 characters.")]
-    string Bio,
+    public string? Bio { get; set; }
 
     [StringLength(300, MinimumLength = 5, ErrorMessage = "Address must be between 5 and 300 characters.")]
-    string Address,
+    public string? Address { get; set; }
 
-    DateTime BirthDate,
+    public DateTime? BirthDate { get; set; }
 
-    Guid CityId,
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
+    public Guid? CityId { get; set; }
 
-    Guid UserId,
-
-    [StringLength(20, MinimumLength = 2, ErrorMessage = "Gender must be between 2 and 20 characters.")]
-    string Gender
-);
+    [EnumDataType(typeof(Gender))]
+    public Gender? Gender { get; set; }
+}
 

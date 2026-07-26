@@ -7,8 +7,10 @@ using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
+using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
+using JobBoardPlatform.Core.Entities.RefreshTokenEntity.Entity;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.SkillEntity.Entity;
@@ -23,7 +25,7 @@ using System.Reflection;
 namespace JobBoardPlatform.Infrastructure.Data;
 
 public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
-{ 
+{
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
@@ -44,7 +46,9 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Skill> Skills => Set<Skill>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<UserSkill> UserSkills => Set<UserSkill>();
-    
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<JobCategory> JobCategories => Set<JobCategory>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

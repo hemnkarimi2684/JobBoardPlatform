@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.WebApi.ResultPattern;
@@ -20,37 +21,81 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateCompanyAsync([FromBody] CreateCompanyRequestDto createCompany)
+    public async Task<IActionResult> CreateCompanyAsync(
+        [FromBody] CreateCompanyRequestDto createCompany,
+        CancellationToken cancellationToken)
     {
-        await _companyService.CreateCompanyAsync(createCompany);
+        await _companyService.CreateCompanyAsync(createCompany, cancellationToken);
 
         return Ok(Result.Success());
     }
 
-    [HttpGet("{ownerId:guid}")]
-   // [Authorize(Roles = "Employer,Admin")]
-    public async Task<IActionResult> GetCompanyInfoByOwnerIdAsync([FromRoute] Guid ownerId)
+    [HttpGet("by-user/{ownerId:guid}")]
+    [Authorize(Roles = "Employer,Admin")]
+    public async Task<IActionResult> GetCompanyProfileByOwnerIdAsync(
+        [FromRoute] Guid ownerId,
+        CancellationToken cancellationToken)
     {
-        var result = await _companyService.GetCompanyInfoByOwnerIdAsync(ownerId);
+        var result = await _companyService.GetCompanyProfileByOwnerIdAsync(ownerId, cancellationToken);
 
-        return Ok(Result<CompanyInfoResponseDto>.Success(result));
+        return Ok(Result<CompanyProfileResponseDto>.Success(result));
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllCompaniesAsync(
+        [FromQuery] TextRequestDto textRequestDto,
+        [FromQuery] PagingRequestDto pagingRequestDto,
+        CancellationToken cancellationToken)
+    {
+        var result = await _companyService.GetAllCompaniesAsync(textRequestDto, pagingRequestDto, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpGet("{companyId:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCompanyByIdAsync(
+        [FromRoute] Guid companyId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _companyService.GetCompanyByIdAsync(companyId, cancellationToken);
+
+        return Ok(Result<CompanyProfileResponseDto>.Success(result));
     }
 
     [HttpPut("{companyId:guid}")]
-    //[Authorize(Roles = "Employer")]
-    public async Task<IActionResult> UpdateCompanyIdAsync([FromRoute] Guid companyId, [FromBody] UpdateCompanyInfoRequestDto update)
+    [Authorize(Roles = "Employer")]
+    public async Task<IActionResult> UpdateCompanyIdAsync(
+        [FromRoute] Guid companyId,
+        [FromBody] UpdateCompanyInfoRequestDto update,
+        CancellationToken cancellationToken)
     {
-        await _companyService.UpdateCompanyIdAsync(companyId, update);
+        await _companyService.UpdateCompanyIdAsync(companyId, update, cancellationToken);
 
         return Ok(Result.Success());
     }
 
     [HttpPatch("{companyId:guid}/upload-image")]
-    //[Authorize(Roles = "Employer")]
-    public async Task<IActionResult> UploadCompanyImageAsync([FromRoute] Guid companyId, [FromForm] UploadCompanyImageRequestDto imageRequestDto)
+    [Authorize(Roles = "Employer")]
+    public async Task<IActionResult> UploadCompanyImageAsync(
+        [FromRoute] Guid companyId,
+        [FromForm] UploadCompanyImageRequestDto imageRequestDto,
+        CancellationToken cancellationToken)
     {
-        await _companyService.UploadCompanyImageAsync(companyId, imageRequestDto);
+        await _companyService.UploadCompanyImageAsync(companyId, imageRequestDto, cancellationToken);
 
         return Ok(Result.Success());
+    }
+
+    [HttpGet("{companyId:guid}/download-image")]
+    [AllowAnonymous]
+    public async Task<IActionResult> DownloadCompanyImageAsync(
+        [FromRoute] Guid companyId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _companyService.DownloadCompanyImageAsync(companyId, cancellationToken);
+
+        return File(result.Data, result.ContentType, result.FileName);
     }
 }

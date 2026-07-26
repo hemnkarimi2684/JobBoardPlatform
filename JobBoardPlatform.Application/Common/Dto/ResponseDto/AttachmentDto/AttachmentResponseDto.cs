@@ -2,18 +2,11 @@
 
 public class AttachmentResponseDto
 {
-    /// <summary>
-    /// اسم فایل اپلود شده 
-    /// </summary>
-    public string FileName { get; set; } = string.Empty;
+    public Guid AttachmentId { get; init; }
 
-    /// <summary>
-    /// نوع محتوا فایل اپدیت شده
-    /// </summary>
-    public string ContentType { get; set; } = string.Empty;
+    public string FileName { get; init; } = string.Empty;
 
-    /// <summary>
-    /// دیتا فایل اپلود شده 
-    /// </summary>
-    public byte[] Data { get; set; } = [];
+    public string ContentType { get; init; } = string.Empty;
+
+    public byte[] Data { get; init; } = [];
 }

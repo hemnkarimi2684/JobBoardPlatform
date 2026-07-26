@@ -1,16 +1,16 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
+using JobBoardPlatform.Application.Common.CurrentUser.Implementation;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
-using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
-using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
 
 namespace JobBoardPlatform.Application.Implementation.EducationDetailBusiness;
 
@@ -20,25 +20,30 @@ public class EducationDetailService : IEducationDetailService
 
     private readonly ICurrentUser _currentUser;
 
-    public EducationDetailService(IUnitOfWork unitOfWork, ICurrentUser currentUser)
+    private readonly IAccessControlService _accessControlService;
+
+    public EducationDetailService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
+        _accessControlService = accessControlService;
     }
 
-    public async Task<bool> CreateEducationDetailAsync(CreateEducationDetailRequestDto createCommand)
-    {
-        CheckSelfOrAdminPermission(createCommand.UserId, _currentUser);
+    #region Create Methods
 
-        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId);
+    public async Task<bool> CreateEducationDetailAsync(
+        CreateEducationDetailRequestDto createCommand,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureApplicantOrAdmin(createCommand.UserId, _currentUser);
+
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId, cancellationToken);
 
         if (!isUserExist)
             throw new NotFoundException($"user with id {createCommand.UserId} was not found");
 
-        var certificateDegreeName = ParseCertificateDegreeForCreate(createCommand.CertificateDegreeName);
-
         var educationDetail = new EducationDetail(
-                                           certificateDegreeName,
+                                           createCommand.CertificateDegree,
                                            createCommand.Major,
                                            createCommand.University,
                                            createCommand.StartDate,
@@ -49,107 +54,117 @@ public class EducationDetailService : IEducationDetailService
                                            _currentUser.UserId
                                            );
 
-        await _unitOfWork.EducationDetailRepository.AddAsync(educationDetail);
+        await _unitOfWork.EducationDetailRepository.AddAsync(educationDetail, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<Pagination<UserEducationDetailResponseDto>> GetUserEducationDetailsAsync(Guid userId, PagingRequestDto pagingCommand)
+    #endregion
+
+    #region Get Methods 
+
+    public async Task<Pagination<EducationHistoryResponseDto>> GetUserEducationDetailsAsync(
+        Guid userId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         var (userEducationDetails, totalDataCount) = await _unitOfWork.EducationDetailRepository
                                                           .GetUserEducationDetailsAsync(ed =>
-                                                          new UserEducationDetailResponseDto
-                                                          (
-                                                              ed.CertificateDegreeName,
-                                                              ed.Major,
-                                                              ed.University,
-                                                              ed.StartDate,
-                                                              ed.CompletionDate,
-                                                              ed.Percentage,
-                                                              ed.IsCurrentlyStudying
-                                                          ),
+                                                          new EducationHistoryResponseDto
+                                                          {
+                                                              EducationDetailId = ed.Id,
+                                                              UserId = ed.UserId,
+                                                              CertificateDegreeName = ed.CertificateDegreeName,
+                                                              Major = ed.Major,
+                                                              University = ed.University,
+                                                              StartDate = ed.StartDate,
+                                                              CompletionDate = ed.CompletionDate,
+                                                              Percentage = ed.Percentage,
+                                                              IsCurrentlyStudying = ed.IsCurrentlyStudying
+                                                          },
                                                           userId,
+                                                          cancellationToken,
                                                           pagingCommand.PageNumber,
                                                           pagingCommand.PageSize);
 
-        return Pagination<UserEducationDetailResponseDto>
+        return Pagination<EducationHistoryResponseDto>
                     .GetPagination(userEducationDetails,
                                    pagingCommand.PageNumber,
                                    pagingCommand.PageSize,
                                    totalDataCount);
     }
 
-    public async Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailRequestDto updateCommand)
+    public async Task<EducationHistoryResponseDto> GetEducationDetailByIdAsync(
+        Guid educationDetailId,
+        CancellationToken cancellationToken = default)
     {
-        var userId = await _unitOfWork.EducationDetailRepository.GetEducationDetailUserIdAsync(educationDetailId);
+        var educationDetail = await _unitOfWork.EducationDetailRepository.GetByIdAsync(educationDetailId, cancellationToken);
+
+        if (educationDetail == null)
+            throw new NotFoundException($"The education detail with id {educationDetailId} was not found.");
+
+        _accessControlService.EnsureApplicantOrAdmin(educationDetail.UserId, _currentUser);
+
+        return new EducationHistoryResponseDto
+        {
+            EducationDetailId = educationDetail.Id,
+            UserId = educationDetail.UserId,
+            CertificateDegreeName = educationDetail.CertificateDegreeName,
+            Major = educationDetail.Major,
+            University = educationDetail.University,
+            StartDate = educationDetail.StartDate,
+            CompletionDate = educationDetail.CompletionDate,
+            Percentage = educationDetail.Percentage,
+            IsCurrentlyStudying = educationDetail.IsCurrentlyStudying
+        };
+    }
+
+    #endregion
+
+    #region Update Methods
+
+    public async Task<bool> UpdateEducationDetailAsync(
+        Guid educationDetailId,
+        UpdateEducationDetailRequestDto updateCommand,
+        CancellationToken cancellationToken = default)
+    {
+        var userId = await _unitOfWork.EducationDetailRepository.GetEducationDetailUserIdAsync(educationDetailId, cancellationToken);
 
         if (userId == null)
             throw new NotFoundException($"The education detail with id {educationDetailId} was not found.");
 
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId.Value, _currentUser);
 
         var result = await _unitOfWork.EducationDetailRepository.UpdateEducationDetailAsync(
                                                                                             educationDetailId,
+                                                                                            cancellationToken,
                                                                                             MapToUpdateEducationDetail(updateCommand));
 
         if (!result)
             throw new NotFoundException($"the educationDetail with id {educationDetailId} was not found");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
+
+    #endregion
 
     #region Private Methods
 
-    private CertificateDegree ParseCertificateDegreeForCreate(string certificateDegree)
-    {
-        if (string.IsNullOrWhiteSpace(certificateDegree))
-            throw new ValidationException("certificateDegree is required.");
-
-        if (!Enum.TryParse<CertificateDegree>(certificateDegree, true, out var result))
-            throw new ValidationException("Invalid certificateDegree type.");
-
-        return result;
-    }
-
-    private CertificateDegree? ParseCertificateDegreeForUpdate(string? certificateDegree)
-    {
-        if (string.IsNullOrWhiteSpace(certificateDegree))
-            return null;
-
-        if (!Enum.TryParse<CertificateDegree>(certificateDegree, true, out var result))
-            throw new ValidationException("Invalid certificateDegree type.");
-
-        return result;
-    }
-
     private UpdateEducationDetail MapToUpdateEducationDetail(UpdateEducationDetailRequestDto updateCommand)
     {
-        var certificateDegreeName = ParseCertificateDegreeForUpdate(updateCommand.CertificateDegreeName);
-
         return new UpdateEducationDetail
-        (
-           certificateDegreeName,
-           updateCommand.Major,
-           updateCommand.University,
-           updateCommand.StartDate,
-           updateCommand.CompletionDate,
-           updateCommand.Percentage < 1 ? null : updateCommand.Percentage,
-           updateCommand.IsCurrentlyStudying,
-           _currentUser.UserId
-        );
-    }
-
-    private void CheckSelfOrAdminPermission(Guid? targetUserId, ICurrentUser currentUser)
-    {
-        var isSelfUser = targetUserId == currentUser.UserId;
-
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        //اینجا چک میشه که کاربر فقط بتونه خودش اطلاعات مدرک تحصیلیش رو اپدیت کنه نه کس دیگه ای به جز ادمین                                                               
-        if (!isAdmin && !isSelfUser)
-            throw new ForbiddenException("You do not have sufficient access to manage this EducationDetail.");
+        {
+            CertificateDegreeName = updateCommand.CertificateDegree,
+            Major = updateCommand.Major,
+            University = updateCommand.University,
+            StartDate = updateCommand.StartDate,
+            CompletionDate = updateCommand.CompletionDate,
+            Percentage = updateCommand.Percentage < 1 ? null : updateCommand.Percentage,
+            IsCurrentlyStudying = updateCommand.IsCurrentlyStudying,
+            ModifiedById = _currentUser.UserId
+        };
     }
 
     #endregion

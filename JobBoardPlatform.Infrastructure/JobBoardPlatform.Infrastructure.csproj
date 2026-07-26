@@ -23,8 +23,4 @@
     <ProjectReference Include="..\JobBoardPlatform.Core\JobBoardPlatform.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repositories\NotifierRepo\" />
-  </ItemGroup>
-
 </Project>

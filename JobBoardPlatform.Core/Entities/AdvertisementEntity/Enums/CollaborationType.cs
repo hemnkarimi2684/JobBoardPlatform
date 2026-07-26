@@ -3,6 +3,6 @@
 public enum CollaborationType
 {
     FullTime = 1,
-    PartTime,
-    Contractual
+    PartTime = 2,
+    Contractual = 3
 }

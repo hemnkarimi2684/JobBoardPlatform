@@ -14,29 +14,42 @@ public class SkillRepository : GenericRepository<Skill>, ISkillRepository
     {
     }
 
-    public async Task<(List<TResult>, int)> GetAllSkillsAsync<TResult>(Expression<Func<Skill, TResult>> projection,
-                                                             string text,
-                                                             int pageNumber = 1,
-                                                             int pageSize = 10)
+    public async Task<(List<TResult>, int)> GetAllSkillsAsync<TResult>(
+        Expression<Func<Skill, TResult>> projection,
+        string? text,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
     {
-        var trimmedText = text.Trim();
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
 
         var query = Entities
-                         .AsNoTracking()
-                         .Where(us => EF.Functions.Like(us.Name, $"%{trimmedText}%"));
+                        .AsNoTracking()
+                        .AsQueryable();
 
-        var totalDataCount = await query.CountAsync();
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            var trimmedText = text.Trim();
+
+            query = query
+                       .Where(s => EF.Functions.Like(s.Name, $"%{trimmedText}%"));
+        }
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
                              .OrderByDescending(us => us.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
-                             .ToListAsync();
+                             .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
     }
 
-    public async Task<bool> IsDuplicateSkillAsync(string skillName) => await AnyAsync(s => s.Name == skillName);
+    public async Task<bool> IsDuplicateSkillAsync(
+        string skillName,
+        CancellationToken cancellationToken) => await AnyAsync(s => s.Name == skillName, cancellationToken);
 
 }

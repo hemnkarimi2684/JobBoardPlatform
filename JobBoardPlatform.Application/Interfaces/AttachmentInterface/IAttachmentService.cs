@@ -11,21 +11,32 @@ public interface IAttachmentService
     /// <summary>
     /// اپلود فایل
     /// </summary>
-    /// <param name="uploadFileRequest"></param>
+    /// <param name="formFile"></param>
+    /// <param name="attachmentType"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Guid> UploadAsync(IFormFile formFile, AttachmentType attachmentType);
+    Task<Guid> UploadAsync(
+        IFormFile formFile,
+        AttachmentType attachmentType,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// دانلود فایل
     /// </summary>
     /// <param name="attachmentId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AttachmentResponseDto> DownloadAsync(Guid attachmentId);
+    Task<AttachmentResponseDto> DownloadAsync(
+        Guid attachmentId,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// حذف فایل ذخیره شده در دیتابیس 
     /// </summary>
     /// <param name="attachmentId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> HardDeleteAttachmentAsync(Guid attachmentId);
+    Task<bool> HardDeleteAttachmentAsync(
+        Guid attachmentId,
+        CancellationToken cancellationToken = default);
 }

@@ -1,10 +1,19 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
+using System.Text.Json.Serialization;
 
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
 
 public class AdvertisementDetailResponseDto
 {
+    public Guid AdvertisementId { get; set; }
+
+    public Guid JobId { get; set; }
+
+    public Guid CityId { get; set; }
+
+    public Guid CompanyId { get; set; }
+
     public string Description { get; set; } = string.Empty;
 
     public int MinimumAge { get; set; }
@@ -19,6 +28,7 @@ public class AdvertisementDetailResponseDto
 
     public DateTime CreatedAt { get; set; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public CollaborationType CollaborationType { get; set; }
 
     public string CityName { get; set; } = string.Empty;
@@ -38,7 +48,8 @@ public class AdvertisementDetailResponseDto
         return new AdvertisementDetailResponseDto
         {
             Description = advertisementDetail.Description,
-            AboutCompany = advertisementDetail.AboutCompany,
+            JobId = advertisementDetail.JobId,
+            AboutCompany = advertisementDetail.CompanyAboutUs,
             CreatedAt = advertisementDetail.CreatedAt,
             MaximumAge = advertisementDetail.MaximumAge,
             MinimumAge = advertisementDetail.MinimumAge,
@@ -48,9 +59,12 @@ public class AdvertisementDetailResponseDto
             MinimumSalary = advertisementDetail.MinimumSalary,
             CompanyName = advertisementDetail.CompanyName,
             ExperienceLevel = advertisementDetail.ExperienceLevel,
-            Industry = advertisementDetail.Industry,
+            Industry = advertisementDetail.CompanyIndustry,
             JobName = advertisementDetail.JobName,
-            SkillNames = advertisementDetail.SkillNames,
+            SkillNames = advertisementDetail.Skills,
+            AdvertisementId = advertisementDetail.AdvertisementId,
+            CityId = advertisementDetail.CityId,
+            CompanyId = advertisementDetail.CompanyId,
         };
     }
 }

@@ -3,7 +3,6 @@ using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Infrastructure.Repositories.ResumeRepo;
 
@@ -13,26 +12,52 @@ public class ResumeRepository : GenericRepository<Resume>, IResumeRepository
     {
     }
 
-    public async Task<TResult?> GetResumeByUserIdAsync<TResult>(Expression<Func<Resume, TResult>> projection, Guid userId)
+    public async Task<Resume?> GetResumeByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
     {
         return await Entities
-                           .AsNoTracking()
-                           .Where(r => r.UserId == userId)
-                           .Select(projection)
-                           .FirstOrDefaultAsync();
+                         .FirstOrDefaultAsync(r => r.UserId == userId, cancellationToken);
     }
 
-    public async Task<Guid?> GetResumeFileIdAsync(Guid resumeId)
+    public async Task<Guid?> GetResumeFileIdResumeIdAsync(
+        Guid resumeId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                             .AsNoTracking()
                             .Where(r => r.Id == resumeId)
                             .Select(r => r.LastUploadedFileId)
-                            .FirstOrDefaultAsync();
+                            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> IsDuplicateResumeForUserAsync(Guid userId) => await AnyAsync(r => r.UserId == userId);
+    public async Task<Guid?> GetResumeFileIdUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                            .AsNoTracking()
+                            .Where(r => r.UserId == userId)
+                            .Select(r => r.LastUploadedFileId)
+                            .FirstOrDefaultAsync(cancellationToken);
+    }
 
-    public async Task<bool> IsResumeExistAsync(Guid resumeId) => await AnyAsync(r => r.Id == resumeId);
+    public async Task<Guid?> GetResumeIdByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                        .AsNoTracking()
+                        .Where(r => r.UserId == userId)
+                        .Select(r => r.UserId)
+                        .FirstOrDefaultAsync(cancellationToken);
+    }
 
+    public async Task<bool> IsDuplicateResumeForUserAsync(
+        Guid userId,
+        CancellationToken cancellationToken) => await AnyAsync(r => r.UserId == userId, cancellationToken);
+
+    public async Task<bool> IsResumeExistAsync(
+        Guid resumeId,
+        CancellationToken cancellationToken) => await AnyAsync(r => r.Id == resumeId, cancellationToken);
 }

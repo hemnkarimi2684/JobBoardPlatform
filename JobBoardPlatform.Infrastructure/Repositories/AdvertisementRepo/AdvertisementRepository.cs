@@ -14,72 +14,97 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
     {
     }
 
-    public async Task<TResult?> GetAdvertisementProjectionAsync<TResult>(Expression<Func<Advertisement, TResult>> projection, Guid advertisementId)
+    public async Task<TResult?> GetAdvertisementProjectionAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> projection,
+        Guid advertisementId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                           .AsNoTracking()
                           .Where(a => a.Id == advertisementId && a.IsActive)
                           .Select(projection)
-                          .FirstOrDefaultAsync();
+                          .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<AdvertisementDetail?> GetAdvertisementInfoByIdAsync(Guid advertisementId)
+    public async Task<AdvertisementDetail?> GetAdvertisementInfoByIdAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken)
     {
         return await Entities
-                        .AsNoTracking()
-                        .Where(a => a.Id == advertisementId)
-                        .Select(a => new AdvertisementDetail(
-                             a.Description,
-                             a.MinimumAge,
-                             a.MaximumAge,
-                             a.MinimumSalary,
-                             a.MaximumSalary,
-                             a.ExperienceLevel,
-                             a.CollaborationType,
-                             a.City.Name,
-                             a.Company.Name,
-                             a.Job.Name,
-                             a.Company.AboutUs,
-                             a.Company.Industry,
-                             a.CreatedAt,
-                             a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
-                             ))
-                        .FirstOrDefaultAsync();
+                         .AsNoTracking()
+                         .Where(a => a.Id == advertisementId)
+                         .Select(a => new AdvertisementDetail
+                         {
+                             AdvertisementId = a.Id,
+                             JobId = a.JobId,
+                             Description = a.Description,
+                             MinimumAge = a.MinimumAge,
+                             MaximumAge = a.MaximumAge,
+                             MinimumSalary = a.MinimumSalary,
+                             MaximumSalary = a.MaximumSalary,
+                             ExperienceLevel = a.ExperienceLevel,
+                             CollaborationType = a.CollaborationType,
+                             CityName = a.City.Name,
+                             CompanyName = a.Company.Name,
+                             JobName = a.Job.Name,
+                             CompanyAboutUs = a.Company.AboutUs,
+                             CompanyIndustry = a.Company.Industry,
+                             CreatedAt = a.CreatedAt,
+                             Skills = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
+                             CityId = a.CityId,
+                             CompanyId = a.CompanyId
+                         })
+                         .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Guid?> GetAdvertisementOwnerIdByIdAsync(Guid advertisementId)
+    public async Task<Guid?> GetAdvertisementOwnerIdByIdAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken)
     {
         return await Entities
                         .AsNoTracking()
                         .Include(a => a.Company.OwnedByUser)
                         .Where(a => a.Id == advertisementId && !a.IsDeleted && a.DeletedAt == null)
                         .Select(a => a.Company.OwnedByUserId)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetAdvertisementsByCompanyAsync<TResult>(Expression<Func<Advertisement, TResult>> projection, Guid companyId, int pageNumber = 1, int pageSize = 10)
+    public async Task<(List<TResult>, int)> GetAdvertisementsByCompanyAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> projection,
+        Guid companyId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
     {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
         var query = Entities
                          .AsNoTracking()
                          .Where(a => a.CompanyId == companyId && a.IsActive);
 
-        var totalDataCount = await query.CountAsync();
+        var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
                              .OrderByDescending(b => b.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
-                             .ToListAsync();
+                             .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
     }
 
-    public async Task<bool> IsAdvertisementExistAsync(Guid advertisementId) => await AnyAsync(a => a.Id == advertisementId);
+    public async Task<bool> IsAdvertisementExistAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken) => await AnyAsync(a => a.Id == advertisementId && a.IsActive, cancellationToken);
 
-    public async Task<bool> UpdateAdvertisementInfoAsync(Guid advertisementId, UpdateAdvertisementInfo updateAdvertisementInfo)
+    public async Task<bool> UpdateAdvertisementInfoAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken,
+        UpdateAdvertisementInfo updateAdvertisementInfo)
     {
-        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive);
+        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive, cancellationToken);
 
         if (advertisement is null)
             return false;
@@ -89,9 +114,13 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         return true;
     }
 
-    public async Task<bool> UpdateAdvertisementStatusAsync(Guid advertisementId, Guid? modifiedById, bool isActive)
+    public async Task<bool> UpdateAdvertisementStatusAsync(
+        Guid advertisementId,
+        Guid? modifiedById,
+        bool isActive,
+        CancellationToken cancellationToken)
     {
-        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive);
+        var advertisement = await Entities.FirstOrDefaultAsync(a => a.Id == advertisementId && a.IsActive, cancellationToken);
 
         if (advertisement is null)
             return false;
@@ -99,5 +128,118 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         advertisement.UpdateActiveStatus(modifiedById, isActive);
 
         return true;
+    }
+
+    public async Task<(List<TResult>, int)> FilterAdvertisementsAsync<TResult>(
+        AdvertisementQueryFilter filter,
+        Expression<Func<Advertisement, TResult>> projection,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        pageNumber = pageNumber < 1 ? 1 : pageNumber;
+        pageSize = pageSize < 1 ? 10 : pageSize;
+
+        var query = Entities
+                        .AsNoTracking()
+                        .AsQueryable();
+
+        if (filter.JobCategoryId.HasValue)
+        {
+            query = query.Where(a => a.Job.JobCategoryId == filter.JobCategoryId);
+        }
+
+        if (filter.MinimumSalary.HasValue)
+        {
+            query = query.Where(a => a.MinimumSalary >= filter.MinimumSalary.Value);
+        }
+
+        if (filter.MaximumSalary.HasValue)
+        {
+            query = query.Where(a => a.MaximumSalary <= filter.MaximumSalary.Value);
+        }
+
+        if (filter.CollabrationType.HasValue)
+        {
+            query = query.Where(a => a.CollaborationType == filter.CollabrationType);
+        }
+
+        if (filter.SkillIds is not null && filter.SkillIds.Count > 0)
+        {
+            query = query.Where(a => a.AdvertisementSkills.Any(x => filter.SkillIds.Contains(x.SkillId)));
+        }
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
+        var result = await query
+                             .OrderByDescending(b => b.CreatedAt)
+                             .Skip((pageNumber - 1) * pageSize)
+                             .Take(pageSize)
+                             .Select(projection)
+                             .ToListAsync(cancellationToken);
+
+        return (result, totalDataCount);
+    }
+
+    public async Task<(List<TResult>, int)> SearchAdvertisementsAsync<TResult>(
+        string? searchTerm,
+        Expression<Func<Advertisement, TResult>> projection,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
+        var query = Entities
+                        .AsNoTracking()
+                        .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var term = searchTerm.Trim();
+
+            query = Entities
+                        .AsNoTracking()
+                        .Where(a => EF.Functions.Like(a.Job.Name, $"%{term}%") ||
+                                    EF.Functions.Like(a.City.Name, $"%{term}%"));
+        }
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
+        var result = await query
+                             .OrderByDescending(b => b.CreatedAt)
+                             .Skip((pageNumber - 1) * pageSize)
+                             .Take(pageSize)
+                             .Select(projection)
+                             .ToListAsync(cancellationToken);
+
+        return (result, totalDataCount);
+    }
+
+    public async Task<(List<TResult>, int)> GetJobAdvertisementsAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> projection,
+        Guid jobId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10)
+    {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
+        var query = Entities
+                         .AsNoTracking()
+                         .Where(a => a.JobId == jobId);
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
+        var result = await query
+                             .OrderByDescending(b => b.CreatedAt)
+                             .Skip((pageNumber - 1) * pageSize)
+                             .Take(pageSize)
+                             .Select(projection)
+                             .ToListAsync(cancellationToken);
+
+        return (result, totalDataCount);
     }
 }

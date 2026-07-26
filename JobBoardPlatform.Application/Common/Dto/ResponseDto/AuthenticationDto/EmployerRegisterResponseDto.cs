@@ -1,4 +1,8 @@
 ﻿namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 
-public record EmployerRegisterResponseDto(Guid EmployerId,Guid CompanyId);
+public class EmployerRegisterResponseDto
+{
+    public Guid EmployerId { get; init; }
 
+    public Guid CompanyId { get; init; }
+}

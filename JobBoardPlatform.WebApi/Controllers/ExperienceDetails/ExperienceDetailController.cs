@@ -8,47 +8,65 @@ using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace JobBoardPlatform.WebApi.Controllers.ExperienceDetails
+namespace JobBoardPlatform.WebApi.Controllers.ExperienceDetails;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class ExperienceDetailController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class ExperienceDetailController : ControllerBase
+    private readonly IExperienceDetailService _experienceDetailService;
+
+    public ExperienceDetailController(IExperienceDetailService experienceDetailService)
     {
-        private readonly IExperienceDetailService _experienceDetailService;
+        _experienceDetailService = experienceDetailService;
+    }
 
-        public ExperienceDetailController(IExperienceDetailService experienceDetailService)
-        {
-            _experienceDetailService = experienceDetailService;
-        }
+    [HttpGet("{userId:guid}/experience-details")]
+    [Authorize(Roles = "Admin,JobSeeker")]
+    public async Task<IActionResult> GetUserExperienceDetailsAsync(
+        [FromRoute] Guid userId,
+        [FromQuery] PagingRequestDto pagingRequest,
+        CancellationToken cancellationToken)
+    {
+        var result = await _experienceDetailService.GetUserExperienceDetailsAsync(userId, pagingRequest, cancellationToken);
 
-        [HttpGet("{userId:guid}/experience-details")]
-        [Authorize(Roles = "Admin,Employer,JobSeeker")]
-        [RequestModelValidationFilter]
-        public async Task<IActionResult> GetUserExperienceDetailsAsync([FromRoute] Guid userId, [FromQuery] PagingRequestDto pagingRequest)
-        {
-            var result = await _experienceDetailService.GetUserExperienceDetailsAsync(userId, pagingRequest);
+        return Ok(result);
+    }
 
-            return Ok(Result<Pagination<UserExperienceDetailResponseDto>>.Success(result));
-        }
+    [HttpGet("{experienceDetailId:guid}")]
+    [Authorize(Roles = "Admin,JobSeeker")]
+    public async Task<IActionResult> GetExperienceDetailByIdAsync(
+        [FromRoute] Guid experienceDetailId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _experienceDetailService.GetExperienceDetailByIdAsync(experienceDetailId, cancellationToken);
 
-        [HttpPost]
-        [Authorize(Roles = "JobSeeker")]
-        [RequestModelValidationFilter]
-        public async Task<IActionResult> CreateExperienceDetailAsync([FromBody] CreateExperienceDetailRequestDto createExperience)
-        {
-            await _experienceDetailService.CreateExperienceDetailAsync(createExperience);
+        return Ok(Result<ExperienceHistoryResponseDto>.Success(result));
+    }
 
-            return Ok(Result.Success());
-        }
+    [HttpPost]
+    [Authorize(Roles = "JobSeeker")]
+    [RequestModelValidationFilter]
+    public async Task<IActionResult> CreateExperienceDetailAsync(
+        [FromBody] CreateExperienceDetailRequestDto createExperience,
+        CancellationToken cancellationToken)
+    {
+        await _experienceDetailService.CreateExperienceDetailAsync(createExperience, cancellationToken);
 
-        [HttpPut("{experienceDetailId:guid}")]
-        [Authorize(Roles = "JobSeeker")]
-        public async Task<IActionResult> UpdateExperienceDetailAsync([FromRoute] Guid experienceDetailId, [FromBody] UpdateExperienceDetailRequestDto updateExperience)
-        {
-            await _experienceDetailService.UpdateExperienceDetailAsync(experienceDetailId, updateExperience);
+        return Ok(Result.Success());
+    }
 
-            return Ok(Result.Success());
-        }
+    [HttpPut("{experienceDetailId:guid}")]
+    [Authorize(Roles = "JobSeeker")]
+    [RequestModelValidationFilter]
+    public async Task<IActionResult> UpdateExperienceDetailAsync(
+        [FromRoute] Guid experienceDetailId,
+        [FromBody] UpdateExperienceDetailRequestDto updateExperience,
+        CancellationToken cancellationToken)
+    {
+        await _experienceDetailService.UpdateExperienceDetailAsync(experienceDetailId, updateExperience, cancellationToken);
+
+        return Ok(Result.Success());
     }
 }

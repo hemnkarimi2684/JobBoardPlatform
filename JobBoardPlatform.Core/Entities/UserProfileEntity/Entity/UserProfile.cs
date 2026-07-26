@@ -163,4 +163,9 @@ public class UserProfile : BaseEntity
 
         Validate();
     }
+
+    public void UpdateImage(Guid? newImageId)
+    {
+        UserImageFileId = newImageId;
+    }
 }

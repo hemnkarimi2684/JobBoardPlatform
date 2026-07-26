@@ -11,21 +11,43 @@ public interface IEducationDetailService
     /// دریافت مدرک های تحصیلی کاربر
     /// </summary>
     /// <param name="userId"></param>
+    /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<UserEducationDetailResponseDto>> GetUserEducationDetailsAsync(Guid userId, PagingRequestDto pagingCommand);
+    Task<Pagination<EducationHistoryResponseDto>> GetUserEducationDetailsAsync(
+        Guid userId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// ثبت مدرک تحصیلی 
     /// </summary>
     /// <param name="createCommand"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> CreateEducationDetailAsync(CreateEducationDetailRequestDto createCommand);
+    Task<bool> CreateEducationDetailAsync(
+        CreateEducationDetailRequestDto createCommand,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// اپدیت اطلاعات مدرک تحصیلی ثبت شده 
+    /// اپدیت اطلاعات مدرک تحصیلی ثبت شده
     /// </summary>
     /// <param name="educationDetailId"></param>
     /// <param name="updateCommand"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> UpdateEducationDetailAsync(Guid educationDetailId, UpdateEducationDetailRequestDto updateCommand);
+    Task<bool> UpdateEducationDetailAsync(
+        Guid educationDetailId,
+        UpdateEducationDetailRequestDto updateCommand,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت مدرک تحصیلی توسط شناسه 
+    /// </summary>
+    /// <param name="educationDetailId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<EducationHistoryResponseDto> GetEducationDetailByIdAsync(
+        Guid educationDetailId,
+        CancellationToken cancellationToken = default);
 }

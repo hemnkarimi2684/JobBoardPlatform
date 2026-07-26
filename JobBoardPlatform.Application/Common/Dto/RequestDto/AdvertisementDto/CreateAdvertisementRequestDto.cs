@@ -3,39 +3,43 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 
-public record CreateAdvertisementRequestDto(
-                                            [Required(ErrorMessage = "the Description is required", AllowEmptyStrings = false)]
-                                            [MinLength(100, ErrorMessage = "the Description characteers cannot be lower than 100")]
-                                            [MaxLength(2000, ErrorMessage = "the Description characteers cannot be higher than 2000")]
-                                            string Description,
+public class CreateAdvertisementRequestDto
+{
+    [Required(ErrorMessage = "Description is required.", AllowEmptyStrings = false)]
+    [MinLength(100, ErrorMessage = "Description cannot be less than 100 characters.")]
+    [MaxLength(2000, ErrorMessage = "Description cannot exceed 2000 characters.")]
+    public string Description { get; set; } = string.Empty;
 
-                                            [Range(18, 55, ErrorMessage = "Minimum age must be between 18 and 55.")]
-                                            int MinimumAge,
+    [Range(18, 55, ErrorMessage = "Minimum age must be between 18 and 55.")]
+    public int MinimumAge { get; set; }
 
-                                            [Range(18, 65, ErrorMessage = "Maximum age must be between 18 and 65.")]
-                                            int MaximumAge,
+    [Range(18, 65, ErrorMessage = "Maximum age must be between 18 and 65.")]
+    public int MaximumAge { get; set; }
 
-                                            [Range(0, double.MaxValue, ErrorMessage = "the MinimumSalary must be in the range")]
-                                            decimal MinimumSalary,
+    [Range(typeof(decimal), "0", "79228162514264337593543950335", ErrorMessage = "Minimum salary must be greater than or equal to 0.")]
+    public decimal MinimumSalary { get; set; }
 
-                                            [Range(0, double.MaxValue, ErrorMessage = "the MaximumSalary must be in the range")]
-                                            decimal MaximumSalary,
+    [Range(typeof(decimal), "0", "79228162514264337593543950335", ErrorMessage = "Maximum salary must be greater than or equal to 0.")]
+    public decimal MaximumSalary { get; set; }
 
-                                            [Range(0, 50, ErrorMessage = "the ExperienceLevel must be in the range")]
-                                            int ExperienceLevel,
+    public int ExperienceLevel { get; set; }
 
-                                            [Required(ErrorMessage = "the DescriptiCollaborationTypeon is required", AllowEmptyStrings = false)]
-                                            [MinLength(0, ErrorMessage = "the CollaborationType characteers cannot be lower than 0")]
-                                            [MaxLength(25, ErrorMessage = "the CollaborationType characteers cannot be higher than 25")]
-                                            string CollaborationType,
+    [EnumDataType(typeof(CollaborationType))]
+    public CollaborationType CollaborationType { get; set; }
 
-                                            [Required(ErrorMessage = "the JobId is required", AllowEmptyStrings = false)]
-                                            Guid JobId,
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
+    public Guid JobId { get; set; }
 
-                                            [Required(ErrorMessage = "the CityId is required", AllowEmptyStrings = false)]
-                                            Guid CityId,
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
+    public Guid CityId { get; set; }
 
-                                            [Required(ErrorMessage = "the CompanyId is required", AllowEmptyStrings = false)]
-                                            Guid CompanyId,
+    [Required(ErrorMessage = "identifier is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
+    public Guid CompanyId { get; set; }
 
-                                            List<Guid> SkillsId);
+    [Required(ErrorMessage = "SkillsId is required.")]
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
+    public List<Guid> SkillsId { get; set; } = new();
+}

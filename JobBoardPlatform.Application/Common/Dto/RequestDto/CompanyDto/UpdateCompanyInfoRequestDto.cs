@@ -1,40 +1,35 @@
 ﻿using JobBoardPlatform.Application.Implementation.CompanyBusiness;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 
-public record UpdateCompanyInfoRequestDto(
+public class UpdateCompanyInfoRequestDto
+{
+    [StringLength(120, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 120 characters.")]
+    public string? Name { get; set; }
 
-                                         [MinLength(2, ErrorMessage = "the Name characteers cannot be lower than 2")]
-                                         [MaxLength(120, ErrorMessage = "the Name characteers cannot be higher than 120")]
-                                         string? Name,
+    [DataType(DataType.Date)]
+    public DateTime? YearOfEstablishment { get; set; }
 
-                                         [DataType(DataType.Date)]
-                                         DateTime? YearOfEstablishment,
+    [StringLength(200, MinimumLength = 2, ErrorMessage = "Industry must be between 2 and 200 characters.")]
+    public string? Industry { get; set; }
 
-                                         [MinLength(2, ErrorMessage = "the Industry characteers cannot be lower than 2")]
-                                         [MaxLength(200, ErrorMessage = "the Industry characteers cannot be higher than 200")]
-                                         string? Industry,
+    [StringLength(1500, MinimumLength = 50, ErrorMessage = "About Us must be between 50 and 1500 characters.")]
+    public string? AboutUs { get; set; }
 
-                                         [MinLength(50, ErrorMessage = "the AboutUs characteers cannot be lower than 50")]
-                                         [MaxLength(1500, ErrorMessage = "the AboutUs characteers cannot be higher than 1500")]
-                                         string? AboutUs,
+    [Url(ErrorMessage = "Invalid website URL format.")]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "Website address must be between 2 and 100 characters.")]
+    public string? WebSiteAddress { get; set; }
 
-                                         [MinLength(2, ErrorMessage = "the WebSiteAddress characteers cannot be lower than 2")]
-                                         [MaxLength(100, ErrorMessage = "the WebSiteAddress characteers cannot be higher than 100")]
-                                         string? WebSiteAddress,
+    [EnumDataType(typeof(OwnershipType))]
+    public OwnershipType? OwnershipType { get; set; }
 
-                                         [MinLength(1, ErrorMessage = "the OwnershipType characteers cannot be lower than 1")]
-                                         [MaxLength(25, ErrorMessage = "the OwnershipType characteers cannot be higher than 25")]
-                                         string? OwnershipType,
+    [EnumDataType(typeof(CompanySizeEnum))]
+    public CompanySizeEnum? CompanySize { get; set; }
 
-                                         [MinLength(1, ErrorMessage = "the CompanySize characteers cannot be lower than 1")]
-                                         [MaxLength(25, ErrorMessage = "the CompanySize characteers cannot be higher than 25")]
-                                         string? CompanySize,
-
-                                         [MinLength(2, ErrorMessage = "the ActivityType characteers cannot be lower than 100")]
-                                         [MaxLength(120, ErrorMessage = "the ActivityType characteers cannot be higher than 2000")]
-                                         string? ActivityType
-);
+    [StringLength(120, MinimumLength = 2, ErrorMessage = "Activity type must be between 2 and 120 characters.")]
+    public string? ActivityType { get; set; }
+}

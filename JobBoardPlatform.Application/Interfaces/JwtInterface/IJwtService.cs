@@ -5,5 +5,5 @@ namespace JobBoardPlatform.Application.Interfaces.JwtInterface;
 
 public interface IJwtService
 {
-    Task<TokenLoginResponseDto> GenerateTokenAsync(User user);
+    Task<TokenLoginResponseDto> GenerateTokenAsync(User user, CancellationToken cancellationToken = default);
 }

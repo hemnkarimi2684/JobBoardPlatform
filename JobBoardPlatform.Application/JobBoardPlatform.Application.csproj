@@ -14,10 +14,4 @@
     <ProjectReference Include="..\JobBoardPlatform.Core\JobBoardPlatform.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\Dto\RequestDto\CityDto\" />
-    <Folder Include="Common\Dto\RequestDto\SkillDto\" />
-    <Folder Include="Common\Dto\ResponseDto\Common\" />
-  </ItemGroup>
-
 </Project>

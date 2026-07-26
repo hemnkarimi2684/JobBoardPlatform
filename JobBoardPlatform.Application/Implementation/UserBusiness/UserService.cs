@@ -1,15 +1,21 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
+using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
+using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
 namespace JobBoardPlatform.Application.Implementation.UserBusiness;
@@ -20,35 +26,47 @@ public class UserService : IUserService
 
     private readonly ICurrentUser _currentUser;
 
+    private readonly IAccessControlService _accessControlService;
+
+    private readonly IAttachmentService _attachmentService;
+
     private readonly UserManager<User> _userManager;
 
-    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, UserManager<User> userManager)
+    private readonly ILogger<UserService> _logger;
+
+    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IAttachmentService attachmentService, UserManager<User> userManager, ILogger<UserService> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
+        _accessControlService = accessControlService;
+        _attachmentService = attachmentService;
         _userManager = userManager;
+        _logger = logger;
     }
 
-    public async Task<bool> CreateProfileAsync(CreateProfileRequestDto createCommand)
+
+    #region Create Methods
+
+    public async Task<bool> CreateProfileAsync(
+        CreateProfileRequestDto createCommand,
+        CancellationToken cancellationToken = default)
     {
-        var doesUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId);
+        var doesUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId, cancellationToken);
 
         if (!doesUserExist)
             throw new NotFoundException($"User with id {createCommand.UserId} was not found.");
 
-        CheckSelfOrAdminPermission(createCommand.UserId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(createCommand.UserId, _currentUser);
 
-        var isDuplicateUserProfile = await _unitOfWork.UserProfileRepository.IsDuplicateUserProfileAsync(createCommand.UserId);
+        var isDuplicateUserProfile = await _unitOfWork.UserProfileRepository.IsDuplicateUserProfileAsync(createCommand.UserId, cancellationToken);
 
         if (isDuplicateUserProfile)
             throw new ConflictException($"User with id {createCommand.UserId} already has profile");
 
-        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId);
+        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId, cancellationToken);
 
         if (!doesCityExist)
             throw new NotFoundException($"City with id {createCommand.CityId} was not found.");
-
-        var gender = ParseGenderForCreate(createCommand.Gender);
 
         var userProfile = new UserProfile(
                                           createCommand.FirstName,
@@ -58,29 +76,38 @@ public class UserService : IUserService
                                           createCommand.BirthDate,
                                           createCommand.UserId,
                                           createCommand.CityId,
-                                          gender,
+                                          createCommand.Gender,
                                           null,
                                           _currentUser.UserId
                                           );
 
-        await _unitOfWork.UserProfileRepository.AddAsync(userProfile);
+        await _unitOfWork.UserProfileRepository.AddAsync(userProfile, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<UserProfileInfoResponseDto> GetUserProfileInfoAsync(Guid userId)
-    {
-        CheckSelfOrAdminPermission(userId, _currentUser);
+    #endregion
 
-        var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileInfoAsync(up => new UserProfileInfoResponseDto(
-                                                                                    up.FirstName + " " + up.LastName,
-                                                                                    up.Bio,
-                                                                                    up.Address,
-                                                                                    up.BirthDate,
-                                                                                    up.City.Name,
-                                                                                    up.Gender
-                                                                                    ),
-                                                                                      userId);
+    #region Get methods
+
+    public async Task<UserProfileResponseDto> GetUserProfileByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+
+        var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileByUserIdAsync(up => new UserProfileResponseDto
+        {
+            UserId = up.UserId,
+            FullName = up.FirstName + " " + up.LastName,
+            Bio = up.Bio,
+            Address = up.Address,
+            BirthDate = up.BirthDate,
+            CityName = up.City.Name,
+            Gender = up.Gender,
+            UserImageFileId = up.UserImageFileId
+        },
+          userId, cancellationToken);
 
         if (userProfile is null)
             throw new NotFoundException($"the user profile with id {userId} was not found");
@@ -88,29 +115,41 @@ public class UserService : IUserService
         return userProfile;
     }
 
-    public async Task<bool> UpdateProfileAsync(Guid userId, UpdateProfileRequestDto updateCommand)
+    #endregion
+
+    #region Update Methods
+
+    public async Task<bool> UpdateProfileAsync(
+        Guid userId,
+        UpdateProfileRequestDto updateCommand,
+        CancellationToken cancellationToken = default)
     {
-        CheckSelfOrAdminPermission(userId, _currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         if (updateCommand.CityId != null)
         {
-            var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(updateCommand.CityId.Value);
+            var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(updateCommand.CityId.Value, cancellationToken);
 
             if (!doesCityExist)
                 throw new NotFoundException($"City with id {updateCommand.CityId} was not found.");
         }
 
-        var result = await _unitOfWork.UserProfileRepository.UpdateProfileAsync(userId, MapToUpdateUserProfile(updateCommand));
+        var result = await _unitOfWork.UserProfileRepository.UpdateProfileAsync(
+                                                                                userId,
+                                                                                cancellationToken,
+                                                                                MapToUpdateUserProfile(updateCommand));
 
         if (!result)
             throw new NotFoundException($"the user profile with id {userId} was not found");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<bool> ApprovedEmployerAsync(Guid userId)
+    public async Task<bool> ApprovedEmployerAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
-        CheckAdminPermission(_currentUser);
+        _accessControlService.EnsureAdmin(_currentUser);
 
         var user = await _userManager.FindByIdAsync(userId.ToString());
 
@@ -127,7 +166,7 @@ public class UserService : IUserService
 
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             user.UpdateIsApproved(true, _currentUser.UserId);
 
@@ -144,77 +183,132 @@ public class UserService : IUserService
                     throw new ValidationException(string.Join(" ", addClaimResult.Errors.Select(e => e.Description)));
             }
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransactionAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             return true;
         }
         catch (Exception)
         {
-            await _unitOfWork.RollBackTransactionAsync();
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
 
             throw;
         }
     }
 
+    #endregion
+
+    #region Upload User Image 
+
+    public async Task UploadUserImageAsync(
+        Guid userId,
+        UploadUserImageRequestDto imageRequestDto,
+        CancellationToken cancellationToken = default)
+    {
+        if (imageRequestDto?.Image is null)
+            throw new ValidationException("image is required.");
+
+        var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId, cancellationToken);
+
+        if (!isUserExist)
+            throw new NotFoundException($"the user with id {userId} was not found");
+
+        var userProfile = await _unitOfWork.UserProfileRepository.GetProfileByUserIdAsync(userId, cancellationToken);
+
+        if (userProfile is null)
+            throw new NotFoundException($"The user with id '{userId}' does not have a profile.");
+
+        _accessControlService.EnsureApplicant(userProfile.UserId, _currentUser);
+
+        await UploadImageAsync(userProfile, imageRequestDto.Image, cancellationToken);
+    }
+
+    #endregion
+
+    #region DownLoad User Image
+
+    public async Task<AttachmentResponseDto> DownloadUserImageAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+
+        var userProfile = await _unitOfWork.UserProfileRepository.GetProfileByUserIdAsync(userId, cancellationToken);
+
+        if (userProfile is null)
+            throw new NotFoundException($"The user with id '{userId}' does not have a profile.");
+
+        _accessControlService.EnsureApplicantOrAdmin(userProfile.UserId, _currentUser);
+
+        if (userProfile.UserImageFileId is null)
+            throw new NotFoundException($"The user with id '{userId}' does not have an attached image.");
+
+        return await _attachmentService.DownloadAsync(userProfile.UserImageFileId.Value, cancellationToken);
+    }
+
+
+    #endregion
 
     #region Private methods
 
-    private void CheckSelfOrAdminPermission(Guid targetUserId, ICurrentUser currentUser)
-    {
-        var isSelfUser = targetUserId == currentUser.UserId;
-
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        if (!isAdmin && !isSelfUser)
-            throw new ForbiddenException("You do not have sufficient access to manage this user actions.");
-    }
-
-    private void CheckAdminPermission(ICurrentUser currentUser)
-    {
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        if (!isAdmin)
-            throw new ForbiddenException("You do not have sufficient access to manage this user actions.");
-    }
-
-    private Gender ParseGenderForCreate(string gender)
-    {
-        if (string.IsNullOrWhiteSpace(gender))
-            throw new ValidationException("gender is required.");
-
-        if (!Enum.TryParse<Gender>(gender, true, out var result))
-            throw new ValidationException("Invalid gender type.");
-
-        return result;
-    }
-
-    private Gender? ParseGenderEnumForUpdate(string? gender)
-    {
-        if (string.IsNullOrWhiteSpace(gender))
-            return null;
-
-        if (!Enum.TryParse<Gender>(gender, true, out var result))
-            throw new ValidationException("Invalid gender type.");
-
-        return result;
-    }
-
     private UpdateUserProfile MapToUpdateUserProfile(UpdateProfileRequestDto updateCommand)
     {
-        var gender = ParseGenderEnumForUpdate(updateCommand.Gender);
-
         return new UpdateUserProfile
-        (
-          updateCommand.FirstName,
-          updateCommand.LastName,
-          updateCommand.Bio,
-          updateCommand.Address,
-          updateCommand.BirthDate,
-          updateCommand.CityId,
-          gender,
-          _currentUser.UserId
-        );
+        {
+            FirstName = updateCommand.FirstName,
+            LastName = updateCommand.LastName,
+            Bio = updateCommand.Bio,
+            Address = updateCommand.Address,
+            BirthDate = updateCommand.BirthDate,
+            CityId = updateCommand.CityId,
+            Gender = updateCommand.Gender,
+            ModifiedById = _currentUser.UserId
+        };
+    }
+
+    private async Task DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete attachment {AttachmentId}", attachmentId);
+        }
+    }
+
+    private async Task UploadImageAsync(UserProfile userProfile, IFormFile image, CancellationToken cancellationToken)
+    {
+        //نگه داشتن ایدی قبلی عکس اپلود شده 
+        var oldImageId = userProfile.UserImageFileId;
+        Guid? newImageId = null;
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            newImageId = await _attachmentService.UploadAsync(image, AttachmentType.Image, cancellationToken);
+
+            userProfile.UpdateImage(newImageId);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
+
+            //اینجا برای این ترای کچ کذاشتم که اگه توی فلو اضافه کردن و اپدیت کردن عکس به رزومه به اکسپشن و مشکلی خورد....
+            //وعکس جدیدی اپلود شده بود اما بدون اینکه به کاربر اختصاص داشته باشه اینو بیام حذف کنم 
+            if (newImageId != null)
+                await DeleteAttachmentAsync(newImageId.Value, cancellationToken);
+
+            throw;
+        }
+
+        //حالا اگه عکس جدیدی سیو شد و اپدیت شد بیا اون عکس قدیمی رو حذف کن 
+        if (oldImageId != null)
+            await DeleteAttachmentAsync(oldImageId.Value, cancellationToken);
     }
 
     #endregion

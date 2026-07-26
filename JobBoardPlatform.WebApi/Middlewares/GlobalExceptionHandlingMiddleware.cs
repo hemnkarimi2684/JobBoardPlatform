@@ -48,6 +48,10 @@ public class GlobalExceptionHandlingMiddleware : IMiddleware
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 await context.Response.WriteAsync(GenerateResponseBody(unauthorizedException.Message, unauthorizedException.Code));
                 break;
+            case OperationCanceledException:
+                context.Response.StatusCode = 499;
+                await context.Response.WriteAsync(GenerateResponseBody("The request was canceled.", "request_canceled"));
+                break;
             default:
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 await context.Response.WriteAsync(GenerateResponseBody

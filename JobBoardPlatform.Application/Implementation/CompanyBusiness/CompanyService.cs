@@ -1,17 +1,25 @@
 ﻿using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace JobBoardPlatform.Application.Implementation.CompanyBusiness;
 
@@ -23,34 +31,39 @@ public class CompanyService : ICompanyService
 
     private readonly IAttachmentService _attachmentService;
 
+    private readonly IAccessControlService _accessControlService;
+
     private readonly ILogger<CompanyService> _logger;
 
-    public CompanyService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAttachmentService attachmentService, ILogger<CompanyService> logger)
+    public CompanyService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAttachmentService attachmentService, IAccessControlService accessControlService, ILogger<CompanyService> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _attachmentService = attachmentService;
+        _accessControlService = accessControlService;
         _logger = logger;
     }
 
-    public async Task<Guid> CreateCompanyAsync(CreateCompanyRequestDto createCommand)
+    #region Create Methods
+
+    public async Task<Guid> CreateCompanyAsync(
+        CreateCompanyRequestDto createCommand,
+        CancellationToken cancellationToken = default)
     {
-        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId);
+        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId, cancellationToken);
 
         if (!doesCityExist)
             throw new NotFoundException($"City with id {createCommand.CityId} was not found.");
 
-        var companyExistsByName = await _unitOfWork.CompanyRepository.IsCompanyExistByNameAsync(createCommand.Name);
+        var companyExistsByName = await _unitOfWork.CompanyRepository.IsCompanyExistByNameAsync(createCommand.Name, cancellationToken);
 
         if (companyExistsByName)
             throw new ConflictException($"the company with this name {createCommand.Name} already exist");
 
-        var companyExistsForOwner = await _unitOfWork.CompanyRepository.IsCompanyExistForOwnerId(createCommand.OwnedByUserId);
+        var companyExistsForOwner = await _unitOfWork.CompanyRepository.IsCompanyExistForOwnerId(createCommand.OwnedByUserId, cancellationToken);
 
         if (companyExistsForOwner)
             throw new ConflictException($"this owner already has company");
-
-        var parsedEnums = ParseEnums(createCommand.OwnershipType, createCommand.CompanySize);
 
         //The reason the item has a .Value property is that Enum.TryParse was used;
         //the output is a nullable enum, but I am certain the enums won't reach the service as null,
@@ -58,18 +71,18 @@ public class CompanyService : ICompanyService
         //and an exception is thrown if the input value is null.
         var company = new Company(
             createCommand.Name, createCommand.YearOfEstablishment, createCommand.Industry,
-            createCommand.AboutUs, createCommand.WebSiteAddress, parsedEnums.Item1.Value,
-            createCommand.OwnedByUserId, parsedEnums.Item2.Value, createCommand.ActivityType,
+            createCommand.AboutUs, createCommand.WebSiteAddress, createCommand.OwnershipType,
+            createCommand.OwnedByUserId, createCommand.CompanySize, createCommand.ActivityType,
             null
             );
 
-        await _unitOfWork.CompanyRepository.AddAsync(company);
+        await _unitOfWork.CompanyRepository.AddAsync(company, cancellationToken);
 
         var companyCity = new CompanyCity(createCommand.Location, company.Id, createCommand.CityId);
 
-        await _unitOfWork.CompanyCityRepository.AddAsync(companyCity);
+        await _unitOfWork.CompanyCityRepository.AddAsync(companyCity, cancellationToken);
 
-        var saveResult = await _unitOfWork.SaveChangesAsync() > 0;
+        var saveResult = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
 
         if (!saveResult)
             throw new ValidationException("something went wring in create companu plaese try again!");
@@ -77,19 +90,31 @@ public class CompanyService : ICompanyService
         return company.Id;
     }
 
-    public async Task<CompanyInfoResponseDto> GetCompanyInfoByOwnerIdAsync(Guid ownerId)
+    #endregion
+
+    #region Get Methods
+
+    public async Task<CompanyProfileResponseDto> GetCompanyProfileByOwnerIdAsync(
+        Guid ownerId,
+        CancellationToken cancellationToken = default)
     {
-        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyInfoResponseDto(
-            c.Name,
-            c.YearOfEstablishment,
-            c.Industry,
-            c.AboutUs,
-            c.WebSiteAddress,
-            c.OwnershipType,
-            c.CompanySize,
-            c.ActivityType
-            ),
-            ownerId);
+        _accessControlService.EnsureOwnerEmployerOrAdmin(ownerId, _currentUser);
+
+        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyProfileResponseDto
+        {
+            Name = c.Name,
+            UserId = c.OwnedByUserId,
+            YearOfEstablishment = c.YearOfEstablishment,
+            Industry = c.Industry,
+            AboutUs = c.AboutUs,
+            WebSiteAddress = c.WebSiteAddress,
+            OwnershipType = c.OwnershipType,
+            CompanySize = c.CompanySize,
+            ActivityType = c.ActivityType,
+            CompanyImageFileId = c.CompanyImageFileId
+        },
+          ownerId,
+          cancellationToken);
 
         if (companyInfo is null)
             throw new NotFoundException($"the company with this ownerId {ownerId} not found");
@@ -97,75 +122,135 @@ public class CompanyService : ICompanyService
         return companyInfo;
     }
 
-    public async Task<bool> UpdateCompanyIdAsync(Guid companyId, UpdateCompanyInfoRequestDto updateCommand)
+    public async Task<Pagination<CompanyProfileResponseDto>> GetAllCompaniesAsync(
+        TextRequestDto textRequestDto,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
     {
-        var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId);
+        var (result, totalDataCount) = await _unitOfWork.CompanyRepository.GetAllCompaniesAsync(c => new CompanyProfileResponseDto
+        {
+            Name = c.Name,
+            UserId = c.OwnedByUserId,
+            YearOfEstablishment = c.YearOfEstablishment,
+            Industry = c.Industry,
+            AboutUs = c.AboutUs,
+            WebSiteAddress = c.WebSiteAddress,
+            OwnershipType = c.OwnershipType,
+            CompanySize = c.CompanySize,
+            ActivityType = c.ActivityType,
+            CompanyImageFileId = c.CompanyImageFileId
+        },
+        textRequestDto.Text,
+        cancellationToken,
+        pagingCommand.PageNumber,
+        pagingCommand.PageSize);
+
+        return Pagination<CompanyProfileResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
+    }
+
+    public async Task<CompanyProfileResponseDto> GetCompanyByIdAsync(
+        Guid companyId,
+        CancellationToken cancellationToken = default)
+    {
+        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken);
+
+        if (company is null)
+            throw new NotFoundException($"the company with this id {companyId} not found");
+
+        return new CompanyProfileResponseDto
+        {
+            Name = company.Name,
+            UserId = company.OwnedByUserId,
+            YearOfEstablishment = company.YearOfEstablishment,
+            Industry = company.Industry,
+            AboutUs = company.AboutUs,
+            WebSiteAddress = company.WebSiteAddress,
+            OwnershipType = company.OwnershipType,
+            CompanySize = company.CompanySize,
+            ActivityType = company.ActivityType,
+            CompanyImageFileId = company.CompanyImageFileId
+        };
+    }
+
+    #endregion
+
+    #region Update Methods
+
+    public async Task<bool> UpdateCompanyIdAsync(
+        Guid companyId,
+        UpdateCompanyInfoRequestDto updateCommand,
+        CancellationToken cancellationToken = default)
+    {
+        var companyOwnerId = await _unitOfWork.CompanyRepository.GetCompanyOwnerIdByCompanyIdAsync(companyId, cancellationToken);
 
         if (companyOwnerId == null)
             throw new NotFoundException($"The company with id {companyId} was not found.");
 
-        CheckOwnerOrAdminPermission(companyOwnerId, _currentUser);
+        _accessControlService.EnsureOwnerEmployerOrAdmin(companyOwnerId.Value, _currentUser);
 
-        var updateCompanyInfoResult = await _unitOfWork.CompanyRepository.UpdateCompanyInfoAsync(companyId, MapToCompanyInfoUpdate(updateCommand));
+        var updateCompanyInfoResult = await _unitOfWork.CompanyRepository.UpdateCompanyInfoAsync(
+                                                                                companyId,
+                                                                                cancellationToken,
+                                                                                MapToCompanyInfoUpdate(updateCommand));
 
         if (!updateCompanyInfoResult)
             throw new NotFoundException($"the company with this id {companyId} not found");
 
-        return await _unitOfWork.SaveChangesAsync() > 0;
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task UploadCompanyImageAsync(Guid companyId, UploadCompanyImageRequestDto imageRequestDto)
+    #endregion
+
+    #region Upload Company Image
+
+    public async Task UploadCompanyImageAsync(
+        Guid companyId,
+        UploadCompanyImageRequestDto imageRequestDto,
+        CancellationToken cancellationToken = default)
     {
-        if (imageRequestDto?.File is null)
+        if (imageRequestDto?.Image is null)
             throw new ValidationException("Image file is required.");
 
-        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId);
+        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken, true);
 
         if (company == null)
             throw new NotFoundException($"The company with id {companyId} was not found.");
 
-        CheckOwnerOrAdminPermission(company.OwnedByUserId, _currentUser);
+        _accessControlService.EnsureOwnerEmployerOrAdmin(company.OwnedByUserId, _currentUser);
 
-        //نگه داشتن ایدی عکس قبلی برای حذف شدن بعد از اپدیت عکس توسط کارفرما
-        var oldImageId = company.CompanyImageFileId;
-        Guid? newImageId = null;
+        await UploadImageAsync(company, imageRequestDto.Image, cancellationToken);
+    }
 
-        try
-        {
-            await _unitOfWork.BeginTransactionAsync();
+    #endregion
 
-            newImageId = await _attachmentService.UploadAsync(imageRequestDto.File, AttachmentType.Image);
+    #region DownLoad Company Image
 
-            company.UpdateImage(newImageId);
 
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransactionAsync();
-        }
-        catch (Exception)
-        {
-            await _unitOfWork.RollBackTransactionAsync();
+    public async Task<AttachmentResponseDto> DownloadCompanyImageAsync(
+        Guid companyId,
+        CancellationToken cancellationToken = default)
+    {
+        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken);
 
-            //اینجا برای این ترای کچ کذاشتم که اگه توی فلو اضافه کردن و اپدیت کردن عکس به شرکت به اکسپشن و مشکلی خورد....
-            //و عکس جدیدی اپلود شده بود اما بدون اینکه به شرکت اختصاص داشته باشه اینو بیام حذف کنم 
-            if (newImageId != null)
-                await DeleteAttachmentAsync(newImageId.Value);
+        if (company == null)
+            throw new NotFoundException($"The company with id {companyId} was not found.");
 
-            throw;
-        }
+        if (company.CompanyImageFileId == null)
+            throw new NotFoundException($"The company with id '{companyId}' does not have an attached image.");
 
-        //حالا اگه عکس جدیدی سیو شد و اپدیت شد بیا اون عکس قدیمی رو حذف کن 
-        if (oldImageId != null)
-            await DeleteAttachmentAsync(oldImageId.Value);
+        return await _attachmentService.DownloadAsync(company.CompanyImageFileId.Value, cancellationToken);
     }
 
 
+    #endregion
+
     #region Private Methods
 
-    private async Task DeleteAttachmentAsync(Guid attachmentId)
+    private async Task DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken)
     {
         try
         {
-            await _attachmentService.HardDeleteAttachmentAsync(attachmentId);
+            await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -173,34 +258,42 @@ public class CompanyService : ICompanyService
         }
     }
 
-    private (OwnershipType?, CompanySizeEnum?) ParseEnums(string? ownershipType, string? companySize)
+    private async Task UploadImageAsync(Company company, IFormFile image, CancellationToken cancellationToken)
     {
-        OwnershipType? parsedOwnershipType = null;
-        CompanySizeEnum? parsedCompanySize = null;
+        //نگه داشتن ایدی عکس قبلی برای حذف شدن بعد از اپدیت عکس توسط کارفرما
+        var oldImageId = company.CompanyImageFileId;
+        Guid? newImageId = null;
 
-        if (!string.IsNullOrWhiteSpace(ownershipType))
+        try
         {
-            if (!Enum.TryParse<OwnershipType>(ownershipType, true, out var result))
-                throw new ValidationException("Invalid ownership type.");
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            parsedOwnershipType = result;
+            newImageId = await _attachmentService.UploadAsync(image, AttachmentType.Image, cancellationToken);
+
+            company.UpdateImage(newImageId);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
+
+            //اینجا برای این ترای کچ کذاشتم که اگه توی فلو اضافه کردن و اپدیت کردن عکس به شرکت به اکسپشن و مشکلی خورد....
+            //و عکس جدیدی اپلود شده بود اما بدون اینکه به شرکت اختصاص داشته باشه اینو بیام حذف کنم 
+            if (newImageId != null)
+                await DeleteAttachmentAsync(newImageId.Value, cancellationToken);
+
+            throw;
         }
 
-        if (!string.IsNullOrWhiteSpace(companySize))
-        {
-            if (!Enum.TryParse<CompanySizeEnum>(companySize, true, out var result))
-                throw new ValidationException("Invalid company size.");
-
-            parsedCompanySize = result;
-        }
-
-        return (parsedOwnershipType, parsedCompanySize);
+        //حالا اگه عکس جدیدی سیو شد و اپدیت شد بیا اون عکس قدیمی رو حذف کن 
+        if (oldImageId != null)
+            await DeleteAttachmentAsync(oldImageId.Value, cancellationToken);
     }
 
     private CompanyInfoUpdate MapToCompanyInfoUpdate(UpdateCompanyInfoRequestDto updateCompanyInfoCommand)
     {
-        var parsedEnums = ParseEnums(updateCompanyInfoCommand.OwnershipType, updateCompanyInfoCommand.CompanySize);
-
         return new CompanyInfoUpdate
         (
             updateCompanyInfoCommand.Name,
@@ -208,31 +301,11 @@ public class CompanyService : ICompanyService
             updateCompanyInfoCommand.Industry,
             updateCompanyInfoCommand.AboutUs,
             updateCompanyInfoCommand.WebSiteAddress,
-            parsedEnums.Item1,
-            parsedEnums.Item2,
+            updateCompanyInfoCommand.OwnershipType,
+            updateCompanyInfoCommand.CompanySize,
             updateCompanyInfoCommand.ActivityType,
             _currentUser.UserId
         );
-    }
-
-    private void CheckOwnerOrAdminPermission(Guid? ownerId, ICurrentUser currentUser)
-    {
-        var isOwner = ownerId == currentUser.UserId;
-
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
-        var isEmployer = currentUser.UserRoles.Contains(RoleConstants.EmployerRoleName);
-
-        if (!isAdmin && !(isOwner && isEmployer))
-            throw new ForbiddenException("You do not have sufficient access to manage this company.");
-    }
-
-    private void CheckEmployerOrAdminPermission(ICurrentUser currentUser)
-    {
-        var isAdminOrEmployer = currentUser.UserRoles.Any(role => role == RoleConstants.EmployerRoleName || role == RoleConstants.AdminRoleName);
-
-        if (!isAdminOrEmployer)
-            throw new ForbiddenException("You do not have sufficient access to manage a company.");
     }
 
     #endregion

@@ -25,5 +25,10 @@ public enum JobApplicationStatus
     /// <summary>
     /// رد شده
     /// </summary>
-    Rejected
+    Rejected,
+
+    /// <summary>
+    /// کنسل شده
+    /// </summary>
+    Cancelled
 }

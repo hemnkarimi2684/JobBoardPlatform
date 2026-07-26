@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.SkillDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
@@ -10,29 +11,55 @@ public interface ISkillService
     /// دریافت مهارت های یک کاربر
     /// </summary>
     /// <param name="userId"></param>
+    /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<UserSkillDetailResponseDto>> GetUserSkillsAsync(Guid userId, PagingRequestDto pagingCommand);
+    Task<Pagination<UserSkillResponseDto>> GetUserSkillsAsync(
+        Guid userId,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// ساخت یک مهارت 
+    /// ساخت یک مهارت
     /// </summary>
     /// <param name="name"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> CreateSkillAsync(string name);
+    Task<bool> CreateSkillAsync(
+        CreateSkillRequestDto skillRequestDto,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// اضافه کردن مهارت به یک کاربر 
+    /// اضافه کردن مهارت به یک کاربر
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="skillsId"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> AddSkillsToUserAsync(Guid userId, List<Guid> skillsId);
+    Task<bool> AddSkillsToUserAsync(
+        Guid userId,
+        List<Guid> skillsId,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// دریافت تمام مهارت ها 
     /// </summary>
     /// <param name="text"></param>
     /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<UserSkillDetailResponseDto>> GetAllSkillsAsync(string text, PagingRequestDto pagingCommand);
+    Task<Pagination<SkillDetailResponseDto>> GetAllSkillsAsync(
+        TextRequestDto textRequestDto,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت مهارت توسط شناسه اش
+    /// </summary>
+    /// <param name="skillId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<SkillDetailResponseDto> GetSkillByIdAsync(
+        Guid skillId,
+        CancellationToken cancellationToken = default);
 }

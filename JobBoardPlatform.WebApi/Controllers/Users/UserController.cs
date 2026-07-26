@@ -4,59 +4,89 @@ using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace JobBoardPlatform.WebApi.Controllers.Users
+namespace JobBoardPlatform.WebApi.Controllers.Users;
+
+[Route("api/Users")]
+[ApiController]
+[Authorize]
+public class UserController : ControllerBase
 {
-    [Route("api/Users")]
-    [ApiController]
-    [Authorize]
-    public class UserController : ControllerBase
+    private readonly IUserService _userService;
+
+    public UserController(IUserService userService)
     {
-        private readonly IUserService _userService;
+        _userService = userService;
+    }
 
-        public UserController(IUserService userService)
-        {
-            _userService = userService;
-        }
+    [HttpPost]
+    [Authorize(Roles = "JobSeeker")]
+    [RequestModelValidationFilter]
+    public async Task<IActionResult> CreateProfileAsync(
+        [FromBody] CreateProfileRequestDto createProfile,
+        CancellationToken cancellationToken)
+    {
+        await _userService.CreateProfileAsync(createProfile, cancellationToken);
 
-        [HttpPost]
-        [Authorize(Roles = "JobSeeker")]
-        [RequestModelValidationFilter]
-        public async Task<IActionResult> CreateProfileAsync([FromBody] CreateProfileRequestDto createProfile)
-        {
-            await _userService.CreateProfileAsync(createProfile);
+        return Ok(Result.Success());
+    }
 
-            return Ok(Result.Success());
-        }
+    [HttpPut("{userId:guid}")]
+    [Authorize(Roles = "JobSeeker")]
+    [RequestModelValidationFilter]
+    public async Task<IActionResult> UpdateProfileAsync(
+        [FromRoute] Guid userId,
+        [FromBody] UpdateProfileRequestDto updateProfile,
+        CancellationToken cancellationToken)
+    {
+        await _userService.UpdateProfileAsync(userId, updateProfile, cancellationToken);
 
-        [HttpPut("{userId:guid}")]
-        [Authorize(Roles = "JobSeeker")]
-        [RequestModelValidationFilter]
-        public async Task<IActionResult> UpdateProfileAsync([FromRoute] Guid userId, [FromBody] UpdateProfileRequestDto updateProfile)
-        {
-            await _userService.UpdateProfileAsync(userId, updateProfile);
+        return Ok(Result.Success());
+    }
 
-            return Ok(Result.Success());
-        }
+    [HttpGet("by-user/{userId:guid}/profile")]
+    [Authorize(Roles = "Admin,JobSeeker")]
+    public async Task<IActionResult> GetUserProfileByUserIdAsync(
+        [FromRoute] Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _userService.GetUserProfileByUserIdAsync(userId, cancellationToken);
 
-        [HttpGet("{userId:guid}/info")]
-        [Authorize(Roles = "Admin,Employer,JobSeeker")]
-        public async Task<IActionResult> GetUserProfileInfoAsync([FromRoute] Guid userId)
-        {
-            var result = await _userService.GetUserProfileInfoAsync(userId);
+        return Ok(Result<UserProfileResponseDto>.Success(result));
+    }
 
-            return Ok(Result<UserProfileInfoResponseDto>.Success(result));
-        }
+    [HttpPatch("{employerId:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ApprovedEmployerAsync(
+        [FromRoute] Guid employerId,
+        CancellationToken cancellationToken)
+    {
+        await _userService.ApprovedEmployerAsync(employerId, cancellationToken);
 
-        [HttpPatch("{employerId:guid}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ApprovedEmployerAsync([FromRoute] Guid employerId)
-        {
-            await _userService.ApprovedEmployerAsync(employerId);
+        return Ok(Result.Success());
+    }
 
-            return Ok(Result.Success());
-        }
+    [HttpGet("{userId:guid}/download-image")]
+    [Authorize(Roles = "Admin,JobSeeker")]
+    public async Task<IActionResult> DownloadUserImageAsync(
+        [FromRoute] Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var result = await _userService.DownloadUserImageAsync(userId, cancellationToken);
+
+        return File(result.Data, result.ContentType, result.FileName);
+    }
+
+    [HttpPatch("{userId:guid}/upload-image")]
+    [Authorize(Roles = "JobSeeker")]
+    public async Task<IActionResult> UploadUserImageAsync(
+        [FromRoute] Guid userId,
+        [FromForm] UploadUserImageRequestDto imageRequestDto,
+        CancellationToken cancellationToken)
+    {
+        await _userService.UploadUserImageAsync(userId, imageRequestDto, cancellationToken);
+
+        return Ok(Result.Success());
     }
 }
