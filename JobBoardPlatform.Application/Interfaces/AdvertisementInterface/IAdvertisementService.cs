@@ -69,7 +69,7 @@ public interface IAdvertisementService
     /// <param name="advertisementId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> InActivateAdvertisementAsync(
+    Task<bool> DeactivateAdvertisementAsync(
         Guid advertisementId,
         CancellationToken cancellationToken = default);
 
@@ -134,15 +134,17 @@ public interface IAdvertisementService
     Task<Pagination<AdvertisementDetailResponseDto>> GetAllAdvertisementsAsync(
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// ویژه کردن اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
+    /// <param name="durationInDays"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task PromoteAdvertisementAsync(
         Guid advertisementId,
+        int durationInDays,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -152,6 +154,6 @@ public interface IAdvertisementService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task DemoteAdvertisementAsync(
-        Guid advertisementId, 
+        Guid advertisementId,
         CancellationToken cancellationToken = default);
 }

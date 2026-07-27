@@ -13,7 +13,7 @@ public static class UserQueries
                                                       FROM Users U
                                                       INNER JOIN UserRoles UR ON U.Id = UR.UserId
                                                       INNER JOIN Companies C ON U.Id = C.OwnedByUserId
-                                                      WHERE UR.RoleId = @RoleId AND U.IsApproved = 1
+                                                      WHERE UR.RoleId = '5337E711-0787-4445-83DD-08DEE31DC442' AND U.IsApproved = 1
                                                       ORDER BY U.CreatedAt DESC
                                                       OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
 
@@ -27,7 +27,7 @@ public static class UserQueries
                                                FROM Users AS U
                                                INNER JOIN UserRoles AS UR
                                                    ON UR.UserId = U.Id
-                                                  AND UR.RoleId = @RoleId
+                                                  AND UR.RoleId = '42C14691-0D24-4597-83DE-08DEE31DC442'
                                                ORDER BY U.CreatedAt DESC
                                                OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
 }

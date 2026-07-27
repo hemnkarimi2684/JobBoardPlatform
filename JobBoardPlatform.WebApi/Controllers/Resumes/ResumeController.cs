@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Resumes;
 
-[Route("api/[controller]s")]
+[Route("api/resumes")]
 [ApiController]
 [Authorize]
 public class ResumeController : ControllerBase
@@ -22,7 +22,7 @@ public class ResumeController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> CreateResumeAsync(
         [FromBody] CreateResumeRequestDto resumeRequest,
@@ -34,7 +34,7 @@ public class ResumeController : ControllerBase
     }
 
     [HttpGet("by-user/{userId:guid}")]
-    [Authorize(Roles = "JobSeeker,Admin,Employer")]
+    //[Authorize(Roles = "JobSeeker,Admin,Employer")]
     public async Task<IActionResult> GetResumeDetailAsync(
         [FromRoute] Guid userId,
         CancellationToken cancellationToken)
@@ -45,7 +45,7 @@ public class ResumeController : ControllerBase
     }
 
     [HttpPatch("{resumeId:guid}/upload-file")]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> UploadResumeFileByResumeIdAsync(
         [FromRoute] Guid resumeId,
         [FromForm] UploadResumeFileRequestDto uploadResumeFile,
@@ -57,7 +57,7 @@ public class ResumeController : ControllerBase
     }
 
     [HttpPatch("by-user/{userId:guid}/upload-file")]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> UploadResumeFileByUserIdAsync(
         [FromRoute] Guid userId,
         [FromForm] UploadResumeFileRequestDto uploadResumeFile,
@@ -69,7 +69,6 @@ public class ResumeController : ControllerBase
     }
 
     [HttpPatch("{resumeId:guid}/download")]
-    [Authorize(Roles = "Admin,Employer,JobSeeker")]
     public async Task<IActionResult> DownloadResumeFileAsync(
         [FromRoute] Guid resumeId,
         CancellationToken cancellationToken)
@@ -80,7 +79,6 @@ public class ResumeController : ControllerBase
     }
 
     [HttpPatch("by-user/{userId:guid}/download")]
-    [Authorize(Roles = "Admin,Employer,JobSeeker")]
     public async Task<IActionResult> DownloadResumeFileByUserIdAsync(
         [FromRoute] Guid userId,
         CancellationToken cancellationToken)
@@ -91,7 +89,7 @@ public class ResumeController : ControllerBase
     }
 
     [HttpDelete("{resumeId:guid}")]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> DeleteResumeFileByIdAsync(
         [FromRoute] Guid resumeId,
         CancellationToken cancellationToken)

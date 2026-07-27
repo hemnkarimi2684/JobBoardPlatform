@@ -1,8 +1,6 @@
-﻿using System.Security.Claims;
+﻿namespace JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
 
-namespace JobBoardPlatform.Application.Common.Constants;
-
-public class ClaimConstants
+public class UserClaims
 {
     //سطح دسترسی برای کارفرما
     public const string EmployerClaimType = "Employer";
@@ -10,5 +8,5 @@ public class ClaimConstants
 
     //سطح دسترسی برای کارجو
     public const string JobSeekerClaimType = "JobSeeker";
-    public const string IsActiveClaimValue = "IsAcitve";
+    public const string IsActiveClaimValue = "IsActive";
 }

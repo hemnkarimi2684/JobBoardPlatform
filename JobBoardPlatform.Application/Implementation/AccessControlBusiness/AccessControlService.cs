@@ -1,4 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
+﻿using JobBoardPlatform.Application.Common.Constants.RoleConstant;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
@@ -46,13 +46,8 @@ public class AccessControlService : IAccessControlService
         throw new ForbiddenException("You do not have sufficient access.");
     }
 
-    public void EnsureApplicantOrOwnerEmployerOrAdmin(Guid ownerId, Guid applicantUserId, ICurrentUser currentUser)
+    public void EnsureApplicantOrOwnerEmployer(Guid ownerId, Guid applicantUserId, ICurrentUser currentUser)
     {
-        //ایا خود ادمینه که درخواست داده؟
-        var isAdmin = IsAdmin(currentUser);
-        if (isAdmin)
-            return;
-
         //ایا کارفرماس؟ اگه هست اطلاعات مربوط به خودش رو مبینیه یا نه؟
         var isOwnerEmployer = IsOwnerEmployer(ownerId, currentUser);
 
@@ -75,6 +70,17 @@ public class AccessControlService : IAccessControlService
         if (isAdmin)
             return;
 
+        //ایا کارفرماس؟ اگه هست اطلاعات مربوط به خودش رو مبینیه یا نه؟
+        var isOwnerEmployer = IsOwnerEmployer(ownerId, currentUser);
+
+        if (isOwnerEmployer)
+            return;
+
+        throw new ForbiddenException("You do not have sufficient access.");
+    }
+
+    public void EnsureOwnerEmployer(Guid ownerId, ICurrentUser currentUser)
+    {
         //ایا کارفرماس؟ اگه هست اطلاعات مربوط به خودش رو مبینیه یا نه؟
         var isOwnerEmployer = IsOwnerEmployer(ownerId, currentUser);
 

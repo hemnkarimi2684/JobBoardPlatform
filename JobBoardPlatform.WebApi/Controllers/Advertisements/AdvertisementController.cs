@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Advertisements;
 
-[Route("api/[controller]s")]
+[Route("api/advertisement")]
 [ApiController]
 [Authorize]
 public class AdvertisementController : ControllerBase
@@ -22,7 +22,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> CreateAdvertisementAsync(
         [FromBody] CreateAdvertisementRequestDto createAdvertisement,
@@ -34,7 +34,7 @@ public class AdvertisementController : ControllerBase
     }
 
     [HttpPut("{advertisementId:guid}")]
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> UpdateAdvertisementAsync(
         [FromRoute] Guid advertisementId,
@@ -46,19 +46,8 @@ public class AdvertisementController : ControllerBase
         return Ok(Result.Success());
     }
 
-    [HttpDelete("{advertisementId:guid}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> SoftDeleteAdvertisementAsync(
-        [FromRoute] Guid advertisementId,
-        CancellationToken cancellationToken)
-    {
-        await _advertisementService.SoftDeleteAdvertisementAsync(advertisementId, cancellationToken);
-
-        return Ok(Result.Success());
-    }
-
     [HttpGet("by-company/{companyId:guid}")]
-    [Authorize(Roles = "Employer,Admin")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> GetAdvertisementsByCompanyAsync(
         [FromRoute] Guid companyId,
         [FromQuery] PagingRequestDto pagingRequestDto,
@@ -69,30 +58,7 @@ public class AdvertisementController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPatch("{advertisementId:guid}/in-activate")]
-    [Authorize(Roles = "Admin,Employer")]
-    public async Task<IActionResult> InActivateAdvertisementAsync(
-        [FromRoute] Guid advertisementId,
-        CancellationToken cancellationToken)
-    {
-        await _advertisementService.InActivateAdvertisementAsync(advertisementId, cancellationToken);
-
-        return Ok(Result.Success());
-    }
-
-    [HttpPatch("{advertisementId:guid}/activate")]
-    [Authorize(Roles = "Admin,Employer")]
-    public async Task<IActionResult> ActivateAdvertisementAsync(
-        [FromRoute] Guid advertisementId,
-        CancellationToken cancellationToken)
-    {
-        var result = await _advertisementService.ActivateAdvertisementAsync(advertisementId, cancellationToken);
-
-        return Ok(Result.Success());
-    }
-
     [HttpGet("{advertisementId:guid}")]
-    [Authorize(Roles = "Employer,Admin")]
     public async Task<IActionResult> GetAdvertisementInfoByIdAsync(
        [FromRoute] Guid advertisementId,
         CancellationToken cancellationToken)

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.EducationDetails;
 
-[Route("api/[controller]")]
+[Route("api/educationDetails")]
 [ApiController]
 [Authorize]
 public class EducationDetailController : ControllerBase
@@ -24,7 +24,7 @@ public class EducationDetailController : ControllerBase
     }
 
     [HttpGet("{userId:guid}/education-details")]
-    [Authorize(Roles = "Admin,JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> GetUserEducationDetailsAsync(
         [FromRoute] Guid userId,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -36,7 +36,7 @@ public class EducationDetailController : ControllerBase
     }
 
     [HttpGet("{educationDetailId:guid}")]
-    [Authorize(Roles = "Admin,JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> GetEducationDetailByIdAsync(
         [FromRoute] Guid educationDetailId,
         CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ public class EducationDetailController : ControllerBase
 
     [HttpPost]
     [RequestModelValidationFilter]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> CreateEducationDetailAsync(
         [FromBody] CreateEducationDetailRequestDto createEducation,
         CancellationToken cancellationToken)
@@ -60,7 +60,7 @@ public class EducationDetailController : ControllerBase
 
     [HttpPut("{educationDetailId:guid}")]
     [RequestModelValidationFilter]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> UpdateEducationDetailAsync(
         [FromRoute] Guid educationDetailId,
         [FromBody] UpdateEducationDetailRequestDto updateEducation,

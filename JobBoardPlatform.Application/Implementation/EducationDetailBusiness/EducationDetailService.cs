@@ -68,7 +68,7 @@ public class EducationDetailService : IEducationDetailService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+        _accessControlService.EnsureApplicant(userId, _currentUser);
 
         var (userEducationDetails, totalDataCount) = await _unitOfWork.EducationDetailRepository
                                                           .GetUserEducationDetailsAsync(ed =>
@@ -105,7 +105,7 @@ public class EducationDetailService : IEducationDetailService
         if (educationDetail == null)
             throw new NotFoundException($"The education detail with id {educationDetailId} was not found.");
 
-        _accessControlService.EnsureApplicantOrAdmin(educationDetail.UserId, _currentUser);
+        _accessControlService.EnsureApplicant(educationDetail.UserId, _currentUser);
 
         return new EducationHistoryResponseDto
         {

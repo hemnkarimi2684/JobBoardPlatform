@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Skills;
 
-[Route("api/[controller]s")]
+[Route("api/skills")]
 [ApiController]
 [Authorize]
 public class SkillController : ControllerBase
@@ -22,7 +22,6 @@ public class SkillController : ControllerBase
     }
 
     [HttpGet("by-user/{userId:guid}")]
-    [Authorize(Roles = "Admin,Employer,JobSeeker")]
     public async Task<IActionResult> GetUserSkillsAsync(
         [FromRoute] Guid userId,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -45,7 +44,7 @@ public class SkillController : ControllerBase
     }
 
     [HttpPost("assign-to-user/{userId:guid}")]
-    [Authorize(Roles = "Admin,JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> AddSkillsToUserAsync(
         [FromRoute] Guid userId,
         [FromBody] List<Guid> skillsId,

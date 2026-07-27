@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.JobApplications;
 
-[Route("api/[controller]s")]
+[Route("api/jobApplications")]
 [ApiController]
 [Authorize]
 public class JobApplicationController : ControllerBase
@@ -24,7 +24,7 @@ public class JobApplicationController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> CreateJobApplicationAsync(
         [FromBody] CreateJobApplicationRequestDto createJobApplication,
@@ -36,7 +36,7 @@ public class JobApplicationController : ControllerBase
     }
 
     [HttpPatch("{jobApplicationId:guid}")]
-    [Authorize(Roles = "Admin,Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> UpdateJobApplicationStatusAsync(
         [FromRoute] Guid jobApplicationId,
@@ -49,7 +49,7 @@ public class JobApplicationController : ControllerBase
     }
 
     [HttpGet("by-advertisement/{advertisementId:guid}")]
-    [Authorize(Roles = "Employer,Admin")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> GetAdvertisementJobApplicationsAsync(
         [FromRoute] Guid advertisementId,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -61,7 +61,7 @@ public class JobApplicationController : ControllerBase
     }
 
     [HttpGet("{jobApplicationId:guid}")]
-    [Authorize(Roles = "Employer,Admin")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> GetJobApplicationByIdAsync(
         [FromRoute] Guid jobApplicationId,
         CancellationToken cancellationToken)
@@ -72,7 +72,7 @@ public class JobApplicationController : ControllerBase
     }
 
     [HttpGet("by-user/{userId:guid}")]
-    [Authorize(Roles = "JobSeeker,Admin")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> GetJobApplicationsByUserIdAsync(
         [FromRoute] Guid userId,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -84,7 +84,7 @@ public class JobApplicationController : ControllerBase
     }
 
     [HttpPatch("{jobApplicationId:guid}/cancel")]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> CancelJobApplicationAsync(
         [FromRoute] Guid jobApplicationId,
         CancellationToken cancellationToken)

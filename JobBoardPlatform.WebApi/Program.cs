@@ -1,4 +1,6 @@
+using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
 using JobBoardPlatform.Application.Common.Constants;
+using JobBoardPlatform.Application.Common.Constants.RoleConstant;
 using JobBoardPlatform.Application.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
@@ -57,8 +59,13 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("IsApproved", policy => policy
-    .RequireClaim(ClaimConstants.EmployerClaimType, ClaimConstants.IsApprovedClaimValue));
+    options.AddPolicy("ApprovedEmployerOnly", policy =>
+       policy.RequireRole(RoleConstants.EmployerRoleName)
+             .RequireClaim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue));
+
+    options.AddPolicy("ActiveJobSeekerOnly", policy =>
+       policy.RequireRole(RoleConstants.JobSeekerRoleName)
+             .RequireClaim(UserClaims.JobSeekerClaimType, UserClaims.IsActiveClaimValue));
 });
 
 var app = builder.Build();

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Users;
 
-[Route("api/Users")]
+[Route("api/users")]
 [ApiController]
 [Authorize]
 public class UserController : ControllerBase
@@ -21,7 +21,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> CreateProfileAsync(
         [FromBody] CreateProfileRequestDto createProfile,
@@ -33,7 +33,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("{userId:guid}")]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> UpdateProfileAsync(
         [FromRoute] Guid userId,
@@ -45,30 +45,7 @@ public class UserController : ControllerBase
         return Ok(Result.Success());
     }
 
-    [HttpGet("by-user/{userId:guid}/profile")]
-    [Authorize(Roles = "Admin,JobSeeker")]
-    public async Task<IActionResult> GetUserProfileByUserIdAsync(
-        [FromRoute] Guid userId,
-        CancellationToken cancellationToken)
-    {
-        var result = await _userService.GetUserProfileByUserIdAsync(userId, cancellationToken);
-
-        return Ok(Result<UserProfileResponseDto>.Success(result));
-    }
-
-    [HttpPatch("{employerId:guid}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> ApprovedEmployerAsync(
-        [FromRoute] Guid employerId,
-        CancellationToken cancellationToken)
-    {
-        await _userService.ApprovedEmployerAsync(employerId, cancellationToken);
-
-        return Ok(Result.Success());
-    }
-
     [HttpGet("{userId:guid}/download-image")]
-    [Authorize(Roles = "Admin,JobSeeker")]
     public async Task<IActionResult> DownloadUserImageAsync(
         [FromRoute] Guid userId,
         CancellationToken cancellationToken)
@@ -79,7 +56,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("{userId:guid}/upload-image")]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> UploadUserImageAsync(
         [FromRoute] Guid userId,
         [FromForm] UploadUserImageRequestDto imageRequestDto,

@@ -80,7 +80,7 @@ public class AdvertisementService : IAdvertisementService
         if (companyOwnerId == null)
             throw new NotFoundException($"The company with id {companyId} was not found.");
 
-        _accessControlService.EnsureOwnerEmployerOrAdmin(companyOwnerId.Value, _currentUser);
+        _accessControlService.EnsureOwnerEmployer(companyOwnerId.Value, _currentUser);
 
         var (companyAdvertisements, totalDataCount) = await _unitOfWork.AdvertisementRepository
                                                     .GetAdvertisementsByCompanyAsync(a => new AdvertisementDetailResponseDto
@@ -362,7 +362,7 @@ public class AdvertisementService : IAdvertisementService
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<bool> InActivateAdvertisementAsync(
+    public async Task<bool> DeactivateAdvertisementAsync(
         Guid advertisementId,
         CancellationToken cancellationToken = default)
     {
@@ -396,6 +396,54 @@ public class AdvertisementService : IAdvertisementService
             throw new NotFoundException($"the advertisement with this id {advertisementId} not found ");
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+    }
+
+    public async Task PromoteAdvertisementAsync(
+        Guid advertisementId,
+        int durationInDays,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        if (durationInDays != 7 && durationInDays != 15 && durationInDays != 30)
+            throw new ValidationException("Allowed durations are 7 or 15 or 30 days.");
+
+        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
+
+        if (advertisement == null)
+            throw new NotFoundException($"the advertisement with id {advertisementId} was not found.");
+
+        //بررسی میکنم اینجا که  این ایا اگهی هنوز فعال است یا نه 
+        if (advertisement.IsFeatured && advertisement.FeaturedUntil.HasValue && advertisement.FeaturedUntil.Value >= DateTime.UtcNow)
+            throw new ValidationException("the advertisement is already Featured");
+
+        //اینجا چون خود پراپرتی فیچر انتیلم نال است برای پر کردنش از تاریخ دقیق روز استفاده میکنم چرا مطمئنم چون بالا چک کردم که اگه
+        // بزرگتر یا مساوی از تاریخ امروز باشه یعنی هنوز فعاله
+        var featuredUntil = DateTime.UtcNow.AddDays(durationInDays);
+
+        advertisement.UpdateFeatured(true, featuredUntil);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DemoteAdvertisementAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
+
+        if (advertisement == null)
+            throw new NotFoundException($"the advertisement with id {advertisementId} was not found.");
+
+        //با این شرط اینجا گذاشتم اون اگهی هایی که تاریخ انقضاشون گشذشته هم کامل منقضی میکنم 
+        if (advertisement.FeaturedUntil == null && advertisement.IsFeatured == false)
+            throw new ValidationException("The advertisement is already in normal status.");
+
+        advertisement.UpdateFeatured(false, null);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     #endregion
@@ -440,50 +488,6 @@ public class AdvertisementService : IAdvertisementService
 
         if (!isCompanyExistInCity)
             throw new NotFoundException($"the company with id {companyId} not found in city with id {cityId}");
-    }
-
-    public async Task PromoteAdvertisementAsync(
-        Guid advertisementId,
-        int durationInDays,
-        CancellationToken cancellationToken = default)
-    {
-        if (durationInDays != 7 && durationInDays != 15 && durationInDays != 30)
-            throw new ValidationException("Allowed durations are 7 or 15 or 30 days.");
-
-        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
-
-        if (advertisement == null)
-            throw new NotFoundException($"the advertisement with id {advertisementId} was not found.");
-
-        //بررسی میکنم اینجا که  این ایا اگهی هنوز فعال است یا نه 
-        if (advertisement.IsFeatured && advertisement.FeaturedUntil.HasValue && advertisement.FeaturedUntil.Value >= DateTime.UtcNow)
-            throw new ValidationException("the advertisement is already Featured");
-
-        //اینجا چون خود پراپرتی فیچر انتیلم نال است برای پر کردنش از تاریخ دقیق روز استفاده میکنم چرا مطمئنم چون بالا چک کردم که اگه
-        // بزرگتر یا مساوی از تاریخ امروز باشه یعنی هنوز فعاله
-        var featuredUntil = DateTime.UtcNow.AddDays(durationInDays);
-
-        advertisement.UpdateFeatured(true, featuredUntil);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task DemoteAdvertisementAsync(
-        Guid advertisementId,
-        CancellationToken cancellationToken = default)
-    {
-        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
-
-        if (advertisement == null)
-            throw new NotFoundException($"the advertisement with id {advertisementId} was not found.");
-
-        //با این شرط اینجا اون اگهی هایی که تاریخ انقضاشون گشذشته هم کامل منقضی میکنم 
-        if (advertisement.FeaturedUntil == null && advertisement.IsFeatured == false)
-            throw new ValidationException("The advertisement is already in normal status.");
-
-        advertisement.UpdateFeatured(false, null);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     #endregion

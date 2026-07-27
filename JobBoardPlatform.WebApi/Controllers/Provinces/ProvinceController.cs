@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Provinces;
 
-[Route("api/[controller]")]
+[Route("api/provinces")]
 [ApiController]
 [Authorize]
 public class ProvinceController : ControllerBase

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Cities;
 
-[Route("api/[controller]")]
+[Route("api/cities")]
 [ApiController]
 [Authorize]
 public class CityController : ControllerBase

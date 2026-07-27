@@ -63,7 +63,7 @@ public class JobApplicationService : IJobApplicationService
     {
         var userId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
 
-        _accessControlService.EnsureOwnerEmployerOrAdmin(userId.Value, _currentUser);
+        _accessControlService.EnsureOwnerEmployer(userId.Value, _currentUser);
 
         var (advertisementJobApplications, totalDataCount) = await _unitOfWork
                                                                         .JobApplicationRepository
@@ -108,7 +108,7 @@ public class JobApplicationService : IJobApplicationService
         if (ownerId == null)
             throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
 
-        _accessControlService.EnsureApplicantOrOwnerEmployerOrAdmin(ownerId.Value, jobApplication.UserId, _currentUser);
+        _accessControlService.EnsureApplicantOrOwnerEmployer(ownerId.Value, jobApplication.UserId, _currentUser);
 
         return new JobApplicationDetailResponseDto
         {
@@ -132,7 +132,7 @@ public class JobApplicationService : IJobApplicationService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+        _accessControlService.EnsureApplicant(userId, _currentUser);
 
         var (advertisementJobApplications, totalDataCount) = await _unitOfWork
                                                                         .JobApplicationRepository
@@ -183,7 +183,7 @@ public class JobApplicationService : IJobApplicationService
         if (ownerId == null)
             throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
 
-        _accessControlService.EnsureOwnerEmployerOrAdmin(ownerId.Value, _currentUser);
+        _accessControlService.EnsureOwnerEmployer(ownerId.Value, _currentUser);
 
         ValidateJobApplicationStatus(jobApplication, status);
 

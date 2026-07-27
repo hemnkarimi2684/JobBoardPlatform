@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.WebApi.ResultPattern;
@@ -50,11 +51,11 @@ public class CompanyController : ControllerBase
     {
         var result = await _companyService.GetCompanyByIdAsync(companyId, cancellationToken);
 
-        return Ok(Result<EmployerWithCompanyResponseDto>.Success(result));
+        return Ok(Result<CompanyDetailResponseDto>.Success(result));
     }
 
     [HttpPut("{companyId:guid}")]
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> UpdateCompanyIdAsync(
         [FromRoute] Guid companyId,
         [FromBody] UpdateCompanyInfoRequestDto update,
@@ -66,7 +67,7 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPatch("{companyId:guid}/upload-image")]
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> UploadCompanyImageAsync(
         [FromRoute] Guid companyId,
         [FromForm] UploadCompanyImageRequestDto imageRequestDto,

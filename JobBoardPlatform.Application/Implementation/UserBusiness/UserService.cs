@@ -1,4 +1,6 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
+﻿using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
+using JobBoardPlatform.Application.Common.Constants;
+using JobBoardPlatform.Application.Common.Constants.RoleConstant;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
@@ -155,6 +157,8 @@ public class UserService : IUserService
     public async Task<Pagination<EmployerDetailResponseDto>> GetApprovedEmployersAsync(
          PagingRequestDto pagingCommand)
     {
+        _accessControlService.EnsureAdmin(_currentUser);
+
         var (result, totalDataCount) = await _userDapperRepository.GetApprovedEmployersAsync(pagingCommand.PageNumber, pagingCommand.PageSize);
 
         return Pagination<EmployerDetailResponseDto>.GetPagination(
@@ -167,6 +171,8 @@ public class UserService : IUserService
     public async Task<Pagination<JobSeekerDetailResponseDto>> GetJobSeekersAsync(
          PagingRequestDto pagingCommand)
     {
+        _accessControlService.EnsureAdmin(_currentUser);
+
         var (result, totalDataCount) = await _userDapperRepository.GetJobSeekersAsync(pagingCommand.PageNumber, pagingCommand.PageSize);
 
         return Pagination<JobSeekerDetailResponseDto>.GetPagination(
@@ -231,7 +237,7 @@ public class UserService : IUserService
 
             user.UpdateIsApproved(true, _currentUser.UserId);
 
-            var claim = new Claim(ClaimConstants.EmployerClaimType, ClaimConstants.IsApprovedClaimValue);
+            var claim = new Claim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue);
 
             var employerClaims = await _userManager.GetClaimsAsync(user);
 
@@ -255,7 +261,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task DisapproveEmployerAsync(
+    public async Task RejectEmployerAsync(
     Guid userId,
     CancellationToken cancellationToken = default)
     {
@@ -280,7 +286,7 @@ public class UserService : IUserService
 
             user.UpdateIsApproved(false, _currentUser.UserId);
 
-            var claim = new Claim(ClaimConstants.EmployerClaimType, ClaimConstants.IsApprovedClaimValue);
+            var claim = new Claim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue);
 
             var employerClaims = await _userManager.GetClaimsAsync(user);
 
@@ -328,7 +334,7 @@ public class UserService : IUserService
 
             user.UpdateIsActive(true, _currentUser.UserId);
 
-            var claim = new Claim(ClaimConstants.JobSeekerClaimType, ClaimConstants.IsActiveClaimValue);
+            var claim = new Claim(UserClaims.JobSeekerClaimType, UserClaims.IsActiveClaimValue);
 
             var jobSeekerClaims = await _userManager.GetClaimsAsync(user);
 
@@ -351,7 +357,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task InActivateJobSeekerAsync(
+    public async Task DeactivateJobSeekerAsync(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
@@ -376,7 +382,7 @@ public class UserService : IUserService
 
             user.UpdateIsActive(false, _currentUser.UserId);
 
-            var claim = new Claim(ClaimConstants.JobSeekerClaimType, ClaimConstants.IsActiveClaimValue);
+            var claim = new Claim(UserClaims.JobSeekerClaimType, UserClaims.IsActiveClaimValue);
 
             var jobSeekerClaims = await _userManager.GetClaimsAsync(user);
 
@@ -439,8 +445,6 @@ public class UserService : IUserService
 
         if (userProfile is null)
             throw new NotFoundException($"The user with id '{userId}' does not have a profile.");
-
-        _accessControlService.EnsureApplicantOrAdmin(userProfile.UserId, _currentUser);
 
         if (userProfile.UserImageFileId is null)
             throw new NotFoundException($"The user with id '{userId}' does not have an attached image.");

@@ -40,7 +40,7 @@ public class SkillService : ISkillService
         if (!isUserExist)
             throw new NotFoundException($"the user with id {userId} was not found");
 
-        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+        _accessControlService.EnsureApplicant(userId, _currentUser);
 
         if (skillsId is not null && skillsId.Any())
         {

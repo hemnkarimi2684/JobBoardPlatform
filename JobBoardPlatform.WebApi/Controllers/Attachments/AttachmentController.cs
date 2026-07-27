@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Attachments;
 
-[Route("api/[controller]s")]
+[Route("api/attachments")]
 [ApiController]
 [Authorize]
 public class AttachmentController : ControllerBase

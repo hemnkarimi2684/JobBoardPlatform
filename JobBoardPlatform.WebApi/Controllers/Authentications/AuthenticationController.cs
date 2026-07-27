@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Authentications;
 
-[Route("api/[controller]s")]
+[Route("api/authentications")]
 [ApiController]
 public class AuthenticationController : ControllerBase
 {

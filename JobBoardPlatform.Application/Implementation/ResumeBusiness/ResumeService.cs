@@ -1,4 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
+﻿using JobBoardPlatform.Application.Common.Constants.RoleConstant;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ResumeDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
@@ -267,14 +267,8 @@ public class ResumeService : IResumeService
         // چک کردن اینکه اول ایای خودش داره درخواست میده یا نه
         var isSelfUser = targetUserId == currentUser.UserId;
 
-        //چک کردن اینکه ایای ادمین دارهد درخواست میده یا نه
-        var isAdmin = currentUser.UserRoles.Contains(RoleConstants.AdminRoleName);
-
         // ایا کارفرماس که داره درخواست میده 
         var isEmployer = currentUser.UserRoles.Contains(RoleConstants.EmployerRoleName);
-
-        if (isAdmin)
-            return;
 
         if (isSelfUser)
             return;

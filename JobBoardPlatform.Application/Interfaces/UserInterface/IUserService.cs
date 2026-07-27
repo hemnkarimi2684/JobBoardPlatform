@@ -57,7 +57,7 @@ public interface IUserService
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task DisapproveEmployerAsync(
+    Task RejectEmployerAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
 
@@ -113,7 +113,7 @@ public interface IUserService
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task InActivateJobSeekerAsync(
+    Task DeactivateJobSeekerAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
 

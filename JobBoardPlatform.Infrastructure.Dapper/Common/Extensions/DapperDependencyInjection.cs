@@ -10,10 +10,11 @@ public static class DapperDependencyInjection
 {
     public static IServiceCollection AddDapperDependency(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped(serviceProvider => new DbConnectionFactory(configuration.GetConnectionString("DefaultConnection")!)); ;
-
+        services.AddScoped<IDbConnectionFactory>(sp => new DbConnectionFactory(configuration.GetConnectionString("DefaultConnection")!));
         services.AddScoped<IUserDapperRepository, UserDapperRepository>();
 
         return services;
     }
 }
+
+

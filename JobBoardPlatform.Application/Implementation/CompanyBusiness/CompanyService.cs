@@ -47,25 +47,13 @@ public class CompanyService : ICompanyService
         CreateCompanyRequestDto createCommand,
         CancellationToken cancellationToken = default)
     {
-        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId, cancellationToken);
+        await ValidateForCreateAsync(
+            createCommand.CityId,
+            createCommand.JobCategoryId,
+            createCommand.Name,
+            createCommand.OwnedByUserId,
+            cancellationToken);
 
-        if (!doesCityExist)
-            throw new NotFoundException($"City with id {createCommand.CityId} was not found.");
-
-        var companyExistsByName = await _unitOfWork.CompanyRepository.IsCompanyExistByNameAsync(createCommand.Name, cancellationToken);
-
-        if (companyExistsByName)
-            throw new ConflictException($"the company with this name {createCommand.Name} already exist");
-
-        var companyExistsForOwner = await _unitOfWork.CompanyRepository.IsCompanyExistForOwnerId(createCommand.OwnedByUserId, cancellationToken);
-
-        if (companyExistsForOwner)
-            throw new ConflictException($"this owner already has company");
-
-        //The reason the item has a .Value property is that Enum.TryParse was used;
-        //the output is a nullable enum, but I am certain the enums won't reach the service as null,
-        //because the DTOs are validated in the controller,
-        //and an exception is thrown if the input value is null.
         var company = new Company(
             createCommand.Name, createCommand.YearOfEstablishment,
             createCommand.AboutUs, createCommand.WebSiteAddress, createCommand.OwnershipType,
@@ -282,6 +270,29 @@ public class CompanyService : ICompanyService
             updateCompanyInfoCommand.ActivityType,
             _currentUser.UserId
         );
+    }
+
+    private async Task ValidateForCreateAsync(Guid cityId, Guid jobCategoryId, string companyName, Guid ownedByUserId, CancellationToken cancellationToken)
+    {
+        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(cityId, cancellationToken);
+
+        if (!doesCityExist)
+            throw new NotFoundException($"City with id {cityId} was not found.");
+
+        var doesJobCategoryExist = await _unitOfWork.JobCategoryRepository.ExistAsync(jobCategoryId, cancellationToken);
+
+        if (!doesJobCategoryExist)
+            throw new NotFoundException($"the job category with id {jobCategoryId} was not found.");
+
+        var companyExistsByName = await _unitOfWork.CompanyRepository.IsCompanyExistByNameAsync(companyName, cancellationToken);
+
+        if (companyExistsByName)
+            throw new ConflictException($"the company with this name {companyName} already exist");
+
+        var companyExistsForOwner = await _unitOfWork.CompanyRepository.IsCompanyExistForOwnerId(ownedByUserId, cancellationToken);
+
+        if (companyExistsForOwner)
+            throw new ConflictException($"this owner already has company");
     }
 
     #endregion

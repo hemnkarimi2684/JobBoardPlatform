@@ -1,4 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
+﻿using JobBoardPlatform.Application.Common.Constants.RoleConstant;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdminDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
@@ -17,6 +17,7 @@ using JobBoardPlatform.Application.Implementation.JobCategoryBusiness;
 using JobBoardPlatform.Application.Implementation.JwtBusiness;
 using JobBoardPlatform.Application.Implementation.PaymentBusiness;
 using JobBoardPlatform.Application.Implementation.ProvinceBusiness;
+using JobBoardPlatform.Application.Implementation.RedisBusiness;
 using JobBoardPlatform.Application.Implementation.RefreshTokenBusiness;
 using JobBoardPlatform.Application.Implementation.ResumeBusiness;
 using JobBoardPlatform.Application.Implementation.SkillBusiness;
@@ -35,6 +36,7 @@ using JobBoardPlatform.Application.Interfaces.JobInterface;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
 using JobBoardPlatform.Application.Interfaces.PaymentInterface;
 using JobBoardPlatform.Application.Interfaces.ProvinceInterface;
+using JobBoardPlatform.Application.Interfaces.RedisInterface;
 using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
@@ -131,6 +133,13 @@ public static class ApplicationExtensions
         services.AddScoped<IAccessControlService, AccessControlService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IJobCategoryService, JobCategoryService>();
+        services.AddScoped<IRedisService, RedisService>();
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis");
+            options.InstanceName = "VehicleInspectionAppointmentSystem:";
+        });
 
         services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
         var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();

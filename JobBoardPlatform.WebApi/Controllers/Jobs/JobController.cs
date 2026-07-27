@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Jobs;
 
-[Route("api/[controller]")]
+[Route("api/jobs")]
 [ApiController]
 [Authorize]
 public class JobController : ControllerBase

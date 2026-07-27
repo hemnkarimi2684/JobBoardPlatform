@@ -69,7 +69,7 @@ public class ExperienceDetailService : IExperienceDetailService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+        _accessControlService.EnsureApplicant(userId, _currentUser);
 
         var (experienceDetails, totalDataCount) = await _unitOfWork
                                                                  .ExperienceDetailRepository
@@ -106,7 +106,7 @@ public class ExperienceDetailService : IExperienceDetailService
         if (experienceDetail == null)
             throw new NotFoundException($"The experience detail with id {experienceDetailId} was not found.");
 
-        _accessControlService.EnsureApplicantOrAdmin(experienceDetail.UserId, _currentUser);
+        _accessControlService.EnsureApplicant(experienceDetail.UserId, _currentUser);
 
         return new ExperienceHistoryResponseDto
         {

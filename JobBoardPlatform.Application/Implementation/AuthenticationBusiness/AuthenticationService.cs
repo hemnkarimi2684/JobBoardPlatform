@@ -1,4 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
+﻿using JobBoardPlatform.Application.Common.Constants.RoleConstant;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
