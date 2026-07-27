@@ -16,7 +16,7 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
     {
     }
 
-    public async Task<(List<TResult>, int)> GetAllCompaniesAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAllCompaniesAsync<TResult>(
         Expression<Func<Company, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,

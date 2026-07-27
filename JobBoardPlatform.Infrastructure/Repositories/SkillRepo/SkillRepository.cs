@@ -14,7 +14,7 @@ public class SkillRepository : GenericRepository<Skill>, ISkillRepository
     {
     }
 
-    public async Task<(List<TResult>, int)> GetAllSkillsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAllSkillsAsync<TResult>(
         Expression<Func<Skill, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,

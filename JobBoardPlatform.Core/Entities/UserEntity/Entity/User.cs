@@ -130,4 +130,10 @@ public class User : IdentityUser<Guid>, IEntity
         IsApproved = isApproved;
         Update(modifiedById);
     }
+
+    public void UpdateIsActive(bool isActive, Guid? modifiedById)
+    {
+        IsActive = isActive;
+        Update(modifiedById);
+    }
 }

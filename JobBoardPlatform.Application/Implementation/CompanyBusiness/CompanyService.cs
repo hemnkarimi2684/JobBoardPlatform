@@ -4,6 +4,7 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
@@ -90,43 +91,12 @@ public class CompanyService : ICompanyService
 
     #region Get Methods
 
-    public async Task<CompanyProfileResponseDto> GetCompanyProfileByOwnerIdAsync(
-        Guid ownerId,
-        CancellationToken cancellationToken = default)
-    {
-        _accessControlService.EnsureOwnerEmployerOrAdmin(ownerId, _currentUser);
-
-        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyProfileResponseDto
-        {
-            Id = c.Id,
-            Name = c.Name,
-            UserId = c.OwnedByUserId,
-            YearOfEstablishment = c.YearOfEstablishment,
-            JobCategoryId = c.JobCategoryId,
-            JobCategoryName = c.JobCategory.Name,
-            AboutUs = c.AboutUs,
-            WebSiteAddress = c.WebSiteAddress,
-            OwnershipType = c.OwnershipType,
-            CompanySize = c.CompanySize,
-            ActivityType = c.ActivityType,
-            CompanyImageFileId = c.CompanyImageFileId,
-            Cities = c.CompanyCities.Select(cc => cc.CityId).ToList()
-        },
-          ownerId,
-          cancellationToken);
-
-        if (companyInfo is null)
-            throw new NotFoundException($"the company with this ownerId {ownerId} not found");
-
-        return companyInfo;
-    }
-
-    public async Task<Pagination<CompanyProfileResponseDto>> GetAllCompaniesAsync(
+    public async Task<Pagination<CompanyDetailResponseDto>> GetAllCompaniesAsync(
         TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        var (result, totalDataCount) = await _unitOfWork.CompanyRepository.GetAllCompaniesAsync(c => new CompanyProfileResponseDto
+        var (result, totalDataCount) = await _unitOfWork.CompanyRepository.GetAllCompaniesAsync(c => new CompanyDetailResponseDto
         {
             Id = c.Id,
             Name = c.Name,
@@ -147,14 +117,14 @@ public class CompanyService : ICompanyService
         pagingCommand.PageNumber,
         pagingCommand.PageSize);
 
-        return Pagination<CompanyProfileResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
+        return Pagination<CompanyDetailResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
     }
 
-    public async Task<CompanyProfileResponseDto> GetCompanyByIdAsync(
+    public async Task<CompanyDetailResponseDto> GetCompanyByIdAsync(
         Guid companyId,
         CancellationToken cancellationToken = default)
     {
-        var company = await _unitOfWork.CompanyRepository.GetCompanyByIdAsync(c => new CompanyProfileResponseDto
+        var company = await _unitOfWork.CompanyRepository.GetCompanyByIdAsync(c => new CompanyDetailResponseDto
         {
             Id = c.Id,
             Name = c.Name,

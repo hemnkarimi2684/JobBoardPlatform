@@ -43,6 +43,10 @@ public class AdvertisementDetailResponseDto
 
     public string CompanyJobCategoryName { get; set; } = string.Empty;
 
+    public bool IsFeatured { get; set; }
+
+    public DateTime? FeaturedUntil { get; set; }
+
     public List<string> SkillNames { get; set; } = new();
 
     public static AdvertisementDetailResponseDto MapToResponseDto(AdvertisementDetail advertisementDetail)
@@ -67,7 +71,9 @@ public class AdvertisementDetailResponseDto
             SkillNames = advertisementDetail.Skills,
             AdvertisementId = advertisementDetail.AdvertisementId,
             CityId = advertisementDetail.CityId,
-            CompanyId = advertisementDetail.CompanyId
+            CompanyId = advertisementDetail.CompanyId,
+            FeaturedUntil = advertisementDetail.FeaturedUntil,
+            IsFeatured = advertisementDetail.IsFeatured
         };
     }
 }

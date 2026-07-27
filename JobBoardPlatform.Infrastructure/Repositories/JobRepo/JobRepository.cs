@@ -14,7 +14,7 @@ public class JobRepository : GenericRepository<Job>, IJobRepository
     {
     }
 
-    public async Task<(List<TResult>, int)> GetAllJobsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAllJobsAsync<TResult>(
         string? text,
         Expression<Func<Job, TResult>> projection,
         CancellationToken cancellationToken,

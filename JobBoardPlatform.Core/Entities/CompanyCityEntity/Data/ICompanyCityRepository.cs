@@ -16,7 +16,7 @@ public interface ICompanyCityRepository : IGenericRepository<CompanyCity>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetCityCompaniesAsync<TResult>(Expression<Func<CompanyCity, TResult>> projection,
+    Task<(List<TResult> Items, int TotalDataCount)> GetCityCompaniesAsync<TResult>(Expression<Func<CompanyCity, TResult>> projection,
                                                               Guid cityId,
                                                               CancellationToken cancellationToken,
                                                               int pageNumber = 1,

@@ -1,6 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
-using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
@@ -30,17 +30,6 @@ public class CompanyController : ControllerBase
         return Ok(Result.Success());
     }
 
-    [HttpGet("by-user/{ownerId:guid}")]
-    [Authorize(Roles = "Employer,Admin")]
-    public async Task<IActionResult> GetCompanyProfileByOwnerIdAsync(
-        [FromRoute] Guid ownerId,
-        CancellationToken cancellationToken)
-    {
-        var result = await _companyService.GetCompanyProfileByOwnerIdAsync(ownerId, cancellationToken);
-
-        return Ok(Result<CompanyProfileResponseDto>.Success(result));
-    }
-
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllCompaniesAsync(
@@ -61,7 +50,7 @@ public class CompanyController : ControllerBase
     {
         var result = await _companyService.GetCompanyByIdAsync(companyId, cancellationToken);
 
-        return Ok(Result<CompanyProfileResponseDto>.Success(result));
+        return Ok(Result<EmployerWithCompanyResponseDto>.Success(result));
     }
 
     [HttpPut("{companyId:guid}")]

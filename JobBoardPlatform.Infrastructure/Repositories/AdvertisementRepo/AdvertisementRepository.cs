@@ -53,7 +53,9 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                              CreatedAt = a.CreatedAt,
                              Skills = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
                              CityId = a.CityId,
-                             CompanyId = a.CompanyId
+                             CompanyId = a.CompanyId,
+                             FeaturedUntil = a.FeaturedUntil,
+                             IsFeatured = a.IsFeatured
                          })
                          .FirstOrDefaultAsync(cancellationToken);
     }
@@ -70,7 +72,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                         .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetAdvertisementsByCompanyAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAdvertisementsByCompanyAsync<TResult>(
         Expression<Func<Advertisement, TResult>> projection,
         Guid companyId,
         CancellationToken cancellationToken,
@@ -87,7 +89,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
-                             .OrderByDescending(b => b.CreatedAt)
+                             .OrderByDescending(a => a.IsFeatured && a.FeaturedUntil > DateTime.UtcNow)
+                             .ThenByDescending(a => a.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
@@ -131,7 +134,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         return true;
     }
 
-    public async Task<(List<TResult>, int)> FilterAdvertisementsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> FilterAdvertisementsAsync<TResult>(
         AdvertisementQueryFilter filter,
         Expression<Func<Advertisement, TResult>> projection,
         CancellationToken cancellationToken,
@@ -173,7 +176,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
-                             .OrderByDescending(b => b.CreatedAt)
+                             .OrderByDescending(a => a.IsFeatured && a.FeaturedUntil > DateTime.UtcNow)
+                             .ThenByDescending(a => a.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
@@ -182,7 +186,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         return (result, totalDataCount);
     }
 
-    public async Task<(List<TResult>, int)> SearchAdvertisementsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> SearchAdvertisementsAsync<TResult>(
         string? searchTerm,
         Expression<Func<Advertisement, TResult>> projection,
         CancellationToken cancellationToken,
@@ -208,7 +212,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
-                             .OrderByDescending(b => b.CreatedAt)
+                             .OrderByDescending(a => a.IsFeatured && a.FeaturedUntil > DateTime.UtcNow)
+                             .ThenByDescending(a => a.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)
@@ -217,7 +222,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         return (result, totalDataCount);
     }
 
-    public async Task<(List<TResult>, int)> GetJobAdvertisementsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetJobAdvertisementsAsync<TResult>(
         Expression<Func<Advertisement, TResult>> projection,
         Guid jobId,
         CancellationToken cancellationToken,

@@ -27,7 +27,7 @@ public interface IProvinceRepository : IGenericRepository<Province>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetAllProvincesAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetAllProvincesAsync<TResult>(
         Expression<Func<Province, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,

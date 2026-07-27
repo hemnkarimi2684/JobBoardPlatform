@@ -1,6 +1,7 @@
 using JobBoardPlatform.Application.Common.Constants;
 using JobBoardPlatform.Application.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
+using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
 using JobBoardPlatform.WebApi.Middlewares;
 using Microsoft.OpenApi.Models;
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddInfrastructureDependency(builder.Configuration);
+builder.Services.AddDapperDependency(builder.Configuration);
 builder.Services.AddBusinessDependency(builder.Configuration);
 builder.Services.AddScoped<GlobalExceptionHandlingMiddleware>();
 

@@ -2,6 +2,7 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
 namespace JobBoardPlatform.Application.Interfaces.CompanyInterface;
@@ -16,16 +17,6 @@ public interface ICompanyService
     /// <returns></returns>
     Task<Guid> CreateCompanyAsync(
         CreateCompanyRequestDto createCompanyCommand,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// دریافت اطلاعات شرکت
-    /// </summary>
-    /// <param name="ownerId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<CompanyProfileResponseDto> GetCompanyProfileByOwnerIdAsync(
-        Guid ownerId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -58,7 +49,7 @@ public interface ICompanyService
     /// <param name="pagingCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<Pagination<CompanyProfileResponseDto>> GetAllCompaniesAsync(
+    Task<Pagination<CompanyDetailResponseDto>> GetAllCompaniesAsync(
         TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
@@ -69,7 +60,7 @@ public interface ICompanyService
     /// <param name="companyId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<CompanyProfileResponseDto> GetCompanyByIdAsync(
+    Task<CompanyDetailResponseDto> GetCompanyByIdAsync(
         Guid companyId,
         CancellationToken cancellationToken = default);
 
@@ -81,5 +72,5 @@ public interface ICompanyService
     /// <returns></returns>
     Task<AttachmentResponseDto> DownloadCompanyImageAsync(
         Guid companyId,
-        CancellationToken cancellationToken = default); 
+        CancellationToken cancellationToken = default);
 }

@@ -26,7 +26,7 @@ public interface ICityRepository : IGenericRepository<City>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetProvinceCitiesAsync<TResult>(Expression<Func<City, TResult>> projection,
+    Task<(List<TResult> Items, int TotalDataCount)> GetProvinceCitiesAsync<TResult>(Expression<Func<City, TResult>> projection,
                                                             Guid provinceId,
                                                             CancellationToken cancellationToken,
                                                             int pageNumber = 1,
@@ -54,7 +54,7 @@ public interface ICityRepository : IGenericRepository<City>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetAllCitiesAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetAllCitiesAsync<TResult>(
         Expression<Func<City, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,

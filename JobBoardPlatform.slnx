@@ -6,6 +6,7 @@
     <Project Path="JobBoardPlatform.Application/JobBoardPlatform.Application.csproj" Id="b1bf4d8b-6ee2-42ef-a348-fa3e1c38f4cb" />
   </Folder>
   <Folder Name="/03_Infrastructure/">
+    <Project Path="JobBoardPlatform.Infrastructure.Dapper/JobBoardPlatform.Infrastructure.Dapper.csproj" Id="504070ee-ddac-4d5c-aa2d-f73aad19b0e9" />
     <Project Path="JobBoardPlatform.Infrastructure/JobBoardPlatform.Infrastructure.csproj" Id="b38e8e0e-fea2-4993-840c-c3b1e228a10c" />
   </Folder>
   <Folder Name="/04_Presentation/">

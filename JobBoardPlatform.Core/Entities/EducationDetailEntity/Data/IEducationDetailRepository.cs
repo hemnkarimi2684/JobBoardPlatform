@@ -17,7 +17,7 @@ public interface IEducationDetailRepository : IGenericRepository<EducationDetail
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetUserEducationDetailsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetUserEducationDetailsAsync<TResult>(
                                             Expression<Func<EducationDetail, TResult>> projection,
                                             Guid userId,
                                             CancellationToken cancellationToken,

@@ -27,7 +27,7 @@ public interface IJobCategoryRepository : IGenericRepository<JobCategory>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetAllJobCategoriesAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetAllJobCategoriesAsync<TResult>(
         Expression<Func<JobCategory, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,

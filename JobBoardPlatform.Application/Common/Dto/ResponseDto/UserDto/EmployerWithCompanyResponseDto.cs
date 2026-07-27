@@ -1,15 +1,19 @@
 ﻿using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using System.Text.Json.Serialization;
 
-namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
+namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 
-public class CompanyProfileResponseDto
+public class EmployerWithCompanyResponseDto
 {
-    public Guid Id { get; init; }
+    public Guid CompanyId { get; init; }
 
     public string Name { get; init; } = default!;
 
     public Guid UserId { get; init; }
+
+    public string PhoneNumber { get; init; } = string.Empty;
+
+    public string Email { get; init; } = string.Empty;
 
     public DateTime YearOfEstablishment { get; init; }
 

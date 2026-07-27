@@ -26,7 +26,7 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
                            cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetAdvertisementJobApplicationsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAdvertisementJobApplicationsAsync<TResult>(
          Expression<Func<JobApplication, TResult>> projection,
          Guid advertisementId,
          CancellationToken cancellationToken,
@@ -64,7 +64,7 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
                           .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetJobApplicationsByUserIdAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetJobApplicationsByUserIdAsync<TResult>(
         Expression<Func<JobApplication, TResult>> projection,
         Guid userId, 
         CancellationToken cancellationToken, 

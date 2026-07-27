@@ -84,7 +84,7 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetAllCompaniesAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetAllCompaniesAsync<TResult>(
         Expression<Func<Company, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,

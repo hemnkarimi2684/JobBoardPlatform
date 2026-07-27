@@ -44,21 +44,21 @@ public interface IUserService
     /// <summary>
     /// تایید کردن کارفرما توسط ادمین
     /// </summary>
-    /// <param name="employerId"></param>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> ApprovedEmployerAsync(
-        Guid employerId,
+    Task ApprovedEmployerAsync(
+        Guid userId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// رد کردن کارفرما توسط ادمین
     /// </summary>
-    /// <param name="employerId"></param>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> InApprovedEmployerAsync(
-        Guid employerId,
+    Task DisapproveEmployerAsync(
+        Guid userId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -84,32 +84,46 @@ public interface IUserService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// دریافت تمام کارفرما های فعال در سیستم 
+    /// دریافت تمام کارفرما های فعال در سیستم
     /// </summary>
+    /// <param name="pagingCommand"></param>
     /// <returns></returns>
-    Task<EmployerResponseDto> GetApprovedEmployersAsync(
-        PagingRequestDto pagingRequestDto,
-        CancellationToken cancellationToken = default);
+    Task<Pagination<EmployerDetailResponseDto>> GetApprovedEmployersAsync(PagingRequestDto pagingCommand);
 
     /// <summary>
     /// دریافت تمام کارجو ها
     /// </summary>
-    /// <param name="pagingRequestDto"></param>
+    /// <param name="pagingCommand"></param>
+    /// <returns></returns>
+    Task<Pagination<JobSeekerDetailResponseDto>> GetJobSeekersAsync(PagingRequestDto pagingCommand);
+
+    /// <summary>
+    /// فعال کردن اکانت کارجو
+    /// </summary>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<JobSeekerResponseDto> GetJobSeekersAsync(
-        PagingRequestDto pagingRequestDto,
+    Task ActivateJobSeekerAsync(
+        Guid userId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// فعال یا غیر فعال کردن اکانت کارجو
+    /// غیر فعال کردن اکانت کارجو
     /// </summary>
-    /// <param name="jobSeekerId"></param>
-    /// <param name="isActive"></param>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> SetJobSeekerActivationAsync(
-        Guid jobSeekerId,
-        bool isActive,
+    Task InActivateJobSeekerAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت اطلاعات کارفرما و شرکتش
+    /// </summary>
+    /// <param name="ownerId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<EmployerWithCompanyResponseDto> GetEmployerWithCompanyAsync(
+        Guid ownerId,
         CancellationToken cancellationToken = default);
 }

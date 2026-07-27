@@ -19,7 +19,7 @@ public class JobCategoryRepository : GenericRepository<JobCategory>, IJobCategor
                           .AnyAsync(jc => jc.Id == jobCategoryId, cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetAllJobCategoriesAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAllJobCategoriesAsync<TResult>(
         Expression<Func<JobCategory, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,

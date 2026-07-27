@@ -19,7 +19,7 @@ public class AdvertisementFilterRequestDto
 
     public List<Guid>? SkillIds { get; set; }
 
-    public AdvertisementQueryFilter MaoToQueryFilter()
+    public AdvertisementQueryFilter MapToQueryFilter()
     {
         return new AdvertisementQueryFilter
         {

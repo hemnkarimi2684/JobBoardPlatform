@@ -26,7 +26,7 @@ public class ExperienceDetailRepository : GenericRepository<ExperienceDetail>, I
                            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetUserExperienceDetailsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetUserExperienceDetailsAsync<TResult>(
         Expression<Func<ExperienceDetail, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken,

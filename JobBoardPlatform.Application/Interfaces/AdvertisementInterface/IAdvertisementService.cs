@@ -124,4 +124,34 @@ public interface IAdvertisementService
         AdvertisementFilterRequestDto filterDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام اگهی های فعال و غیر فعال 
+    /// </summary>
+    /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Pagination<AdvertisementDetailResponseDto>> GetAllAdvertisementsAsync(
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// ویژه کردن اگهی
+    /// </summary>
+    /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task PromoteAdvertisementAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// عادی کردن یک اگهی
+    /// </summary>
+    /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task DemoteAdvertisementAsync(
+        Guid advertisementId, 
+        CancellationToken cancellationToken = default);
 }

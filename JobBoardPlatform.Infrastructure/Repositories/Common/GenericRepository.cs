@@ -38,8 +38,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
             int page = 1, int pageSize = 10,
             bool tracking = false)
     {
-        page = page < 0 ? 1 : page;
-        pageSize = pageSize < 0 ? 10 : pageSize;
+        page = page <= 0 ? 1 : page;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
 
         var query = Entities.AsQueryable();
 

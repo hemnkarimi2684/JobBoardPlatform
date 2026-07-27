@@ -13,7 +13,7 @@ public class CityRepository : GenericRepository<City>, ICityRepository
     {
     }
 
-    public async Task<(List<TResult>, int)> GetAllCitiesAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAllCitiesAsync<TResult>(
         Expression<Func<City, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,
@@ -59,7 +59,7 @@ public class CityRepository : GenericRepository<City>, ICityRepository
                           .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetProvinceCitiesAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetProvinceCitiesAsync<TResult>(
         Expression<Func<City, TResult>> projection,
         Guid provinceId,
         CancellationToken cancellationToken,

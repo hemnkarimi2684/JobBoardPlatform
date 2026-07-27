@@ -23,7 +23,7 @@ public class EducationDetailRepository : GenericRepository<EducationDetail>, IEd
                            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetUserEducationDetailsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetUserEducationDetailsAsync<TResult>(
         Expression<Func<EducationDetail, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken,

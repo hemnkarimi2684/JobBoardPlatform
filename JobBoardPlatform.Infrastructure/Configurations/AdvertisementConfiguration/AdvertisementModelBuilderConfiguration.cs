@@ -30,6 +30,12 @@ public class AdvertisementModelBuilderConfiguration : BaseModelBuilderConfigurat
         builder.Property(a => a.IsActive)
             .HasDefaultValue(true);
 
+        builder.Property(a => a.IsFeatured)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.HasIndex(a => a.FeaturedUntil);
+
         builder.HasMany(a => a.AdvertisementSkills)
             .WithOne(x => x.Advertisement)
             .HasForeignKey(x => x.AdvertisementId)

@@ -66,7 +66,7 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetAdvertisementsByCompanyAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetAdvertisementsByCompanyAsync<TResult>(
         Expression<Func<Advertisement, TResult>> projection,
         Guid companyId,
         CancellationToken cancellationToken,
@@ -106,7 +106,7 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> FilterAdvertisementsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> FilterAdvertisementsAsync<TResult>(
         AdvertisementQueryFilter advertisementQueryFilter,
         Expression<Func<Advertisement, TResult>> projection,
         CancellationToken cancellationToken,
@@ -123,7 +123,7 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> SearchAdvertisementsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> SearchAdvertisementsAsync<TResult>(
         string searchTerm,
         Expression<Func<Advertisement, TResult>> projection,
         CancellationToken cancellationToken,
@@ -140,7 +140,7 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetJobAdvertisementsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetJobAdvertisementsAsync<TResult>(
         Expression<Func<Advertisement, TResult>> projection,
         Guid jobId,
         CancellationToken cancellationToken,

@@ -18,7 +18,7 @@ public interface IExperienceDetailRepository : IGenericRepository<ExperienceDeta
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetUserExperienceDetailsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetUserExperienceDetailsAsync<TResult>(
                              Expression<Func<ExperienceDetail, TResult>> projection,
                              Guid userId,
                              CancellationToken cancellationToken,
