@@ -9,6 +9,7 @@ using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
+using JobBoardPlatform.Application.Interfaces.EmailInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
@@ -36,17 +37,20 @@ public class UserService : IUserService
 
     private readonly IUserDapperRepository _userDapperRepository;
 
+    private readonly IEmailService _emailService;
+
     private readonly UserManager<User> _userManager;
 
     private readonly ILogger<UserService> _logger;
 
-    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IAttachmentService attachmentService, IUserDapperRepository userDapperRepository, UserManager<User> userManager, ILogger<UserService> logger)
+    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IAttachmentService attachmentService, IUserDapperRepository userDapperRepository, IEmailService emailService, UserManager<User> userManager, ILogger<UserService> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _accessControlService = accessControlService;
         _attachmentService = attachmentService;
         _userDapperRepository = userDapperRepository;
+        _emailService = emailService;
         _userManager = userManager;
         _logger = logger;
     }
@@ -259,6 +263,8 @@ public class UserService : IUserService
 
             throw;
         }
+
+        await _emailService.SendAsync(user.Email!, "Approved Employer Account", "Your account has been verified.", false, cancellationToken);
     }
 
     public async Task RejectEmployerAsync(
@@ -278,7 +284,7 @@ public class UserService : IUserService
             throw new ValidationException($"the user with id {user.Id} is not an employer");
 
         if (!user.IsApproved)
-            throw new ConflictException($"the employer with id {user.Id} is not approved");
+            throw new ConflictException($"the employer with id {user.Id} is already not approved");
 
         try
         {
@@ -307,6 +313,8 @@ public class UserService : IUserService
 
             throw;
         }
+
+        await _emailService.SendAsync(user.Email!, "Reject Employer Account", "Your account was rejected.", false, cancellationToken);
     }
 
     public async Task ActivateJobSeekerAsync(

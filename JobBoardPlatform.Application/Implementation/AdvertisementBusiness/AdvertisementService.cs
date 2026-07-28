@@ -105,6 +105,7 @@ public class AdvertisementService : IAdvertisementService
                                                         CompanyId = a.CompanyId,
                                                         FeaturedUntil = a.FeaturedUntil,
                                                         IsFeatured = a.IsFeatured,
+                                                        IsActive = a.IsActive,
                                                         SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
                                                     },
                                                     companyId,
@@ -177,6 +178,7 @@ public class AdvertisementService : IAdvertisementService
             CompanyId = a.CompanyId,
             FeaturedUntil = a.FeaturedUntil,
             IsFeatured = a.IsFeatured,
+            IsActive = a.IsActive,
             SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
         },
         a => a.IsActive,
@@ -213,6 +215,7 @@ public class AdvertisementService : IAdvertisementService
             CompanyId = a.CompanyId,
             FeaturedUntil = a.FeaturedUntil,
             IsFeatured = a.IsFeatured,
+            IsActive = a.IsActive,
             SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
         },
         cancellationToken,
@@ -258,6 +261,7 @@ public class AdvertisementService : IAdvertisementService
                 CompanyId = a.CompanyId,
                 FeaturedUntil = a.FeaturedUntil,
                 IsFeatured = a.IsFeatured,
+                IsActive = a.IsActive,
                 SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
             },
               cancellationToken, pagingCommand.PageNumber, pagingCommand.PageSize);
@@ -298,6 +302,7 @@ public class AdvertisementService : IAdvertisementService
                 CompanyId = a.CompanyId,
                 FeaturedUntil = a.FeaturedUntil,
                 IsFeatured = a.IsFeatured,
+                IsActive = a.IsActive,
                 SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
             },
               cancellationToken, pagingCommand.PageNumber, pagingCommand.PageSize);
@@ -368,14 +373,15 @@ public class AdvertisementService : IAdvertisementService
     {
         _accessControlService.EnsureAdmin(_currentUser);
 
-        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(
-            advertisementId,
-            _currentUser.UserId,
-            false,
-            cancellationToken);
+        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
 
-        if (!updateAdvertisementStatusResult)
-            throw new NotFoundException($"the advertisement with this id {advertisementId} not found ");
+        if (advertisement is null)
+            throw new NotFoundException($"the advertisement with this id {advertisementId} not found");
+
+        if (!advertisement.IsActive)
+            throw new ValidationException($"the advertisement with id {advertisementId} is already inactive");
+
+        advertisement.UpdateActiveStatus(_currentUser.UserId, false);
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
@@ -386,14 +392,15 @@ public class AdvertisementService : IAdvertisementService
     {
         _accessControlService.EnsureAdmin(_currentUser);
 
-        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(
-            advertisementId,
-            _currentUser.UserId,
-            true,
-            cancellationToken);
+        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
 
-        if (!updateAdvertisementStatusResult)
-            throw new NotFoundException($"the advertisement with this id {advertisementId} not found ");
+        if (advertisement is null)
+            throw new NotFoundException($"the advertisement with this id {advertisementId} not found");
+
+        if (advertisement.IsActive)
+            throw new ValidationException($"the advertisement with id {advertisementId} is already active");
+
+        advertisement.UpdateActiveStatus(_currentUser.UserId, true);
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }

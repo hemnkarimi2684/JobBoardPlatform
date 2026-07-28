@@ -20,17 +20,6 @@ public class JobCategoryController : ControllerBase
         _jobCategoryService = jobCategoryService;
     }
 
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateJobCategoryAsync(
-      [FromBody] CreateJobCategoryRequestDto jobCategoryRequestDto,
-        CancellationToken cancellationToken)
-    {
-        await _jobCategoryService.CreateJobCategoryAsync(jobCategoryRequestDto, cancellationToken);
-
-        return Ok(Result.Success());
-    }
-
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllJobCategoriesAsync(

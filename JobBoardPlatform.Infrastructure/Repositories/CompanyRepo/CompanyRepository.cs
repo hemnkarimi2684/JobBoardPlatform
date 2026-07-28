@@ -51,8 +51,8 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
     }
 
     public async Task<TResult?> GetCompanyByIdAsync<TResult>(
-        Expression<Func<Company, TResult>> projection, 
-        Guid companyId, 
+        Expression<Func<Company, TResult>> projection,
+        Guid companyId,
         CancellationToken cancellationToken)
     {
         return await Entities
@@ -81,7 +81,7 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
         return await Entities
                          .AsNoTracking()
                          .Where(c => c.Id == companyId)
-                         .Select(c => c.Id)
+                         .Select(c => c.OwnedByUserId)
                          .FirstOrDefaultAsync(cancellationToken);
     }
 

@@ -23,18 +23,6 @@ public class CityController : ControllerBase
         _cityService = cityService;
     }
 
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    [RequestModelValidationFilter]
-    public async Task<IActionResult> CreateCityAsync(
-        [FromBody] CreateCityRequestDto requestDto,
-        CancellationToken cancellationToken)
-    {
-        await _cityService.CreateCityAsync(requestDto, cancellationToken);
-
-        return Ok(Result.Success());
-    }
-
     [HttpGet("{cityId:guid}/companies")]
     [AllowAnonymous]
     public async Task<IActionResult> GetCityCompaniesAsync(

@@ -21,17 +21,6 @@ public class ProvinceController : ControllerBase
         _provinceService = provinceService;
     }
 
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateProvinceAsync(
-       [FromBody] CreateProvinceRequestDto provinceRequestDto,
-        CancellationToken cancellationToken)
-    {
-        await _provinceService.CreateProvinceAsync(provinceRequestDto, cancellationToken);
-
-        return Ok(Result.Success());
-    }
-
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllProvincesAsync(

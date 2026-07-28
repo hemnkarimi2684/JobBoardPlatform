@@ -20,17 +20,6 @@ public class JobController : ControllerBase
         _jobService = jobService;
     }
 
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateJobAsync(
-       [FromBody] CreateJobRequestDto createJobRequestDto,
-        CancellationToken cancellationToken)
-    {
-        await _jobService.CreateJobAsync(createJobRequestDto, cancellationToken);
-
-        return Ok(Result.Success());
-    }
-
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllJobsAsync(

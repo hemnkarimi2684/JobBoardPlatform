@@ -25,4 +25,5 @@ public class AdvertisementDetail
     public List<string> Skills { get; init; } = new List<string>();
     public Guid CityId { get; init; }
     public Guid CompanyId { get; init; }
+    public bool IsActive { get; set; }
 }

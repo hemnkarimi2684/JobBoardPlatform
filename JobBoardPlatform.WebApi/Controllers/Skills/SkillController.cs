@@ -32,17 +32,6 @@ public class SkillController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateSkillAsync(
-       [FromBody] CreateSkillRequestDto skillRequestDto,
-        CancellationToken cancellationToken)
-    {
-        await _skillService.CreateSkillAsync(skillRequestDto, cancellationToken);
-
-        return Ok(Result.Success());
-    }
-
     [HttpPost("assign-to-user/{userId:guid}")]
     [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> AddSkillsToUserAsync(

@@ -55,7 +55,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                              CityId = a.CityId,
                              CompanyId = a.CompanyId,
                              FeaturedUntil = a.FeaturedUntil,
-                             IsFeatured = a.IsFeatured
+                             IsFeatured = a.IsFeatured,
+                             IsActive = a.IsActive
                          })
                          .FirstOrDefaultAsync(cancellationToken);
     }
@@ -246,5 +247,16 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                              .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
+    }
+
+    public async Task<string?> GetAdvertisementOwnerEmailAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                          .AsNoTracking()
+                          .Where(a => a.Id == advertisementId)
+                          .Select(a => a.Company.OwnedByUser.Email)
+                          .FirstOrDefaultAsync(cancellationToken);
     }
 }

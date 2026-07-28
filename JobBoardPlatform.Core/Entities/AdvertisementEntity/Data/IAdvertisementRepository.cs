@@ -146,5 +146,15 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10);
+
+    /// <summary>
+    /// دریافت ایمیل صاحب اگهی
+    /// </summary>
+    /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<string?> GetAdvertisementOwnerEmailAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken);
 }
 

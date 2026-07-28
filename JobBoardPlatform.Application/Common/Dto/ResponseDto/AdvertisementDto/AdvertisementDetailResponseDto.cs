@@ -47,6 +47,8 @@ public class AdvertisementDetailResponseDto
 
     public DateTime? FeaturedUntil { get; set; }
 
+    public bool IsActive { get; set; }
+
     public List<string> SkillNames { get; set; } = new();
 
     public static AdvertisementDetailResponseDto MapToResponseDto(AdvertisementDetail advertisementDetail)
@@ -73,7 +75,8 @@ public class AdvertisementDetailResponseDto
             CityId = advertisementDetail.CityId,
             CompanyId = advertisementDetail.CompanyId,
             FeaturedUntil = advertisementDetail.FeaturedUntil,
-            IsFeatured = advertisementDetail.IsFeatured
+            IsFeatured = advertisementDetail.IsFeatured,
+            IsActive = advertisementDetail.IsActive,
         };
     }
 }
