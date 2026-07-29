@@ -14,7 +14,7 @@ public interface IJobApplicationService
     /// <param name="createCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> CreateJobApplicationAsync(
+    Task CreateJobApplicationAsync(
         CreateJobApplicationRequestDto createCommand,
         CancellationToken cancellationToken = default);
 
@@ -47,7 +47,7 @@ public interface IJobApplicationService
     /// <param name="status"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> UpdateJobApplicationStatusAsync(
+    Task UpdateJobApplicationStatusAsync(
         Guid jobApplicationId,
         JobApplicationStatus status,
         CancellationToken cancellationToken = default);

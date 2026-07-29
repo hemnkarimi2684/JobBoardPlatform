@@ -14,6 +14,7 @@ using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
@@ -264,7 +265,20 @@ public class UserService : IUserService
             throw;
         }
 
-        await _emailService.SendAsync(user.Email!, "Approved Employer Account", "Your account has been verified.", false, cancellationToken);
+        if (string.IsNullOrWhiteSpace(user.Email))
+        {
+            _logger.LogError("user {UserId} has no email", user.Id);
+            return;
+        }
+
+        try
+        {
+            await _emailService.SendAsync(user.Email!, "Approved Employer Account", "Your account has been verified.", false, cancellationToken);
+        }
+        catch (EmailSendingException ex)
+        {
+            _logger.LogWarning(ex, "Employer approved successfully, but email sending failed for user {UserId}", user.Id);
+        }
     }
 
     public async Task RejectEmployerAsync(
@@ -314,7 +328,20 @@ public class UserService : IUserService
             throw;
         }
 
-        await _emailService.SendAsync(user.Email!, "Reject Employer Account", "Your account was rejected.", false, cancellationToken);
+        if (string.IsNullOrWhiteSpace(user.Email))
+        {
+            _logger.LogError("user {UserId} has no email", user.Id);
+            return;
+        }
+
+        try
+        {
+            await _emailService.SendAsync(user.Email, "Approved Employer Account", "Your account has been verified.", false, cancellationToken);
+        }
+        catch (EmailSendingException ex)
+        {
+            _logger.LogWarning(ex, "Employer Reject successfully, but email sending failed for user {UserId}", user.Id);
+        }
     }
 
     public async Task ActivateJobSeekerAsync(

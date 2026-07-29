@@ -12,6 +12,9 @@ using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
+using static JobBoardPlatform.Application.Common.AccessClaims.PermissionClaim.Permissions;
 
 namespace JobBoardPlatform.Application.Implementation.JobApplicationBusiness;
 
@@ -27,18 +30,21 @@ public class JobApplicationService : IJobApplicationService
 
     private readonly IEmailService _emailService;
 
-    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService, IEmailService emailService)
+    private readonly ILogger<JobApplication> _logger;
+
+    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService, IEmailService emailService, ILogger<JobApplication> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _advertisementService = advertisementService;
         _accessControlService = accessControlService;
         _emailService = emailService;
+        _logger = logger;
     }
 
     #region Create Methods
 
-    public async Task<bool> CreateJobApplicationAsync(
+    public async Task CreateJobApplicationAsync(
         CreateJobApplicationRequestDto createCommand,
         CancellationToken cancellationToken = default)
     {
@@ -48,13 +54,37 @@ public class JobApplicationService : IJobApplicationService
 
         var userFullName = await _unitOfWork.UserProfileRepository.GetUserFullNameByUserIdAsync(createCommand.UserId, cancellationToken);
 
-        var jobAplication = new JobApplication(JobApplicationStatus.Pending, advInformation.JobTitle, advInformation.CompanyName,
+        var jobApplication = new JobApplication(JobApplicationStatus.Pending, advInformation.JobTitle, advInformation.CompanyName,
                                                advInformation.CityName, advInformation.CollaborationType, userFullName!, advInformation.ExperienceLevel,
                                                createCommand.ResumeId, createCommand.AdvertisementId, createCommand.UserId, _currentUser.UserId);
 
-        await _unitOfWork.JobApplicationRepository.AddAsync(jobAplication, cancellationToken);
+        await _unitOfWork.JobApplicationRepository.AddAsync(jobApplication, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+        var result = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+
+        if (!result)
+            throw new ValidationException("Something went wrong while creating the job application.");
+
+        var ownerEmail = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerEmailAsync(createCommand.AdvertisementId, cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(ownerEmail))
+        {
+            _logger.LogError("owner has no email");
+            return;
+        }
+
+        try
+        {
+            await _emailService.SendAsync(ownerEmail, "New Job Application", "You have received a new job application request.", false, cancellationToken);
+        }
+        catch (EmailSendingException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Job application {JobApplicationId} was created successfully, but email sending failed for advertisement {AdvertisementId}.",
+                jobApplication.Id,
+                createCommand.AdvertisementId);
+        }
     }
 
     #endregion
@@ -173,7 +203,7 @@ public class JobApplicationService : IJobApplicationService
 
     #region Update Methods
 
-    public async Task<bool> UpdateJobApplicationStatusAsync(
+    public async Task UpdateJobApplicationStatusAsync(
         Guid jobApplicationId,
         JobApplicationStatus status,
         CancellationToken cancellationToken = default)
@@ -194,8 +224,12 @@ public class JobApplicationService : IJobApplicationService
 
         jobApplication.UpdateStatus(status, _currentUser.UserId);
 
-        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+        var result = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
 
+        if (!result)
+            throw new ValidationException("Something went wrong while updating the job application.");
+
+        await HandelEmailSendingForJobApplicationStatusAsync(jobApplication, status, cancellationToken);
     }
 
     public async Task<bool> CancelJobApplicationAsync(
@@ -264,6 +298,39 @@ public class JobApplicationService : IJobApplicationService
         {
             if (jobApplicationStatus == JobApplicationStatus.Reviewing)
                 throw new ValidationException("The status cannot be reverted from Interviewing to Under Review, as the review has already been completed.");
+        }
+    }
+
+    private async Task HandelEmailSendingForJobApplicationStatusAsync(
+        JobApplication jobApplication,
+        JobApplicationStatus jobApplicationStatus,
+        CancellationToken cancellationToken)
+    {
+        var userEmail = await _unitOfWork.UserRepository.GetUserEmailAsync(jobApplication.UserId, cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(userEmail))
+        {
+            _logger.LogError("user {UserId} has no email, jobApplicationId={JobApplicationId}", jobApplication.UserId, jobApplication.Id);
+            return;
+        }
+
+        try
+        {
+            if (jobApplicationStatus == JobApplicationStatus.Reviewing)
+                await _emailService.SendAsync(userEmail, "Job Application status is on reviewed", "Your request is being reviewed.", false, cancellationToken);
+
+            if (jobApplicationStatus == JobApplicationStatus.Interview)
+                await _emailService.SendAsync(userEmail, "Job Application status is on interview", "You have been invited to an interview.", false, cancellationToken);
+
+            if (jobApplicationStatus == JobApplicationStatus.Rejected)
+                await _emailService.SendAsync(userEmail, "Job Application status is rejected", "Your request was rejected.", false, cancellationToken);
+
+            if (jobApplicationStatus == JobApplicationStatus.Accepted)
+                await _emailService.SendAsync(userEmail, "Job Application status is accepted", "Your request has been accepted.", false, cancellationToken);
+        }
+        catch (EmailSendingException ex)
+        {
+            _logger.LogWarning(ex, "Job application {JobApplicationId} was updated successfully, but email sending failed for user {UserId}.", jobApplication.Id, jobApplication.UserId);
         }
     }
 

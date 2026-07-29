@@ -53,4 +53,12 @@ public interface IUserRepository
         Expression<Func<User, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// دریافت ایمیل کاربر مورد نظر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<string?> GetUserEmailAsync(Guid userId, CancellationToken cancellationToken);
 }

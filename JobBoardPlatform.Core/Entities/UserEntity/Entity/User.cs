@@ -21,7 +21,7 @@ public class User : IdentityUser<Guid>, IEntity
     {
         Email = email;
         PhoneNumber = phoneNumber;
-        UserName = Email;
+        UserName = PhoneNumber;
         IsApproved = isApproved;
         CreatedById = createdById;
 
