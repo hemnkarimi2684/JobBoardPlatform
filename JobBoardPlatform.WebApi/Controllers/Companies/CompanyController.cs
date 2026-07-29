@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
@@ -87,5 +88,23 @@ public class CompanyController : ControllerBase
         var result = await _companyService.DownloadCompanyImageAsync(companyId, cancellationToken);
 
         return File(result.Data, result.ContentType, result.FileName);
+    }
+
+    [HttpGet("owner-ship-types")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetOwnershipTypes()
+    {
+        var result = _companyService.GetOwnershipTypes();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
+    }
+
+    [HttpGet("company-sizes")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCompanySizes()
+    {
+        var result = _companyService.GetCompanySizes();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
     }
 }

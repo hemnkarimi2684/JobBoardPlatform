@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Core.Entities.EducationDetailEntity.Data;

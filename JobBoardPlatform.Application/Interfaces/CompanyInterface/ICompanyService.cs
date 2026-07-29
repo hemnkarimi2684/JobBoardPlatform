@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -73,4 +74,16 @@ public interface ICompanyService
     Task<AttachmentResponseDto> DownloadCompanyImageAsync(
         Guid companyId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام اندازه شرکت ها در سیستم
+    /// </summary>
+    /// <returns></returns>
+    List<EnumResponseDto> GetCompanySizes();
+
+    /// <summary>
+    /// دریافت تمام نوع شرکت ها در سیستم 
+    /// </summary>
+    /// <returns></returns>
+    List<EnumResponseDto> GetOwnershipTypes();
 }

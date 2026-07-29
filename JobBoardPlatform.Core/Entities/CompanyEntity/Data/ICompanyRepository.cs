@@ -2,6 +2,7 @@
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using System.Linq.Expressions;
 
@@ -16,7 +17,7 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> IsCompanyExistByNameAsync(
-        string name, 
+        string name,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -26,7 +27,7 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> IsCompanyExistForOwnerId(
-        Guid ownerId, 
+        Guid ownerId,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -102,6 +103,6 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <returns></returns>
     Task<TResult?> GetCompanyByIdAsync<TResult>(
         Expression<Func<Company, TResult>> projection,
-        Guid companyId, 
+        Guid companyId,
         CancellationToken cancellationToken);
 }

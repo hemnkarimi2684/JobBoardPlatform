@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
@@ -101,5 +102,14 @@ public class AdvertisementController : ControllerBase
         var result = await _advertisementService.FilterAdvertisementsAsync(filterRequestDto, pagingRequestDto, cancellationToken);
 
         return Ok(result);
+    }
+
+    [HttpGet("collabration-types")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCollaborationTypes()
+    {
+        var result = _advertisementService.GetCollaborationTypes();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
     }
 }

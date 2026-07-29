@@ -1,8 +1,10 @@
 ﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.EmailInterface;
@@ -12,6 +14,7 @@ using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 using static JobBoardPlatform.Application.Common.AccessClaims.PermissionClaim.Permissions;
@@ -198,6 +201,15 @@ public class JobApplicationService : IJobApplicationService
                                                                  totalDataCount);
     }
 
+    public List<EnumResponseDto> GetJobApplicationStatuses()
+    {
+        var jobApplicationStatuses = EnumHelper.GetEnumValues<JobApplicationStatus>();
+
+        if (jobApplicationStatuses is null)
+            throw new NotFoundException("there is no jobApplication status in the system.");
+
+        return jobApplicationStatuses;
+    }
 
     #endregion
 

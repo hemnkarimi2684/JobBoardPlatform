@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
@@ -66,8 +67,8 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
 
     public async Task<(List<TResult> Items, int TotalDataCount)> GetJobApplicationsByUserIdAsync<TResult>(
         Expression<Func<JobApplication, TResult>> projection,
-        Guid userId, 
-        CancellationToken cancellationToken, 
+        Guid userId,
+        CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10)
     {

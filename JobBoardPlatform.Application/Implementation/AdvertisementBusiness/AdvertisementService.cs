@@ -3,14 +3,18 @@ using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using System.Net.Http.Headers;
 
 
@@ -312,6 +316,16 @@ public class AdvertisementService : IAdvertisementService
                                                             pagingCommand.PageNumber,
                                                             pagingCommand.PageSize,
                                                             totalDataCount);
+    }
+
+    public List<EnumResponseDto> GetCollaborationTypes()
+    {
+        var collaborationTypes = EnumHelper.GetEnumValues<CollaborationType>();
+
+        if (collaborationTypes is null)
+            throw new NotFoundException("we dont have any collabration types in the system.");
+
+        return collaborationTypes;
     }
 
     #endregion

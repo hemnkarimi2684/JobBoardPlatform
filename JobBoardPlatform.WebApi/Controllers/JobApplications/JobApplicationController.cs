@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -92,5 +93,14 @@ public class JobApplicationController : ControllerBase
         await _jobApplicationService.CancelJobApplicationAsync(jobApplicationId, cancellationToken);
 
         return Ok(Result.Success());
+    }
+
+    [HttpGet("statuses")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetJobApplicationStatuses()
+    {
+        var result = _jobApplicationService.GetJobApplicationStatuses();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -69,5 +70,14 @@ public class EducationDetailController : ControllerBase
         await _educationDetailService.UpdateEducationDetailAsync(educationDetailId, updateEducation, cancellationToken);
 
         return Ok(Result.Success());
+    }
+
+    [HttpGet("certificate-degrees")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCertificateDegrees()
+    {
+        var result = _educationDetailService.GetCertificateDegrees();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
@@ -126,4 +127,10 @@ public interface IUserService
     Task<EmployerWithCompanyResponseDto> GetEmployerWithCompanyAsync(
         Guid ownerId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام جنسیت ها در سیستم
+    /// </summary>
+    /// <returns></returns>
+    List<EnumResponseDto> GetGenders();
 }

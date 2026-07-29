@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;

@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Core.Entities.EducationDetailEntity.Data;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;

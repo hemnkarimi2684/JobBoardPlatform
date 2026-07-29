@@ -46,6 +46,7 @@ using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;

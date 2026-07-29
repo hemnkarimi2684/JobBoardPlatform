@@ -5,8 +5,10 @@ using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.EmailInterface;
@@ -19,6 +21,7 @@ using JobBoardPlatform.Core.Entities.UserEntity.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -185,6 +188,16 @@ public class UserService : IUserService
                                                         pagingCommand.PageNumber,
                                                         pagingCommand.PageSize,
                                                         totalDataCount);
+    }
+
+    public List<EnumResponseDto> GetGenders()
+    {
+        var genders = EnumHelper.GetEnumValues<Gender>();
+
+        if (genders is null)
+            throw new NotFoundException("there is no genders in system.");
+
+        return genders;
     }
 
     #endregion

@@ -3,14 +3,18 @@ using JobBoardPlatform.Application.Common.CurrentUser.Implementation;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 
 namespace JobBoardPlatform.Application.Implementation.EducationDetailBusiness;
 
@@ -119,6 +123,16 @@ public class EducationDetailService : IEducationDetailService
             Percentage = educationDetail.Percentage,
             IsCurrentlyStudying = educationDetail.IsCurrentlyStudying
         };
+    }
+
+    public List<EnumResponseDto> GetCertificateDegrees()
+    {
+        var CertificateDegrees = EnumHelper.GetEnumValues<CertificateDegree>();
+
+        if (CertificateDegrees == null)
+            throw new NotFoundException("there is not CertificateDegrees in the system");
+
+        return CertificateDegrees;
     }
 
     #endregion

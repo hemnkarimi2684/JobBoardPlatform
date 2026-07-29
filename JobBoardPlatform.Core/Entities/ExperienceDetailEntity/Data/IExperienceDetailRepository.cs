@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using System.Linq.Expressions;
 

@@ -6,6 +6,7 @@ using JobBoardPlatform.Infrastructure.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
 using JobBoardPlatform.WebApi.Middlewares;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +58,11 @@ builder.Services.AddSwaggerGen(c =>
 
 #endregion
 
+//اینم صرفا میره تنظیمات توی اپ ستینگ برای سری لاگ رو میخونه
+builder.Host.UseSerilog((context, services, configuration) => configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services));
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ApprovedEmployerOnly", policy =>
@@ -79,6 +85,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+
+//به ازای هر ریکوست میاد با تمام جزئیات لاگشون میکنه و نگه میداره 
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 

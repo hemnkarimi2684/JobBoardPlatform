@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;

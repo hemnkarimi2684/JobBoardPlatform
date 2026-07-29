@@ -2,6 +2,7 @@
 using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;

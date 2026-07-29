@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.WebApi.Filters;
@@ -65,5 +66,14 @@ public class UserController : ControllerBase
         await _userService.UploadUserImageAsync(userId, imageRequestDto, cancellationToken);
 
         return Ok(Result.Success());
+    }
+
+    [HttpPatch("genders")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetGenders()
+    {
+        var result = _userService.GetGenders();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
     }
 }

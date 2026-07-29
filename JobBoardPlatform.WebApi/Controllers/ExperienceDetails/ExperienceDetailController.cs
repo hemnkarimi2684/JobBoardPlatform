@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ExperienceDetailDto;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -68,5 +69,14 @@ public class ExperienceDetailController : ControllerBase
         await _experienceDetailService.UpdateExperienceDetailAsync(experienceDetailId, updateExperience, cancellationToken);
 
         return Ok(Result.Success());
+    }
+
+    [HttpGet("seniority-levels")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetSeniorityLevels()
+    {
+        var result = _experienceDetailService.GetSeniorityLevels();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using System.Linq.Expressions;
@@ -156,4 +157,10 @@ public interface IAdvertisementService
     Task DemoteAdvertisementAsync(
         Guid advertisementId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام نوع همکاری ها در سیستم 
+    /// </summary>
+    /// <returns></returns>
+    List<EnumResponseDto> GetCollaborationTypes();
 }

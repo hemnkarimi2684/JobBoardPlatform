@@ -3,9 +3,11 @@ using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
@@ -15,6 +17,8 @@ using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -134,6 +138,26 @@ public class CompanyService : ICompanyService
             throw new NotFoundException($"the company with this id {companyId} not found");
 
         return company;
+    }
+
+    public List<EnumResponseDto> GetCompanySizes()
+    {
+        var companySizes = EnumHelper.GetEnumValues<CompanySizeEnum>();
+
+        if (companySizes is null)
+            throw new NotFoundException("there is no company size in the system");
+
+        return companySizes;
+    }
+
+    public List<EnumResponseDto> GetOwnershipTypes()
+    {
+        var ownerShipTypes = EnumHelper.GetEnumValues<OwnershipType>();
+
+        if (ownerShipTypes is null)
+            throw new NotFoundException("there is no ownerShip types in the system");
+
+        return ownerShipTypes;
     }
 
     #endregion
