@@ -68,7 +68,7 @@ public class UserController : ControllerBase
         return Ok(Result.Success());
     }
 
-    [HttpPatch("genders")]
+    [HttpGet("genders")]
     [AllowAnonymous]
     public async Task<IActionResult> GetGenders()
     {
