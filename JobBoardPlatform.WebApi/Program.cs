@@ -60,8 +60,9 @@ builder.Services.AddSwaggerGen(c =>
 
 //اینم صرفا میره تنظیمات توی اپ ستینگ برای سری لاگ رو میخونه
 builder.Host.UseSerilog((context, services, configuration) => configuration
-        .ReadFrom.Configuration(context.Configuration)
-        .ReadFrom.Services(services));
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
 
 builder.Services.AddAuthorization(options =>
 {
