@@ -21,9 +21,11 @@ public class User : IdentityUser<Guid>, IEntity
     {
         Email = email;
         PhoneNumber = phoneNumber;
-        UserName = Email;
+        UserName = PhoneNumber;
         IsApproved = isApproved;
         CreatedById = createdById;
+
+        IsActive = true;
 
         //Methods
         PhoneNumber.FixPhoneNumberFormat();
@@ -39,6 +41,8 @@ public class User : IdentityUser<Guid>, IEntity
     public bool IsDeleted { get; private set; }
 
     public bool IsApproved { get; private set; }
+
+    public bool IsActive { get; private set; }
 
     #region Foreign Keys
 
@@ -124,6 +128,12 @@ public class User : IdentityUser<Guid>, IEntity
     public void UpdateIsApproved(bool isApproved, Guid? modifiedById)
     {
         IsApproved = isApproved;
+        Update(modifiedById);
+    }
+
+    public void UpdateIsActive(bool isActive, Guid? modifiedById)
+    {
+        IsActive = isActive;
         Update(modifiedById);
     }
 }

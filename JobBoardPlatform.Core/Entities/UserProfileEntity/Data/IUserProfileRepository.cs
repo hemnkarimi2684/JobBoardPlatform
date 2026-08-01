@@ -2,6 +2,7 @@
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Core.Entities.UserProfileEntity.Data;
@@ -60,7 +61,7 @@ public interface IUserProfileRepository : IGenericRepository<UserProfile>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> IsUserHasProfileAsync(
-        Guid userId, 
+        Guid userId,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -70,6 +71,6 @@ public interface IUserProfileRepository : IGenericRepository<UserProfile>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<UserProfile?> GetProfileByUserIdAsync(
-        Guid userId, 
+        Guid userId,
         CancellationToken cancellationToken);
 }

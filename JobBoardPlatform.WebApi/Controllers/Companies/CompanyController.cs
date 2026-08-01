@@ -1,6 +1,8 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
@@ -30,17 +32,6 @@ public class CompanyController : ControllerBase
         return Ok(Result.Success());
     }
 
-    [HttpGet("by-user/{ownerId:guid}")]
-    [Authorize(Roles = "Employer,Admin")]
-    public async Task<IActionResult> GetCompanyProfileByOwnerIdAsync(
-        [FromRoute] Guid ownerId,
-        CancellationToken cancellationToken)
-    {
-        var result = await _companyService.GetCompanyProfileByOwnerIdAsync(ownerId, cancellationToken);
-
-        return Ok(Result<CompanyProfileResponseDto>.Success(result));
-    }
-
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllCompaniesAsync(
@@ -61,11 +52,11 @@ public class CompanyController : ControllerBase
     {
         var result = await _companyService.GetCompanyByIdAsync(companyId, cancellationToken);
 
-        return Ok(Result<CompanyProfileResponseDto>.Success(result));
+        return Ok(Result<CompanyDetailResponseDto>.Success(result));
     }
 
     [HttpPut("{companyId:guid}")]
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> UpdateCompanyIdAsync(
         [FromRoute] Guid companyId,
         [FromBody] UpdateCompanyInfoRequestDto update,
@@ -77,13 +68,24 @@ public class CompanyController : ControllerBase
     }
 
     [HttpPatch("{companyId:guid}/upload-image")]
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> UploadCompanyImageAsync(
         [FromRoute] Guid companyId,
         [FromForm] UploadCompanyImageRequestDto imageRequestDto,
         CancellationToken cancellationToken)
     {
         await _companyService.UploadCompanyImageAsync(companyId, imageRequestDto, cancellationToken);
+
+        return Ok(Result.Success());
+    }
+
+    [HttpDelete("{companyId:guid}/delete-image")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
+    public async Task<IActionResult> DeleteCompanyImageAsync(
+        [FromRoute] Guid companyId,
+        CancellationToken cancellationToken)
+    {
+        await _companyService.DeleteCompanyImageAsync(companyId, cancellationToken);
 
         return Ok(Result.Success());
     }
@@ -97,5 +99,23 @@ public class CompanyController : ControllerBase
         var result = await _companyService.DownloadCompanyImageAsync(companyId, cancellationToken);
 
         return File(result.Data, result.ContentType, result.FileName);
+    }
+
+    [HttpGet("owner-ship-types")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetOwnershipTypes()
+    {
+        var result = _companyService.GetOwnershipTypes();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
+    }
+
+    [HttpGet("company-sizes")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCompanySizes()
+    {
+        var result = _companyService.GetCompanySizes();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
     }
 }

@@ -17,9 +17,13 @@ public class AdvertisementDetail
     public string CompanyName { get; init; } = string.Empty;
     public string JobName { get; init; } = string.Empty;
     public string CompanyAboutUs { get; init; } = string.Empty;
-    public string CompanyIndustry { get; init; } = string.Empty;
+    public Guid CompanyJobCategoryId { get; set; }
+    public string CompanyJobCategoryName { get; set; } = string.Empty;
+    public bool IsFeatured { get; set; }
+    public DateTime? FeaturedUntil { get; set; }
     public DateTime CreatedAt { get; init; }
     public List<string> Skills { get; init; } = new List<string>();
     public Guid CityId { get; init; }
     public Guid CompanyId { get; init; }
+    public bool IsActive { get; set; }
 }

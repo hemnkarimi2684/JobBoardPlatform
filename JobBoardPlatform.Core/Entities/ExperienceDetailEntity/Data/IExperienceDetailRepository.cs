@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using System.Linq.Expressions;
 
@@ -18,7 +19,7 @@ public interface IExperienceDetailRepository : IGenericRepository<ExperienceDeta
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetUserExperienceDetailsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetUserExperienceDetailsAsync<TResult>(
                              Expression<Func<ExperienceDetail, TResult>> projection,
                              Guid userId,
                              CancellationToken cancellationToken,

@@ -5,7 +5,7 @@ namespace JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 public record CompanyInfoUpdate(
     string? Name, 
     DateTime? YearOfEstablishment, 
-    string? Industry,
+    Guid? JobCategoryId,
     string? AboutUs, 
     string? WebSiteAddress, 
     OwnershipType? OwnershipType,

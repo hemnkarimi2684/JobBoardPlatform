@@ -32,6 +32,7 @@ public class Advertisement : BaseEntity
         CompanyId = companyId;
         CreatedById = createdById;
         IsActive = true;
+        IsFeatured = false;
 
         Validate();
     }
@@ -75,6 +76,16 @@ public class Advertisement : BaseEntity
     /// وضعیت فعال یاغیر فعال بودن اگهی
     /// </summary>
     public bool IsActive { get; private set; }
+
+    /// <summary>
+    /// ایا این اگهی ویژه است یا نه
+    /// </summary>
+    public bool IsFeatured { get; private set; }
+
+    /// <summary>
+    /// تاریخ انقضا اگهی ویژه
+    /// </summary>
+    public DateTime? FeaturedUntil { get; private set; }
 
     #region Foreign Keys
 
@@ -172,6 +183,12 @@ public class Advertisement : BaseEntity
         IsActive = isActive;
 
         Update(modifierId);
+    }
+
+    public void UpdateFeatured(bool isFeatured, DateTime? featuredUntil)
+    {
+        IsFeatured = isFeatured;
+        FeaturedUntil = featuredUntil;
     }
 
     public void UpdateAdvertisementInfo(UpdateAdvertisementInfo updateAdvertisement)

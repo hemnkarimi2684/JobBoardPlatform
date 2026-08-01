@@ -14,7 +14,9 @@ public class CompanyListItemResponseDto
 
     public DateTime YearOfEstablishment { get; init; }
 
-    public string Industry { get; init; } = string.Empty;
+    public string JobCategoryName { get; init; } = string.Empty;
+
+    public Guid JobCategoryId { get; init; }
 
     public string AboutUs { get; init; } = string.Empty;
 

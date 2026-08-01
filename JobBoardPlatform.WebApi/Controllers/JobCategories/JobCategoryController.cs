@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.JobCategories;
 
-[Route("api/[controller]")]
+[Route("api/jobCategories")]
 [ApiController]
 [Authorize]
 public class JobCategoryController : ControllerBase
@@ -18,17 +18,6 @@ public class JobCategoryController : ControllerBase
     public JobCategoryController(IJobCategoryService jobCategoryService)
     {
         _jobCategoryService = jobCategoryService;
-    }
-
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateJobCategoryAsync(
-      [FromBody] CreateJobCategoryRequestDto jobCategoryRequestDto,
-        CancellationToken cancellationToken)
-    {
-        await _jobCategoryService.CreateJobCategoryAsync(jobCategoryRequestDto, cancellationToken);
-
-        return Ok(Result.Success());
     }
 
     [HttpGet]

@@ -1,16 +1,18 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.CurrentUser.Implementation;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 
 namespace JobBoardPlatform.Application.Implementation.EducationDetailBusiness;
 
@@ -68,7 +70,7 @@ public class EducationDetailService : IEducationDetailService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+        _accessControlService.EnsureApplicant(userId, _currentUser);
 
         var (userEducationDetails, totalDataCount) = await _unitOfWork.EducationDetailRepository
                                                           .GetUserEducationDetailsAsync(ed =>
@@ -105,7 +107,7 @@ public class EducationDetailService : IEducationDetailService
         if (educationDetail == null)
             throw new NotFoundException($"The education detail with id {educationDetailId} was not found.");
 
-        _accessControlService.EnsureApplicantOrAdmin(educationDetail.UserId, _currentUser);
+        _accessControlService.EnsureApplicant(educationDetail.UserId, _currentUser);
 
         return new EducationHistoryResponseDto
         {
@@ -119,6 +121,16 @@ public class EducationDetailService : IEducationDetailService
             Percentage = educationDetail.Percentage,
             IsCurrentlyStudying = educationDetail.IsCurrentlyStudying
         };
+    }
+
+    public List<EnumResponseDto> GetCertificateDegrees()
+    {
+        var CertificateDegrees = EnumHelper.GetEnumValues<CertificateDegree>();
+
+        if (CertificateDegrees == null)
+            throw new NotFoundException("there is not CertificateDegrees in the system");
+
+        return CertificateDegrees;
     }
 
     #endregion

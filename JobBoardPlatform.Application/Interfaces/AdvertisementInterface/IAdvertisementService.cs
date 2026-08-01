@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using System.Linq.Expressions;
@@ -69,7 +70,7 @@ public interface IAdvertisementService
     /// <param name="advertisementId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> InActivateAdvertisementAsync(
+    Task<bool> DeactivateAdvertisementAsync(
         Guid advertisementId,
         CancellationToken cancellationToken = default);
 
@@ -124,4 +125,42 @@ public interface IAdvertisementService
         AdvertisementFilterRequestDto filterDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام اگهی های فعال و غیر فعال 
+    /// </summary>
+    /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Pagination<AdvertisementDetailResponseDto>> GetAllAdvertisementsAsync(
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// ویژه کردن اگهی
+    /// </summary>
+    /// <param name="advertisementId"></param>
+    /// <param name="durationInDays"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task PromoteAdvertisementAsync(
+        Guid advertisementId,
+        int durationInDays,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// عادی کردن یک اگهی
+    /// </summary>
+    /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task DemoteAdvertisementAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام نوع همکاری ها در سیستم 
+    /// </summary>
+    /// <returns></returns>
+    List<EnumResponseDto> GetCollaborationTypes();
 }

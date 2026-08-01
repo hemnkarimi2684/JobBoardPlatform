@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ExperienceDetailDto;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.ExperienceDetails;
 
-[Route("api/[controller]")]
+[Route("api/experienceDetail")]
 [ApiController]
 [Authorize]
 public class ExperienceDetailController : ControllerBase
@@ -23,7 +24,7 @@ public class ExperienceDetailController : ControllerBase
     }
 
     [HttpGet("{userId:guid}/experience-details")]
-    [Authorize(Roles = "Admin,JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> GetUserExperienceDetailsAsync(
         [FromRoute] Guid userId,
         [FromQuery] PagingRequestDto pagingRequest,
@@ -35,7 +36,7 @@ public class ExperienceDetailController : ControllerBase
     }
 
     [HttpGet("{experienceDetailId:guid}")]
-    [Authorize(Roles = "Admin,JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> GetExperienceDetailByIdAsync(
         [FromRoute] Guid experienceDetailId,
         CancellationToken cancellationToken)
@@ -46,7 +47,7 @@ public class ExperienceDetailController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> CreateExperienceDetailAsync(
         [FromBody] CreateExperienceDetailRequestDto createExperience,
@@ -58,7 +59,7 @@ public class ExperienceDetailController : ControllerBase
     }
 
     [HttpPut("{experienceDetailId:guid}")]
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [RequestModelValidationFilter]
     public async Task<IActionResult> UpdateExperienceDetailAsync(
         [FromRoute] Guid experienceDetailId,
@@ -68,5 +69,14 @@ public class ExperienceDetailController : ControllerBase
         await _experienceDetailService.UpdateExperienceDetailAsync(experienceDetailId, updateExperience, cancellationToken);
 
         return Ok(Result.Success());
+    }
+
+    [HttpGet("seniority-levels")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetSeniorityLevels()
+    {
+        var result = _experienceDetailService.GetSeniorityLevels();
+
+        return Ok(Result<List<EnumResponseDto>>.Success(result));
     }
 }

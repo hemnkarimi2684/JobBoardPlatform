@@ -1,5 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
@@ -8,8 +7,10 @@ using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
 using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace JobBoardPlatform.Application.Implementation.AuthenticationBusiness;
 
@@ -61,13 +62,16 @@ public class AuthenticationService : IAuthenticationService
             throw new ValidationException("Email/phone number or password is incorrect.");
 
         if (user.IsApproved == false)
-            throw new ForbiddenException("Dear user, your account has not yet been verified; please try again later.");
+            throw new ForbiddenException("“Your account is pending administrator approval.”");
+
+        if (user.IsActive == false)
+            throw new ForbiddenException("Your account is deactivated. Please contact support.");
 
         return await _jwtService.GenerateTokenAsync(user);
     }
 
     public async Task LogoutAsync(
-        LogoutRequestDto logoutRequest, 
+        LogoutRequestDto logoutRequest,
         CancellationToken cancellationToken = default)
     {
         var result = await _refreshTokenService.RevokeAsync(logoutRequest.RefreshToken, cancellationToken);
@@ -77,7 +81,7 @@ public class AuthenticationService : IAuthenticationService
     }
 
     public async Task<TokenLoginResponseDto> RefreshAsync(
-        RefreshRequestDto refreshRequest, 
+        RefreshRequestDto refreshRequest,
         CancellationToken cancellationToken = default)
     {
         //دریافت توکن از دیتابیس 
@@ -98,6 +102,12 @@ public class AuthenticationService : IAuthenticationService
 
         if (user == null)
             throw new NotFoundException("User associated with this token was not found.");
+
+        if (user.IsApproved == false)
+            throw new ForbiddenException("Your account is pending administrator approval");
+
+        if (user.IsActive == false)
+            throw new ForbiddenException("Your account is deactivated. Please contact support");
 
         // منقضی کردن توکن فعلی که داره استفاده میشه برای اینکه کلا یک بار مصرف باشه 
         refreshToken.Revoke();
@@ -138,6 +148,19 @@ public class AuthenticationService : IAuthenticationService
 
             if (!addToRoleResult.Succeeded)
                 throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
+
+            var claim = new Claim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue);
+
+            var employerClaims = await _userManager.GetClaimsAsync(user);
+
+            if (!employerClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
+            {
+
+                var result = await _userManager.AddClaimAsync(user, claim);
+
+                if (!result.Succeeded)
+                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
+            }
 
             var createdCompanyId = await _companyService.CreateCompanyAsync(registerCommand.ToCreateCompanyRequestDto(user.Id));
 
@@ -185,6 +208,18 @@ public class AuthenticationService : IAuthenticationService
 
             if (!addToRoleResult.Succeeded)
                 throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
+
+            var claim = new Claim(UserClaims.JobSeekerClaimType, UserClaims.IsActiveClaimValue);
+
+            var jobSeekerClaims = await _userManager.GetClaimsAsync(user);
+
+            if (!jobSeekerClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
+            {
+                var result = await _userManager.AddClaimAsync(user, claim);
+
+                if (!result.Succeeded)
+                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
+            }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);

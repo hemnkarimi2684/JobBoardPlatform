@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Core.Entities.EducationDetailEntity.Data;
@@ -17,7 +18,7 @@ public interface IEducationDetailRepository : IGenericRepository<EducationDetail
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetUserEducationDetailsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetUserEducationDetailsAsync<TResult>(
                                             Expression<Func<EducationDetail, TResult>> projection,
                                             Guid userId,
                                             CancellationToken cancellationToken,

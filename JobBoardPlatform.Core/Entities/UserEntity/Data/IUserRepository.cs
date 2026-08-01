@@ -1,5 +1,6 @@
 ﻿
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
@@ -53,4 +54,12 @@ public interface IUserRepository
         Expression<Func<User, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// دریافت ایمیل کاربر مورد نظر 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<UserDisplayDto?> GetUserEmailAsync(Guid userId, CancellationToken cancellationToken);
 }

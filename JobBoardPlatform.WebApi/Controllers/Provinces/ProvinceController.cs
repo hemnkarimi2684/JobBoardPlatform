@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Provinces;
 
-[Route("api/[controller]")]
+[Route("api/provinces")]
 [ApiController]
 [Authorize]
 public class ProvinceController : ControllerBase
@@ -19,17 +19,6 @@ public class ProvinceController : ControllerBase
     public ProvinceController(IProvinceService provinceService)
     {
         _provinceService = provinceService;
-    }
-
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateProvinceAsync(
-       [FromBody] CreateProvinceRequestDto provinceRequestDto,
-        CancellationToken cancellationToken)
-    {
-        await _provinceService.CreateProvinceAsync(provinceRequestDto, cancellationToken);
-
-        return Ok(Result.Success());
     }
 
     [HttpGet]

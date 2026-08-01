@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Cities;
 
-[Route("api/[controller]")]
+[Route("api/cities")]
 [ApiController]
 [Authorize]
 public class CityController : ControllerBase
@@ -21,18 +21,6 @@ public class CityController : ControllerBase
     public CityController(ICityService cityService)
     {
         _cityService = cityService;
-    }
-
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    [RequestModelValidationFilter]
-    public async Task<IActionResult> CreateCityAsync(
-        [FromBody] CreateCityRequestDto requestDto,
-        CancellationToken cancellationToken)
-    {
-        await _cityService.CreateCityAsync(requestDto, cancellationToken);
-
-        return Ok(Result.Success());
     }
 
     [HttpGet("{cityId:guid}/companies")]

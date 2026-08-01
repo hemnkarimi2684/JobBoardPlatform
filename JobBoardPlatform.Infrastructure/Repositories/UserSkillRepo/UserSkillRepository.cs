@@ -13,7 +13,7 @@ public class UserSkillRepository : GenericRepository<UserSkill>, IUserSkillRepos
     {
     }
 
-    public async Task<(List<TResult>, int)> GetUserSkillsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetUserSkillsAsync<TResult>(
         Expression<Func<UserSkill, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken,

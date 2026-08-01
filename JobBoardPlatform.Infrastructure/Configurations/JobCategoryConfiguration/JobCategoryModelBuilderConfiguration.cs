@@ -21,5 +21,11 @@ public class JobCategoryModelBuilderConfiguration : BaseModelBuilderConfiguratio
             .HasForeignKey(j => j.JobCategoryId)
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
+
+        builder.HasMany(jc => jc.Companies)
+            .WithOne(c => c.JobCategory)
+            .HasForeignKey(c => c.JobCategoryId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired();
     }
 }

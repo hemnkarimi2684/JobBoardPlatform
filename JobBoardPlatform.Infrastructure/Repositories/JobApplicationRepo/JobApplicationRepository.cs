@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,7 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
                            cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetAdvertisementJobApplicationsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAdvertisementJobApplicationsAsync<TResult>(
          Expression<Func<JobApplication, TResult>> projection,
          Guid advertisementId,
          CancellationToken cancellationToken,
@@ -64,10 +65,10 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
                           .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetJobApplicationsByUserIdAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetJobApplicationsByUserIdAsync<TResult>(
         Expression<Func<JobApplication, TResult>> projection,
-        Guid userId, 
-        CancellationToken cancellationToken, 
+        Guid userId,
+        CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10)
     {

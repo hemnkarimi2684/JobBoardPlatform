@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Jobs;
 
-[Route("api/[controller]")]
+[Route("api/jobs")]
 [ApiController]
 [Authorize]
 public class JobController : ControllerBase
@@ -18,17 +18,6 @@ public class JobController : ControllerBase
     public JobController(IJobService jobService)
     {
         _jobService = jobService;
-    }
-
-    [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateJobAsync(
-       [FromBody] CreateJobRequestDto createJobRequestDto,
-        CancellationToken cancellationToken)
-    {
-        await _jobService.CreateJobAsync(createJobRequestDto, cancellationToken);
-
-        return Ok(Result.Success());
     }
 
     [HttpGet]

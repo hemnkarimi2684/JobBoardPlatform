@@ -2,6 +2,7 @@
 using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
     {
     }
 
-    public async Task<(List<TResult>, int)> GetAllCompaniesAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAllCompaniesAsync<TResult>(
         Expression<Func<Company, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,
@@ -50,6 +51,18 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
         return (result, totalDataCount);
     }
 
+    public async Task<TResult?> GetCompanyByIdAsync<TResult>(
+        Expression<Func<Company, TResult>> projection,
+        Guid companyId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                           .AsNoTracking()
+                           .Where(c => c.Id == companyId)
+                           .Select(projection)
+                           .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<TResult?> GetCompanyByOwnerIdAsync<TResult>(
         Expression<Func<Company, TResult>> projection,
         Guid ownerId,
@@ -69,7 +82,7 @@ public class CompanyRepository : GenericRepository<Company>, ICompanyRepository
         return await Entities
                          .AsNoTracking()
                          .Where(c => c.Id == companyId)
-                         .Select(c => c.Id)
+                         .Select(c => c.OwnedByUserId)
                          .FirstOrDefaultAsync(cancellationToken);
     }
 

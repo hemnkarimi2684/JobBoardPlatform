@@ -60,12 +60,20 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("FeaturedUntil")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
                     b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsFeatured")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
@@ -105,6 +113,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("DeletedById");
 
+                    b.HasIndex("FeaturedUntil");
+
                     b.HasIndex("JobId");
 
                     b.HasIndex("MaximumSalary");
@@ -113,7 +123,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("Advertisements", (string)null);
+                    b.ToTable("Advertisements");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Entity.AdvertisementSkill", b =>
@@ -168,7 +178,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("AdvertisementId", "SkillId")
                         .IsUnique();
 
-                    b.ToTable("AdvertisementSkills", (string)null);
+                    b.ToTable("AdvertisementSkills");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.AttachmentEntity.Entity.Attachment", b =>
@@ -231,7 +241,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("Attachments", (string)null);
+                    b.ToTable("Attachments");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.CityEntity.Entity.City", b =>
@@ -297,7 +307,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("ProvinceId");
 
-                    b.ToTable("Cities", (string)null);
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity.CompanyCity", b =>
@@ -357,7 +367,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("CompanyId", "CityId")
                         .IsUnique();
 
-                    b.ToTable("CompanyCities", (string)null);
+                    b.ToTable("CompanyCities");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.CompanyEntity.Entity.Company", b =>
@@ -397,15 +407,13 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Property<Guid?>("DeletedById")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Industry")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<Guid>("JobCategoryId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
@@ -446,6 +454,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("DeletedById");
 
+                    b.HasIndex("JobCategoryId");
+
                     b.HasIndex("ModifiedById");
 
                     b.HasIndex("Name")
@@ -454,7 +464,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("OwnedByUserId")
                         .IsUnique();
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity.EducationDetail", b =>
@@ -530,7 +540,131 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EducationDetails", (string)null);
+                    b.ToTable("EducationDetails");
+                });
+
+            modelBuilder.Entity("JobBoardPlatform.Core.Entities.EmailTemplateEntity.Entity.EmailTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<Guid?>("CreatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ModifiedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("ModifiedById");
+
+                    b.HasIndex("Subject");
+
+                    b.ToTable("EmailTemplates");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000001"),
+                            Body = "Your employer account has been approved.",
+                            IsActive = true,
+                            Key = "EmployerApproved",
+                            Subject = "Employer Account Approved"
+                        },
+                        new
+                        {
+                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000002"),
+                            Body = "Unfortunately, your employer account has not been approved. Please contact support for more information.",
+                            IsActive = true,
+                            Key = "EmployerRejected",
+                            Subject = "Employer Account Rejected"
+                        },
+                        new
+                        {
+                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000003"),
+                            Body = "You have received a new application for the {{JobTitle}} position.\n\nPlease log in to your dashboard to review the application.",
+                            IsActive = true,
+                            Key = "NewJobApplicationReceived",
+                            Subject = "New Application for {{JobTitle}}"
+                        },
+                        new
+                        {
+                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000004"),
+                            Body = "Hello {{CandidateName}},\n\nYour application for the {{JobTitle}} position at {{CompanyName}} is currently under review.",
+                            IsActive = true,
+                            Key = "JobApplicationReviewing",
+                            Subject = "Your Job Application Is Under Review"
+                        },
+                        new
+                        {
+                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000005"),
+                            Body = "Hello {{CandidateName}},\n\nYou have been invited to an interview for the {{JobTitle}} position at {{CompanyName}}.\n\nPlease log in to your account to view the interview details.",
+                            IsActive = true,
+                            Key = "JobApplicationInterview",
+                            Subject = "Interview Invitation"
+                        },
+                        new
+                        {
+                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000006"),
+                            Body = "Hello {{CandidateName}},\n\nCongratulations! Your application for the {{JobTitle}} position at {{CompanyName}} has been accepted.",
+                            IsActive = true,
+                            Key = "JobApplicationAccepted",
+                            Subject = "Your Job Application Has Been Accepted"
+                        },
+                        new
+                        {
+                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000007"),
+                            Body = "Hello {{CandidateName}},\n\nUnfortunately, your application for the {{JobTitle}} position at {{CompanyName}} was not accepted.\n\nWe wish you success in your future applications.",
+                            IsActive = true,
+                            Key = "JobApplicationRejected",
+                            Subject = "Job Application Update"
+                        });
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity.ExperienceDetail", b =>
@@ -608,7 +742,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ExperienceDetails", (string)null);
+                    b.ToTable("ExperienceDetails");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity.JobApplication", b =>
@@ -700,7 +834,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("JobApplications", (string)null);
+                    b.ToTable("JobApplications");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity.JobCategory", b =>
@@ -752,7 +886,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("JobCategories", (string)null);
+                    b.ToTable("JobCategories");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.JobEntity.Entity.Job", b =>
@@ -809,7 +943,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Jobs", (string)null);
+                    b.ToTable("Jobs");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.NotifierEntity.Entity.Notifier", b =>
@@ -881,7 +1015,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("RecipientUserId");
 
-                    b.ToTable("Notifier", (string)null);
+                    b.ToTable("Notifiers");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.PaymentEntity.Entity.Payment", b =>
@@ -946,7 +1080,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Payment", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ProvinceEntity.Entity.Province", b =>
@@ -1001,7 +1135,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("ProvinceCode")
                         .IsUnique();
 
-                    b.ToTable("Provinces", (string)null);
+                    b.ToTable("Provinces");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.RefreshTokenEntity.Entity.RefreshToken", b =>
@@ -1044,9 +1178,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("RevokedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Token")
                         .IsRequired()
@@ -1070,7 +1202,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ResumeEntity.Entity.Resume", b =>
@@ -1132,7 +1264,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Resumes", (string)null);
+                    b.ToTable("Resumes");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.RoleEntity.Entity.Role", b =>
@@ -1272,7 +1404,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("Skills", (string)null);
+                    b.ToTable("Skills");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", b =>
@@ -1308,6 +1440,11 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
@@ -1468,7 +1605,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[UserImageFileId] IS NOT NULL");
 
-                    b.ToTable("UserProfiles", (string)null);
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.UserSkillEntity.Entity.UserSkill", b =>
@@ -1523,7 +1660,7 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("UserId", "SkillId")
                         .IsUnique();
 
-                    b.ToTable("UserSkills", (string)null);
+                    b.ToTable("UserSkills");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1830,6 +1967,12 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                         .HasForeignKey("DeletedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity.JobCategory", "JobCategory")
+                        .WithMany("Companies")
+                        .HasForeignKey("JobCategoryId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
                         .WithMany()
                         .HasForeignKey("ModifiedById")
@@ -1846,6 +1989,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Navigation("Creator");
 
                     b.Navigation("Deleter");
+
+                    b.Navigation("JobCategory");
 
                     b.Navigation("Modifier");
 
@@ -1882,6 +2027,30 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.Navigation("Modifier");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("JobBoardPlatform.Core.Entities.EmailTemplateEntity.Entity.EmailTemplate", b =>
+                {
+                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Deleter")
+                        .WithMany()
+                        .HasForeignKey("DeletedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("JobBoardPlatform.Core.Entities.UserEntity.Entity.User", "Modifier")
+                        .WithMany()
+                        .HasForeignKey("ModifiedById")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Deleter");
+
+                    b.Navigation("Modifier");
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity.ExperienceDetail", b =>
@@ -2415,6 +2584,8 @@ namespace JobBoardPlatform.Infrastructure.Migrations
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity.JobCategory", b =>
                 {
+                    b.Navigation("Companies");
+
                     b.Navigation("Jobs");
                 });
 

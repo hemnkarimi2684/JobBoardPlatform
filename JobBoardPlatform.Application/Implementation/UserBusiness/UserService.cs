@@ -1,18 +1,27 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
+﻿using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
+using JobBoardPlatform.Application.Interfaces.EmailInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
-using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
+using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Constants;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Core.Entities.UserEntity.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -30,20 +39,25 @@ public class UserService : IUserService
 
     private readonly IAttachmentService _attachmentService;
 
+    private readonly IUserDapperRepository _userDapperRepository;
+
+    private readonly IEmailService _emailService;
+
     private readonly UserManager<User> _userManager;
 
     private readonly ILogger<UserService> _logger;
 
-    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IAttachmentService attachmentService, UserManager<User> userManager, ILogger<UserService> logger)
+    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IAttachmentService attachmentService, IUserDapperRepository userDapperRepository, IEmailService emailService, UserManager<User> userManager, ILogger<UserService> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _accessControlService = accessControlService;
         _attachmentService = attachmentService;
+        _userDapperRepository = userDapperRepository;
+        _emailService = emailService;
         _userManager = userManager;
         _logger = logger;
     }
-
 
     #region Create Methods
 
@@ -94,7 +108,7 @@ public class UserService : IUserService
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+        _accessControlService.EnsureAdmin(_currentUser);
 
         var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileByUserIdAsync(up => new UserProfileResponseDto
         {
@@ -113,6 +127,77 @@ public class UserService : IUserService
             throw new NotFoundException($"the user profile with id {userId} was not found");
 
         return userProfile;
+    }
+
+    public async Task<EmployerWithCompanyResponseDto> GetEmployerWithCompanyAsync(
+         Guid ownerId,
+         CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var result = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new EmployerWithCompanyResponseDto
+        {
+            CompanyId = c.Id,
+            Name = c.Name,
+            Email = c.OwnedByUser.Email!,
+            PhoneNumber = c.OwnedByUser.PhoneNumber!,
+            UserId = c.OwnedByUserId,
+            YearOfEstablishment = c.YearOfEstablishment,
+            JobCategoryId = c.JobCategoryId,
+            JobCategoryName = c.JobCategory.Name,
+            AboutUs = c.AboutUs,
+            WebSiteAddress = c.WebSiteAddress,
+            OwnershipType = c.OwnershipType,
+            CompanySize = c.CompanySize,
+            ActivityType = c.ActivityType,
+            CompanyImageFileId = c.CompanyImageFileId,
+            Cities = c.CompanyCities.Select(cc => cc.CityId).ToList()
+        },
+          ownerId,
+          cancellationToken);
+
+        if (result is null)
+            throw new NotFoundException($"the company with this ownerId {ownerId} not found");
+
+        return result;
+    }
+
+    public async Task<Pagination<EmployerDetailResponseDto>> GetApprovedEmployersAsync(
+         PagingRequestDto pagingCommand)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var (result, totalDataCount) = await _userDapperRepository.GetApprovedEmployersAsync(pagingCommand.PageNumber, pagingCommand.PageSize);
+
+        return Pagination<EmployerDetailResponseDto>.GetPagination(
+                                                        EmployerDetailResponseDto.MapToResponseDto(result),
+                                                        pagingCommand.PageNumber,
+                                                        pagingCommand.PageSize,
+                                                        totalDataCount);
+    }
+
+    public async Task<Pagination<JobSeekerDetailResponseDto>> GetJobSeekersAsync(
+         PagingRequestDto pagingCommand)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var (result, totalDataCount) = await _userDapperRepository.GetJobSeekersAsync(pagingCommand.PageNumber, pagingCommand.PageSize);
+
+        return Pagination<JobSeekerDetailResponseDto>.GetPagination(
+                                                        JobSeekerDetailResponseDto.MapToResponseDto(result),
+                                                        pagingCommand.PageNumber,
+                                                        pagingCommand.PageSize,
+                                                        totalDataCount);
+    }
+
+    public List<EnumResponseDto> GetGenders()
+    {
+        var genders = EnumHelper.GetEnumValues<Gender>();
+
+        if (genders is null)
+            throw new NotFoundException("there is no genders in system.");
+
+        return genders;
     }
 
     #endregion
@@ -145,7 +230,7 @@ public class UserService : IUserService
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<bool> ApprovedEmployerAsync(
+    public async Task ApprovedEmployerAsync(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
@@ -161,7 +246,7 @@ public class UserService : IUserService
         if (!isEmployer)
             throw new ValidationException($"the user with id {user.Id} is not an employer");
 
-        if (user.IsApproved == true)
+        if (user.IsApproved)
             throw new ConflictException($"the employer with id {user.Id} is already approved");
 
         try
@@ -170,23 +255,21 @@ public class UserService : IUserService
 
             user.UpdateIsApproved(true, _currentUser.UserId);
 
-            var claim = new Claim(ClaimConstants.EmployerClaimType, ClaimConstants.IsApprovedClaimValue);
+            var claim = new Claim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue);
 
             var employerClaims = await _userManager.GetClaimsAsync(user);
 
             if (!employerClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
             {
 
-                var addClaimResult = await _userManager.AddClaimAsync(user, claim);
+                var result = await _userManager.AddClaimAsync(user, claim);
 
-                if (!addClaimResult.Succeeded)
-                    throw new ValidationException(string.Join(" ", addClaimResult.Errors.Select(e => e.Description)));
+                if (!result.Succeeded)
+                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-            return true;
         }
         catch (Exception)
         {
@@ -194,6 +277,208 @@ public class UserService : IUserService
 
             throw;
         }
+
+        if (string.IsNullOrWhiteSpace(user.Email))
+        {
+            _logger.LogError("user {UserId} has no email", user.Id);
+            return;
+        }
+
+        try
+        {
+            await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.EmployerApproved, user.Email!, null, cancellationToken);
+        }
+        catch (EmailSendingException ex)
+        {
+            _logger.LogWarning(ex, "Employer approved successfully, but email sending failed for user {UserId}", user.Id);
+        }
+    }
+
+    public async Task RejectEmployerAsync(
+    Guid userId,
+    CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            throw new NotFoundException($"user with id {userId} was not found.");
+
+        var isEmployer = await _userManager.IsInRoleAsync(user, RoleConstants.EmployerRoleName);
+
+        if (!isEmployer)
+            throw new ValidationException($"the user with id {user.Id} is not an employer");
+
+        if (!user.IsApproved)
+            throw new ConflictException($"the employer with id {user.Id} is already not approved");
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            user.UpdateIsApproved(false, _currentUser.UserId);
+
+            var claim = new Claim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue);
+
+            var employerClaims = await _userManager.GetClaimsAsync(user);
+
+            if (employerClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
+            {
+                var result = await _userManager.RemoveClaimAsync(user, claim);
+
+                if (!result.Succeeded)
+                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
+            }
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
+
+            throw;
+        }
+
+        if (string.IsNullOrWhiteSpace(user.Email))
+        {
+            _logger.LogError("user {UserId} has no email", user.Id);
+            return;
+        }
+
+        try
+        {
+            await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.EmployerRejected, user.Email!, null, cancellationToken);
+        }
+        catch (EmailSendingException ex)
+        {
+            _logger.LogWarning(ex, "Employer Reject successfully, but email sending failed for user {UserId}", user.Id);
+        }
+    }
+
+    public async Task ActivateJobSeekerAsync(
+    Guid userId,
+    CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            throw new NotFoundException($"user with id {userId} was not found.");
+
+        var isJobSeeker = await _userManager.IsInRoleAsync(user, RoleConstants.JobSeekerRoleName);
+
+        if (!isJobSeeker)
+            throw new ValidationException($"the user with id {user.Id} is not a jobSeeker");
+
+        if (user.IsActive)
+            throw new ConflictException($"the jobSeeker with id {user.Id} is already active");
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            user.UpdateIsActive(true, _currentUser.UserId);
+
+            var claim = new Claim(UserClaims.JobSeekerClaimType, UserClaims.IsActiveClaimValue);
+
+            var jobSeekerClaims = await _userManager.GetClaimsAsync(user);
+
+            if (!jobSeekerClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
+            {
+                var result = await _userManager.AddClaimAsync(user, claim);
+
+                if (!result.Succeeded)
+                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
+            }
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
+
+            throw;
+        }
+    }
+
+    public async Task DeactivateJobSeekerAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+
+        if (user == null)
+            throw new NotFoundException($"user with id {userId} was not found.");
+
+        var isJobSeeker = await _userManager.IsInRoleAsync(user, RoleConstants.JobSeekerRoleName);
+
+        if (!isJobSeeker)
+            throw new ValidationException($"the user with id {user.Id} is not a jobSeeker");
+
+        if (!user.IsActive)
+            throw new ConflictException($"The JobSeeker with id {user.Id} is already inactive.");
+
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            user.UpdateIsActive(false, _currentUser.UserId);
+
+            var claim = new Claim(UserClaims.JobSeekerClaimType, UserClaims.IsActiveClaimValue);
+
+            var jobSeekerClaims = await _userManager.GetClaimsAsync(user);
+
+            if (jobSeekerClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
+            {
+                var result = await _userManager.RemoveClaimAsync(user, claim);
+
+                if (!result.Succeeded)
+                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
+            }
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
+
+            throw;
+        }
+    }
+
+    #endregion
+
+    #region Delete Methods
+
+    public async Task DeleteUserImageAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        var userProfile = await _unitOfWork.UserProfileRepository.GetProfileByUserIdAsync(userId, cancellationToken);
+
+        if (userProfile == null)
+            throw new NotFoundException($"the user with id {userId} does not have any profile");
+
+        if (userProfile.UserImageFileId == null)
+            throw new ValidationException($"user does not have any image for profile");
+
+        var lastImageId = userProfile.UserImageFileId.Value;
+
+        userProfile.UpdateImage(null);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var deleted = await _attachmentService.HardDeleteAttachmentAsync(lastImageId, cancellationToken);
+
+        if (!deleted)
+            _logger.LogError("user image reference removed, but deleting the attachment failed.");
     }
 
     #endregion
@@ -236,8 +521,6 @@ public class UserService : IUserService
 
         if (userProfile is null)
             throw new NotFoundException($"The user with id '{userId}' does not have a profile.");
-
-        _accessControlService.EnsureApplicantOrAdmin(userProfile.UserId, _currentUser);
 
         if (userProfile.UserImageFileId is null)
             throw new NotFoundException($"The user with id '{userId}' does not have an attached image.");

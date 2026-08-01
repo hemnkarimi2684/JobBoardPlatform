@@ -34,10 +34,17 @@ public interface IAccessControlService
     void EnsureApplicantOrAdmin(Guid applicantUserId, ICurrentUser currentUser);
 
     /// <summary>
+    /// اطمینان از مالک کارفرما
+    /// </summary>
+    /// <param name="ownerId"></param>
+    /// <param name="currentUser"></param>
+    void EnsureOwnerEmployer(Guid ownerId, ICurrentUser currentUser);
+
+    /// <summary>
     /// اطمینان از دسترسی به دیدن درخواست شغلی
     /// </summary>
     /// <param name="ownerId"></param>
     /// <param name="applicantUserId"></param>
     /// <param name="currentUser"></param>
-    void EnsureApplicantOrOwnerEmployerOrAdmin(Guid ownerId, Guid applicantUserId, ICurrentUser currentUser);
+    void EnsureApplicantOrOwnerEmployer(Guid ownerId, Guid applicantUserId, ICurrentUser currentUser);
 }

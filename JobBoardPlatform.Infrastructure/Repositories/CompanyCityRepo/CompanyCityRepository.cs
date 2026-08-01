@@ -13,7 +13,7 @@ public class CompanyCityRepository : GenericRepository<CompanyCity>, ICompanyCit
     {
     }
 
-    public async Task<(List<TResult>, int)> GetCityCompaniesAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetCityCompaniesAsync<TResult>(
         Expression<Func<CompanyCity, TResult>> projection,
         Guid cityId,
         CancellationToken cancellationToken,
@@ -37,5 +37,14 @@ public class CompanyCityRepository : GenericRepository<CompanyCity>, ICompanyCit
                              .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
+    }
+
+    public async Task<bool> IsCompanyExistInCityAsync(
+        Guid companyId,
+        Guid cityId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                          .AnyAsync(cc => cc.CompanyId == companyId && cc.CityId == cityId, cancellationToken);
     }
 }

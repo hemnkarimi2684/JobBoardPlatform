@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
@@ -14,7 +15,7 @@ public interface IJobApplicationService
     /// <param name="createCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> CreateJobApplicationAsync(
+    Task CreateJobApplicationAsync(
         CreateJobApplicationRequestDto createCommand,
         CancellationToken cancellationToken = default);
 
@@ -47,7 +48,7 @@ public interface IJobApplicationService
     /// <param name="status"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> UpdateJobApplicationStatusAsync(
+    Task UpdateJobApplicationStatusAsync(
         Guid jobApplicationId,
         JobApplicationStatus status,
         CancellationToken cancellationToken = default);
@@ -64,8 +65,19 @@ public interface IJobApplicationService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
 
-
+    /// <summary>
+    /// کنسل کردن درخواست کاری خود
+    /// </summary>
+    /// <param name="jobApplicationId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task<bool> CancelJobApplicationAsync(
         Guid jobApplicationId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام وضعیت های درخوسات کاری در سیستم 
+    /// </summary>
+    /// <returns></returns>
+    List<EnumResponseDto> GetJobApplicationStatuses();
 }

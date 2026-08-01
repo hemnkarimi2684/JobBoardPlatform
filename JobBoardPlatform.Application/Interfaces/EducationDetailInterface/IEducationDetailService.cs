@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.EducationDetailDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
@@ -50,4 +51,10 @@ public interface IEducationDetailService
     Task<EducationHistoryResponseDto> GetEducationDetailByIdAsync(
         Guid educationDetailId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام مقطع تحصیلی ها در سیستم 
+    /// </summary>
+    /// <returns></returns>
+    List<EnumResponseDto> GetCertificateDegrees();
 }

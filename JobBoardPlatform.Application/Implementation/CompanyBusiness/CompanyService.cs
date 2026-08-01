@@ -1,10 +1,11 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
@@ -15,11 +16,9 @@ using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
 
 namespace JobBoardPlatform.Application.Implementation.CompanyBusiness;
 
@@ -50,29 +49,17 @@ public class CompanyService : ICompanyService
         CreateCompanyRequestDto createCommand,
         CancellationToken cancellationToken = default)
     {
-        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId, cancellationToken);
+        await ValidateForCreateAsync(
+            createCommand.CityId,
+            createCommand.JobCategoryId,
+            createCommand.Name,
+            createCommand.OwnedByUserId,
+            cancellationToken);
 
-        if (!doesCityExist)
-            throw new NotFoundException($"City with id {createCommand.CityId} was not found.");
-
-        var companyExistsByName = await _unitOfWork.CompanyRepository.IsCompanyExistByNameAsync(createCommand.Name, cancellationToken);
-
-        if (companyExistsByName)
-            throw new ConflictException($"the company with this name {createCommand.Name} already exist");
-
-        var companyExistsForOwner = await _unitOfWork.CompanyRepository.IsCompanyExistForOwnerId(createCommand.OwnedByUserId, cancellationToken);
-
-        if (companyExistsForOwner)
-            throw new ConflictException($"this owner already has company");
-
-        //The reason the item has a .Value property is that Enum.TryParse was used;
-        //the output is a nullable enum, but I am certain the enums won't reach the service as null,
-        //because the DTOs are validated in the controller,
-        //and an exception is thrown if the input value is null.
         var company = new Company(
-            createCommand.Name, createCommand.YearOfEstablishment, createCommand.Industry,
+            createCommand.Name, createCommand.YearOfEstablishment,
             createCommand.AboutUs, createCommand.WebSiteAddress, createCommand.OwnershipType,
-            createCommand.OwnedByUserId, createCommand.CompanySize, createCommand.ActivityType,
+            createCommand.OwnedByUserId, createCommand.CompanySize, createCommand.JobCategoryId, createCommand.ActivityType,
             null
             );
 
@@ -94,48 +81,19 @@ public class CompanyService : ICompanyService
 
     #region Get Methods
 
-    public async Task<CompanyProfileResponseDto> GetCompanyProfileByOwnerIdAsync(
-        Guid ownerId,
-        CancellationToken cancellationToken = default)
-    {
-        _accessControlService.EnsureOwnerEmployerOrAdmin(ownerId, _currentUser);
-
-        var companyInfo = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new CompanyProfileResponseDto
-        {
-            Id = c.Id,
-            Name = c.Name,
-            UserId = c.OwnedByUserId,
-            YearOfEstablishment = c.YearOfEstablishment,
-            Industry = c.Industry,
-            AboutUs = c.AboutUs,
-            WebSiteAddress = c.WebSiteAddress,
-            OwnershipType = c.OwnershipType,
-            CompanySize = c.CompanySize,
-            ActivityType = c.ActivityType,
-            CompanyImageFileId = c.CompanyImageFileId,
-            Cities = c.CompanyCities.Select(cc => cc.CityId).ToList()
-        },
-          ownerId,
-          cancellationToken);
-
-        if (companyInfo is null)
-            throw new NotFoundException($"the company with this ownerId {ownerId} not found");
-
-        return companyInfo;
-    }
-
-    public async Task<Pagination<CompanyProfileResponseDto>> GetAllCompaniesAsync(
+    public async Task<Pagination<CompanyDetailResponseDto>> GetAllCompaniesAsync(
         TextRequestDto textRequestDto,
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        var (result, totalDataCount) = await _unitOfWork.CompanyRepository.GetAllCompaniesAsync(c => new CompanyProfileResponseDto
+        var (result, totalDataCount) = await _unitOfWork.CompanyRepository.GetAllCompaniesAsync(c => new CompanyDetailResponseDto
         {
             Id = c.Id,
             Name = c.Name,
             UserId = c.OwnedByUserId,
             YearOfEstablishment = c.YearOfEstablishment,
-            Industry = c.Industry,
+            JobCategoryId = c.JobCategoryId,
+            JobCategoryName = c.JobCategory.Name,
             AboutUs = c.AboutUs,
             WebSiteAddress = c.WebSiteAddress,
             OwnershipType = c.OwnershipType,
@@ -149,33 +107,55 @@ public class CompanyService : ICompanyService
         pagingCommand.PageNumber,
         pagingCommand.PageSize);
 
-        return Pagination<CompanyProfileResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
+        return Pagination<CompanyDetailResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
     }
 
-    public async Task<CompanyProfileResponseDto> GetCompanyByIdAsync(
+    public async Task<CompanyDetailResponseDto> GetCompanyByIdAsync(
         Guid companyId,
         CancellationToken cancellationToken = default)
     {
-        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken);
+        var company = await _unitOfWork.CompanyRepository.GetCompanyByIdAsync(c => new CompanyDetailResponseDto
+        {
+            Id = c.Id,
+            Name = c.Name,
+            UserId = c.OwnedByUserId,
+            YearOfEstablishment = c.YearOfEstablishment,
+            JobCategoryId = c.JobCategoryId,
+            JobCategoryName = c.JobCategory.Name,
+            AboutUs = c.AboutUs,
+            WebSiteAddress = c.WebSiteAddress,
+            OwnershipType = c.OwnershipType,
+            CompanySize = c.CompanySize,
+            ActivityType = c.ActivityType,
+            CompanyImageFileId = c.CompanyImageFileId,
+            Cities = c.CompanyCities.Select(cc => cc.CityId).ToList()
+        },
+          companyId, cancellationToken);
 
         if (company is null)
             throw new NotFoundException($"the company with this id {companyId} not found");
 
-        return new CompanyProfileResponseDto
-        {
-            Id = company.Id,
-            Name = company.Name,
-            UserId = company.OwnedByUserId,
-            YearOfEstablishment = company.YearOfEstablishment,
-            Industry = company.Industry,
-            AboutUs = company.AboutUs,
-            WebSiteAddress = company.WebSiteAddress,
-            OwnershipType = company.OwnershipType,
-            CompanySize = company.CompanySize,
-            ActivityType = company.ActivityType,
-            CompanyImageFileId = company.CompanyImageFileId,
-            Cities = company.CompanyCities.Select(cc => cc.CityId).ToList()
-        };
+        return company;
+    }
+
+    public List<EnumResponseDto> GetCompanySizes()
+    {
+        var companySizes = EnumHelper.GetEnumValues<CompanySizeEnum>();
+
+        if (companySizes is null)
+            throw new NotFoundException("there is no company size in the system");
+
+        return companySizes;
+    }
+
+    public List<EnumResponseDto> GetOwnershipTypes()
+    {
+        var ownerShipTypes = EnumHelper.GetEnumValues<OwnershipType>();
+
+        if (ownerShipTypes is null)
+            throw new NotFoundException("there is no ownerShip types in the system");
+
+        return ownerShipTypes;
     }
 
     #endregion
@@ -203,6 +183,34 @@ public class CompanyService : ICompanyService
             throw new NotFoundException($"the company with this id {companyId} not found");
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+    }
+
+    #endregion
+
+    #region Delete Methods
+
+    public async Task DeleteCompanyImageAsync(
+        Guid companyId,
+        CancellationToken cancellationToken = default)
+    {
+        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken, true);
+
+        if (company == null)
+            throw new NotFoundException($"the company with id {companyId} was not found");
+
+        if (company.CompanyImageFileId == null)
+            throw new ValidationException("this company does not have any image");
+
+        var lastImageId = company.CompanyImageFileId.Value;
+
+        company.UpdateImage(null);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var deleted = await _attachmentService.HardDeleteAttachmentAsync(lastImageId, cancellationToken);
+
+        if (!deleted)
+            _logger.LogError("company image reference removed, but deleting the attachment failed.");
     }
 
     #endregion
@@ -304,7 +312,7 @@ public class CompanyService : ICompanyService
         (
             updateCompanyInfoCommand.Name,
             updateCompanyInfoCommand.YearOfEstablishment,
-            updateCompanyInfoCommand.Industry,
+            updateCompanyInfoCommand.JobCategoryId,
             updateCompanyInfoCommand.AboutUs,
             updateCompanyInfoCommand.WebSiteAddress,
             updateCompanyInfoCommand.OwnershipType,
@@ -312,6 +320,29 @@ public class CompanyService : ICompanyService
             updateCompanyInfoCommand.ActivityType,
             _currentUser.UserId
         );
+    }
+
+    private async Task ValidateForCreateAsync(Guid cityId, Guid jobCategoryId, string companyName, Guid ownedByUserId, CancellationToken cancellationToken)
+    {
+        var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(cityId, cancellationToken);
+
+        if (!doesCityExist)
+            throw new NotFoundException($"City with id {cityId} was not found.");
+
+        var doesJobCategoryExist = await _unitOfWork.JobCategoryRepository.ExistAsync(jobCategoryId, cancellationToken);
+
+        if (!doesJobCategoryExist)
+            throw new NotFoundException($"the job category with id {jobCategoryId} was not found.");
+
+        var companyExistsByName = await _unitOfWork.CompanyRepository.IsCompanyExistByNameAsync(companyName, cancellationToken);
+
+        if (companyExistsByName)
+            throw new ConflictException($"the company with this name {companyName} already exist");
+
+        var companyExistsForOwner = await _unitOfWork.CompanyRepository.IsCompanyExistForOwnerId(ownedByUserId, cancellationToken);
+
+        if (companyExistsForOwner)
+            throw new ConflictException($"this owner already has company");
     }
 
     #endregion

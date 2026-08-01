@@ -1,5 +1,7 @@
-﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
+﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
+using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
@@ -43,11 +45,21 @@ public interface IUserService
     /// <summary>
     /// تایید کردن کارفرما توسط ادمین
     /// </summary>
-    /// <param name="employerId"></param>
+    /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> ApprovedEmployerAsync(
-        Guid employerId,
+    Task ApprovedEmployerAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// رد کردن کارفرما توسط ادمین
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task RejectEmployerAsync(
+        Guid userId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -70,5 +82,65 @@ public interface IUserService
     Task UploadUserImageAsync(
         Guid userId,
         UploadUserImageRequestDto imageRequestDto,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام کارفرما های فعال در سیستم
+    /// </summary>
+    /// <param name="pagingCommand"></param>
+    /// <returns></returns>
+    Task<Pagination<EmployerDetailResponseDto>> GetApprovedEmployersAsync(PagingRequestDto pagingCommand);
+
+    /// <summary>
+    /// دریافت تمام کارجو ها
+    /// </summary>
+    /// <param name="pagingCommand"></param>
+    /// <returns></returns>
+    Task<Pagination<JobSeekerDetailResponseDto>> GetJobSeekersAsync(PagingRequestDto pagingCommand);
+
+    /// <summary>
+    /// فعال کردن اکانت کارجو
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task ActivateJobSeekerAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// غیر فعال کردن اکانت کارجو
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task DeactivateJobSeekerAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت اطلاعات کارفرما و شرکتش
+    /// </summary>
+    /// <param name="ownerId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<EmployerWithCompanyResponseDto> GetEmployerWithCompanyAsync(
+        Guid ownerId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام جنسیت ها در سیستم
+    /// </summary>
+    /// <returns></returns>
+    List<EnumResponseDto> GetGenders();
+
+    /// <summary>
+    /// حذف عکس پروفایل
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task DeleteUserImageAsync(
+        Guid userId,
         CancellationToken cancellationToken = default);
 }

@@ -24,6 +24,10 @@ public class UserModelBuilderConfiguration : IEntityTypeConfiguration<User>
         builder.HasIndex(u => u.PhoneNumber)
             .IsUnique();
 
+        builder.Property(u => u.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
         builder.HasMany(u => u.EducationDetails)
             .WithOne(ed => ed.User)
             .HasForeignKey(u => u.UserId)

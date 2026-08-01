@@ -1,14 +1,18 @@
-using JobBoardPlatform.Application.Common.Constants;
+using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
 using JobBoardPlatform.Application.Common.Extensions;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
+using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
 using JobBoardPlatform.WebApi.Middlewares;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 builder.Services.AddInfrastructureDependency(builder.Configuration);
+builder.Services.AddDapperDependency(builder.Configuration);
 builder.Services.AddBusinessDependency(builder.Configuration);
 builder.Services.AddScoped<GlobalExceptionHandlingMiddleware>();
 
@@ -53,10 +57,21 @@ builder.Services.AddSwaggerGen(c =>
 
 #endregion
 
+//اینم صرفا میره تنظیمات توی اپ ستینگ برای سری لاگ رو میخونه
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
+
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("IsApproved", policy => policy
-    .RequireClaim(ClaimConstants.EmployerClaimType, ClaimConstants.IsApprovedClaimValue));
+    options.AddPolicy("ApprovedEmployerOnly", policy =>
+       policy.RequireRole(RoleConstants.EmployerRoleName)
+             .RequireClaim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue));
+
+    options.AddPolicy("ActiveJobSeekerOnly", policy =>
+       policy.RequireRole(RoleConstants.JobSeekerRoleName)
+             .RequireClaim(UserClaims.JobSeekerClaimType, UserClaims.IsActiveClaimValue));
 });
 
 var app = builder.Build();
@@ -70,6 +85,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+
+//به ازای هر ریکوست میاد با تمام جزئیات لاگشون میکنه و نگه میداره 
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 

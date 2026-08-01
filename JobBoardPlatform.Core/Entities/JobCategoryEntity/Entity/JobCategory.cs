@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
 using JobBoardPlatform.Core.Entities.Common.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
@@ -30,6 +31,11 @@ public class JobCategory : BaseEntity
     /// جزئیات مربوط به کار هایی که در این دسته بندی  شغلی هستند 
     /// </summary>
     public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
+
+    /// <summary>
+    /// جزئیات مربوط به شرکت هایی که در این دسته بندی شغلی وجود دارند 
+    /// </summary>
+    public virtual ICollection<Company> Companies { get; set; } = new List<Company>();
 
     #endregion
 

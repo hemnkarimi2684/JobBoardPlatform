@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
@@ -66,7 +67,7 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetAdvertisementsByCompanyAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetAdvertisementsByCompanyAsync<TResult>(
         Expression<Func<Advertisement, TResult>> projection,
         Guid companyId,
         CancellationToken cancellationToken,
@@ -106,7 +107,7 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> FilterAdvertisementsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> FilterAdvertisementsAsync<TResult>(
         AdvertisementQueryFilter advertisementQueryFilter,
         Expression<Func<Advertisement, TResult>> projection,
         CancellationToken cancellationToken,
@@ -123,7 +124,7 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> SearchAdvertisementsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> SearchAdvertisementsAsync<TResult>(
         string searchTerm,
         Expression<Func<Advertisement, TResult>> projection,
         CancellationToken cancellationToken,
@@ -140,11 +141,21 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetJobAdvertisementsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetJobAdvertisementsAsync<TResult>(
         Expression<Func<Advertisement, TResult>> projection,
         Guid jobId,
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10);
+
+    /// <summary>
+    /// دریافت ایمیل صاحب اگهی
+    /// </summary>
+    /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<string?> GetAdvertisementOwnerEmailAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken);
 }
 

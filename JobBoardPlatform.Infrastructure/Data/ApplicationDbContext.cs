@@ -5,10 +5,13 @@ using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Entity;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
+using JobBoardPlatform.Core.Entities.NotifierEntity.Entity;
+using JobBoardPlatform.Core.Entities.PaymentEntity.Entity;
 using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 using JobBoardPlatform.Core.Entities.RefreshTokenEntity.Entity;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
@@ -48,6 +51,9 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<UserSkill> UserSkills => Set<UserSkill>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<JobCategory> JobCategories => Set<JobCategory>();
+    public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
+    public DbSet<Notifier> Notifiers => Set<Notifier>();
+    public DbSet<Payment> Payments => Set<Payment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

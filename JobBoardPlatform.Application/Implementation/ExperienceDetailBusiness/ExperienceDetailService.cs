@@ -1,9 +1,10 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ExperienceDetailDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
@@ -13,6 +14,7 @@ using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 
 namespace JobBoardPlatform.Application.Implementation.ExperienceDetailBusiness;
 
@@ -69,7 +71,7 @@ public class ExperienceDetailService : IExperienceDetailService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+        _accessControlService.EnsureApplicant(userId, _currentUser);
 
         var (experienceDetails, totalDataCount) = await _unitOfWork
                                                                  .ExperienceDetailRepository
@@ -106,7 +108,7 @@ public class ExperienceDetailService : IExperienceDetailService
         if (experienceDetail == null)
             throw new NotFoundException($"The experience detail with id {experienceDetailId} was not found.");
 
-        _accessControlService.EnsureApplicantOrAdmin(experienceDetail.UserId, _currentUser);
+        _accessControlService.EnsureApplicant(experienceDetail.UserId, _currentUser);
 
         return new ExperienceHistoryResponseDto
         {
@@ -122,6 +124,15 @@ public class ExperienceDetailService : IExperienceDetailService
         };
     }
 
+    public List<EnumResponseDto> GetSeniorityLevels()
+    {
+        var seniorityLevels = EnumHelper.GetEnumValues<SeniorityLevel>();
+
+        if (seniorityLevels == null)
+            throw new NotFoundException("there is no seniorityLevels in system");
+
+        return seniorityLevels;
+    }
 
     #endregion
 

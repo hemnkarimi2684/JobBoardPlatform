@@ -7,11 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.17.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.16" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.16" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\JobBoardPlatform.Core\JobBoardPlatform.Core.csproj" />
+    <ProjectReference Include="..\JobBoardPlatform.Infrastructure.Dapper\JobBoardPlatform.Infrastructure.Dapper.csproj" />
   </ItemGroup>
 
 </Project>

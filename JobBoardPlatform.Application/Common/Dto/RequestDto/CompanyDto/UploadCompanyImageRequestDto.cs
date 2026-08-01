@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
+namespace JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 
 public class UploadCompanyImageRequestDto
 {

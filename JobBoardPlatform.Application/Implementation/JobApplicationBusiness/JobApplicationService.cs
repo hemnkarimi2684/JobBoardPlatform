@@ -1,15 +1,26 @@
 ﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
+using JobBoardPlatform.Application.Interfaces.EmailInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Constants;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
+using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
+using static JobBoardPlatform.Application.Common.AccessClaims.PermissionClaim.Permissions;
 
 namespace JobBoardPlatform.Application.Implementation.JobApplicationBusiness;
 
@@ -23,17 +34,23 @@ public class JobApplicationService : IJobApplicationService
 
     private readonly IAccessControlService _accessControlService;
 
-    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService)
+    private readonly IEmailService _emailService;
+
+    private readonly ILogger<JobApplication> _logger;
+
+    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService, IEmailService emailService, ILogger<JobApplication> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _advertisementService = advertisementService;
         _accessControlService = accessControlService;
+        _emailService = emailService;
+        _logger = logger;
     }
 
     #region Create Methods
 
-    public async Task<bool> CreateJobApplicationAsync(
+    public async Task CreateJobApplicationAsync(
         CreateJobApplicationRequestDto createCommand,
         CancellationToken cancellationToken = default)
     {
@@ -43,13 +60,42 @@ public class JobApplicationService : IJobApplicationService
 
         var userFullName = await _unitOfWork.UserProfileRepository.GetUserFullNameByUserIdAsync(createCommand.UserId, cancellationToken);
 
-        var jobAplication = new JobApplication(JobApplicationStatus.Pending, advInformation.JobTitle, advInformation.CompanyName,
+        var jobApplication = new JobApplication(JobApplicationStatus.Pending, advInformation.JobTitle, advInformation.CompanyName,
                                                advInformation.CityName, advInformation.CollaborationType, userFullName!, advInformation.ExperienceLevel,
                                                createCommand.ResumeId, createCommand.AdvertisementId, createCommand.UserId, _currentUser.UserId);
 
-        await _unitOfWork.JobApplicationRepository.AddAsync(jobAplication, cancellationToken);
+        await _unitOfWork.JobApplicationRepository.AddAsync(jobApplication, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+        var result = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+
+        if (!result)
+            throw new ValidationException("Something went wrong while creating the job application.");
+
+        var ownerEmail = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerEmailAsync(createCommand.AdvertisementId, cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(ownerEmail))
+        {
+            _logger.LogError("owner has no email");
+            return;
+        }
+
+        var placeHolders = new Dictionary<string, string>
+        {
+              { "JobTitle", jobApplication.JobTitle }
+        };
+
+        try
+        {
+            await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.NewJobApplicationReceived, ownerEmail, placeHolders, cancellationToken);
+        }
+        catch (EmailSendingException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Job application {JobApplicationId} was created successfully, but email sending failed for advertisement {AdvertisementId}.",
+                jobApplication.Id,
+                createCommand.AdvertisementId);
+        }
     }
 
     #endregion
@@ -63,7 +109,7 @@ public class JobApplicationService : IJobApplicationService
     {
         var userId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
 
-        _accessControlService.EnsureOwnerEmployerOrAdmin(userId.Value, _currentUser);
+        _accessControlService.EnsureOwnerEmployer(userId.Value, _currentUser);
 
         var (advertisementJobApplications, totalDataCount) = await _unitOfWork
                                                                         .JobApplicationRepository
@@ -108,7 +154,7 @@ public class JobApplicationService : IJobApplicationService
         if (ownerId == null)
             throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
 
-        _accessControlService.EnsureApplicantOrOwnerEmployerOrAdmin(ownerId.Value, jobApplication.UserId, _currentUser);
+        _accessControlService.EnsureApplicantOrOwnerEmployer(ownerId.Value, jobApplication.UserId, _currentUser);
 
         return new JobApplicationDetailResponseDto
         {
@@ -132,7 +178,7 @@ public class JobApplicationService : IJobApplicationService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
+        _accessControlService.EnsureApplicant(userId, _currentUser);
 
         var (advertisementJobApplications, totalDataCount) = await _unitOfWork
                                                                         .JobApplicationRepository
@@ -163,12 +209,21 @@ public class JobApplicationService : IJobApplicationService
                                                                  totalDataCount);
     }
 
+    public List<EnumResponseDto> GetJobApplicationStatuses()
+    {
+        var jobApplicationStatuses = EnumHelper.GetEnumValues<JobApplicationStatus>();
+
+        if (jobApplicationStatuses is null)
+            throw new NotFoundException("there is no jobApplication status in the system.");
+
+        return jobApplicationStatuses;
+    }
 
     #endregion
 
     #region Update Methods
 
-    public async Task<bool> UpdateJobApplicationStatusAsync(
+    public async Task UpdateJobApplicationStatusAsync(
         Guid jobApplicationId,
         JobApplicationStatus status,
         CancellationToken cancellationToken = default)
@@ -183,14 +238,18 @@ public class JobApplicationService : IJobApplicationService
         if (ownerId == null)
             throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
 
-        _accessControlService.EnsureOwnerEmployerOrAdmin(ownerId.Value, _currentUser);
+        _accessControlService.EnsureOwnerEmployer(ownerId.Value, _currentUser);
 
         ValidateJobApplicationStatus(jobApplication, status);
 
         jobApplication.UpdateStatus(status, _currentUser.UserId);
 
-        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+        var result = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
 
+        if (!result)
+            throw new ValidationException("Something went wrong while updating the job application.");
+
+        await HandelEmailSendingForJobApplicationStatusAsync(jobApplication, status, cancellationToken);
     }
 
     public async Task<bool> CancelJobApplicationAsync(
@@ -259,6 +318,46 @@ public class JobApplicationService : IJobApplicationService
         {
             if (jobApplicationStatus == JobApplicationStatus.Reviewing)
                 throw new ValidationException("The status cannot be reverted from Interviewing to Under Review, as the review has already been completed.");
+        }
+    }
+
+    private async Task HandelEmailSendingForJobApplicationStatusAsync(
+        JobApplication jobApplication,
+        JobApplicationStatus jobApplicationStatus,
+        CancellationToken cancellationToken)
+    {
+        var userDisplay = await _unitOfWork.UserRepository.GetUserEmailAsync(jobApplication.UserId, cancellationToken);
+
+        if (userDisplay is null)
+        {
+            _logger.LogError("user {UserId} was not found, jobApplicationId={JobApplicationId}", jobApplication.UserId, jobApplication.Id);
+            return;
+        }
+
+        var placeHolders = new Dictionary<string, string>()
+        {
+            {"CandidateName",userDisplay.FullName },
+            {"JobTitle",jobApplication.JobTitle },
+            {"CompanyName",jobApplication.CompanyName }
+        };
+
+        try
+        {
+            if (jobApplicationStatus == JobApplicationStatus.Reviewing)
+                await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.JobApplicationReviewing, userDisplay.Email, placeHolders, cancellationToken);
+
+            if (jobApplicationStatus == JobApplicationStatus.Interview)
+                await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.JobApplicationInterview, userDisplay.Email, placeHolders, cancellationToken);
+
+            if (jobApplicationStatus == JobApplicationStatus.Rejected)
+                await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.JobApplicationRejected, userDisplay.Email, placeHolders, cancellationToken);
+
+            if (jobApplicationStatus == JobApplicationStatus.Accepted)
+                await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.JobApplicationAccepted, userDisplay.Email, placeHolders, cancellationToken);
+        }
+        catch (EmailSendingException ex)
+        {
+            _logger.LogWarning(ex, "Job application {JobApplicationId} was updated successfully, but email sending failed for user {UserId}.", jobApplication.Id, jobApplication.UserId);
         }
     }
 

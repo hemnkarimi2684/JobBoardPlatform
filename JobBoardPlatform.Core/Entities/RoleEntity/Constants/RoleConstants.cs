@@ -1,4 +1,4 @@
-﻿namespace JobBoardPlatform.Application.Common.Constants;
+﻿namespace JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 
 public class RoleConstants 
 {

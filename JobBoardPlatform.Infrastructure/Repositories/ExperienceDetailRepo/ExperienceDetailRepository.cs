@@ -2,6 +2,7 @@
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Data;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
@@ -26,11 +27,11 @@ public class ExperienceDetailRepository : GenericRepository<ExperienceDetail>, I
                            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<(List<TResult>, int)> GetUserExperienceDetailsAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetUserExperienceDetailsAsync<TResult>(
         Expression<Func<ExperienceDetail, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken,
-        int pageNumber = 1, 
+        int pageNumber = 1,
         int pageSize = 10)
     {
         pageNumber = pageNumber <= 0 ? 1 : pageNumber;

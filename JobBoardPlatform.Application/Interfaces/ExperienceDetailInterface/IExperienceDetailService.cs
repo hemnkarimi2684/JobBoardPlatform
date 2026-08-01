@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ExperienceDetailDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using Microsoft.AspNetCore.Routing;
@@ -51,4 +52,10 @@ public interface IExperienceDetailService
     Task<ExperienceHistoryResponseDto> GetExperienceDetailByIdAsync(
         Guid experienceDetailId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام نوع و سطح های کاری در سیستم 
+    /// </summary>
+    /// <returns></returns>
+    List<EnumResponseDto> GetSeniorityLevels();
 }

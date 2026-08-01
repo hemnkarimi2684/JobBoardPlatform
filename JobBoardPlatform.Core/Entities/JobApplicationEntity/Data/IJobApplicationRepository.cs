@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
+using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
@@ -29,7 +30,7 @@ public interface IJobApplicationRepository : IGenericRepository<JobApplication>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetAdvertisementJobApplicationsAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetAdvertisementJobApplicationsAsync<TResult>(
         Expression<Func<JobApplication, TResult>> projection,
         Guid advertisementId,
         CancellationToken cancellationToken,
@@ -70,7 +71,7 @@ public interface IJobApplicationRepository : IGenericRepository<JobApplication>
         Guid employerId,
         CancellationToken cancellationToken);
 
-    Task<(List<TResult>, int)> GetJobApplicationsByUserIdAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetJobApplicationsByUserIdAsync<TResult>(
         Expression<Func<JobApplication, TResult>> projection,
         Guid userId,
         CancellationToken cancellationToken,

@@ -17,7 +17,7 @@ public interface IUserSkillRepository : IGenericRepository<UserSkill>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetUserSkillsAsync<TResult>(Expression<Func<UserSkill, TResult>> projection,
+    Task<(List<TResult> Items, int TotalDataCount)> GetUserSkillsAsync<TResult>(Expression<Func<UserSkill, TResult>> projection,
                                               Guid userId,
                                               CancellationToken cancellationToken,
                                               int pageNumber = 1,

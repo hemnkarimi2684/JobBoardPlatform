@@ -1,15 +1,17 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdminDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
+using JobBoardPlatform.Application.Common.EmailSettings;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Implementation.AccessControlBusiness;
+using JobBoardPlatform.Application.Implementation.AdminDashboardBusiness;
 using JobBoardPlatform.Application.Implementation.AdvertisementBusiness;
 using JobBoardPlatform.Application.Implementation.AttachmentBusiness;
 using JobBoardPlatform.Application.Implementation.AuthenticationBusiness;
 using JobBoardPlatform.Application.Implementation.CityBusiness;
 using JobBoardPlatform.Application.Implementation.CompanyBusiness;
 using JobBoardPlatform.Application.Implementation.EducationDetailBusiness;
+using JobBoardPlatform.Application.Implementation.EmailBusiness;
 using JobBoardPlatform.Application.Implementation.ExperienceDetailBusiness;
 using JobBoardPlatform.Application.Implementation.JobApplicationBusiness;
 using JobBoardPlatform.Application.Implementation.JobBusiness;
@@ -17,17 +19,20 @@ using JobBoardPlatform.Application.Implementation.JobCategoryBusiness;
 using JobBoardPlatform.Application.Implementation.JwtBusiness;
 using JobBoardPlatform.Application.Implementation.PaymentBusiness;
 using JobBoardPlatform.Application.Implementation.ProvinceBusiness;
+using JobBoardPlatform.Application.Implementation.RedisBusiness;
 using JobBoardPlatform.Application.Implementation.RefreshTokenBusiness;
 using JobBoardPlatform.Application.Implementation.ResumeBusiness;
 using JobBoardPlatform.Application.Implementation.SkillBusiness;
 using JobBoardPlatform.Application.Implementation.UserBusiness;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
+using JobBoardPlatform.Application.Interfaces.AdminDashboardInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.AttachmentInterface;
 using JobBoardPlatform.Application.Interfaces.AuthenticationInterface;
 using JobBoardPlatform.Application.Interfaces.CityInterface;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
+using JobBoardPlatform.Application.Interfaces.EmailInterface;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
@@ -35,11 +40,12 @@ using JobBoardPlatform.Application.Interfaces.JobInterface;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
 using JobBoardPlatform.Application.Interfaces.PaymentInterface;
 using JobBoardPlatform.Application.Interfaces.ProvinceInterface;
+using JobBoardPlatform.Application.Interfaces.RedisInterface;
 using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
-using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -131,6 +137,18 @@ public static class ApplicationExtensions
         services.AddScoped<IAccessControlService, AccessControlService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IJobCategoryService, JobCategoryService>();
+        services.AddScoped<IRedisService, RedisService>();
+        services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+
+        services.Configure<SmtpSettings>(configuration.GetSection(nameof(SmtpSettings)));
+        services.AddScoped<IEmailService, EmailService>();
+
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis");
+            options.InstanceName = "VehicleInspectionAppointmentSystem:";
+        });
 
         services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
         var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();

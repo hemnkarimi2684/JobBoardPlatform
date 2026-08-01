@@ -18,8 +18,6 @@ public class EducationDetail : BaseEntity
 
     public EducationDetail(CertificateDegree certificateDegreeName, string major, string university, DateTime startDate, DateTime? completionDate, double? percentage, bool isCurrentlyStudying, Guid userId, Guid? createdById = null)
     {
-        HandleCurrentlyStudyingStatus(isCurrentlyStudying);
-
         CertificateDegreeName = certificateDegreeName;
         Major = major;
         University = university;
@@ -29,6 +27,8 @@ public class EducationDetail : BaseEntity
         IsCurrentlyStudying = isCurrentlyStudying;
         UserId = userId;
         CreatedById = createdById;
+
+        HandleCurrentlyStudyingStatus(isCurrentlyStudying);
 
         Validate();
     }

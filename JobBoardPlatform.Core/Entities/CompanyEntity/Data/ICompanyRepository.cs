@@ -2,6 +2,7 @@
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using System.Linq.Expressions;
 
@@ -16,7 +17,7 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> IsCompanyExistByNameAsync(
-        string name, 
+        string name,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -26,7 +27,7 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> IsCompanyExistForOwnerId(
-        Guid ownerId, 
+        Guid ownerId,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -84,11 +85,24 @@ public interface ICompanyRepository : IGenericRepository<Company>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult>, int)> GetAllCompaniesAsync<TResult>(
+    Task<(List<TResult> Items, int TotalDataCount)> GetAllCompaniesAsync<TResult>(
         Expression<Func<Company, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10
         );
+
+    /// <summary>
+    /// دریافت شرکت توسط شناسه اش 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="companyId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<TResult?> GetCompanyByIdAsync<TResult>(
+        Expression<Func<Company, TResult>> projection,
+        Guid companyId,
+        CancellationToken cancellationToken);
 }

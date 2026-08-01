@@ -5,7 +5,7 @@ public enum Gender
     /// <summary>
     /// مرد
     /// </summary>
-    Men,
+    Men = 1,
 
     /// <summary>
     /// زن

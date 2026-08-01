@@ -71,7 +71,8 @@ public class CityService : ICityService
             CityName = cc.City.Name,
             CompanyName = cc.Company.Name,
             YearOfEstablishment = cc.Company.YearOfEstablishment,
-            Industry = cc.Company.Industry,
+            JobCategoryId = cc.Company.JobCategoryId,
+            JobCategoryName = cc.Company.JobCategory.Name,
             AboutUs = cc.Company.AboutUs,
             CompanyImageFileId = cc.Company.CompanyImageFileId
         },

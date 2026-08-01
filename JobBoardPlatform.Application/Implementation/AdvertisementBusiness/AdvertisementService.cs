@@ -1,17 +1,18 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
-using System.Net.Http.Headers;
 
 
 namespace JobBoardPlatform.Application.Implementation.AdvertisementBusiness;
@@ -80,7 +81,7 @@ public class AdvertisementService : IAdvertisementService
         if (companyOwnerId == null)
             throw new NotFoundException($"The company with id {companyId} was not found.");
 
-        _accessControlService.EnsureOwnerEmployerOrAdmin(companyOwnerId.Value, _currentUser);
+        _accessControlService.EnsureOwnerEmployer(companyOwnerId.Value, _currentUser);
 
         var (companyAdvertisements, totalDataCount) = await _unitOfWork.AdvertisementRepository
                                                     .GetAdvertisementsByCompanyAsync(a => new AdvertisementDetailResponseDto
@@ -97,11 +98,15 @@ public class AdvertisementService : IAdvertisementService
                                                         CompanyName = a.Company.Name,
                                                         JobName = a.Job.Name,
                                                         AboutCompany = a.Company.AboutUs,
-                                                        Industry = a.Company.Industry,
+                                                        CompanyJobCategoryId = a.Company.JobCategoryId,
+                                                        CompanyJobCategoryName = a.Company.JobCategory.Name,
                                                         CreatedAt = a.CreatedAt,
                                                         AdvertisementId = a.Id,
                                                         CityId = a.CityId,
                                                         CompanyId = a.CompanyId,
+                                                        FeaturedUntil = a.FeaturedUntil,
+                                                        IsFeatured = a.IsFeatured,
+                                                        IsActive = a.IsActive,
                                                         SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
                                                     },
                                                     companyId,
@@ -166,11 +171,15 @@ public class AdvertisementService : IAdvertisementService
             CompanyName = a.Company.Name,
             JobName = a.Job.Name,
             AboutCompany = a.Company.AboutUs,
-            Industry = a.Company.Industry,
+            CompanyJobCategoryId = a.Company.JobCategoryId,
+            CompanyJobCategoryName = a.Company.JobCategory.Name,
             CreatedAt = a.CreatedAt,
             AdvertisementId = a.Id,
             CityId = a.CityId,
             CompanyId = a.CompanyId,
+            FeaturedUntil = a.FeaturedUntil,
+            IsFeatured = a.IsFeatured,
+            IsActive = a.IsActive,
             SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
         },
         a => a.IsActive,
@@ -179,6 +188,41 @@ public class AdvertisementService : IAdvertisementService
         pagingCommand.PageSize);
     }
 
+    public async Task<Pagination<AdvertisementDetailResponseDto>> GetAllAdvertisementsAsync(
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        return await _unitOfWork.AdvertisementRepository.QueryAsync(a => new AdvertisementDetailResponseDto
+        {
+            Description = a.Description,
+            JobId = a.JobId,
+            MinimumAge = a.MinimumAge,
+            MaximumAge = a.MaximumAge,
+            MinimumSalary = a.MinimumSalary,
+            MaximumSalary = a.MaximumSalary,
+            ExperienceLevel = a.ExperienceLevel,
+            CollaborationType = a.CollaborationType,
+            CityName = a.City.Name,
+            CompanyName = a.Company.Name,
+            JobName = a.Job.Name,
+            AboutCompany = a.Company.AboutUs,
+            CompanyJobCategoryId = a.Company.JobCategoryId,
+            CompanyJobCategoryName = a.Company.JobCategory.Name,
+            CreatedAt = a.CreatedAt,
+            AdvertisementId = a.Id,
+            CityId = a.CityId,
+            CompanyId = a.CompanyId,
+            FeaturedUntil = a.FeaturedUntil,
+            IsFeatured = a.IsFeatured,
+            IsActive = a.IsActive,
+            SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+        },
+        cancellationToken,
+        pagingCommand.PageNumber,
+        pagingCommand.PageSize);
+    }
 
     public async Task<Pagination<AdvertisementDetailResponseDto>> SearchAdvertisementsAsync(
         AdvertisementSearchRequestDto searchDto,
@@ -210,11 +254,15 @@ public class AdvertisementService : IAdvertisementService
                 CompanyName = a.Company.Name,
                 JobName = a.Job.Name,
                 AboutCompany = a.Company.AboutUs,
-                Industry = a.Company.Industry,
+                CompanyJobCategoryId = a.Company.JobCategoryId,
+                CompanyJobCategoryName = a.Company.JobCategory.Name,
                 CreatedAt = a.CreatedAt,
                 AdvertisementId = a.Id,
                 CityId = a.CityId,
                 CompanyId = a.CompanyId,
+                FeaturedUntil = a.FeaturedUntil,
+                IsFeatured = a.IsFeatured,
+                IsActive = a.IsActive,
                 SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
             },
               cancellationToken, pagingCommand.PageNumber, pagingCommand.PageSize);
@@ -232,7 +280,7 @@ public class AdvertisementService : IAdvertisementService
         CancellationToken cancellationToken = default)
     {
         var (result, totalDataCount) = await _unitOfWork.AdvertisementRepository.FilterAdvertisementsAsync(
-            filterDto.MaoToQueryFilter(),
+            filterDto.MapToQueryFilter(),
             a => new AdvertisementDetailResponseDto
             {
                 Description = a.Description,
@@ -247,11 +295,15 @@ public class AdvertisementService : IAdvertisementService
                 CompanyName = a.Company.Name,
                 JobName = a.Job.Name,
                 AboutCompany = a.Company.AboutUs,
-                Industry = a.Company.Industry,
+                CompanyJobCategoryId = a.Company.JobCategoryId,
+                CompanyJobCategoryName = a.Company.JobCategory.Name,
                 CreatedAt = a.CreatedAt,
                 AdvertisementId = a.Id,
                 CityId = a.CityId,
                 CompanyId = a.CompanyId,
+                FeaturedUntil = a.FeaturedUntil,
+                IsFeatured = a.IsFeatured,
+                IsActive = a.IsActive,
                 SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
             },
               cancellationToken, pagingCommand.PageNumber, pagingCommand.PageSize);
@@ -263,6 +315,16 @@ public class AdvertisementService : IAdvertisementService
                                                             totalDataCount);
     }
 
+    public List<EnumResponseDto> GetCollaborationTypes()
+    {
+        var collaborationTypes = EnumHelper.GetEnumValues<CollaborationType>();
+
+        if (collaborationTypes is null)
+            throw new NotFoundException("we dont have any collabration types in the system.");
+
+        return collaborationTypes;
+    }
+
     #endregion
 
     #region Delete Methods
@@ -271,12 +333,7 @@ public class AdvertisementService : IAdvertisementService
         Guid advertisementId,
         CancellationToken cancellationToken = default)
     {
-        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
-
-        if (advertisementOwnerId == null)
-            throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
-
-        _accessControlService.EnsureOwnerEmployerOrAdmin(advertisementOwnerId.Value, _currentUser);
+        _accessControlService.EnsureAdmin(_currentUser);
 
         var advertisementDeleteResult = await _unitOfWork.AdvertisementRepository.SoftDeleteAsync(advertisementId, _currentUser.UserId, cancellationToken);
 
@@ -321,25 +378,21 @@ public class AdvertisementService : IAdvertisementService
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
-    public async Task<bool> InActivateAdvertisementAsync(
+    public async Task<bool> DeactivateAdvertisementAsync(
         Guid advertisementId,
         CancellationToken cancellationToken = default)
     {
-        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
+        _accessControlService.EnsureAdmin(_currentUser);
 
-        if (advertisementOwnerId == null)
-            throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
+        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
 
-        _accessControlService.EnsureOwnerEmployerOrAdmin(advertisementOwnerId.Value, _currentUser);
+        if (advertisement is null)
+            throw new NotFoundException($"the advertisement with this id {advertisementId} not found");
 
-        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(
-            advertisementId,
-            _currentUser.UserId,
-            false,
-            cancellationToken);
+        if (!advertisement.IsActive)
+            throw new ValidationException($"the advertisement with id {advertisementId} is already inactive");
 
-        if (!updateAdvertisementStatusResult)
-            throw new NotFoundException($"the advertisement with this id {advertisementId} not found ");
+        advertisement.UpdateActiveStatus(_currentUser.UserId, false);
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
@@ -348,23 +401,67 @@ public class AdvertisementService : IAdvertisementService
         Guid advertisementId,
         CancellationToken cancellationToken = default)
     {
-        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
+        _accessControlService.EnsureAdmin(_currentUser);
 
-        if (advertisementOwnerId == null)
-            throw new NotFoundException($"The advertisement with id {advertisementId} was not found.");
+        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
 
-        _accessControlService.EnsureOwnerEmployerOrAdmin(advertisementOwnerId.Value, _currentUser);
+        if (advertisement is null)
+            throw new NotFoundException($"the advertisement with this id {advertisementId} not found");
 
-        var updateAdvertisementStatusResult = await _unitOfWork.AdvertisementRepository.UpdateAdvertisementStatusAsync(
-            advertisementId,
-            _currentUser.UserId,
-            true,
-            cancellationToken);
+        if (advertisement.IsActive)
+            throw new ValidationException($"the advertisement with id {advertisementId} is already active");
 
-        if (!updateAdvertisementStatusResult)
-            throw new NotFoundException($"the advertisement with this id {advertisementId} not found ");
+        advertisement.UpdateActiveStatus(_currentUser.UserId, true);
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+    }
+
+    public async Task PromoteAdvertisementAsync(
+        Guid advertisementId,
+        int durationInDays,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        if (durationInDays != 7 && durationInDays != 15 && durationInDays != 30)
+            throw new ValidationException("Allowed durations are 7 or 15 or 30 days.");
+
+        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
+
+        if (advertisement == null)
+            throw new NotFoundException($"the advertisement with id {advertisementId} was not found.");
+
+        //بررسی میکنم اینجا که  این ایا اگهی هنوز فعال است یا نه 
+        if (advertisement.IsFeatured && advertisement.FeaturedUntil.HasValue && advertisement.FeaturedUntil.Value >= DateTime.UtcNow)
+            throw new ValidationException("the advertisement is already Featured");
+
+        //اینجا چون خود پراپرتی فیچر انتیلم نال است برای پر کردنش از تاریخ دقیق روز استفاده میکنم چرا مطمئنم چون بالا چک کردم که اگه
+        // بزرگتر یا مساوی از تاریخ امروز باشه یعنی هنوز فعاله
+        var featuredUntil = DateTime.UtcNow.AddDays(durationInDays);
+
+        advertisement.UpdateFeatured(true, featuredUntil);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DemoteAdvertisementAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
+
+        if (advertisement == null)
+            throw new NotFoundException($"the advertisement with id {advertisementId} was not found.");
+
+        //با این شرط اینجا گذاشتم اون اگهی هایی که تاریخ انقضاشون گشذشته هم کامل منقضی میکنم 
+        if (advertisement.FeaturedUntil == null && advertisement.IsFeatured == false)
+            throw new ValidationException("The advertisement is already in normal status.");
+
+        advertisement.UpdateFeatured(false, null);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     #endregion
@@ -404,6 +501,11 @@ public class AdvertisementService : IAdvertisementService
 
         if (!isCityExist)
             throw new NotFoundException($"the city with id {cityId} was not found");
+
+        var isCompanyExistInCity = await _unitOfWork.CompanyCityRepository.IsCompanyExistInCityAsync(companyId, cityId, cancellationToken);
+
+        if (!isCompanyExistInCity)
+            throw new NotFoundException($"the company with id {companyId} not found in city with id {cityId}");
     }
 
     #endregion

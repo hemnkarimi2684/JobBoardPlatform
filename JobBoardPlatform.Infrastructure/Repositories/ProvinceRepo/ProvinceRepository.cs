@@ -13,7 +13,7 @@ public class ProvinceRepository : GenericRepository<Province>, IProvinceReposito
     {
     }
 
-    public async Task<(List<TResult>, int)> GetAllProvincesAsync<TResult>(
+    public async Task<(List<TResult> Items, int TotalDataCount)> GetAllProvincesAsync<TResult>(
         Expression<Func<Province, TResult>> projection,
         string? text,
         CancellationToken cancellationToken,

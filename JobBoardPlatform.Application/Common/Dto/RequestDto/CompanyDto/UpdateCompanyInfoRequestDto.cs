@@ -14,9 +14,6 @@ public class UpdateCompanyInfoRequestDto
     [DataType(DataType.Date)]
     public DateTime? YearOfEstablishment { get; set; }
 
-    [StringLength(200, MinimumLength = 2, ErrorMessage = "Industry must be between 2 and 200 characters.")]
-    public string? Industry { get; set; }
-
     [StringLength(1500, MinimumLength = 50, ErrorMessage = "About Us must be between 50 and 1500 characters.")]
     public string? AboutUs { get; set; }
 
@@ -29,6 +26,9 @@ public class UpdateCompanyInfoRequestDto
 
     [EnumDataType(typeof(CompanySizeEnum))]
     public CompanySizeEnum? CompanySize { get; set; }
+
+    [RegularExpression(@"^(?!00000000-0000-0000-0000-000000000000$).*$", ErrorMessage = "Invalid identifier.")]
+    public Guid? JobCategoryId { get; set; }
 
     [StringLength(120, MinimumLength = 2, ErrorMessage = "Activity type must be between 2 and 120 characters.")]
     public string? ActivityType { get; set; }
