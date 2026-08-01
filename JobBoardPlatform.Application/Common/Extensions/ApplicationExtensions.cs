@@ -1,5 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants.RoleConstant;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdminDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.EmailSettings;
@@ -46,8 +45,7 @@ using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
-using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
-using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Core.Entities.RoleEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

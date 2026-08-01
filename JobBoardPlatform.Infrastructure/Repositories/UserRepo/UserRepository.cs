@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Data;
+using JobBoardPlatform.Core.Entities.UserEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -32,12 +33,16 @@ public class UserRepository : IUserRepository
                                 .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<string?> GetUserEmailAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<UserDisplayDto?> GetUserEmailAsync(Guid userId, CancellationToken cancellationToken)
     {
         return await _context.Users
                                 .AsNoTracking()
                                 .Where(u => u.Id == userId && u.IsActive)
-                                .Select(u => u.Email)
+                                .Select(u => new UserDisplayDto
+                                {
+                                    Email = u.Email!,
+                                    FullName = u.UserProfile!.FirstName + " " + u.UserProfile.LastName
+                                })
                                 .FirstOrDefaultAsync(cancellationToken);
     }
 

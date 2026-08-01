@@ -1,8 +1,8 @@
-﻿using JobBoardPlatform.Application.Common.Constants.RoleConstant;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
-using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+
 
 namespace JobBoardPlatform.Application.Implementation.AccessControlBusiness;
 

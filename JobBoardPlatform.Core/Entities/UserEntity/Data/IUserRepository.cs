@@ -1,5 +1,6 @@
 ﻿
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
+using JobBoardPlatform.Core.Entities.UserEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Entity;
@@ -60,5 +61,5 @@ public interface IUserRepository
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<string?> GetUserEmailAsync(Guid userId, CancellationToken cancellationToken);
+    Task<UserDisplayDto?> GetUserEmailAsync(Guid userId, CancellationToken cancellationToken);
 }

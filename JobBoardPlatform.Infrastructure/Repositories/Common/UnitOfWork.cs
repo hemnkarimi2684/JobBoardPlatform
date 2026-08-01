@@ -7,6 +7,7 @@ using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Data;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Data;
+using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Data;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
 using JobBoardPlatform.Core.Entities.JobCategoryEntity.Data;
@@ -29,6 +30,7 @@ using JobBoardPlatform.Infrastructure.Repositories.CityRepo;
 using JobBoardPlatform.Infrastructure.Repositories.CompanyCityRepo;
 using JobBoardPlatform.Infrastructure.Repositories.CompanyRepo;
 using JobBoardPlatform.Infrastructure.Repositories.EducationDetailRepo;
+using JobBoardPlatform.Infrastructure.Repositories.EmailTemplateRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ExperienceDetailRepo;
 using JobBoardPlatform.Infrastructure.Repositories.JobApplicationRepo;
 using JobBoardPlatform.Infrastructure.Repositories.JobCategoryRepo;
@@ -73,6 +75,7 @@ public class UnitOfWork : IUnitOfWork
         UserSkillRepository = new UserSkillRepository(_context);
         JobCategoryRepository = new JobCategoryRepository(_context);
         RefreshTokenRepository = new RefreshTokenRepository(_context);
+        EmailTemplateRepository = new EmailTemplateRepository(_context);
     }
 
     private IDbContextTransaction? _transaction;
@@ -114,6 +117,8 @@ public class UnitOfWork : IUnitOfWork
     public IJobCategoryRepository JobCategoryRepository { get; }
 
     public IRefreshTokenRepository RefreshTokenRepository { get; }
+
+    public IEmailTemplateRepository EmailTemplateRepository { get; }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {

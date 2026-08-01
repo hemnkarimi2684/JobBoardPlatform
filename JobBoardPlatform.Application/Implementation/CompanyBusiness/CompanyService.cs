@@ -1,11 +1,9 @@
-﻿using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
-using JobBoardPlatform.Application.Common.Dto.ResponseDto.UserDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
@@ -185,6 +183,34 @@ public class CompanyService : ICompanyService
             throw new NotFoundException($"the company with this id {companyId} not found");
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+    }
+
+    #endregion
+
+    #region Delete Methods
+
+    public async Task DeleteCompanyImageAsync(
+        Guid companyId,
+        CancellationToken cancellationToken = default)
+    {
+        var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken, true);
+
+        if (company == null)
+            throw new NotFoundException($"the company with id {companyId} was not found");
+
+        if (company.CompanyImageFileId == null)
+            throw new ValidationException("this company does not have any image");
+
+        var lastImageId = company.CompanyImageFileId.Value;
+
+        company.UpdateImage(null);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var deleted = await _attachmentService.HardDeleteAttachmentAsync(lastImageId, cancellationToken);
+
+        if (!deleted)
+            _logger.LogError("company image reference removed, but deleting the attachment failed.");
     }
 
     #endregion

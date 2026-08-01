@@ -9,8 +9,11 @@ using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.EmailInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
+using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Constants;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
@@ -76,9 +79,14 @@ public class JobApplicationService : IJobApplicationService
             return;
         }
 
+        var placeHolders = new Dictionary<string, string>
+        {
+              { "JobTitle", jobApplication.JobTitle }
+        };
+
         try
         {
-            await _emailService.SendAsync(ownerEmail, "New Job Application", "You have received a new job application request.", false, cancellationToken);
+            await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.NewJobApplicationReceived, ownerEmail, placeHolders, cancellationToken);
         }
         catch (EmailSendingException ex)
         {
@@ -318,27 +326,34 @@ public class JobApplicationService : IJobApplicationService
         JobApplicationStatus jobApplicationStatus,
         CancellationToken cancellationToken)
     {
-        var userEmail = await _unitOfWork.UserRepository.GetUserEmailAsync(jobApplication.UserId, cancellationToken);
+        var userDisplay = await _unitOfWork.UserRepository.GetUserEmailAsync(jobApplication.UserId, cancellationToken);
 
-        if (string.IsNullOrWhiteSpace(userEmail))
+        if (userDisplay is null)
         {
-            _logger.LogError("user {UserId} has no email, jobApplicationId={JobApplicationId}", jobApplication.UserId, jobApplication.Id);
+            _logger.LogError("user {UserId} was not found, jobApplicationId={JobApplicationId}", jobApplication.UserId, jobApplication.Id);
             return;
         }
+
+        var placeHolders = new Dictionary<string, string>()
+        {
+            {"CandidateName",userDisplay.FullName },
+            {"JobTitle",jobApplication.JobTitle },
+            {"CompanyName",jobApplication.CompanyName }
+        };
 
         try
         {
             if (jobApplicationStatus == JobApplicationStatus.Reviewing)
-                await _emailService.SendAsync(userEmail, "Job Application status is on reviewed", "Your request is being reviewed.", false, cancellationToken);
+                await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.JobApplicationReviewing, userDisplay.Email, placeHolders, cancellationToken);
 
             if (jobApplicationStatus == JobApplicationStatus.Interview)
-                await _emailService.SendAsync(userEmail, "Job Application status is on interview", "You have been invited to an interview.", false, cancellationToken);
+                await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.JobApplicationInterview, userDisplay.Email, placeHolders, cancellationToken);
 
             if (jobApplicationStatus == JobApplicationStatus.Rejected)
-                await _emailService.SendAsync(userEmail, "Job Application status is rejected", "Your request was rejected.", false, cancellationToken);
+                await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.JobApplicationRejected, userDisplay.Email, placeHolders, cancellationToken);
 
             if (jobApplicationStatus == JobApplicationStatus.Accepted)
-                await _emailService.SendAsync(userEmail, "Job Application status is accepted", "Your request has been accepted.", false, cancellationToken);
+                await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.JobApplicationAccepted, userDisplay.Email, placeHolders, cancellationToken);
         }
         catch (EmailSendingException ex)
         {

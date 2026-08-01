@@ -1,7 +1,6 @@
 using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
-using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.Constants.RoleConstant;
 using JobBoardPlatform.Application.Common.Extensions;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
 using JobBoardPlatform.WebApi.Middlewares;

@@ -181,4 +181,12 @@ public static class DomainErrors
     public static Error JobCategoryNameInvalidLength => new Error("job categoty name must be between 2 and 150 characters long.", "JobCategory_Name_Invalid_Length");
 
     #endregion
+
+    #region EmailTemplate Errors
+    public static Error EmailKeyIsRequired => new Error("email key is required", "Email_Key_Is_Required");
+    public static Error EmailKeyInvalidLength => new Error("email key length must be between 3 and 100 characters", "Email_Key_Invalid_Length");
+    public static Error EmailSubjectIsRequired => new Error("email subject is required", "Email_Subject_Is_Required");
+    public static Error EmailSubjectInvalidLength => new Error("email subject length must be between 3 and 255 characters", "Email_Subject_Invalid_Length");
+    public static Error EmailBodyIsRequired => new Error("email body is required", "Email_body_Is_Required");
+    #endregion
 }

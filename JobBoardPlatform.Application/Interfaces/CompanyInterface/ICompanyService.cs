@@ -86,4 +86,14 @@ public interface ICompanyService
     /// </summary>
     /// <returns></returns>
     List<EnumResponseDto> GetOwnershipTypes();
+
+    /// <summary>
+    /// حذف عکس شرکت
+    /// </summary>
+    /// <param name="companyId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task DeleteCompanyImageAsync(
+        Guid companyId,
+        CancellationToken cancellationToken = default);
 }

@@ -79,6 +79,17 @@ public class CompanyController : ControllerBase
         return Ok(Result.Success());
     }
 
+    [HttpDelete("{companyId:guid}/delete-image")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
+    public async Task<IActionResult> DeleteCompanyImageAsync(
+        [FromRoute] Guid companyId,
+        CancellationToken cancellationToken)
+    {
+        await _companyService.DeleteCompanyImageAsync(companyId, cancellationToken);
+
+        return Ok(Result.Success());
+    }
+
     [HttpGet("{companyId:guid}/download-image")]
     [AllowAnonymous]
     public async Task<IActionResult> DownloadCompanyImageAsync(

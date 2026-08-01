@@ -133,4 +133,14 @@ public interface IUserService
     /// </summary>
     /// <returns></returns>
     List<EnumResponseDto> GetGenders();
+
+    /// <summary>
+    /// حذف عکس پروفایل
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task DeleteUserImageAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
 }

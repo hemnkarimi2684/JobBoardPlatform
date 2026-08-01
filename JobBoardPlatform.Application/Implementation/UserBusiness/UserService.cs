@@ -1,6 +1,4 @@
 ﻿using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
-using JobBoardPlatform.Application.Common.Constants;
-using JobBoardPlatform.Application.Common.Constants.RoleConstant;
 using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
@@ -16,7 +14,9 @@ using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
+using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Constants;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Core.Entities.UserEntity.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Dto;
@@ -286,7 +286,7 @@ public class UserService : IUserService
 
         try
         {
-            await _emailService.SendAsync(user.Email!, "Approved Employer Account", "Your account has been verified.", false, cancellationToken);
+            await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.EmployerApproved, user.Email!, null, cancellationToken);
         }
         catch (EmailSendingException ex)
         {
@@ -349,7 +349,7 @@ public class UserService : IUserService
 
         try
         {
-            await _emailService.SendAsync(user.Email, "Approved Employer Account", "Your account has been verified.", false, cancellationToken);
+            await _emailService.SendTemplateEmailAsync(EmailTemplateKeys.EmployerRejected, user.Email!, null, cancellationToken);
         }
         catch (EmailSendingException ex)
         {
@@ -451,6 +451,34 @@ public class UserService : IUserService
 
             throw;
         }
+    }
+
+    #endregion
+
+    #region Delete Methods
+
+    public async Task DeleteUserImageAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        var userProfile = await _unitOfWork.UserProfileRepository.GetProfileByUserIdAsync(userId, cancellationToken);
+
+        if (userProfile == null)
+            throw new NotFoundException($"the user with id {userId} does not have any profile");
+
+        if (userProfile.UserImageFileId == null)
+            throw new ValidationException($"user does not have any image for profile");
+
+        var lastImageId = userProfile.UserImageFileId.Value;
+
+        userProfile.UpdateImage(null);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var deleted = await _attachmentService.HardDeleteAttachmentAsync(lastImageId, cancellationToken);
+
+        if (!deleted)
+            _logger.LogError("user image reference removed, but deleting the attachment failed.");
     }
 
     #endregion

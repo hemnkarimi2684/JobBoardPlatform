@@ -68,6 +68,17 @@ public class UserController : ControllerBase
         return Ok(Result.Success());
     }
 
+    [HttpDelete("{userId:guid}/delete-image")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
+    public async Task<IActionResult> DeleteUserImageAsync(
+        [FromRoute] Guid userId,
+        CancellationToken cancellationToken)
+    {
+        await _userService.DeleteUserImageAsync(userId, cancellationToken);
+
+        return Ok(Result.Success());
+    }
+
     [HttpGet("genders")]
     [AllowAnonymous]
     public async Task<IActionResult> GetGenders()

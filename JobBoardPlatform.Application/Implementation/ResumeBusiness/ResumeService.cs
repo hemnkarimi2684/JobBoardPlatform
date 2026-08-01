@@ -1,5 +1,4 @@
-﻿using JobBoardPlatform.Application.Common.Constants.RoleConstant;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
+﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ResumeDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AttachmentDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
@@ -11,7 +10,7 @@ using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -98,7 +97,7 @@ public class ResumeService : IResumeService
         var deleted = await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
 
         if (!deleted)
-            throw new ValidationException("Resume file reference removed, but deleting the attachment failed.");
+            _logger.LogError("Resume file reference removed, but deleting the attachment failed.");
 
         return deleted;
     }

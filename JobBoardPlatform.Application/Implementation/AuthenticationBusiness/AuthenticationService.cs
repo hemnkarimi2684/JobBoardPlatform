@@ -1,6 +1,4 @@
 ﻿using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
-using JobBoardPlatform.Application.Common.Constants.RoleConstant;
-using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.AuthenticationDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
@@ -9,6 +7,7 @@ using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.JwtInterface;
 using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;

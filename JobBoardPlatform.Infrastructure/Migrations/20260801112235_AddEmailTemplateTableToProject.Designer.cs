@@ -4,6 +4,7 @@ using JobBoardPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobBoardPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260801112235_AddEmailTemplateTableToProject")]
+    partial class AddEmailTemplateTableToProject
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -607,64 +610,6 @@ namespace JobBoardPlatform.Infrastructure.Migrations
                     b.HasIndex("Subject");
 
                     b.ToTable("EmailTemplates");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000001"),
-                            Body = "Your employer account has been approved.",
-                            IsActive = true,
-                            Key = "EmployerApproved",
-                            Subject = "Employer Account Approved"
-                        },
-                        new
-                        {
-                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000002"),
-                            Body = "Unfortunately, your employer account has not been approved. Please contact support for more information.",
-                            IsActive = true,
-                            Key = "EmployerRejected",
-                            Subject = "Employer Account Rejected"
-                        },
-                        new
-                        {
-                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000003"),
-                            Body = "You have received a new application for the {{JobTitle}} position.\n\nPlease log in to your dashboard to review the application.",
-                            IsActive = true,
-                            Key = "NewJobApplicationReceived",
-                            Subject = "New Application for {{JobTitle}}"
-                        },
-                        new
-                        {
-                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000004"),
-                            Body = "Hello {{CandidateName}},\n\nYour application for the {{JobTitle}} position at {{CompanyName}} is currently under review.",
-                            IsActive = true,
-                            Key = "JobApplicationReviewing",
-                            Subject = "Your Job Application Is Under Review"
-                        },
-                        new
-                        {
-                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000005"),
-                            Body = "Hello {{CandidateName}},\n\nYou have been invited to an interview for the {{JobTitle}} position at {{CompanyName}}.\n\nPlease log in to your account to view the interview details.",
-                            IsActive = true,
-                            Key = "JobApplicationInterview",
-                            Subject = "Interview Invitation"
-                        },
-                        new
-                        {
-                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000006"),
-                            Body = "Hello {{CandidateName}},\n\nCongratulations! Your application for the {{JobTitle}} position at {{CompanyName}} has been accepted.",
-                            IsActive = true,
-                            Key = "JobApplicationAccepted",
-                            Subject = "Your Job Application Has Been Accepted"
-                        },
-                        new
-                        {
-                            Id = new Guid("41f80e91-65d4-4b1a-9c19-000000000007"),
-                            Body = "Hello {{CandidateName}},\n\nUnfortunately, your application for the {{JobTitle}} position at {{CompanyName}} was not accepted.\n\nWe wish you success in your future applications.",
-                            IsActive = true,
-                            Key = "JobApplicationRejected",
-                            Subject = "Job Application Update"
-                        });
                 });
 
             modelBuilder.Entity("JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity.ExperienceDetail", b =>
