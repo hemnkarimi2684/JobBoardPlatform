@@ -38,6 +38,15 @@ public class AdminUsersController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("unapproved-employers")]
+    public async Task<IActionResult> GetUnapprovedEmployersAsync(
+        [FromQuery] PagingRequestDto pagingRequestDto)
+    {
+        var result = await _userService.GetUnapprovedEmployersAsync(pagingRequestDto);
+
+        return Ok(result);
+    }
+
     [HttpGet("jobSeekers")]
     public async Task<IActionResult> GetJobSeekersAsync(
         [FromQuery] PagingRequestDto pagingRequestDto)

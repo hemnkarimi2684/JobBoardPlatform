@@ -65,4 +65,29 @@ public class UserDapperRepository : IUserDapperRepository
 
         return (result, totalCount);
     }
+
+    public async Task<(IEnumerable<EmployerDetailReadModel> Items, int totalDataCount)> GetUnapprovedEmployersAsync(
+        int pageNumber = 1, 
+        int pageSize = 10)
+    {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
+        await using var connection = _connectionFactory.CreateConnection();
+
+        var query = UserQueries.GetUnapprovedEmployerDetail;
+
+        var param = new
+        {
+            Skip = (pageNumber - 1) * pageSize,
+            Take = pageSize
+        };
+
+        var result = await connection.QueryAsync<EmployerDetailReadModel>(query, param);
+
+        //چک کردن اینکه اگه کلا لیسته خالی بود 
+        int totalCount = result.FirstOrDefault()?.TotalCount ?? 0;
+
+        return (result, totalCount);
+    }
 }

@@ -198,19 +198,39 @@ public class CompanyService : ICompanyService
         if (company == null)
             throw new NotFoundException($"the company with id {companyId} was not found");
 
+        _accessControlService.EnsureOwnerEmployer(company.OwnedByUserId, _currentUser);
+
         if (company.CompanyImageFileId == null)
             throw new ValidationException("this company does not have any image");
 
-        var lastImageId = company.CompanyImageFileId.Value;
+        var attachmentId = company.CompanyImageFileId.Value;
 
         company.UpdateImage(null);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        var deleted = await _attachmentService.HardDeleteAttachmentAsync(lastImageId, cancellationToken);
+            //ذخیره تغییر شرکت فیلد عکس 
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        if (!deleted)
-            _logger.LogError("company image reference removed, but deleting the attachment failed.");
+            // حذف سخت فایل و رکورد اتچمنت از دیتابیس
+            var deleted = await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
+
+            if (!deleted)
+                throw new InvalidOperationException("Failed to delete the attachment file or database record.");
+
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
+
+            _logger.LogError(ex, "Failed to delete company image for CompanyId: {CompanyId}, AttachmentId: {AttachmentId}. Transaction rolled back.",
+                companyId, attachmentId);
+
+            throw;
+        }
     }
 
     #endregion

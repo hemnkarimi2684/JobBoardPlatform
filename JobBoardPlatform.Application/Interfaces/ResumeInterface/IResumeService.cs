@@ -69,7 +69,7 @@ public interface IResumeService
     /// <param name="resumeId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> DeleteResumeFileByIdAsync(
+    Task DeleteResumeFileByIdAsync(
         Guid resumeId,
         CancellationToken cancellationToken = default);
 

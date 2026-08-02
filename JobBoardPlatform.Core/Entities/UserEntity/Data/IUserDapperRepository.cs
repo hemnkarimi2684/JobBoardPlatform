@@ -24,4 +24,13 @@ public interface IUserDapperRepository
         int pageNumber = 1,
         int pageSize = 10);
 
+    /// <summary>
+    /// دریافت تمام کارفرما های در حال انتظار 
+    /// </summary>
+    /// <param name="pageNumber"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    Task<(IEnumerable<EmployerDetailReadModel> Items, int totalDataCount)> GetUnapprovedEmployersAsync(
+        int pageNumber = 1,
+        int pageSize = 10);
 }
