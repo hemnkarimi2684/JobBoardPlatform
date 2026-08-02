@@ -92,6 +92,13 @@ public interface IUserService
     Task<Pagination<EmployerDetailResponseDto>> GetApprovedEmployersAsync(PagingRequestDto pagingCommand);
 
     /// <summary>
+    /// دریافت تمام کارفرما های در حال انتظار 
+    /// </summary>
+    /// <param name="pagingCommand"></param>
+    /// <returns></returns>
+    Task<Pagination<EmployerDetailResponseDto>> GetUnapprovedEmployersAsync(PagingRequestDto pagingCommand);
+
+    /// <summary>
     /// دریافت تمام کارجو ها
     /// </summary>
     /// <param name="pagingCommand"></param>

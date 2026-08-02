@@ -2,7 +2,8 @@
 
 public static class UserQueries
 {
-    public const string GetApprovedEmployerDetail = @"SELECT 
+    public const string GetApprovedEmployerDetail = @"
+                                                      SELECT 
                                                           U.Id AS EmployerId,
                                                           U.PhoneNumber,
                                                           U.Email,
@@ -10,14 +11,49 @@ public static class UserQueries
                                                           C.Name AS CompanyName,
                                                           U.CreatedAt AS EmployerCreatedAt,
                                                           COUNT(*) OVER() AS TotalCount
-                                                      FROM Users U
-                                                      INNER JOIN UserRoles UR ON U.Id = UR.UserId
-                                                      INNER JOIN Companies C ON U.Id = C.OwnedByUserId
-                                                      WHERE UR.RoleId = '5337E711-0787-4445-83DD-08DEE31DC442' 
-                                                          AND U.IsApproved = 1
-                                                          AND U.IsDeleted = 0
-                                                          AND U.DeletedAt IS NULL
-                                                      ORDER BY U.CreatedAt DESC
+                                                      FROM Users AS U
+                                                      INNER JOIN Companies AS C 
+                                                          ON C.OwnedByUserId = U.Id
+                                                      WHERE U.IsApproved = 1
+                                                        AND U.IsDeleted = 0
+                                                        AND U.DeletedAt IS NULL
+                                                        AND EXISTS
+                                                        (
+                                                            SELECT 1
+                                                            FROM UserRoles AS UR
+                                                            INNER JOIN Roles AS R 
+                                                                ON R.Id = UR.RoleId
+                                                            WHERE UR.UserId = U.Id
+                                                              AND R.NormalizedName = 'EMPLOYER'
+                                                        )
+                                                      ORDER BY U.CreatedAt DESC, U.Id
+                                                      OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+
+    public const string GetUnapprovedEmployerDetail = @"
+                                                      SELECT 
+                                                          U.Id AS EmployerId,
+                                                          U.PhoneNumber,
+                                                          U.Email,
+                                                          C.Id AS CompanyId,
+                                                          C.Name AS CompanyName,
+                                                          U.CreatedAt AS EmployerCreatedAt,
+                                                          COUNT(*) OVER() AS TotalCount
+                                                      FROM Users AS U
+                                                      INNER JOIN Companies AS C 
+                                                          ON C.OwnedByUserId = U.Id
+                                                      WHERE U.IsApproved = 0
+                                                        AND U.IsDeleted = 0
+                                                        AND U.DeletedAt IS NULL
+                                                        AND EXISTS
+                                                        (
+                                                            SELECT 1
+                                                            FROM UserRoles AS UR
+                                                            INNER JOIN Roles AS R 
+                                                                ON R.Id = UR.RoleId
+                                                            WHERE UR.UserId = U.Id
+                                                              AND R.NormalizedName = 'EMPLOYER'
+                                                        )
+                                                      ORDER BY U.CreatedAt DESC, U.Id
                                                       OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
 
     public const string GetJobSeekerDetail = @"SELECT

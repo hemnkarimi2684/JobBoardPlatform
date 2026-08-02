@@ -15,7 +15,6 @@ using JobBoardPlatform.Core.Entities.AttachmentEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Constants;
-using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Core.Entities.UserEntity.Data;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
@@ -168,6 +167,21 @@ public class UserService : IUserService
         _accessControlService.EnsureAdmin(_currentUser);
 
         var (result, totalDataCount) = await _userDapperRepository.GetApprovedEmployersAsync(pagingCommand.PageNumber, pagingCommand.PageSize);
+
+        return Pagination<EmployerDetailResponseDto>.GetPagination(
+                                                        EmployerDetailResponseDto.MapToResponseDto(result),
+                                                        pagingCommand.PageNumber,
+                                                        pagingCommand.PageSize,
+                                                        totalDataCount);
+    }
+
+
+    public async Task<Pagination<EmployerDetailResponseDto>> GetUnapprovedEmployersAsync(
+        PagingRequestDto pagingCommand)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var (result, totalDataCount) = await _userDapperRepository.GetUnapprovedEmployersAsync(pagingCommand.PageNumber, pagingCommand.PageSize);
 
         return Pagination<EmployerDetailResponseDto>.GetPagination(
                                                         EmployerDetailResponseDto.MapToResponseDto(result),
@@ -469,16 +483,36 @@ public class UserService : IUserService
         if (userProfile.UserImageFileId == null)
             throw new ValidationException($"user does not have any image for profile");
 
-        var lastImageId = userProfile.UserImageFileId.Value;
+        _accessControlService.EnsureApplicant(userProfile.UserId, _currentUser);
+
+        var attachmentId = userProfile.UserImageFileId.Value;
 
         userProfile.UpdateImage(null);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        var deleted = await _attachmentService.HardDeleteAttachmentAsync(lastImageId, cancellationToken);
+            // ذخیره تغییر فیلد عکس در پروفایل کاربر
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        if (!deleted)
-            _logger.LogError("user image reference removed, but deleting the attachment failed.");
+            // حذف سخت فایل و رکورد اتچمنت از دیتابیس
+            var deleted = await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
+
+            if (!deleted)
+                throw new InvalidOperationException("Failed to delete the attachment file or database record.");
+
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
+
+            _logger.LogError(ex, "Failed to delete user profile imgae for userId: {UserId}, AttachmentId: {AttachmentId}. Transaction rolled back.",
+                userId, attachmentId);
+
+            throw;
+        }
     }
 
     #endregion

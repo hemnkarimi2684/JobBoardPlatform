@@ -71,7 +71,7 @@ public class ResumeService : IResumeService
 
     #region Delete Methods
 
-    public async Task<bool> DeleteResumeFileByIdAsync(
+    public async Task DeleteResumeFileByIdAsync(
         Guid resumeId,
         CancellationToken cancellationToken = default)
     {
@@ -92,14 +92,30 @@ public class ResumeService : IResumeService
 
         resume.UpdateFile(null);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        var deleted = await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
+            //ذخیره تغییر رزومه و نال کردن پرارپتی ایدی اتچمنتش 
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        if (!deleted)
-            _logger.LogError("Resume file reference removed, but deleting the attachment failed.");
+            // حذف سخت فایل و رکورد اتچمنت از دیتابیس
+            var deleted = await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
 
-        return deleted;
+            if (!deleted)
+                throw new InvalidOperationException("Failed to delete the attachment file or database record.");
+
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await _unitOfWork.RollBackTransactionAsync(cancellationToken);
+
+            _logger.LogError(ex, "Failed to delete resume file for resumeId: {ResumeId}, AttachmentId: {AttachmentId}. Transaction rolled back.",
+                resumeId, attachmentId);
+
+            throw;
+        }
     }
 
     #endregion
