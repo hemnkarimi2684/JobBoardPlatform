@@ -27,7 +27,7 @@ public class SkillService : ISkillService
         _accessControlService = accessControlService;
     }
 
-    #region Craete Methods
+    #region Create Methods
 
     public async Task<bool> AddSkillsToUserAsync(
         Guid userId,
@@ -37,7 +37,7 @@ public class SkillService : ISkillService
         var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId, cancellationToken);
 
         if (!isUserExist)
-            throw new NotFoundException($"the user with id {userId} was not found");
+            throw new NotFoundException("user was not found");
 
         _accessControlService.EnsureApplicant(userId, _currentUser);
 
@@ -48,7 +48,7 @@ public class SkillService : ISkillService
                 var isDuplicateSkillForUser = await _unitOfWork.UserSkillRepository.IsDuplicateSkillForUserAsync(userId, skillId,cancellationToken);
 
                 if (isDuplicateSkillForUser)
-                    throw new ConflictException($"the user with id {userId} already has skill with id {skillId}");
+                    throw new ConflictException($"user already has skill");
 
                 var userSkill = new UserSkill(userId, skillId, _currentUser.UserId);
 
@@ -68,7 +68,7 @@ public class SkillService : ISkillService
         var isDuplicateSkill = await _unitOfWork.SkillRepository.IsDuplicateSkillAsync(skillRequestDto.Name, cancellationToken);
 
         if (isDuplicateSkill)
-            throw new ConflictException($"the skill with name {skillRequestDto.Name} is already exist");
+            throw new ConflictException($"skill is already exist");
 
         var skill = new Skill(skillRequestDto.Name, _currentUser.UserId);
 
@@ -111,7 +111,7 @@ public class SkillService : ISkillService
         var skill = await _unitOfWork.SkillRepository.GetByIdAsync(skillId, cancellationToken);
 
         if (skill is null)
-            throw new NotFoundException($"the skill with id {skillId} was not found.");
+            throw new NotFoundException($"skill was not found.");
 
         return new SkillDetailResponseDto
         {

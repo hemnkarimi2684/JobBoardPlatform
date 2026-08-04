@@ -67,19 +67,19 @@ public class UserService : IUserService
         var doesUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId, cancellationToken);
 
         if (!doesUserExist)
-            throw new NotFoundException($"User with id {createCommand.UserId} was not found.");
+            throw new NotFoundException("User was not found.");
 
         _accessControlService.EnsureApplicantOrAdmin(createCommand.UserId, _currentUser);
 
         var isDuplicateUserProfile = await _unitOfWork.UserProfileRepository.IsDuplicateUserProfileAsync(createCommand.UserId, cancellationToken);
 
         if (isDuplicateUserProfile)
-            throw new ConflictException($"User with id {createCommand.UserId} already has profile");
+            throw new ConflictException("This user already has a profile.");
 
         var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(createCommand.CityId, cancellationToken);
 
         if (!doesCityExist)
-            throw new NotFoundException($"City with id {createCommand.CityId} was not found.");
+            throw new NotFoundException("City was not found.");
 
         var userProfile = new UserProfile(
                                           createCommand.FirstName,
@@ -123,7 +123,7 @@ public class UserService : IUserService
           userId, cancellationToken);
 
         if (userProfile is null)
-            throw new NotFoundException($"the user profile with id {userId} was not found");
+            throw new NotFoundException("User profile was not found.");
 
         return userProfile;
     }
@@ -156,7 +156,7 @@ public class UserService : IUserService
           cancellationToken);
 
         if (result is null)
-            throw new NotFoundException($"the company with this ownerId {ownerId} not found");
+            throw new NotFoundException("Company was not found.");
 
         return result;
     }
@@ -209,7 +209,7 @@ public class UserService : IUserService
         var genders = EnumHelper.GetEnumValues<Gender>();
 
         if (genders is null)
-            throw new NotFoundException("there is no genders in system.");
+            throw new NotFoundException("No genders are currently available.");
 
         return genders;
     }
@@ -230,7 +230,7 @@ public class UserService : IUserService
             var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(updateCommand.CityId.Value, cancellationToken);
 
             if (!doesCityExist)
-                throw new NotFoundException($"City with id {updateCommand.CityId} was not found.");
+                throw new NotFoundException("City was not found.");
         }
 
         var result = await _unitOfWork.UserProfileRepository.UpdateProfileAsync(
@@ -239,7 +239,7 @@ public class UserService : IUserService
                                                                                 MapToUpdateUserProfile(updateCommand));
 
         if (!result)
-            throw new NotFoundException($"the user profile with id {userId} was not found");
+            throw new NotFoundException("User profile was not found.");
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
@@ -253,15 +253,15 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(userId.ToString());
 
         if (user == null)
-            throw new NotFoundException($"user with id {userId} was not found.");
+            throw new NotFoundException("User was not found.");
 
         var isEmployer = await _userManager.IsInRoleAsync(user, RoleConstants.EmployerRoleName);
 
         if (!isEmployer)
-            throw new ValidationException($"the user with id {user.Id} is not an employer");
+            throw new ValidationException("The selected user is not an employer.");
 
         if (user.IsApproved)
-            throw new ConflictException($"the employer with id {user.Id} is already approved");
+            throw new ConflictException("This employer is already approved.");
 
         try
         {
@@ -279,7 +279,7 @@ public class UserService : IUserService
                 var result = await _userManager.AddClaimAsync(user, claim);
 
                 if (!result.Succeeded)
-                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
+                    throw new ValidationException("Employer approval could not be completed. Please try again.");
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -317,15 +317,15 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(userId.ToString());
 
         if (user == null)
-            throw new NotFoundException($"user with id {userId} was not found.");
+            throw new NotFoundException("User was not found.");
 
         var isEmployer = await _userManager.IsInRoleAsync(user, RoleConstants.EmployerRoleName);
 
         if (!isEmployer)
-            throw new ValidationException($"the user with id {user.Id} is not an employer");
+            throw new ValidationException("The selected user is not an employer.");
 
         if (!user.IsApproved)
-            throw new ConflictException($"the employer with id {user.Id} is already not approved");
+            throw new ConflictException("This employer is already unapproved.");
 
         try
         {
@@ -342,7 +342,7 @@ public class UserService : IUserService
                 var result = await _userManager.RemoveClaimAsync(user, claim);
 
                 if (!result.Succeeded)
-                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
+                    throw new ValidationException("Employer rejection could not be completed. Please try again.");
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -380,15 +380,15 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(userId.ToString());
 
         if (user == null)
-            throw new NotFoundException($"user with id {userId} was not found.");
+            throw new NotFoundException("User was not found.");
 
         var isJobSeeker = await _userManager.IsInRoleAsync(user, RoleConstants.JobSeekerRoleName);
 
         if (!isJobSeeker)
-            throw new ValidationException($"the user with id {user.Id} is not a jobSeeker");
+            throw new ValidationException("The selected user is not a job seeker.");
 
         if (user.IsActive)
-            throw new ConflictException($"the jobSeeker with id {user.Id} is already active");
+            throw new ConflictException("This job seeker is already active.");
 
         try
         {
@@ -405,7 +405,7 @@ public class UserService : IUserService
                 var result = await _userManager.AddClaimAsync(user, claim);
 
                 if (!result.Succeeded)
-                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
+                    throw new ValidationException("Job seeker activation could not be completed. Please try again.");
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -428,15 +428,15 @@ public class UserService : IUserService
         var user = await _userManager.FindByIdAsync(userId.ToString());
 
         if (user == null)
-            throw new NotFoundException($"user with id {userId} was not found.");
+            throw new NotFoundException("User was not found.");
 
         var isJobSeeker = await _userManager.IsInRoleAsync(user, RoleConstants.JobSeekerRoleName);
 
         if (!isJobSeeker)
-            throw new ValidationException($"the user with id {user.Id} is not a jobSeeker");
+            throw new ValidationException("The selected user is not a job seeker.");
 
         if (!user.IsActive)
-            throw new ConflictException($"The JobSeeker with id {user.Id} is already inactive.");
+            throw new ConflictException("This job seeker is already inactive.");
 
         try
         {
@@ -453,7 +453,7 @@ public class UserService : IUserService
                 var result = await _userManager.RemoveClaimAsync(user, claim);
 
                 if (!result.Succeeded)
-                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
+                    throw new ValidationException("Job seeker deactivation could not be completed. Please try again.");
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -478,10 +478,10 @@ public class UserService : IUserService
         var userProfile = await _unitOfWork.UserProfileRepository.GetProfileByUserIdAsync(userId, cancellationToken);
 
         if (userProfile == null)
-            throw new NotFoundException($"the user with id {userId} does not have any profile");
+            throw new NotFoundException("User profile was not found.");
 
         if (userProfile.UserImageFileId == null)
-            throw new ValidationException($"user does not have any image for profile");
+            throw new ValidationException("This profile does not have an image to delete.");
 
         _accessControlService.EnsureApplicant(userProfile.UserId, _currentUser);
 
@@ -525,17 +525,17 @@ public class UserService : IUserService
         CancellationToken cancellationToken = default)
     {
         if (imageRequestDto?.Image is null)
-            throw new ValidationException("image is required.");
+            throw new ValidationException("Please select an image to upload.");
 
         var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId, cancellationToken);
 
         if (!isUserExist)
-            throw new NotFoundException($"the user with id {userId} was not found");
+            throw new NotFoundException("User was not found.");
 
         var userProfile = await _unitOfWork.UserProfileRepository.GetProfileByUserIdAsync(userId, cancellationToken);
 
         if (userProfile is null)
-            throw new NotFoundException($"The user with id '{userId}' does not have a profile.");
+            throw new NotFoundException("User profile was not found.");
 
         _accessControlService.EnsureApplicant(userProfile.UserId, _currentUser);
 
@@ -554,10 +554,10 @@ public class UserService : IUserService
         var userProfile = await _unitOfWork.UserProfileRepository.GetProfileByUserIdAsync(userId, cancellationToken);
 
         if (userProfile is null)
-            throw new NotFoundException($"The user with id '{userId}' does not have a profile.");
+            throw new NotFoundException("User profile was not found.");
 
         if (userProfile.UserImageFileId is null)
-            throw new NotFoundException($"The user with id '{userId}' does not have an attached image.");
+            throw new NotFoundException("This profile does not have an attached image.");
 
         return await _attachmentService.DownloadAsync(userProfile.UserImageFileId.Value, cancellationToken);
     }

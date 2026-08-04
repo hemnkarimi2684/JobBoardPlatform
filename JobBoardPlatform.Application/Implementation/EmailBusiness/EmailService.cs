@@ -48,10 +48,10 @@ public class EmailService : IEmailService
         var template = await _unitOfWork.EmailTemplateRepository.GetByIdAsync(id, cancellationToken, true);
 
         if (template is null)
-            throw new NotFoundException($"the email template with id {id} was not found.");
+            throw new NotFoundException($"email template was not found.");
 
         if (template.IsActive)
-            throw new ConflictException($"the email template with id {template.Id} is already active.");
+            throw new ConflictException($"email template is already active.");
 
         template.UpdateActiveStatus(true, _currentUser.UserId);
 
@@ -67,10 +67,10 @@ public class EmailService : IEmailService
         var template = await _unitOfWork.EmailTemplateRepository.GetByIdAsync(id, cancellationToken, true);
 
         if (template is null)
-            throw new NotFoundException($"the email template with id {id} was not found.");
+            throw new NotFoundException($"email template was not found.");
 
         if (!template.IsActive)
-            throw new ConflictException($"the email template with id {template.Id} is already inactive.");
+            throw new ConflictException($"email template is already inactive.");
 
         template.UpdateActiveStatus(false, _currentUser.UserId);
 
@@ -87,7 +87,7 @@ public class EmailService : IEmailService
         var template = await _unitOfWork.EmailTemplateRepository.GetByIdAsync(id, cancellationToken, true);
 
         if (template is null)
-            throw new NotFoundException($"the email template with id {id} was not found.");
+            throw new NotFoundException($"email template was not found.");
 
         if (template.Subject == updateTemplateRequestDto.Subject.Trim() && template.Body == updateTemplateRequestDto.Body)
             return;

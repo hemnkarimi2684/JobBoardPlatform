@@ -36,7 +36,7 @@ public class JobCategoryService : IJobCategoryService
         var isDuplicateName = await _unitOfWork.JobCategoryRepository.IsDuplicateNameAsync(jobCategoryRequestDto.Name, cancellationToken);
 
         if (isDuplicateName)
-            throw new ConflictException($"the job category with name {jobCategoryRequestDto.Name} is already exist");
+            throw new ConflictException("job category is already exist");
 
         var jobCategory = new JobCategory(jobCategoryRequestDto.Name, _currentUser.UserId);
 
@@ -68,7 +68,7 @@ public class JobCategoryService : IJobCategoryService
     }
 
     public async Task<JobCategoryDetailResponseDto> GetJobCategoryByIdAsync(
-        Guid jobCategoryId, 
+        Guid jobCategoryId,
         CancellationToken cancellationToken = default)
     {
         var jobCategory = await _unitOfWork.JobCategoryRepository.GetJobCategoryByProjectionAsync(jc => new JobCategoryDetailResponseDto
@@ -85,7 +85,7 @@ public class JobCategoryService : IJobCategoryService
             jobCategoryId, cancellationToken);
 
         if (jobCategory == null)
-            throw new NotFoundException($"the job category with id {jobCategoryId} was not found.");
+            throw new NotFoundException($"job category was not found.");
 
         return jobCategory;
     }

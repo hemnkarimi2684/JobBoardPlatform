@@ -150,7 +150,7 @@ public class CityService : ICityService
         cityId, cancellationToken);
 
         if (city == null)
-            throw new NotFoundException($"teh city with id {cityId} was not found.");
+            throw new NotFoundException("city was not found.");
 
         return city;
     }

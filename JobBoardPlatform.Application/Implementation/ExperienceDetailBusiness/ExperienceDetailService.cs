@@ -42,7 +42,7 @@ public class ExperienceDetailService : IExperienceDetailService
         var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId, cancellationToken);
 
         if (!isUserExist)
-            throw new NotFoundException($"The user with id {createCommand.UserId} was not found.");
+            throw new NotFoundException($"user was not found.");
 
         _accessControlService.EnsureApplicantOrAdmin(createCommand.UserId, _currentUser);
 
@@ -106,7 +106,7 @@ public class ExperienceDetailService : IExperienceDetailService
         var experienceDetail = await _unitOfWork.ExperienceDetailRepository.GetByIdAsync(experienceDetailId, cancellationToken);
 
         if (experienceDetail == null)
-            throw new NotFoundException($"The experience detail with id {experienceDetailId} was not found.");
+            throw new NotFoundException($"experience detail was not found.");
 
         _accessControlService.EnsureApplicant(experienceDetail.UserId, _currentUser);
 
@@ -129,7 +129,7 @@ public class ExperienceDetailService : IExperienceDetailService
         var seniorityLevels = EnumHelper.GetEnumValues<SeniorityLevel>();
 
         if (seniorityLevels == null)
-            throw new NotFoundException("there is no seniorityLevels in system");
+            throw new NotFoundException("No seniority levels are currently available.");
 
         return seniorityLevels;
     }
@@ -146,7 +146,7 @@ public class ExperienceDetailService : IExperienceDetailService
         var userId = await _unitOfWork.ExperienceDetailRepository.GetExperienceDetailUserIdAsync(experienceDetailId, cancellationToken);
 
         if (userId == null)
-            throw new NotFoundException($"The experience detail with id {experienceDetailId} was not found.");
+            throw new NotFoundException($"experience detail was not found.");
 
         _accessControlService.EnsureApplicantOrAdmin(userId.Value, _currentUser);
 
@@ -156,7 +156,7 @@ public class ExperienceDetailService : IExperienceDetailService
                                                                                               MapToUpdateExperienceDetail(updateCommand));
 
         if (!result)
-            throw new NotFoundException($"the experienceDetail with id {experienceDetailId} was not found");
+            throw new NotFoundException($"experienceDetail was not found");
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
