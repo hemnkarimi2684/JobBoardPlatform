@@ -1,46 +1,50 @@
 @model Pagination<EducationHistoryResponseDto>
 
 @{
-    ViewData["Title"] = "سوابق تحصیلی";
+    ViewData["Title"] = "Education History";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">سوابق تحصیلی</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Education History</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert" style="background:#fdecea;color:#b3392f;border:1px solid #f5c6c2;">@TempData["Error"]</div>
-}
-
-@if (Model.Data.Count == 0)
-{
-    <div class="empty">سابقه تحصیلی ثبت نشده است.</div>
-}
-else
-{
-    foreach (var item in Model.Data)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.Major</h3>
-            <div class="meta">@item.University | @item.CertificateDegreeName</div>
-            <div class="detail-grid">
-                <div><span>تاریخ شروع</span> @item.StartDate.ToString("yyyy/MM/dd")</div>
-                <div><span>تاریخ پایان</span> @(item.CompletionDate?.ToString("yyyy/MM/dd") ?? "-")</div>
-                <div><span>معدل</span> @(item.Percentage?.ToString("N0") ?? "-")</div>
-                <div><span>در حال تحصیل</span> @(item.IsCurrentlyStudying ? "بله" : "خیر")</div>
-            </div>
-            <div style="margin-top: 12px;">
-                <a class="btn" asp-action="Edit" asp-route-id="@item.EducationDetailId">ویرایش</a>
-            </div>
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert" style="background:#fdecea; color:#b3392f; border:1px solid #f5c6c2;">@TempData["Error"]</div>
     }
 
-    <partial name="_Pager" model="@Model" />
-}
+    @if (Model.Data.Count == 0)
+    {
+        <div class="empty">No education records have been recorded yet.</div>
+    }
+    else
+    {
+        foreach (var item in Model.Data)
+        {
+            <div class="card">
+                <h3>@item.Major</h3>
+                <div class="meta" style="color: #666; margin-bottom: 15px;">
+                    @item.University &nbsp;|&nbsp; @item.CertificateDegreeName
+                </div>
+                <div class="detail-grid">
+                    <div><span>Start Date:</span> @item.StartDate.ToString("yyyy-MM-dd")</div>
+                    <div><span>Completion Date:</span> @(item.CompletionDate?.ToString("yyyy-MM-dd") ?? "-")</div>
+                    <div><span>GPA / Percentage:</span> @(item.Percentage?.ToString("N0") ?? "-")</div>
+                    <div><span>Currently Studying:</span> @(item.IsCurrentlyStudying ? "Yes" : "No")</div>
+                </div>
+                <div style="margin-top: 12px;">
+                    <a class="btn" asp-action="Edit" asp-route-id="@item.EducationDetailId">Edit</a>
+                </div>
+            </div>
+        }
 
-<div style="margin-top: 14px;">
-    <a class="btn" asp-action="Create">افزودن سوابق تحصیلی</a>
+        <partial name="_Pager" model="@Model" />
+    }
+
+    <div style="margin-top: 14px;">
+        <a class="btn" asp-action="Create">Add Education Record</a>
+    </div>
 </div>

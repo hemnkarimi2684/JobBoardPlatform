@@ -1,45 +1,353 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - JobBoard</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Tahoma, 'Segoe UI', sans-serif; background: #f4f6f8; color: #222; display: flex; flex-direction: column; min-height: 100vh; }
-        .container { width: min(1100px, 92%); margin: 0 auto; }
-        header { background: #1e3a5f; color: #fff; }
-        nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
-        nav .brand { font-size: 1.3rem; font-weight: bold; color: #fff; text-decoration: none; }
-        nav ul { list-style: none; display: flex; gap: 18px; }
-        nav a { color: #cfd8e3; text-decoration: none; }
-        nav a:hover { color: #fff; }
-        main { flex: 1; padding: 28px 0; }
-        footer { background: #1e3a5f; color: #cfd8e3; text-align: center; padding: 16px 0; margin-top: 28px; }
-        .card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 18px; margin-bottom: 14px; }
-        .card h3 { color: #1e3a5f; margin-bottom: 6px; }
-        .card .meta { color: #667; font-size: .9rem; margin-bottom: 8px; }
-        .badge { display: inline-block; background: #e8f0fb; color: #1e3a5f; border-radius: 20px; padding: 3px 12px; font-size: .8rem; margin-left: 6px; }
-        .btn { display: inline-block; background: #2c7be5; color: #fff; border-radius: 6px; padding: 8px 16px; text-decoration: none; font-size: .9rem; }
-        .btn:hover { background: #1e5fb5; }
-        .hero { background: linear-gradient(135deg, #1e3a5f, #2c7be5); color: #fff; border-radius: 12px; padding: 48px 28px; margin-bottom: 28px; }
-        .hero h1 { font-size: 1.9rem; margin-bottom: 10px; }
-        .hero p { opacity: .9; margin-bottom: 18px; }
-        .pager { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-        .pager a, .pager span { padding: 8px 14px; border-radius: 6px; text-decoration: none; background: #fff; color: #1e3a5f; }
-        .pager .current { background: #1e3a5f; color: #fff; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; margin-bottom: 4px; font-size: .9rem; color: #1e3a5f; }
-        .form-control { width: 100%; padding: 9px 12px; border: 1px solid #cfd8e3; border-radius: 6px; font-family: inherit; font-size: .95rem; }
-        .form-control:focus { outline: none; border-color: #2c7be5; }
-        .text-danger { color: #d64545; font-size: .85rem; }
-        .alert { border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; font-size: .9rem; }
-        .alert-success { background: #e6f4ea; color: #1e7e34; border: 1px solid #b7dfc3; }
-        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .detail-grid div { background: #f8fafc; border-radius: 8px; padding: 12px; }
-        .detail-grid span { color: #667; display: block; font-size: .85rem; }
-        .skill { display: inline-block; background: #e6f4ea; color: #1e7e34; border-radius: 20px; padding: 3px 12px; font-size: .8rem; margin-left: 6px; margin-bottom: 6px; }
-        .empty { text-align: center; color: #667; padding: 40px 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #f4f6f8;
+            color: #222;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            text-align: left;
+        }
+
+        .container {
+            width: min(1100px, 92%);
+            margin: 0 auto;
+        }
+
+        header {
+            background: #1e3a5f;
+            color: #fff;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+        }
+
+            nav .brand {
+                font-size: 1.3rem;
+                font-weight: bold;
+                color: #fff;
+                text-decoration: none;
+            }
+
+            nav ul {
+                list-style: none;
+                display: flex;
+                gap: 18px;
+            }
+
+            nav a {
+                color: #cfd8e3;
+                text-decoration: none;
+            }
+
+                nav a:hover {
+                    color: #fff;
+                }
+
+        main {
+            flex: 1;
+            padding: 28px 0;
+        }
+
+        footer {
+            background: #1e3a5f;
+            color: #cfd8e3;
+            text-align: center;
+            padding: 16px 0;
+            margin-top: 28px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+            .card h3 {
+                color: #1e3a5f;
+                margin-bottom: 6px;
+            }
+
+            .card .meta {
+                color: #667;
+                font-size: .9rem;
+                margin-bottom: 8px;
+            }
+
+        .badge {
+            display: inline-block;
+            background: #e8f0fb;
+            color: #1e3a5f;
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: .8rem;
+            margin-left: 6px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #2c7be5;
+            color: #fff;
+            border-radius: 6px;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: .9rem;
+            cursor: pointer;
+        }
+
+            .btn:hover {
+                background: #1e5fb5;
+            }
+
+        .hero {
+            background: linear-gradient(135deg, #1e3a5f, #2c7be5);
+            color: #fff;
+            border-radius: 12px;
+            padding: 48px 28px;
+            margin-bottom: 28px;
+        }
+
+            .hero h1 {
+                font-size: 1.9rem;
+                margin-bottom: 10px;
+            }
+
+            .hero p {
+                opacity: .9;
+                margin-bottom: 18px;
+            }
+
+        .pager {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+            .pager a, .pager span {
+                padding: 8px 14px;
+                border-radius: 6px;
+                text-decoration: none;
+                background: #fff;
+                color: #1e3a5f;
+            }
+
+            .pager .current {
+                background: #1e3a5f;
+                color: #fff;
+            }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 4px;
+                font-size: .9rem;
+                color: #1e3a5f;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #cfd8e3;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: .95rem;
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #2c7be5;
+            }
+
+        .text-danger {
+            color: #d64545;
+            font-size: .85rem;
+        }
+
+        .alert {
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            font-size: .9rem;
+        }
+
+        .alert-success {
+            background: #e6f4ea;
+            color: #1e7e34;
+            border: 1px solid #b7dfc3;
+        }
+
+        .alert-danger {
+            background: #fdecea;
+            color: #b3392f;
+            border: 1px solid #f5c6c2;
+        }
+        /* Added for consistency */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+            .detail-grid div {
+                background: #f8fafc;
+                border-radius: 8px;
+                padding: 12px;
+            }
+
+            .detail-grid span {
+                color: #667;
+                display: block;
+                font-size: .85rem;
+            }
+
+        .skill {
+            display: inline-block;
+            background: #e6f4ea;
+            color: #1e7e34;
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: .8rem;
+            margin-left: 6px;
+            margin-bottom: 6px;
+        }
+
+        .empty {
+            text-align: center;
+            color: #667;
+            padding: 40px 0;
+        }
+        /* Adjustments for LTR */
+        .card form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+            /* Example for form layouts */
+            .card form .form-group {
+                flex: 1;
+                margin-bottom: 0;
+            }
+
+            .card form button[type="submit"] {
+                margin-left: 0;
+            }
+            /* Resetting potential RTL margins */
+            .card form input[type="text"], .card form input[type="password"], .card form input[type="email"], .card form input[type="file"] {
+                width: 100%;
+            }
+
+            .card form select {
+                width: auto;
+            }
+            /* Example for select elements */
+            .card form button {
+                padding: 8px 16px;
+            }
+        /* Ensure button padding is consistent */
+        .card .meta, .detail-grid span {
+            margin-bottom: 8px;
+        }
+        /* Consistent spacing */
+        .card h3 {
+            margin-bottom: 12px;
+        }
+        /* Increased spacing below heading */
+        .card .badge {
+            margin-left: 6px;
+            margin-bottom: 6px;
+        }
+        /* Spacing for badges */
+        .card .skill {
+            margin-left: 6px;
+            margin-bottom: 6px;
+        }
+        /* Spacing for skills */
+        .alert {
+            padding: 10px 14px;
+        }
+        /* Consistent alert padding */
+        .form-group label {
+            margin-bottom: 6px;
+        }
+        /* More space below label */
+        .form-control {
+            padding: 10px 12px;
+        }
+        /* Slightly larger input padding */
+        .pager a, .pager span {
+            margin: 0 5px;
+        }
+        /* Spacing between pager items */
+        .detail-grid div {
+            padding: 14px;
+        }
+        /* Slightly larger padding for detail grid items */
+        .empty {
+            padding: 50px 0;
+        }
+        /* More prominent empty state */
+        /* Specific adjustments for navigation links */
+        nav ul li:last-child a, nav ul li:last-child button {
+            margin-left: 0;
+        }
+        /* Adjustments for button and form within cards */
+        .card a.btn, .card button.btn {
+            margin-top: 10px;
+        }
+        /* Space above buttons in cards */
+        .card form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+            /* Responsive form layout within cards */
+            .card form .form-group {
+                flex: 1 1 200px;
+                margin-bottom: 0;
+            }
+            /* Responsive form groups */
+            .card form button[type="submit"] {
+                margin-left: 0;
+            }
+        /* Ensure no LTR margin issues */
+        .alert-danger {
+            background: #fdecea;
+            color: #b3392f;
+            border: 1px solid #f5c6c2;
+        }
+        /* Explicitly defining alert-danger */
+        .card form button {
+            margin-top: 5px;
+        }
+            /* Margin for submit button within forms */
+            /* Fix for delete file button margin */
+            .card form button[type="submit"][style*="display:inline;margin-right:8px;"] {
+                margin-left: 8px;
+                margin-right: 0;
+            }
     </style>
 </head>
 <body>
@@ -48,40 +356,40 @@
             <nav>
                 <a class="brand" asp-controller="Home" asp-action="Index">JobBoard</a>
                 <ul>
-                    <li><a asp-controller="Home" asp-action="Index">خانه</a></li>
-                    <li><a asp-controller="Advertisement" asp-action="Index">آگهی‌ها</a></li>
-                    <li><a asp-controller="Company" asp-action="Index">شرکت‌ها</a></li>
-                    <li><a asp-controller="Job" asp-action="Index">شغل‌ها</a></li>
-                    <li><a asp-controller="JobCategory" asp-action="Index">دسته‌بندی‌ها</a></li>
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Advertisement" asp-action="Index">Advertisements</a></li>
+                    <li><a asp-controller="Company" asp-action="Index">Companies</a></li>
+                    <li><a asp-controller="Job" asp-action="Index">Jobs</a></li>
+                    <li><a asp-controller="JobCategory" asp-action="Index">Categories</a></li>
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         @if (User.IsInRole("JobSeeker"))
                         {
-                            <li><a asp-controller="Resume" asp-action="Index">رزومه من</a></li>
-                            <li><a asp-controller="JobApplication" asp-action="My">درخواست‌های من</a></li>
-                            <li><a asp-controller="User" asp-action="Profile">پروفایل</a></li>
+                            <li><a asp-controller="Resume" asp-action="Index">My Resume</a></li>
+                            <li><a asp-controller="JobApplication" asp-action="My">My Applications</a></li>
+                            <li><a asp-controller="User" asp-action="Profile">Profile</a></li>
                         }
                         @if (User.IsInRole("Employer"))
                         {
-                            <li><a asp-controller="Company" asp-action="MyCompany">شرکت من</a></li>
-                            <li><a asp-controller="Advertisement" asp-action="MyAds">آگهی‌های من</a></li>
+                            <li><a asp-controller="Company" asp-action="MyCompany">My Company</a></li>
+                            <li><a asp-controller="Advertisement" asp-action="MyAds">My Ads</a></li>
                         }
                         @if (User.IsInRole("Admin"))
                         {
-                            <li><a asp-controller="Admin" asp-action="Dashboard">پنل ادمین</a></li>
+                            <li><a asp-controller="Admin" asp-action="Dashboard">Admin Dashboard</a></li>
                         }
                         <li><span style="color:#fff;">@User.FindFirst(ClaimTypes.Email)?.Value</span></li>
                         <li>
                             <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
-                                <button type="submit" style="background:none;border:none;color:#cfd8e3;cursor:pointer;font-family:inherit;font-size:.9rem;">خروج</button>
+                                <button type="submit" style="background:none; border:none; color:#cfd8e3; cursor:pointer; font-family:inherit; font-size:.9rem;">Logout</button>
                             </form>
                         </li>
                     }
                     else
                     {
-                        <li><a asp-controller="Account" asp-action="Login">ورود</a></li>
-                        <li><a asp-controller="Account" asp-action="RegisterJobSeeker">ثبت‌نام کارجو</a></li>
-                        <li><a asp-controller="Account" asp-action="RegisterEmployer">ثبت‌نام کارفرما</a></li>
+                        <li><a asp-controller="Account" asp-action="Login">Login</a></li>
+                        <li><a asp-controller="Account" asp-action="RegisterJobSeeker">Register Job Seeker</a></li>
+                        <li><a asp-controller="Account" asp-action="RegisterEmployer">Register Employer</a></li>
                     }
                 </ul>
             </nav>
@@ -93,7 +401,7 @@
         </div>
     </main>
     <footer>
-        <div class="container">JobBoard Platform - پروژه پایانی</div>
+        <div class="container">JobBoard Platform</div>
     </footer>
 </body>
 </html>

@@ -1,91 +1,103 @@
 @model AdminDashboardCountsDto
 
 @{
-    ViewData["Title"] = "پنل مدیریت";
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">داشبورد مدیریت</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Admin Dashboard</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert text-danger">@TempData["Error"]</div>
-}
-
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px;">
-    <div class="card">
-        <h3>کل کاربران</h3>
-        <div style="font-size:1.8rem;font-weight:bold;color:#2c7be5;">@Model.TotalUsersCount</div>
-    </div>
-    <a class="card" asp-action="Employers" style="text-decoration:none;color:inherit;display:block;">
-        <h3>کارفرمایان</h3>
-        <div style="font-size:1.8rem;font-weight:bold;color:#2c7be5;">@Model.EmployersCount</div>
-        <span class="badge">@Model.PendingEmployersCount در انتظار تأیید</span>
-    </a>
-    <a class="card" asp-action="JobSeekers" style="text-decoration:none;color:inherit;display:block;">
-        <h3>کارجویان</h3>
-        <div style="font-size:1.8rem;font-weight:bold;color:#2c7be5;">@Model.JobSeekersCount</div>
-    </a>
-    <a class="card" asp-action="Advertisements" style="text-decoration:none;color:inherit;display:block;">
-        <h3>آگهی‌های فعال</h3>
-        <div style="font-size:1.8rem;font-weight:bold;color:#1e7e34;">@Model.ActiveAdvertisementsCount</div>
-        <span class="badge">غیرفعال: @Model.InactiveAdvertisementsCount</span>
-    </a>
-</div>
-
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:14px;">
-    <a class="card" asp-action="Cities" style="text-decoration:none;color:inherit;display:block;">
-        <h3>شهرها</h3>
-        <div class="meta">مدیریت شهرها</div>
-    </a>
-    <a class="card" asp-action="Provinces" style="text-decoration:none;color:inherit;display:block;">
-        <h3>استان‌ها</h3>
-        <div class="meta">مدیریت استان‌ها</div>
-    </a>
-    <a class="card" asp-action="JobCategories" style="text-decoration:none;color:inherit;display:block;">
-        <h3>دسته‌بندی‌های شغلی</h3>
-        <div class="meta">مدیریت دسته‌بندی‌ها</div>
-    </a>
-    <a class="card" asp-action="Skills" style="text-decoration:none;color:inherit;display:block;">
-        <h3>مهارت‌ها</h3>
-        <div class="meta">مدیریت مهارت‌ها</div>
-    </a>
-    <a class="card" asp-action="Jobs" style="text-decoration:none;color:inherit;display:block;">
-        <h3>شغل‌ها</h3>
-        <div class="meta">مدیریت شغل‌ها</div>
-    </a>
-    <a class="card" asp-action="EmailTemplates" style="text-decoration:none;color:inherit;display:block;">
-        <h3>قالب‌های ایمیل</h3>
-        <div class="meta">مدیریت قالب‌ها</div>
-    </a>
-</div>
-
-<div class="card">
-    <h3>وضعیت درخواست‌های شغلی</h3>
-    @if (Model.JobApplicationStatusCounts.Count == 0)
+    @if (TempData["Success"] != null)
     {
-        <div class="empty">درخواست شغلی ثبت نشده است.</div>
+        <div class="alert alert-success">@TempData["Success"]</div>
     }
-    else
+    @if (TempData["Error"] != null)
     {
-        <div style="display:flex;flex-wrap:wrap;gap:10px;">
-            @foreach (var item in Model.JobApplicationStatusCounts)
-            {
-                var statusLabel = item.StatusName switch
-                {
-                    JobApplicationStatus.Pending => "در انتظار",
-                    JobApplicationStatus.Reviewing => "در حال بررسی",
-                    JobApplicationStatus.Interview => "در مرحله مصاحبه",
-                    JobApplicationStatus.Accepted => "پذیرفته شده",
-                    JobApplicationStatus.Rejected => "رد شده",
-                    JobApplicationStatus.Cancelled => "لغو شده",
-                    _ => item.StatusName.ToString()
-                };
-                <span class="skill">@statusLabel: @item.CountPerStatus</span>
-            }
+        <div class="alert text-danger">@TempData["Error"]</div>
+    }
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:14px;">
+        <div class="card">
+            <h3>Total Users</h3>
+            <div style="font-size:1.8rem; font-weight:bold; color:#2c7be5;">@Model.TotalUsersCount</div>
         </div>
-    }
+
+        <a class="card" asp-action="Employers" style="text-decoration:none; color:inherit; display:block;">
+            <h3>Employers</h3>
+            <div style="font-size:1.8rem; font-weight:bold; color:#2c7be5;">@Model.EmployersCount</div>
+            <span class="badge" style="background:#fff3cd; color:#856404; padding:4px 8px; border-radius:4px; font-size:0.85rem;">
+                @Model.PendingEmployersCount Pending Approval
+            </span>
+        </a>
+
+        <a class="card" asp-action="JobSeekers" style="text-decoration:none; color:inherit; display:block;">
+            <h3>Job Seekers</h3>
+            <div style="font-size:1.8rem; font-weight:bold; color:#2c7be5;">@Model.JobSeekersCount</div>
+        </a>
+
+        <a class="card" asp-action="Advertisements" style="text-decoration:none; color:inherit; display:block;">
+            <h3>Active Ads</h3>
+            <div style="font-size:1.8rem; font-weight:bold; color:#1e7e34;">@Model.ActiveAdvertisementsCount</div>
+            <span class="badge" style="background:#f8d7da; color:#721c24; padding:4px 8px; border-radius:4px; font-size:0.85rem;">
+                Inactive: @Model.InactiveAdvertisementsCount
+            </span>
+        </a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:14px;">
+        <a class="card" asp-action="Cities" style="text-decoration:none; color:inherit; display:block;">
+            <h3>Cities</h3>
+            <div class="meta" style="color: #666;">Manage Cities</div>
+        </a>
+        <a class="card" asp-action="Provinces" style="text-decoration:none; color:inherit; display:block;">
+            <h3>Provinces</h3>
+            <div class="meta" style="color: #666;">Manage Provinces</div>
+        </a>
+        <a class="card" asp-action="JobCategories" style="text-decoration:none; color:inherit; display:block;">
+            <h3>Job Categories</h3>
+            <div class="meta" style="color: #666;">Manage Categories</div>
+        </a>
+        <a class="card" asp-action="Skills" style="text-decoration:none; color:inherit; display:block;">
+            <h3>Skills</h3>
+            <div class="meta" style="color: #666;">Manage Skills</div>
+        </a>
+        <a class="card" asp-action="Jobs" style="text-decoration:none; color:inherit; display:block;">
+            <h3>Jobs</h3>
+            <div class="meta" style="color: #666;">Manage Jobs</div>
+        </a>
+        <a class="card" asp-action="EmailTemplates" style="text-decoration:none; color:inherit; display:block;">
+            <h3>Email Templates</h3>
+            <div class="meta" style="color: #666;">Manage Templates</div>
+        </a>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom: 15px;">Job Applications Status</h3>
+        @if (Model.JobApplicationStatusCounts == null || Model.JobApplicationStatusCounts.Count == 0)
+        {
+            <div class="empty">No job applications registered yet.</div>
+        }
+        else
+        {
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                @foreach (var item in Model.JobApplicationStatusCounts)
+                {
+                    var statusLabel = item.StatusName switch
+                    {
+                        JobApplicationStatus.Pending => "Pending",
+                        JobApplicationStatus.Reviewing => "Reviewing",
+                        JobApplicationStatus.Interview => "Interview",
+                        JobApplicationStatus.Accepted => "Accepted",
+                        JobApplicationStatus.Rejected => "Rejected",
+                        JobApplicationStatus.Cancelled => "Cancelled",
+                        _ => item.StatusName.ToString()
+                    };
+                    <span class="skill" style="background:#f1f3f5; padding:6px 12px; border-radius:20px; font-size:0.9rem;">
+                        @statusLabel: @item.CountPerStatus
+                    </span>
+                }
+            </div>
+        }
+    </div>
 </div>
+

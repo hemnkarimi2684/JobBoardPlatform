@@ -1,60 +1,65 @@
 @{
-    ViewData["Title"] = "کارفرمایان";
+    ViewData["Title"] = "Employers";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">مدیریت کارفرمایان</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Employers</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert text-danger">@TempData["Error"]</div>
-}
-
-<h3 style="margin: 18px 0 10px; color: #1e3a5f;">کارفرمایان تأیید نشده</h3>
-@{
-    var unapproved = (List<EmployerDetailResponseDto>)ViewBag.UnapprovedEmployers;
-}
-@if (unapproved.Count == 0)
-{
-    <div class="empty">کارفرمایی در انتظار تأیید وجود ندارد.</div>
-}
-else
-{
-    foreach (var item in unapproved)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.Email</h3>
-            <div class="meta">تلفن: @item.PhoneNumber</div>
-            <div style="margin-top:10px;">
-                <form asp-action="ApproveEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
-                    <button type="submit" class="btn">تأیید</button>
-                </form>
-                <form asp-action="RejectEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
-                    <button type="submit" class="btn" style="background:#d64545;">رد</button>
-                </form>
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert text-danger">@TempData["Error"]</div>
+    }
+
+    <h3 style="margin: 18px 0 10px; color: #1e3a5f;">Pending Employers</h3>
+    @{
+        var unapproved = (List<EmployerDetailResponseDto>)ViewBag.UnapprovedEmployers;
+    }
+    @if (unapproved == null || unapproved.Count == 0)
+    {
+        <div class="empty">No pending employers found.</div>
+    }
+    else
+    {
+        foreach (var item in unapproved)
+        {
+            <div class="card" style="margin-bottom: 15px;">
+                <h3>@item.Email</h3>
+                <div class="meta" style="color: #666;">Phone: @item.PhoneNumber</div>
+                <div style="margin-top:10px;">
+                    <form asp-action="ApproveEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn">Approve</button>
+                    </form>
+                    <form asp-action="RejectEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn" style="background:#d64545;">Reject</button>
+                    </form>
+                </div>
             </div>
-        </div>
+        }
     }
-}
 
-<h3 style="margin: 18px 0 10px; color: #1e3a5f;">کارفرمایان تأیید شده</h3>
-@{
-    var approved = (List<EmployerDetailResponseDto>)ViewBag.ApprovedEmployers;
-}
-@if (approved.Count == 0)
-{
-    <div class="empty">کارفرمایی تأیید شده وجود ندارد.</div>
-}
-else
-{
-    foreach (var item in approved)
-    {
-        <div class="card">
-            <h3>@item.CompanyName</h3>
-            <div class="meta">@item.Email &nbsp;|&nbsp; تلفن: @item.PhoneNumber</div>
-        </div>
+    <h3 style="margin: 18px 0 10px; color: #1e3a5f;">Approved Employers</h3>
+    @{
+        var approved = (List<EmployerDetailResponseDto>)ViewBag.ApprovedEmployers;
     }
-}
+    @if (approved == null || approved.Count == 0)
+    {
+        <div class="empty">No approved employers found.</div>
+    }
+    else
+    {
+        foreach (var item in approved)
+        {
+            <div class="card" style="margin-bottom: 15px;">
+                <h3>@item.CompanyName</h3>
+                <div class="meta" style="color: #666;">@item.Email &nbsp;|&nbsp; Phone: @item.PhoneNumber</div>
+            </div>
+        }
+    }
+</div>
+

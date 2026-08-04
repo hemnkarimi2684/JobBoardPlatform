@@ -1,57 +1,87 @@
 @model Pagination<JobSeekerDetailResponseDto>
 
 @{
-    ViewData["Title"] = "کارجویان";
+    ViewData["Title"] = "Job Seekers";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">مدیریت کارجویان</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Job Seekers</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert text-danger">@TempData["Error"]</div>
-}
-
-@if (Model.Data.Count == 0)
-{
-    <div class="empty">کارجویی ثبت نشده است.</div>
-}
-else
-{
-    foreach (var item in Model.Data)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.Email</h3>
-            <div class="meta">تلفن: @item.PhoneNumber &nbsp;|&nbsp; تاریخ ثبت‌نام: @item.CreatedAt.ToString("yyyy/MM/dd")</div>
-            <div>
-                @if (item.IsActive)
-                {
-                    <span class="badge">فعال</span>
-                }
-                else
-                {
-                    <span class="badge" style="background:#fdecea;color:#d64545;">غیرفعال</span>
-                }
-            </div>
-            <div style="margin-top:10px;">
-                @if (item.IsActive)
-                {
-                    <form asp-action="DeactivateJobSeeker" asp-route-userId="@item.Id" method="post" style="display:inline;">
-                        <button type="submit" class="btn" style="background:#d64545;">غیرفعال‌سازی</button>
-                    </form>
-                }
-                else
-                {
-                    <form asp-action="ActivateJobSeeker" asp-route-userId="@item.Id" method="post" style="display:inline;">
-                        <button type="submit" class="btn">فعال‌سازی</button>
-                    </form>
-                }
-            </div>
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
     }
 
-    <partial name="_Pager" model="Model" />
-}
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert text-danger">@TempData["Error"]</div>
+    }
+
+    @if (Model.Data == null || Model.Data.Count == 0)
+    {
+        <div class="empty">No job seekers registered.</div>
+    }
+    else
+    {
+        foreach (var item in Model.Data)
+        {
+            <div class="card" style="margin-bottom: 15px;">
+                <h3>@item.Email</h3>
+
+                <div class="meta" style="color: #666; margin-bottom: 10px;">
+                    Phone: @item.PhoneNumber
+                    &nbsp;|&nbsp;
+                    Registration Date: @item.CreatedAt.ToString("yyyy/MM/dd")
+                </div>
+
+                <div>
+                    @if (item.IsActive)
+                    {
+                        <span class="badge"
+                              style="background:#e2f0d9; color:#385723; padding:4px 8px; border-radius:4px;">
+                            Active
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge"
+                              style="background:#fdecea; color:#d64545; padding:4px 8px; border-radius:4px;">
+                            Inactive
+                        </span>
+                    }
+                </div>
+
+                <div style="margin-top:10px;">
+                    @if (item.IsActive)
+                    {
+                        <form asp-action="DeactivateJobSeeker"
+                              asp-route-userId="@item.Id"
+                              method="post"
+                              style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit"
+                                    class="btn"
+                                    style="background:#d64545;">
+                                Deactivate
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="ActivateJobSeeker"
+                              asp-route-userId="@item.Id"
+                              method="post"
+                              style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn">
+                                Activate
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+
+        <partial name="_Pager" model="Model" />
+    }
+</div>

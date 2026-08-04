@@ -10,7 +10,8 @@
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert" style="background:#fdecea;color:#a43d3d;border:1px solid #f5c6cb;">@TempData["Error"]</div>
+    // Using the standard danger alert for errors.
+    <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
 <div class="card">
@@ -18,7 +19,7 @@
 
     @if (Model.Jobs.Count > 0)
     {
-        <h4 style="margin: 16px 0 8px; color: #1e3a5f;">شغل‌های این دسته‌بندی</h4>
+        <h4 style="margin: 16px 0 8px; color: #1e3a5f;">Jobs in this category</h4>
         <div>
             @foreach (var job in Model.Jobs)
             {
@@ -28,10 +29,10 @@
     }
     else
     {
-        <p class="meta" style="margin-top: 10px;">در حال حاضر شغلی برای این دسته‌بندی ثبت نشده است.</p>
+        <p class="meta" style="margin-top: 10px;">No jobs have been registered for this category yet.</p>
     }
 
     <div style="margin-top: 18px;">
-        <a class="btn" asp-action="Index">بازگشت به لیست</a>
+        <a class="btn" asp-action="Index">Back to List</a>
     </div>
 </div>

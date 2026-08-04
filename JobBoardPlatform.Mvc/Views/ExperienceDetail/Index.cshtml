@@ -1,45 +1,49 @@
 @model Pagination<ExperienceHistoryResponseDto>
 
 @{
-    ViewData["Title"] = "سوابق کاری";
+    ViewData["Title"] = "Work Experience";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">سوابق کاری</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Work Experience</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert" style="background:#fdecea;color:#b3392f;border:1px solid #f5c6c2;">@TempData["Error"]</div>
-}
-
-@if (Model.Data.Count == 0)
-{
-    <div class="empty">سابقه کاری ثبت نشده است.</div>
-}
-else
-{
-    foreach (var item in Model.Data)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.LastJobTitle</h3>
-            <div class="meta">@item.JobCategory | @item.City | @item.SeniorityLevel</div>
-            <div class="detail-grid">
-                <div><span>تاریخ شروع</span> @item.StartDate.ToString("yyyy/MM/dd")</div>
-                <div><span>تاریخ پایان</span> @(item.EndDate?.ToString("yyyy/MM/dd") ?? "-")</div>
-                <div><span>شغل فعلی</span> @(item.IsCurrentJob ? "بله" : "خیر")</div>
-            </div>
-            <div style="margin-top: 12px;">
-                <a class="btn" asp-action="Edit" asp-route-id="@item.ExperienceDetailId">ویرایش</a>
-            </div>
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert" style="background:#fdecea; color:#b3392f; border:1px solid #f5c6c2;">@TempData["Error"]</div>
     }
 
-    <partial name="_Pager" model="@Model" />
-}
+    @if (Model.Data.Count == 0)
+    {
+        <div class="empty">No work experience has been recorded yet.</div>
+    }
+    else
+    {
+        foreach (var item in Model.Data)
+        {
+            <div class="card">
+                <h3>@item.LastJobTitle</h3>
+                <div class="meta" style="color: #666; margin-bottom: 15px;">
+                    @item.JobCategory &nbsp;|&nbsp; @item.City &nbsp;|&nbsp; @item.SeniorityLevel
+                </div>
+                <div class="detail-grid">
+                    <div><span>Start Date:</span> @item.StartDate.ToString("yyyy-MM-dd")</div>
+                    <div><span>End Date:</span> @(item.EndDate?.ToString("yyyy-MM-dd") ?? "-")</div>
+                    <div><span>Current Job:</span> @(item.IsCurrentJob ? "Yes" : "No")</div>
+                </div>
+                <div style="margin-top: 12px;">
+                    <a class="btn" asp-action="Edit" asp-route-id="@item.ExperienceDetailId">Edit</a>
+                </div>
+            </div>
+        }
 
-<div style="margin-top: 14px;">
-    <a class="btn" asp-action="Create">افزودن سوابق کاری</a>
+        <partial name="_Pager" model="@Model" />
+    }
+
+    <div style="margin-top: 14px;">
+        <a class="btn" asp-action="Create">Add Work Experience</a>
+    </div>
 </div>

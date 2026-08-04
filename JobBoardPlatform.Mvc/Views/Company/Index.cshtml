@@ -1,42 +1,46 @@
 @model Pagination<CompanyDetailResponseDto>
 
 @{
-    ViewData["Title"] = "شرکت‌ها";
+    ViewData["Title"] = "Companies";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">لیست شرکت‌ها</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">List of Companies</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert" style="background:#fdecea;color:#a43d3d;border:1px solid #f5c6cb;">@TempData["Error"]</div>
-}
-
-<form asp-action="Index" method="get" style="margin-bottom: 18px;">
-    <div class="form-group" style="display:flex;gap:8px;margin-bottom:0;">
-        <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="جستجوی شرکت..." />
-        <button type="submit" class="btn">جستجو</button>
-    </div>
-</form>
-
-@if (Model.Data.Count == 0)
-{
-    <div class="empty">شرکتی یافت نشد.</div>
-}
-else
-{
-    foreach (var item in Model.Data)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.Name</h3>
-            <div class="meta">@item.JobCategoryName</div>
-            <p style="margin: 10px 0; color: #445;">@(item.AboutUs != null && item.AboutUs.Length > 120 ? item.AboutUs.Substring(0, 120) + "..." : item.AboutUs)</p>
-            <a class="btn" asp-action="Details" asp-route-id="@item.Id">جزئیات</a>
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert" style="background:#fdecea; color:#a43d3d; border:1px solid #f5c6cb;">@TempData["Error"]</div>
     }
 
-    @await Html.PartialAsync("_Pager", Model);
-}
+    <form asp-action="Index" method="get" style="margin-bottom: 18px;">
+        <div class="form-group" style="display:flex; gap:8px; margin-bottom:0;">
+            <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="Search companies..." />
+            <button type="submit" class="btn">Search</button>
+        </div>
+    </form>
+
+    @if (Model.Data.Count == 0)
+    {
+        <div class="empty">No companies found.</div>
+    }
+    else
+    {
+        foreach (var item in Model.Data)
+        {
+            <div class="card">
+                <h3>@item.Name</h3>
+                <div class="meta" style="color: #666; margin-bottom: 10px;">@item.JobCategoryName</div>
+                <p style="margin: 10px 0; color: #445;">
+                    @(item.AboutUs != null && item.AboutUs.Length > 120 ? item.AboutUs.Substring(0, 120) + "..." : item.AboutUs)
+                </p>
+                <a class="btn" asp-action="Details" asp-route-id="@item.Id">Details</a>
+            </div>
+        }
+
+        @await Html.PartialAsync("_Pager", Model)
+    }
+</div>

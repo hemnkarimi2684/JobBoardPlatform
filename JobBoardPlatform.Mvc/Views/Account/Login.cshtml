@@ -1,10 +1,10 @@
 @model LoginViewModel
 @{
-    ViewData["Title"] = "ورود";
+    ViewData["Title"] = "Login";
 }
 
-<div class="card" style="max-width:420px;margin:0 auto;">
-    <h3>ورود به حساب کاربری</h3>
+<div class="card" style="max-width:420px; margin: 0 auto; direction: ltr; text-align: left;">
+    <h3 style="margin-bottom: 20px;">Login to Account</h3>
 
     @if (TempData["Success"] != null)
     {
@@ -14,31 +14,34 @@
     <form asp-action="Login" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-group">
-            <label asp-for="EmailOrPhoneNumber"></label>
-            <input asp-for="EmailOrPhoneNumber" class="form-control" placeholder="ایمیل یا شماره موبایل" />
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label asp-for="EmailOrPhoneNumber">Email or Phone Number</label>
+            <input asp-for="EmailOrPhoneNumber" class="form-control" placeholder="Enter email or phone" />
             <span asp-validation-for="EmailOrPhoneNumber" class="text-danger"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="Password"></label>
-            <input asp-for="Password" class="form-control" placeholder="رمز عبور" />
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label asp-for="Password">Password</label>
+            <input asp-for="Password" class="form-control" placeholder="Enter password" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="RememberMe">
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label asp-for="RememberMe" style="display: flex; align-items: center; gap: 8px;">
                 <input asp-for="RememberMe" />
-                مرا به خاطر بسپار
+                Remember Me
             </label>
         </div>
 
-        <button type="submit" class="btn">ورود</button>
+        <button type="submit" class="btn" style="width: 100%;">Login</button>
     </form>
 
-    <div style="margin-top:14px;font-size:.9rem;">
-        حساب کاربری ندارید؟
-        <a asp-action="RegisterJobSeeker">ثبت‌نام کارجو</a> |
-        <a asp-action="RegisterEmployer">ثبت‌نام کارفرما</a>
+    <div style="margin-top: 20px; font-size: .9rem; border-top: 1px solid #eee; padding-top: 15px;">
+        Don't have an account?
+        <div style="margin-top: 5px;">
+            <a asp-action="RegisterJobSeeker" class="text-primary">Register as Job Seeker</a>
+            <span style="margin: 0 5px; color: #ccc;">|</span>
+            <a asp-action="RegisterEmployer" class="text-primary">Register as Employer</a>
+        </div>
     </div>
 </div>

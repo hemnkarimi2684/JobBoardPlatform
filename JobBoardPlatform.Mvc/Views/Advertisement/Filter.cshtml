@@ -1,82 +1,128 @@
 @model Pagination<AdvertisementDetailResponseDto>
 
 @{
-    ViewData["Title"] = "فیلتر آگهی‌ها";
+    ViewData["Title"] = "Filter Advertisements";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">فیلتر آگهی‌ها</h2>
+<div style="direction: ltr; text-align: left;">
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-success">@TempData["Error"]</div>
-}
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Filter Advertisements</h2>
 
-<div class="card" style="margin-bottom: 20px;">
-    <form asp-action="Filter" method="get">
-        <div class="detail-grid">
-            <div class="form-group" style="background: transparent; padding: 0;">
-                <label for="jobCategoryId">دسته‌بندی</label>
-                <select id="jobCategoryId" name="jobCategoryId" class="form-control">
-                    <option value="">همه دسته‌بندی‌ها</option>
-                    @foreach (var category in ViewBag.JobCategories)
-                    {
-                        <option value="@category.Value">@category.Text</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group" style="background: transparent; padding: 0;">
-                <label for="collaborationType">نوع همکاری</label>
-                <select id="collaborationType" name="collaborationType" class="form-control">
-                    <option value="">همه</option>
-                    @foreach (var type in ViewBag.CollaborationTypes)
-                    {
-                        <option value="@type.Value">@type.Text</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group" style="background: transparent; padding: 0;">
-                <label for="minimumSalary">حداقل حقوق</label>
-                <input type="number" id="minimumSalary" name="minimumSalary" class="form-control" placeholder="تومان" />
-            </div>
-            <div class="form-group" style="background: transparent; padding: 0;">
-                <label for="maximumSalary">حداکثر حقوق</label>
-                <input type="number" id="maximumSalary" name="maximumSalary" class="form-control" placeholder="تومان" />
-            </div>
-        </div>
-        <button type="submit" class="btn">اعمال فیلتر</button>
-        <a class="btn" asp-action="Filter" style="background:#667;">حذف فیلترها</a>
-    </form>
-</div>
-
-@if (Model.Data.Count == 0)
-{
-    <div class="empty">آگهی‌ای با این فیلترها یافت نشد.</div>
-}
-else
-{
-    foreach (var item in Model.Data)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.JobName</h3>
-            <div class="meta">
-                @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
-            </div>
-            <div>
-                <span class="badge">@item.CollaborationType</span>
-                <span class="badge">سطح: @item.ExperienceLevel</span>
-                @if (item.IsFeatured)
-                {
-                    <span class="badge">ویژه</span>
-                }
-            </div>
-            <p style="margin: 10px 0; color: #445;">@(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)</p>
-            <a class="btn" asp-action="Details" asp-route-id="@item.AdvertisementId">جزئیات</a>
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
     }
 
-    @await Html.PartialAsync("_Pager", Model)
-}
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card" style="margin-bottom: 20px;">
+        <form asp-action="Filter" method="get">
+
+            <div class="detail-grid">
+
+                <div class="form-group" style="background: transparent; padding: 0;">
+                    <label for="jobCategoryId">Job Category</label>
+                    <select id="jobCategoryId" name="jobCategoryId" class="form-control">
+                        <option value="">All Categories</option>
+                        @foreach (var category in ViewBag.JobCategories)
+                        {
+                            <option value="@category.Value">@category.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group" style="background: transparent; padding: 0;">
+                    <label for="collaborationType">Collaboration Type</label>
+                    <select id="collaborationType" name="collaborationType" class="form-control">
+                        <option value="">All Types</option>
+                        @foreach (var type in ViewBag.CollaborationTypes)
+                        {
+                            <option value="@type.Value">@type.Text</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group" style="background: transparent; padding: 0;">
+                    <label for="minimumSalary">Minimum Salary</label>
+                    <input type="number"
+                           id="minimumSalary"
+                           name="minimumSalary"
+                           class="form-control"
+                           placeholder="Minimum salary" />
+                </div>
+
+                <div class="form-group" style="background: transparent; padding: 0;">
+                    <label for="maximumSalary">Maximum Salary</label>
+                    <input type="number"
+                           id="maximumSalary"
+                           name="maximumSalary"
+                           class="form-control"
+                           placeholder="Maximum salary" />
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn">Apply Filters</button>
+            <a class="btn" asp-action="Filter" style="background:#667; margin-left:10px;">
+                Clear Filters
+            </a>
+
+        </form>
+    </div>
+
+    @if (Model.Data.Count == 0)
+    {
+        <div class="empty">
+            No advertisements match the selected filters.
+        </div>
+    }
+    else
+    {
+        foreach (var item in Model.Data)
+        {
+            <div class="card">
+
+                <h3>@item.JobName</h3>
+
+                <div class="meta">
+                    @item.CompanyName
+                    &nbsp;|&nbsp;
+                    @item.CityName
+                    &nbsp;|&nbsp;
+                    @item.CreatedAt.ToString("yyyy/MM/dd")
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <span class="badge">@item.CollaborationType</span>
+                    <span class="badge">
+                        Experience: @item.ExperienceLevel years
+                    </span>
+
+                    @if (item.IsFeatured)
+                    {
+                        <span class="badge">Featured</span>
+                    }
+                </div>
+
+                <p style="margin:10px 0; color:#445;">
+                    @(item.Description.Length > 120
+                                ? item.Description.Substring(0, 120) + "..."
+                                : item.Description)
+                </p>
+
+                <a class="btn"
+                   asp-action="Details"
+                   asp-route-id="@item.AdvertisementId">
+                    View Details
+                </a>
+
+            </div>
+        }
+
+        @await Html.PartialAsync("_Pager", Model)
+    }
+
+</div>

@@ -1,11 +1,11 @@
 @model UserProfileResponseDto
 
 @{
-    ViewData["Title"] = "پروفایل من";
+    ViewData["Title"] = "My Profile";
     var email = User.FindFirst(ClaimTypes.Email)?.Value;
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">پروفایل من</h2>
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">My Profile</h2>
 
 @if (TempData["Success"] != null)
 {
@@ -13,15 +13,16 @@
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert" style="background:#fdecea;color:#b3392f;border:1px solid #f5c6c2;">@TempData["Error"]</div>
+    // Using the alert-danger class defined in _Layout.cshtml for consistency
+    <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
 @if (string.IsNullOrWhiteSpace(Model.FullName))
 {
     <div class="card">
-        <div class="empty">پروفایل کاربری شما هنوز تکمیل نشده است.</div>
+        <div class="empty">Your user profile is not yet complete.</div>
         <div style="text-align:center;margin-top:10px;">
-            <a class="btn" asp-action="Create">ساخت پروفایل</a>
+            <a class="btn" asp-action="Create">Create Profile</a> @* Translated button text *@
         </div>
     </div>
 }
@@ -32,35 +33,36 @@ else
         @if (Model.UserImageFileId != null)
         {
             <div style="margin-bottom: 14px;">
+                @* Assuming DownloadImage action returns the image URL or stream *@
                 <img src="@Url.Action("DownloadImage", "User")" alt="@Model.FullName" style="max-width:160px;border-radius:10px;" />
             </div>
         }
         <div class="detail-grid">
-            <div><span>نام و نام خانوادگی</span> @Model.FullName</div>
-            <div><span>جنسیت</span> @Model.Gender</div>
-            <div><span>تاریخ تولد</span> @Model.BirthDate.ToString("yyyy/MM/dd")</div>
-            <div><span>شهر</span> @Model.CityName</div>
-            <div><span>نشانی</span> @Model.Address</div>
-            <div><span>ایمیل</span> @email</div>
-            <div><span>درباره من</span> @Model.Bio</div>
+            <div><span>Full Name</span> @Model.FullName</div> @* Translated labels *@
+            <div><span>Gender</span> @Model.Gender</div>
+            <div><span>Date of Birth</span> @Model.BirthDate.ToString("yyyy/MM/dd")</div> @* Date format remains consistent *@
+            <div><span>City</span> @Model.CityName</div>
+            <div><span>Address</span> @Model.Address</div>
+            <div><span>Email</span> @email</div>
+            <div><span>About Me</span> @Model.Bio</div>
         </div>
         <div style="margin-top: 16px;">
-            <a class="btn" asp-action="Edit">ویرایش پروفایل</a>
+            <a class="btn" asp-action="Edit">Edit Profile</a> @* Translated button text *@
         </div>
     </div>
 
     <div class="card">
-        <h3>عکس پروفایل</h3>
+        <h3>Profile Picture</h3> @* Translated section title *@
         <form asp-action="UploadImage" method="post" enctype="multipart/form-data" style="margin-bottom: 12px;">
             <div class="form-group">
                 <input type="file" name="Image" class="form-control" />
             </div>
-            <button type="submit" class="btn">آپلود عکس</button>
+            <button type="submit" class="btn">Upload Photo</button> @* Translated button text *@
         </form>
         @if (Model.UserImageFileId != null)
         {
             <form asp-action="DeleteImage" method="post">
-                <button type="submit" class="btn">حذف عکس</button>
+                <button type="submit" class="btn">Delete Photo</button> @* Translated button text *@
             </form>
         }
     </div>

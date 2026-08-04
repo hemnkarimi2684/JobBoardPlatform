@@ -1,107 +1,112 @@
 @model CreateAdvertisementRequestDto
 
 @{
-    ViewData["Title"] = "ثبت آگهی جدید";
+    ViewData["Title"] = "Create New Advertisement";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">ثبت آگهی جدید</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Create New Advertisement</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-success">@TempData["Error"]</div>
-}
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
 
-<div class="card">
-    <form asp-action="Create" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="card">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="detail-grid">
-            <div class="form-group">
-                <label asp-for="JobId">عنوان شغلی</label>
-                <select asp-for="JobId" asp-items="@ViewBag.Jobs" class="form-control">
-                    <option value="">انتخاب کنید</option>
-                </select>
-                <span asp-validation-for="JobId" class="text-danger"></span>
+            <div class="detail-grid">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="JobId">Job Title</label>
+                    <select asp-for="JobId" asp-items="@ViewBag.Jobs" class="form-control">
+                        <option value="">Select Job</option>
+                    </select>
+                    <span asp-validation-for="JobId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="CityId">City</label>
+                    <select asp-for="CityId" asp-items="@ViewBag.Cities" class="form-control">
+                        <option value="">Select City</option>
+                    </select>
+                    <span asp-validation-for="CityId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="CollaborationType">Collaboration Type</label>
+                    <select asp-for="CollaborationType" class="form-control">
+                        <option value="">Select Type</option>
+                        @foreach (var type in ViewBag.CollaborationTypes)
+                        {
+                            <option value="@type.Value">@type.Text</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CollaborationType" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="ExperienceLevel">Experience Level (Years)</label>
+                    <input asp-for="ExperienceLevel" class="form-control" type="number" />
+                    <span asp-validation-for="ExperienceLevel" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="MinimumAge">Minimum Age</label>
+                    <input asp-for="MinimumAge" class="form-control" type="number" />
+                    <span asp-validation-for="MinimumAge" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="MaximumAge">Maximum Age</label>
+                    <input asp-for="MaximumAge" class="form-control" type="number" />
+                    <span asp-validation-for="MaximumAge" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="MinimumSalary">Minimum Salary</label>
+                    <input asp-for="MinimumSalary" class="form-control" />
+                    <span asp-validation-for="MinimumSalary" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="MaximumSalary">Maximum Salary</label>
+                    <input asp-for="MaximumSalary" class="form-control" />
+                    <span asp-validation-for="MaximumSalary" class="text-danger"></span>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label asp-for="CityId">شهر</label>
-                <select asp-for="CityId" asp-items="@ViewBag.Cities" class="form-control">
-                    <option value="">انتخاب کنید</option>
-                </select>
-                <span asp-validation-for="CityId" class="text-danger"></span>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label asp-for="Description">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="6" placeholder="Full job description (at least 100 characters)..."></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="CollaborationType">نوع همکاری</label>
-                <select asp-for="CollaborationType" class="form-control">
-                    <option value="">انتخاب کنید</option>
-                    @foreach (var type in ViewBag.CollaborationTypes)
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Required Skills</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px;">
+                    @foreach (var skill in ViewBag.Skills)
                     {
-                        <option value="@type.Value">@type.Text</option>
+                        <label style="display:inline-flex; align-items:center; gap: 5px;">
+                            <input type="checkbox" name="SkillsId" value="@skill.Value" />
+                            @skill.Text
+                        </label>
                     }
-                </select>
-                <span asp-validation-for="CollaborationType" class="text-danger"></span>
+                </div>
+                <span asp-validation-for="SkillsId" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="ExperienceLevel">سطح تجربه</label>
-                <input asp-for="ExperienceLevel" class="form-control" type="number" />
-                <span asp-validation-for="ExperienceLevel" class="text-danger"></span>
+            <input type="hidden" name="CompanyId" value="@ViewBag.DefaultCompanyId" />
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn">Create Advertisement</button>
+                <a class="btn" asp-action="MyAds" style="background:#667; margin-left: 10px;">Cancel</a>
             </div>
-
-            <div class="form-group">
-                <label asp-for="MinimumAge">حداقل سن</label>
-                <input asp-for="MinimumAge" class="form-control" type="number" />
-                <span asp-validation-for="MinimumAge" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="MaximumAge">حداکثر سن</label>
-                <input asp-for="MaximumAge" class="form-control" type="number" />
-                <span asp-validation-for="MaximumAge" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="MinimumSalary">حداقل حقوق</label>
-                <input asp-for="MinimumSalary" class="form-control" />
-                <span asp-validation-for="MinimumSalary" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="MaximumSalary">حداکثر حقوق</label>
-                <input asp-for="MaximumSalary" class="form-control" />
-                <span asp-validation-for="MaximumSalary" class="text-danger"></span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Description">توضیحات</label>
-            <textarea asp-for="Description" class="form-control" rows="6" placeholder="توضیحات کامل آگهی (حداقل ۱۰۰ کاراکتر)..."></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label>مهارت‌های مورد نیاز</label>
-            <div>
-                @foreach (var skill in ViewBag.Skills)
-                {
-                    <label style="display:inline-block; margin-left:14px; margin-bottom:8px;">
-                        <input type="checkbox" name="SkillsId" value="@skill.Value" />
-                        @skill.Text
-                    </label>
-                }
-            </div>
-            <span asp-validation-for="SkillsId" class="text-danger"></span>
-        </div>
-
-        <input type="hidden" name="CompanyId" value="@ViewBag.DefaultCompanyId" />
-
-        <button type="submit" class="btn">ثبت آگهی</button>
-        <a class="btn" asp-action="MyAds" style="background:#667;">انصراف</a>
-    </form>
+        </form>
+    </div>
 </div>

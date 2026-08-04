@@ -1,84 +1,89 @@
 @model UpdateAdvertisementRequestDto
 
 @{
-    ViewData["Title"] = "ویرایش آگهی";
+    ViewData["Title"] = "Edit Advertisement";
     var routeId = ViewContext.RouteData.Values["id"];
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">ویرایش آگهی</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Edit Advertisement</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-success">@TempData["Error"]</div>
-}
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
 
-<div class="card">
-    <form asp-action="Edit" asp-route-id="@routeId" method="post">
-        <input type="hidden" name="id" value="@routeId" />
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="card">
+        <form asp-action="Edit" asp-route-id="@routeId" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@routeId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="detail-grid">
-            <div class="form-group">
-                <label asp-for="CollaborationType">نوع همکاری</label>
-                <select name="CollaborationType" class="form-control">
-                    <option value="">انتخاب کنید</option>
-                    @foreach (var type in ViewBag.CollaborationTypes)
-                    {
-                        if (Model.CollaborationType.HasValue && (int)Model.CollaborationType.Value == int.Parse(type.Value))
+            <div class="detail-grid">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="CollaborationType">Collaboration Type</label>
+                    <select name="CollaborationType" class="form-control">
+                        <option value="">Select Type</option>
+                        @foreach (var type in ViewBag.CollaborationTypes)
                         {
-                            <option value="@type.Value" selected="selected">@type.Text</option>
+                            if (Model.CollaborationType.HasValue && (int)Model.CollaborationType.Value == int.Parse(type.Value))
+                            {
+                                <option value="@type.Value" selected="selected">@type.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@type.Value">@type.Text</option>
+                            }
                         }
-                        else
-                        {
-                            <option value="@type.Value">@type.Text</option>
-                        }
-                    }
-                </select>
-                <span asp-validation-for="CollaborationType" class="text-danger"></span>
+                    </select>
+                    <span asp-validation-for="CollaborationType" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="ExperienceLevel">Experience Level (Years)</label>
+                    <input asp-for="ExperienceLevel" class="form-control" type="number" />
+                    <span asp-validation-for="ExperienceLevel" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="MinimumAge">Minimum Age</label>
+                    <input asp-for="MinimumAge" class="form-control" type="number" />
+                    <span asp-validation-for="MinimumAge" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="MaximumAge">Maximum Age</label>
+                    <input asp-for="MaximumAge" class="form-control" type="number" />
+                    <span asp-validation-for="MaximumAge" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="MinimumSalary">Minimum Salary</label>
+                    <input asp-for="MinimumSalary" class="form-control" />
+                    <span asp-validation-for="MinimumSalary" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label asp-for="MaximumSalary">Maximum Salary</label>
+                    <input asp-for="MaximumSalary" class="form-control" />
+                    <span asp-validation-for="MaximumSalary" class="text-danger"></span>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label asp-for="ExperienceLevel">سطح تجربه</label>
-                <input asp-for="ExperienceLevel" class="form-control" type="number" />
-                <span asp-validation-for="ExperienceLevel" class="text-danger"></span>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label asp-for="Description">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="6" placeholder="Full job description (at least 100 characters)..."></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="MinimumAge">حداقل سن</label>
-                <input asp-for="MinimumAge" class="form-control" type="number" />
-                <span asp-validation-for="MinimumAge" class="text-danger"></span>
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn">Save Changes</button>
+                <a class="btn" asp-action="MyAds" style="background:#667; margin-left: 10px;">Cancel</a>
             </div>
-
-            <div class="form-group">
-                <label asp-for="MaximumAge">حداکثر سن</label>
-                <input asp-for="MaximumAge" class="form-control" type="number" />
-                <span asp-validation-for="MaximumAge" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="MinimumSalary">حداقل حقوق</label>
-                <input asp-for="MinimumSalary" class="form-control" />
-                <span asp-validation-for="MinimumSalary" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="MaximumSalary">حداکثر حقوق</label>
-                <input asp-for="MaximumSalary" class="form-control" />
-                <span asp-validation-for="MaximumSalary" class="text-danger"></span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Description">توضیحات</label>
-            <textarea asp-for="Description" class="form-control" rows="6" placeholder="توضیحات کامل آگهی (حداقل ۱۰۰ کاراکتر)..."></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn">ذخیره تغییرات</button>
-        <a class="btn" asp-action="MyAds" style="background:#667;">انصراف</a>
-    </form>
+        </form>
+    </div>
 </div>

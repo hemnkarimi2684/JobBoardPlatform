@@ -105,17 +105,22 @@ public class JobApplicationController : Controller
 
     [Authorize(Roles = "JobSeeker")]
     [HttpPost]
+    [ValidateAntiForgeryToken] 
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
     {
         try
         {
             await _jobApplicationService.CancelJobApplicationAsync(id, cancellationToken);
-
-            TempData["Success"] = "درخواست کنسل شد.";
+            TempData["Success"] = "درخواست با موفقیت کنسل شد.";
         }
-        catch (Exception ex) when (ex is AppException)
+        
+        catch (Exception ex) when (ex is AppException || ex.GetType().Name == "ValidationException")
         {
             TempData["Error"] = ex.Message;
+        }
+        catch (Exception)
+        {
+            TempData["Error"] = "خطایی در هنگام لغو درخواست رخ داد.";
         }
 
         return RedirectToAction(nameof(My));

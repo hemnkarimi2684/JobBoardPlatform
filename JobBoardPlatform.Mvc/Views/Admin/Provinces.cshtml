@@ -1,62 +1,65 @@
 @model Pagination<ProvinceResponseDto>
 
 @{
-    ViewData["Title"] = "استان‌ها";
+    ViewData["Title"] = "Provinces";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">مدیریت استان‌ها</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Provinces</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert text-danger">@TempData["Error"]</div>
-}
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert text-danger">@TempData["Error"]</div>
+    }
 
-<div class="card">
-    <h3>افزودن استان جدید</h3>
-    <form asp-action="CreateProvince" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="card" style="margin-bottom: 25px;">
+        <h3 style="margin-top: 0;">Add New Province</h3>
+        <form asp-action="CreateProvince" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-group">
-            <label>نام استان</label>
-            <input type="text" name="Name" class="form-control" placeholder="نام استان" />
-        </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Province Name</label>
+                <input type="text" name="Name" class="form-control" placeholder="e.g. Ontario" />
+            </div>
 
-        <div class="form-group">
-            <label>کد استان</label>
-            <input type="number" name="Code" class="form-control" placeholder="کد استان" />
-        </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Province Code</label>
+                <input type="number" name="Code" class="form-control" placeholder="e.g. 101" />
+            </div>
 
-        <button type="submit" class="btn">افزودن استان</button>
-    </form>
-</div>
+            <button type="submit" class="btn">Add Province</button>
+        </form>
+    </div>
 
-@if (Model.Data.Count == 0)
-{
-    <div class="empty">استانی ثبت نشده است.</div>
-}
-else
-{
-    <table style="width:100%;border-collapse:collapse;">
-        <thead>
-            <tr style="background:#e8f0fb;">
-                <th style="padding:10px;border:1px solid #cfd8e3;text-align:right;">نام استان</th>
-                <th style="padding:10px;border:1px solid #cfd8e3;text-align:right;">کد استان</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Data)
-            {
-                <tr>
-                    <td style="padding:10px;border:1px solid #cfd8e3;">@item.Name</td>
-                    <td style="padding:10px;border:1px solid #cfd8e3;">@item.Code</td>
+    @if (Model.Data.Count == 0)
+    {
+        <div class="empty">No provinces registered.</div>
+    }
+    else
+    {
+        <table style="width:100%; border-collapse:collapse; margin-bottom: 20px;">
+            <thead>
+                <tr style="background:#e8f0fb;">
+                    <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">Province Name</th>
+                    <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">Province Code</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Data)
+                {
+                    <tr>
+                        <td style="padding:10px; border:1px solid #cfd8e3; text-align:left;">@item.Name</td>
+                        <td style="padding:10px; border:1px solid #cfd8e3; text-align:left;">@item.Code</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
-    <partial name="_Pager" model="Model" />
-}
+        <partial name="_Pager" model="Model" />
+    }
+</div>
