@@ -1,0 +1,44 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "ورود";
+}
+
+<div class="card" style="max-width:420px;margin:0 auto;">
+    <h3>ورود به حساب کاربری</h3>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <form asp-action="Login" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="EmailOrPhoneNumber"></label>
+            <input asp-for="EmailOrPhoneNumber" class="form-control" placeholder="ایمیل یا شماره موبایل" />
+            <span asp-validation-for="EmailOrPhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" class="form-control" placeholder="رمز عبور" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="RememberMe">
+                <input asp-for="RememberMe" />
+                مرا به خاطر بسپار
+            </label>
+        </div>
+
+        <button type="submit" class="btn">ورود</button>
+    </form>
+
+    <div style="margin-top:14px;font-size:.9rem;">
+        حساب کاربری ندارید؟
+        <a asp-action="RegisterJobSeeker">ثبت‌نام کارجو</a> |
+        <a asp-action="RegisterEmployer">ثبت‌نام کارفرما</a>
+    </div>
+</div>

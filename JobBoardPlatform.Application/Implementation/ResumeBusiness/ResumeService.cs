@@ -33,6 +33,7 @@ public class ResumeService : IResumeService
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
+        _attachmentService = attachmentService;
         _accessControlService = accessControlService;
         _logger = logger;
     }
@@ -135,10 +136,10 @@ public class ResumeService : IResumeService
 
         var result = await _unitOfWork.UserRepository.GetResumeDetailAsync(u => new ResumeDetailResponseDto
         {
-            Title = u.Resume.Title == null ? null : u.Resume.Title,
-            ResumeId = u.Resume.Id == null ? null : u.Resume.Id,
+            Title = u.Resume == null ? null : u.Resume.Title,
+            ResumeId = u.Resume == null ? null : (Guid?)u.Resume.Id,
             UserId = u.Id,
-            ResumeFileId = u.Resume.LastUploadedFileId == null ? null : u.Resume.LastUploadedFileId,
+            ResumeFileId = u.Resume == null ? null : u.Resume.LastUploadedFileId,
 
             ResumeUserProfiles = u.UserProfile != null ? new ResumeUserProfileResponseDto
             {

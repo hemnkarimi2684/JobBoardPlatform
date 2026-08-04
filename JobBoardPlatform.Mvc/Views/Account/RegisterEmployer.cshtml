@@ -1,0 +1,104 @@
+@model RegisterEmployerRequestDto
+@{
+    ViewData["Title"] = "ثبت‌نام کارفرما";
+}
+
+<div class="card" style="max-width:560px;margin:0 auto;">
+    <h3>ثبت‌نام کارفرما</h3>
+
+    <form asp-action="RegisterEmployer" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" placeholder="ایمیل" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PhoneNumber"></label>
+            <input asp-for="PhoneNumber" class="form-control" placeholder="مثلاً 0912..." />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" class="form-control" placeholder="حداقل ۸ کاراکتر" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" placeholder="نام شرکت" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="YearOfEstablishment"></label>
+            <input asp-for="YearOfEstablishment" class="form-control" />
+            <span asp-validation-for="YearOfEstablishment" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="WebSiteAddress"></label>
+            <input asp-for="WebSiteAddress" class="form-control" placeholder="آدرس وب‌سایت" />
+            <span asp-validation-for="WebSiteAddress" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="AboutUs"></label>
+            <textarea asp-for="AboutUs" class="form-control" rows="4" placeholder="درباره ما (حداقل ۵۰ کاراکتر)"></textarea>
+            <span asp-validation-for="AboutUs" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="OwnershipType"></label>
+            <select asp-for="OwnershipType" asp-items="ViewBag.OwnershipTypes" class="form-control">
+                <option value="">انتخاب کنید</option>
+            </select>
+            <span asp-validation-for="OwnershipType" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CompanySize"></label>
+            <select asp-for="CompanySize" asp-items="ViewBag.CompanySizes" class="form-control">
+                <option value="">انتخاب کنید</option>
+            </select>
+            <span asp-validation-for="CompanySize" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CityId"></label>
+            <select asp-for="CityId" asp-items="ViewBag.Cities" class="form-control">
+                <option value="">انتخاب کنید</option>
+            </select>
+            <span asp-validation-for="CityId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="JobCategoryId"></label>
+            <select asp-for="JobCategoryId" asp-items="ViewBag.JobCategories" class="form-control">
+                <option value="">انتخاب کنید</option>
+            </select>
+            <span asp-validation-for="JobCategoryId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Location"></label>
+            <input asp-for="Location" class="form-control" placeholder="آدرس دفتر شرکت" />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ActivityType"></label>
+            <input asp-for="ActivityType" class="form-control" placeholder="نوع فعالیت (اختیاری)" />
+            <span asp-validation-for="ActivityType" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn">ثبت‌نام</button>
+    </form>
+
+    <div style="margin-top:14px;font-size:.9rem;">
+        حساب کاربری دارید؟ <a asp-action="Login">ورود</a>
+    </div>
+</div>

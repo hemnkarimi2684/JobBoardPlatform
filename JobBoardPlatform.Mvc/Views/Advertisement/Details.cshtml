@@ -1,0 +1,47 @@
+@model AdvertisementDetailResponseDto
+
+@{
+    ViewData["Title"] = Model.JobName;
+}
+
+<div class="card">
+    <h3>@Model.JobName</h3>
+    <div class="meta">
+        @Model.CompanyName &nbsp;|&nbsp; @Model.CityName &nbsp;|&nbsp; @Model.CreatedAt.ToString("yyyy/MM/dd")
+    </div>
+    <div style="margin-bottom: 14px;">
+        <span class="badge">@Model.CollaborationType</span>
+        <span class="badge">سطح: @Model.ExperienceLevel</span>
+        @if (Model.IsFeatured)
+        {
+            <span class="badge">ویژه</span>
+        }
+    </div>
+
+    <div class="detail-grid">
+        <div><span>حداقل سن</span> @Model.MinimumAge سال</div>
+        <div><span>حداکثر سن</span> @Model.MaximumAge سال</div>
+        <div><span>حداقل حقوق</span> @Model.MinimumSalary.ToString("N0")</div>
+        <div><span>حداکثر حقوق</span> @Model.MaximumSalary.ToString("N0")</div>
+        <div><span>دسته‌بندی</span> @Model.CompanyJobCategoryName</div>
+        <div><span>شرکت</span> @Model.AboutCompany</div>
+    </div>
+
+    <h4 style="margin: 16px 0 8px; color: #1e3a5f;">درباره موقعیت</h4>
+    <p style="line-height: 1.8;">@Model.Description</p>
+
+    @if (Model.SkillNames.Count > 0)
+    {
+        <h4 style="margin: 16px 0 8px; color: #1e3a5f;">مهارت‌های مورد نیاز</h4>
+        <div>
+            @foreach (var skill in Model.SkillNames)
+            {
+                <span class="skill">@skill</span>
+            }
+        </div>
+    }
+
+    <div style="margin-top: 18px;">
+        <a class="btn" asp-action="Index">بازگشت به لیست</a>
+    </div>
+</div>

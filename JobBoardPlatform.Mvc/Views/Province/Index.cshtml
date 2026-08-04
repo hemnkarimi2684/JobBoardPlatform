@@ -1,0 +1,40 @@
+@model Pagination<ProvinceResponseDto>
+
+@{
+    ViewData["Title"] = "استان‌ها";
+}
+
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">لیست استان‌ها</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert" style="background:#fdecea;color:#a43d3d;border:1px solid #f5c6cb;">@TempData["Error"]</div>
+}
+
+<form asp-action="Index" method="get" style="margin-bottom: 18px;">
+    <div class="form-group" style="display:flex;gap:8px;margin-bottom:0;">
+        <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="جستجوی استان..." />
+        <button type="submit" class="btn">جستجو</button>
+    </div>
+</form>
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty">استانی یافت نشد.</div>
+}
+else
+{
+    foreach (var item in Model.Data)
+    {
+        <div class="card">
+            <h3>@item.Name</h3>
+            <div class="meta">کد استان: @item.Code</div>
+        </div>
+    }
+
+    @await Html.PartialAsync("_Pager", Model);
+}

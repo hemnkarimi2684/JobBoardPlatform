@@ -1,0 +1,46 @@
+@model Pagination<AdvertisementDetailResponseDto>
+
+@{
+    ViewData["Title"] = "آگهی‌های شغلی";
+}
+
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">آگهی‌های شغلی فعال</h2>
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty">در حال حاضر آگهی فعالی وجود ندارد.</div>
+}
+else
+{
+    foreach (var item in Model.Data)
+    {
+        <div class="card">
+            <h3>@item.JobName</h3>
+            <div class="meta">
+                @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
+            </div>
+            <div>
+                <span class="badge">@item.CollaborationType</span>
+                <span class="badge">سطح: @item.ExperienceLevel</span>
+                @if (item.IsFeatured)
+                {
+                    <span class="badge">ویژه</span>
+                }
+            </div>
+            <p style="margin: 10px 0; color: #445;">@(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)</p>
+            <a class="btn" asp-action="Details" asp-route-id="@item.AdvertisementId">جزئیات</a>
+        </div>
+    }
+
+    <div class="pager">
+        @if (Model.PageNumber > 1)
+        {
+            <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)">قبلی</a>
+        }
+        <span class="current">صفحه @Model.PageNumber از @Model.TotalPageCount</span>
+        @if (Model.PageNumber < Model.TotalPageCount)
+        {
+            <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)">بعدی</a>
+        }
+    </div>
+}

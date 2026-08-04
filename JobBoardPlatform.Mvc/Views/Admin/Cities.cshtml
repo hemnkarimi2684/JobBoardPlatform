@@ -1,0 +1,71 @@
+@{
+    ViewData["Title"] = "شهرها";
+}
+
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">مدیریت شهرها</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert text-danger">@TempData["Error"]</div>
+}
+
+<div class="card">
+    <h3>افزودن شهر جدید</h3>
+    <form asp-action="CreateCity" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label>نام شهر</label>
+            <input type="text" name="Name" class="form-control" placeholder="نام شهر" />
+        </div>
+
+        <div class="form-group">
+            <label>کد شهر</label>
+            <input type="number" name="Code" class="form-control" placeholder="کد شهر" />
+        </div>
+
+        <div class="form-group">
+            <label>استان</label>
+            <select name="ProvinceId" class="form-control" asp-items="ViewBag.Provinces">
+                <option value="">انتخاب استان</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn">افزودن شهر</button>
+    </form>
+</div>
+
+<h3 style="margin: 18px 0 10px; color: #1e3a5f;">فهرست شهرها</h3>
+@{
+    var cities = (List<CityDetailResponseDto>)ViewBag.Cities;
+}
+@if (cities.Count == 0)
+{
+    <div class="empty">شهری ثبت نشده است.</div>
+}
+else
+{
+    <table style="width:100%;border-collapse:collapse;">
+        <thead>
+            <tr style="background:#e8f0fb;">
+                <th style="padding:10px;border:1px solid #cfd8e3;text-align:right;">نام شهر</th>
+                <th style="padding:10px;border:1px solid #cfd8e3;text-align:right;">کد شهر</th>
+                <th style="padding:10px;border:1px solid #cfd8e3;text-align:right;">استان</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in cities)
+            {
+                <tr>
+                    <td style="padding:10px;border:1px solid #cfd8e3;">@item.CityName</td>
+                    <td style="padding:10px;border:1px solid #cfd8e3;">@item.CityCode</td>
+                    <td style="padding:10px;border:1px solid #cfd8e3;">@item.ProvinceName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

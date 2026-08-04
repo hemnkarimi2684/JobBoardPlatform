@@ -1,0 +1,59 @@
+@model UpdateProfileRequestDto
+
+@{
+    ViewData["Title"] = "ویرایش پروفایل";
+}
+
+<div class="card" style="max-width:560px;margin:0 auto;">
+    <h3>ویرایش پروفایل</h3>
+
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="FirstName"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="LastName"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Bio"></label>
+            <textarea asp-for="Bio" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Bio" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Address"></label>
+            <input asp-for="Address" class="form-control" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="BirthDate"></label>
+            <input asp-for="BirthDate" class="form-control" type="date" />
+            <span asp-validation-for="BirthDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CityId"></label>
+            <select asp-for="CityId" asp-items="ViewBag.Cities" class="form-control">
+                <option value="">انتخاب کنید</option>
+            </select>
+            <span asp-validation-for="CityId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Gender"></label>
+            <select asp-for="Gender" asp-items="ViewBag.Genders" class="form-control"></select>
+            <span asp-validation-for="Gender" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn">ذخیره تغییرات</button>
+    </form>
+</div>

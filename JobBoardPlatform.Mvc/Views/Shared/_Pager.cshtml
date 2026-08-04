@@ -1,0 +1,22 @@
+@model object
+@{
+    var pager = (dynamic)Model;
+    var pageNumber = (int)pager.PageNumber;
+    var totalPages = (int)pager.TotalPageCount;
+    var query = Context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
+    query["pageNumber"] = "";
+}
+@if (totalPages > 1)
+{
+    <div class="pager">
+        @if (pageNumber > 1)
+        {
+            <a href="@Context.Request.Path?pageNumber=@(pageNumber - 1)">قبلی</a>
+        }
+        <span class="current">صفحه @pageNumber از @totalPages</span>
+        @if (pageNumber < totalPages)
+        {
+            <a href="@Context.Request.Path?pageNumber=@(pageNumber + 1)">بعدی</a>
+        }
+    </div>
+}

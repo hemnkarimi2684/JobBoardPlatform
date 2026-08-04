@@ -1,0 +1,46 @@
+@model Pagination<EducationHistoryResponseDto>
+
+@{
+    ViewData["Title"] = "سوابق تحصیلی";
+}
+
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">سوابق تحصیلی</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert" style="background:#fdecea;color:#b3392f;border:1px solid #f5c6c2;">@TempData["Error"]</div>
+}
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty">سابقه تحصیلی ثبت نشده است.</div>
+}
+else
+{
+    foreach (var item in Model.Data)
+    {
+        <div class="card">
+            <h3>@item.Major</h3>
+            <div class="meta">@item.University | @item.CertificateDegreeName</div>
+            <div class="detail-grid">
+                <div><span>تاریخ شروع</span> @item.StartDate.ToString("yyyy/MM/dd")</div>
+                <div><span>تاریخ پایان</span> @(item.CompletionDate?.ToString("yyyy/MM/dd") ?? "-")</div>
+                <div><span>معدل</span> @(item.Percentage?.ToString("N0") ?? "-")</div>
+                <div><span>در حال تحصیل</span> @(item.IsCurrentlyStudying ? "بله" : "خیر")</div>
+            </div>
+            <div style="margin-top: 12px;">
+                <a class="btn" asp-action="Edit" asp-route-id="@item.EducationDetailId">ویرایش</a>
+            </div>
+        </div>
+    }
+
+    <partial name="_Pager" model="@Model" />
+}
+
+<div style="margin-top: 14px;">
+    <a class="btn" asp-action="Create">افزودن سوابق تحصیلی</a>
+</div>

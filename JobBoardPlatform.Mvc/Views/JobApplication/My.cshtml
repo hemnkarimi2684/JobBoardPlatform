@@ -1,0 +1,42 @@
+@model Pagination<JobApplicationDetailResponseDto>
+
+@{
+    ViewData["Title"] = "درخواست‌های من";
+}
+
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">درخواست‌های من</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert" style="background:#fdecea;color:#b3392f;border:1px solid #f5c6c2;">@TempData["Error"]</div>
+}
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty">هنوز درخواستی ثبت نکرده‌اید.</div>
+}
+else
+{
+    foreach (var item in Model.Data)
+    {
+        <div class="card">
+            <h3>@item.JobTitle</h3>
+            <div class="meta">
+                @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
+            </div>
+            <div style="margin-bottom: 12px;">
+                <span class="badge">@item.CollaborationType</span>
+                <span class="badge">@item.Status</span>
+            </div>
+            <form asp-action="Cancel" asp-route-id="@item.JobApplicationId" method="post">
+                <button type="submit" class="btn">کنسل درخواست</button>
+            </form>
+        </div>
+    }
+
+    <partial name="_Pager" model="@Model" />
+}

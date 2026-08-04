@@ -1,0 +1,55 @@
+@model Pagination<JobCategoryResponseDto>
+
+@{
+    ViewData["Title"] = "دسته‌بندی‌های شغلی";
+}
+
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">مدیریت دسته‌بندی‌های شغلی</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert text-danger">@TempData["Error"]</div>
+}
+
+<div class="card">
+    <h3>افزودن دسته‌بندی جدید</h3>
+    <form asp-action="CreateJobCategory" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label>نام دسته‌بندی</label>
+            <input type="text" name="Name" class="form-control" placeholder="نام دسته‌بندی" />
+        </div>
+
+        <button type="submit" class="btn">افزودن دسته‌بندی</button>
+    </form>
+</div>
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty">دسته‌بندی‌ای ثبت نشده است.</div>
+}
+else
+{
+    <table style="width:100%;border-collapse:collapse;">
+        <thead>
+            <tr style="background:#e8f0fb;">
+                <th style="padding:10px;border:1px solid #cfd8e3;text-align:right;">نام دسته‌بندی</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td style="padding:10px;border:1px solid #cfd8e3;">@item.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <partial name="_Pager" model="Model" />
+}

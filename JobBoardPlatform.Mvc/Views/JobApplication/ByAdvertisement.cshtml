@@ -1,0 +1,51 @@
+@model Pagination<JobApplicationDetailResponseDto>
+
+@{
+    ViewData["Title"] = "درخواست‌های آگهی";
+    var statuses = Enum.GetValues<JobApplicationStatus>()
+        .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
+        .ToList();
+}
+
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">درخواست‌های آگهی</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert" style="background:#fdecea;color:#b3392f;border:1px solid #f5c6c2;">@TempData["Error"]</div>
+}
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty">درخواستی برای این آگهی ثبت نشده است.</div>
+}
+else
+{
+    foreach (var item in Model.Data)
+    {
+        <div class="card">
+            <h3>@item.UserProfileName</h3>
+            <div class="meta">
+                @item.JobTitle &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
+            </div>
+            <div style="margin-bottom: 12px;">
+                <span class="badge">@item.Status</span>
+            </div>
+            <form asp-action="ChangeStatus" asp-route-id="@item.JobApplicationId" asp-route-advertisementId="@ViewBag.AdvertisementId" method="post" style="display:flex;gap:8px;align-items:center;">
+                <input type="hidden" name="advertisementId" value="@ViewBag.AdvertisementId" />
+                <select name="status" class="form-control" style="width:auto;">
+                    @foreach (var s in statuses)
+                    {
+                        <option value="@s.Value" selected="@(s.Value == ((int)item.Status).ToString() ? "selected" : null)">@s.Text</option>
+                    }
+                </select>
+                <button type="submit" class="btn">ثبت تغییر</button>
+            </form>
+        </div>
+    }
+
+    <partial name="_Pager" model="@Model" />
+}

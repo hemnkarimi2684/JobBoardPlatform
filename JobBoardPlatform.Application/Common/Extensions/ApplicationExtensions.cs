@@ -71,15 +71,30 @@ public static class ApplicationExtensions
     private static async Task SeedRolesAsync(IServiceProvider serviceProvider)
     {
         var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
-        if (roleManager.Roles.Any()) return;
 
-        var adminRole = new Role(RoleConstants.AdminRoleName, "A system administrator who manages users, jobs, and platform settings.");
-        var employerRole = new Role(RoleConstants.EmployerRoleName, "A company representative who creates job postings and reviews applicants.");
-        var jobSeekerRole = new Role(RoleConstants.JobSeekerRoleName, "A user who searches and applies for jobs.");
+        var rolesToSeed = new (string Name, string Description)[]
+        {
+            (RoleConstants.AdminRoleName, "A system administrator who manages users, jobs, and platform settings."),
+            (RoleConstants.EmployerRoleName, "A company representative who creates job postings and reviews applicants."),
+            (RoleConstants.JobSeekerRoleName, "A user who searches and applies for jobs.")
+        };
 
-        await roleManager.CreateAsync(adminRole);
-        await roleManager.CreateAsync(employerRole);
-        await roleManager.CreateAsync(jobSeekerRole);
+        foreach (var (name, description) in rolesToSeed)
+        {
+            if (await roleManager.FindByNameAsync(name) != null)
+                continue;
+
+            var existingRole = roleManager.Roles.FirstOrDefault(r => r.Name == name);
+
+            if (existingRole != null)
+            {
+                existingRole.NormalizedName = roleManager.NormalizeKey(name);
+                await roleManager.UpdateAsync(existingRole);
+                continue;
+            }
+
+            await roleManager.CreateAsync(new Role(name, description));
+        }
     }
 
     private static async Task SeedAdminsAsync(IServiceProvider serviceProvider)

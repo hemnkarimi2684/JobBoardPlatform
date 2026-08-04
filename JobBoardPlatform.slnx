@@ -10,6 +10,7 @@
     <Project Path="JobBoardPlatform.Infrastructure/JobBoardPlatform.Infrastructure.csproj" Id="b38e8e0e-fea2-4993-840c-c3b1e228a10c" />
   </Folder>
   <Folder Name="/04_Presentation/">
+    <Project Path="JobBoardPlatform.Mvc/JobBoardPlatform.Mvc.csproj" Id="cebbbef6-53be-4fb0-83a7-de924391684b" />
     <Project Path="JobBoardPlatform.WebApi/JobBoardPlatform.WebApi.csproj" Id="ff6f0f57-eadf-451c-b81d-b7b77de84c74" />
   </Folder>
 </Solution>

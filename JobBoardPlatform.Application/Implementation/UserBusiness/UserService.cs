@@ -107,7 +107,7 @@ public class UserService : IUserService
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        _accessControlService.EnsureAdmin(_currentUser);
+        _accessControlService.EnsureApplicantOrAdmin(userId, _currentUser);
 
         var userProfile = await _unitOfWork.UserProfileRepository.GetUserProfileByUserIdAsync(up => new UserProfileResponseDto
         {
@@ -132,7 +132,7 @@ public class UserService : IUserService
          Guid ownerId,
          CancellationToken cancellationToken = default)
     {
-        _accessControlService.EnsureAdmin(_currentUser);
+        _accessControlService.EnsureOwnerEmployerOrAdmin(ownerId, _currentUser);
 
         var result = await _unitOfWork.CompanyRepository.GetCompanyByOwnerIdAsync(c => new EmployerWithCompanyResponseDto
         {

@@ -109,6 +109,9 @@ public class JobApplicationService : IJobApplicationService
     {
         var userId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
 
+        if (userId == null)
+            throw new NotFoundException($"Advertisement with id {advertisementId} not found.");
+
         _accessControlService.EnsureOwnerEmployer(userId.Value, _currentUser);
 
         var (advertisementJobApplications, totalDataCount) = await _unitOfWork

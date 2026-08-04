@@ -1,0 +1,30 @@
+@model Pagination<SkillDetailResponseDto>
+
+@{
+    ViewData["Title"] = "مهارت‌ها";
+}
+
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">مهارت‌ها</h2>
+
+<form asp-action="Index" method="get" style="margin-bottom: 18px;">
+    <div style="display:flex;gap:8px;">
+        <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="جستجوی مهارت" />
+        <button type="submit" class="btn">جستجو</button>
+    </div>
+</form>
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty">مهارتی یافت نشد.</div>
+}
+else
+{
+    <div class="card">
+        @foreach (var skill in Model.Data)
+        {
+            <span class="skill">@skill.SkillName</span>
+        }
+    </div>
+
+    <partial name="_Pager" model="@Model" />
+}
