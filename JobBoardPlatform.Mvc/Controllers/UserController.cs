@@ -4,6 +4,7 @@ using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
 using JobBoardPlatform.Application.Interfaces.CityInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
+using JobBoardPlatform.Mvc.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -27,18 +28,18 @@ public class UserController : Controller
     {
         var profile = await _userService.GetUserProfileByUserIdAsync(CurrentUserId(), cancellationToken);
 
-        return View(profile);
+        return View(UserProfileViewModel.FromResponseDto(profile));
     }
 
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken cancellationToken = default)
     {
         await PopulateCitiesAsync(cancellationToken);
-        return View();
+        return View(new UserCreateViewModel());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateProfileRequestDto model, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Create(UserCreateViewModel model, CancellationToken cancellationToken = default)
     {
         model.UserId = CurrentUserId();
         ModelState.Remove(nameof(model.UserId));
@@ -63,19 +64,11 @@ public class UserController : Controller
 
         await PopulateCitiesAsync(cancellationToken);
 
-        return View(new UpdateProfileRequestDto
-        {
-            FirstName = profile.FullName?.Split(' ', 2)[0],
-            LastName = profile.FullName?.Contains(' ') == true ? profile.FullName.Split(' ', 2)[1] : null,
-            Bio = profile.Bio,
-            Address = profile.Address,
-            BirthDate = profile.BirthDate,
-            Gender = profile.Gender
-        });
+        return View(UserEditViewModel.FromResponseDto(profile));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(UpdateProfileRequestDto model, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Edit(UserEditViewModel model, CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {

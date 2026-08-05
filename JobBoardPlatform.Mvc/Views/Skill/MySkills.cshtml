@@ -1,8 +1,8 @@
-@model Pagination<UserSkillResponseDto>
+@model SkillMySkillsViewModel
 
 @{
     ViewData["Title"] = "My Skills";
-    var availableSkills = (List<SkillDetailResponseDto>)ViewBag.AvailableSkills;
+    var availableSkills = Model.AvailableSkills;
 }
 
 <h2 style="margin-bottom: 18px; color: #1e3a5f;">My Skills</h2>

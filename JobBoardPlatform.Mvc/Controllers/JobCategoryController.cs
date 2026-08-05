@@ -1,6 +1,7 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
+using JobBoardPlatform.Mvc.Models.JobCategory;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.Mvc.Controllers;
@@ -23,13 +24,13 @@ public class JobCategoryController : Controller
 
         ViewBag.Text = text;
 
-        return View(result);
+        return View(JobCategoryIndexViewModel.FromResponseDto(result));
     }
 
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken = default)
     {
         var category = await _jobCategoryService.GetJobCategoryByIdAsync(id, cancellationToken);
 
-        return View(category);
+        return View(JobCategoryDetailsViewModel.FromResponseDto(category));
     }
 }

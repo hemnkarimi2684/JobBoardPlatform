@@ -129,7 +129,7 @@ public class SkillService : ISkillService
 
         var (userSkills, totalDataCount) = await _unitOfWork.UserSkillRepository.GetUserSkillsAsync(us => new UserSkillResponseDto
         {
-            SkillId = us.Id,
+            SkillId = us.SkillId,
             SkillName = us.Skill.Name,
             UserId = us.UserId
         },

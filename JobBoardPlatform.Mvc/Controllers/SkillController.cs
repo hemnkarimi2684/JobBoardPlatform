@@ -2,6 +2,7 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Mvc.Models.Skill;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -26,7 +27,7 @@ public class SkillController : Controller
 
         ViewBag.Text = text;
 
-        return View(result);
+        return View(SkillIndexViewModel.FromResponseDto(result));
     }
 
     [Authorize(Policy = "ActiveJobSeekerOnly")]
@@ -44,9 +45,9 @@ public class SkillController : Controller
 
         var ownedIds = skills.Data.Select(s => s.SkillId).ToHashSet();
 
-        ViewBag.AvailableSkills = all.Data.Where(s => !ownedIds.Contains(s.SkillId)).ToList();
+        var availableSkills = all.Data.Where(s => !ownedIds.Contains(s.SkillId)).ToList();
 
-        return View(skills);
+        return View(SkillMySkillsViewModel.FromResponseDto(skills, availableSkills));
     }
 
     [Authorize(Policy = "ActiveJobSeekerOnly")]

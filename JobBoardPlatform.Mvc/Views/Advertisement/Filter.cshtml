@@ -1,128 +1,127 @@
-@model Pagination<AdvertisementDetailResponseDto>
+@model AdvertisementFilterViewModel
 
 @{
     ViewData["Title"] = "Filter Advertisements";
 }
 
-<div style="direction: ltr; text-align: left;">
+<div class="page-head">
+    <div>
+        <h2>Filter Advertisements</h2>
+    </div>
+    <a class="btn btn-ghost" asp-action="Index">&#8592; Back to Job Board</a>
+</div>
 
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Filter Advertisements</h2>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
-
-    <div class="card" style="margin-bottom: 20px;">
-        <form asp-action="Filter" method="get">
-
-            <div class="detail-grid">
-
-                <div class="form-group" style="background: transparent; padding: 0;">
-                    <label for="jobCategoryId">Job Category</label>
-                    <select id="jobCategoryId" name="jobCategoryId" class="form-control">
-                        <option value="">All Categories</option>
-                        @foreach (var category in ViewBag.JobCategories)
-                        {
-                            <option value="@category.Value">@category.Text</option>
-                        }
-                    </select>
-                </div>
-
-                <div class="form-group" style="background: transparent; padding: 0;">
-                    <label for="collaborationType">Collaboration Type</label>
-                    <select id="collaborationType" name="collaborationType" class="form-control">
-                        <option value="">All Types</option>
-                        @foreach (var type in ViewBag.CollaborationTypes)
-                        {
-                            <option value="@type.Value">@type.Text</option>
-                        }
-                    </select>
-                </div>
-
-                <div class="form-group" style="background: transparent; padding: 0;">
-                    <label for="minimumSalary">Minimum Salary</label>
-                    <input type="number"
-                           id="minimumSalary"
-                           name="minimumSalary"
-                           class="form-control"
-                           placeholder="Minimum salary" />
-                </div>
-
-                <div class="form-group" style="background: transparent; padding: 0;">
-                    <label for="maximumSalary">Maximum Salary</label>
-                    <input type="number"
-                           id="maximumSalary"
-                           name="maximumSalary"
-                           class="form-control"
-                           placeholder="Maximum salary" />
-                </div>
-
+<div class="panel">
+    <form asp-action="Filter" method="get">
+        <div class="filter-row">
+            <div class="field">
+                <label for="jobCategoryId">Job Category</label>
+                <select id="jobCategoryId" name="jobCategoryId" class="form-control">
+                    <option value="">All Categories</option>
+                    @foreach (var category in ViewBag.JobCategories)
+                    {
+                        <option value="@category.Value">@category.Text</option>
+                    }
+                </select>
             </div>
 
-            <button type="submit" class="btn">Apply Filters</button>
-            <a class="btn" asp-action="Filter" style="background:#667; margin-left:10px;">
-                Clear Filters
-            </a>
+            <div class="field">
+                <label for="collaborationType">Collaboration Type</label>
+                <select id="collaborationType" name="collaborationType" class="form-control">
+                    <option value="">All Types</option>
+                    @foreach (var type in ViewBag.CollaborationTypes)
+                    {
+                        <option value="@type.Value">@type.Text</option>
+                    }
+                </select>
+            </div>
 
-        </form>
-    </div>
+            <div class="field">
+                <label for="minimumSalary">Minimum Salary</label>
+                <input type="number" id="minimumSalary" name="minimumSalary"
+                       class="form-control" placeholder="Minimum salary" />
+            </div>
 
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">
-            No advertisements match the selected filters.
+            <div class="field">
+                <label for="maximumSalary">Maximum Salary</label>
+                <input type="number" id="maximumSalary" name="maximumSalary"
+                       class="form-control" placeholder="Maximum salary" />
+            </div>
+
+            <div class="field field-actions">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                <a class="btn btn-ghost" asp-action="Filter">Clear</a>
+            </div>
         </div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+    </form>
+</div>
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#9881;</div>
+        <h3>No matches</h3>
+        <p>No advertisements match the selected filters.</p>
+    </div>
+}
+else
+{
+    <div class="job-grid">
+        @foreach (var item in Model.Data)
         {
-            <div class="card">
-
-                <h3>@item.JobName</h3>
-
-                <div class="meta">
-                    @item.CompanyName
-                    &nbsp;|&nbsp;
-                    @item.CityName
-                    &nbsp;|&nbsp;
-                    @item.CreatedAt.ToString("yyyy/MM/dd")
-                </div>
-
-                <div style="margin-bottom:10px;">
-                    <span class="badge">@item.CollaborationType</span>
-                    <span class="badge">
-                        Experience: @item.ExperienceLevel years
-                    </span>
-
+            <article class="job-card">
+                <div class="job-card-top">
+                    <div class="job-logo">
+                        @(string.IsNullOrEmpty(item.CompanyName) ? "?" : item.CompanyName.Substring(0, 1))
+                    </div>
+                    <div class="job-heading">
+                        <h3 class="job-title">
+                            <a asp-action="Details" asp-route-id="@item.AdvertisementId">@item.JobName</a>
+                        </h3>
+                        <div class="job-company">@item.CompanyName</div>
+                    </div>
                     @if (item.IsFeatured)
                     {
-                        <span class="badge">Featured</span>
+                        <span class="badge badge-featured">Featured</span>
                     }
                 </div>
 
-                <p style="margin:10px 0; color:#445;">
-                    @(item.Description.Length > 120
-                                ? item.Description.Substring(0, 120) + "..."
-                                : item.Description)
+                <div class="job-meta">
+                    <span>&#128205; @item.CityName</span>
+                    <span>&#128197; @item.CreatedAt.ToString("MMM yyyy")</span>
+                </div>
+
+                <div class="job-badges">
+                    <span class="badge">@item.CollaborationType</span>
+                    @if (item.ExperienceLevel > 0)
+                    {
+                        <span class="badge badge-outline">@item.ExperienceLevel yrs exp</span>
+                    }
+                    @if (item.MinimumSalary > 0 || item.MaximumSalary > 0)
+                    {
+                        <span class="badge badge-salary">
+                            &#128176; @item.MinimumSalary.ToString("#,##0") - @item.MaximumSalary.ToString("#,##0")
+                        </span>
+                    }
+                </div>
+
+                <p class="job-desc">
+                    @(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)
                 </p>
 
-                <a class="btn"
-                   asp-action="Details"
-                   asp-route-id="@item.AdvertisementId">
-                    View Details
-                </a>
-
-            </div>
+                <a class="btn btn-outline btn-block" asp-action="Details" asp-route-id="@item.AdvertisementId">View Details</a>
+            </article>
         }
+    </div>
 
-        @await Html.PartialAsync("_Pager", Model)
-    }
-
-</div>
+    @await Html.PartialAsync("_Pager", Model)
+}

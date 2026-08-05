@@ -1,6 +1,7 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ResumeDto;
 using JobBoardPlatform.Application.Common.Dto.ResumeDto.Command;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
+using JobBoardPlatform.Mvc.Models.Resume;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -22,16 +23,16 @@ public class ResumeController : Controller
     {
         var resume = await _resumeService.GetResumeDetailAsync(CurrentUserId(), cancellationToken);
 
-        return View(resume);
+        return View(ResumeIndexViewModel.FromResponseDto(resume));
     }
 
     [HttpGet]
     [Authorize(Policy = "ActiveJobSeekerOnly")]
-    public IActionResult Create() => View();
+    public IActionResult Create() => View(new ResumeCreateViewModel());
 
     [HttpPost]
     [Authorize(Policy = "ActiveJobSeekerOnly")]
-    public async Task<IActionResult> Create(CreateResumeRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(ResumeCreateViewModel model, CancellationToken cancellationToken)
     {
         model.UserId = CurrentUserId();
         ModelState.Remove(nameof(model.UserId));

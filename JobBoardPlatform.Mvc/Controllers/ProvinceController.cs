@@ -1,5 +1,6 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Interfaces.ProvinceInterface;
+using JobBoardPlatform.Mvc.Models.Province;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.Mvc.Controllers;
@@ -22,6 +23,6 @@ public class ProvinceController : Controller
 
         ViewBag.Text = text;
 
-        return View(result);
+        return View(ProvinceIndexViewModel.FromResponseDto(result));
     }
 }

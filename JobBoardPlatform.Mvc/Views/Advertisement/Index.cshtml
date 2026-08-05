@@ -1,52 +1,76 @@
-@model Pagination<AdvertisementDetailResponseDto>
+@model AdvertisementIndexViewModel
 
 @{
     ViewData["Title"] = "Job Advertisements";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Active Job Advertisements</h2>
+<div class="page-head">
+    <div>
+        <h2>Active Job Advertisements</h2>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn btn-outline" asp-action="Search">&#128269; Search</a>
+        <a class="btn btn-outline" asp-action="Filter">&#9881; Filter</a>
+    </div>
+</div>
 
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">There are no active advertisements at the moment.</div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128196;</div>
+        <h3>No active advertisements</h3>
+        <p>There are no active advertisements at the moment.</p>
+    </div>
+}
+else
+{
+    <div class="job-grid">
+        @foreach (var item in Model.Data)
         {
-            <div class="card">
-                <h3>@item.JobName</h3>
-                <div class="meta" style="color: #666; margin-bottom: 10px;">
-                    @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <span class="badge">@item.CollaborationType</span>
-                    <span class="badge">Experience: @item.ExperienceLevel years</span>
+            <article class="job-card">
+                <div class="job-card-top">
+                    <div class="job-logo">
+                        @(string.IsNullOrEmpty(item.CompanyName) ? "?" : item.CompanyName.Substring(0, 1))
+                    </div>
+                    <div class="job-heading">
+                        <h3 class="job-title">
+                            <a asp-action="Details" asp-route-id="@item.AdvertisementId">@item.JobName</a>
+                        </h3>
+                        <div class="job-company">@item.CompanyName</div>
+                    </div>
                     @if (item.IsFeatured)
                     {
-                        <span class="badge">Featured</span>
+                        <span class="badge badge-featured">Featured</span>
                     }
                 </div>
-                <p style="margin: 10px 0; color: #445;">
+
+                <div class="job-meta">
+                    <span>&#128205; @item.CityName</span>
+                    <span>&#128197; @item.CreatedAt.ToString("MMM yyyy")</span>
+                </div>
+
+                <div class="job-badges">
+                    <span class="badge">@item.CollaborationType</span>
+                    @if (item.ExperienceLevel > 0)
+                    {
+                        <span class="badge badge-outline">@item.ExperienceLevel yrs exp</span>
+                    }
+                    @if (item.MinimumSalary > 0 || item.MaximumSalary > 0)
+                    {
+                        <span class="badge badge-salary">
+                            &#128176; @item.MinimumSalary.ToString("#,##0") - @item.MaximumSalary.ToString("#,##0")
+                        </span>
+                    }
+                </div>
+
+                <p class="job-desc">
                     @(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)
                 </p>
-                <a class="btn" asp-action="Details" asp-route-id="@item.AdvertisementId">View Details</a>
-            </div>
+
+                <a class="btn btn-outline btn-block" asp-action="Details" asp-route-id="@item.AdvertisementId">View Details</a>
+            </article>
         }
+    </div>
 
-        <div class="pager" style="margin-top: 20px; display: flex; align-items: center; gap: 10px;">
-            @if (Model.PageNumber > 1)
-            {
-                <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" class="btn-pager">Previous</a>
-            }
-
-            <span class="current">Page @Model.PageNumber of @Model.TotalPageCount</span>
-
-            @if (Model.PageNumber < Model.TotalPageCount)
-            {
-                <a asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" class="btn-pager">Next</a>
-            }
-        </div>
-    }
-</div>
+    @await Html.PartialAsync("_Pager", Model)
+}

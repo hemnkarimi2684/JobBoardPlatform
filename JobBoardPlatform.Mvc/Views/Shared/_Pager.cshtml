@@ -3,24 +3,24 @@
     var pager = (dynamic)Model;
     var pageNumber = (int)pager.PageNumber;
     var totalPages = (int)pager.TotalPageCount;
-    // Dynamically build the query string, excluding the pageNumber parameter initially
-    // as it will be added to the href.
-    var query = Context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
-    query["pageNumber"] = ""; // Placeholder to ensure it's not in the base path
 }
 @if (totalPages > 1)
 {
-    <div class="pager">
+    <nav class="pager">
         @if (pageNumber > 1)
         {
-            // Construct the full URL with the previous page number
-            <a href="@Context.Request.Path@(string.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? "?" : "&")pageNumber=@(pageNumber - 1)">Previous</a>
+            var prevQuery = Context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
+            prevQuery["pageNumber"] = (pageNumber - 1).ToString();
+            var prevUrl = Context.Request.Path + "?" + string.Join("&", prevQuery.Select(x => x.Key + "=" + x.Value));
+            <a class="pager-link" href="@prevUrl">&#8592; Previous</a>
         }
-        <span>Page @pageNumber of @totalPages</span>
+        <span class="pager-current">Page @pageNumber of @totalPages</span>
         @if (pageNumber < totalPages)
         {
-            // Construct the full URL with the next page number
-            <a href="@Context.Request.Path@(string.IsNullOrEmpty(Context.Request.QueryString.ToString()) ? "?" : "&")pageNumber=@(pageNumber + 1)">Next</a>
+            var nextQuery = Context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
+            nextQuery["pageNumber"] = (pageNumber + 1).ToString();
+            var nextUrl = Context.Request.Path + "?" + string.Join("&", nextQuery.Select(x => x.Key + "=" + x.Value));
+            <a class="pager-link" href="@nextUrl">Next &#8594;</a>
         }
-    </div>
+    </nav>
 }

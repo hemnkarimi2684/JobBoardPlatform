@@ -63,7 +63,7 @@ public class GlobalExceptionHandlingMiddleware : IMiddleware
             default:
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 await context.Response.WriteAsync(GenerateResponseBody
-                    ("InternalServerError_500", "Something went wrong. Please contact your administrator."));
+                    ("Something went wrong. Please contact your administrator.", "InternalServerError_500"));
                 break;
         }
     }

@@ -8,7 +8,7 @@ using AccountAuthenticationService = JobBoardPlatform.Application.Interfaces.Aut
 using JobBoardPlatform.Application.Interfaces.CityInterface;
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
-using JobBoardPlatform.Mvc.ViewModels;
+using JobBoardPlatform.Mvc.Models.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -86,12 +86,12 @@ public class AccountController : Controller
         if (User.Identity?.IsAuthenticated == true)
             return RedirectToAction(nameof(Index), "Home");
 
-        return View();
+        return View(new RegisterJobSeekerViewModel());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> RegisterJobSeeker(RegisterJobSeekerRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> RegisterJobSeeker(RegisterJobSeekerViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
             return View(model);
@@ -118,12 +118,12 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Index), "Home");
 
         await PopulateSelectListsAsync(cancellationToken);
-        return View();
+        return View(new RegisterEmployerViewModel());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> RegisterEmployer(RegisterEmployerRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> RegisterEmployer(RegisterEmployerViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {

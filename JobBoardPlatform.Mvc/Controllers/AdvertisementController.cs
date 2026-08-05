@@ -14,6 +14,7 @@ using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Mvc.Models.Advertisement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -52,7 +53,7 @@ public class AdvertisementController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        return View(result);
+        return View(AdvertisementIndexViewModel.FromResponseDto(result));
     }
 
     [HttpGet]
@@ -65,7 +66,7 @@ public class AdvertisementController : Controller
 
         ViewBag.SearchTerm = searchTerm;
 
-        return View(result);
+        return View(AdvertisementSearchViewModel.FromResponseDto(result));
     }
 
     [HttpGet]
@@ -92,14 +93,14 @@ public class AdvertisementController : Controller
             .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
             .ToList();
 
-        return View(result);
+        return View(AdvertisementFilterViewModel.FromResponseDto(result));
     }
 
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken = default)
     {
         var advertisement = await _advertisementService.GetAdvertisementInfoByIdAsync(id, cancellationToken);
 
-        return View(advertisement);
+        return View(AdvertisementDetailsViewModel.FromResponseDto(advertisement));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -112,7 +113,7 @@ public class AdvertisementController : Controller
             employer.CompanyId,
             cancellationToken);
 
-        return View(result);
+        return View(AdvertisementMyAdsViewModel.FromResponseDto(result));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -121,12 +122,12 @@ public class AdvertisementController : Controller
     {
         await PopulateSelectListsAsync(cancellationToken);
 
-        return View();
+        return View(new AdvertisementCreateViewModel());
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
-    public async Task<IActionResult> Create(CreateAdvertisementRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(AdvertisementCreateViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -149,21 +150,12 @@ public class AdvertisementController : Controller
 
         await PopulateSelectListsAsync(cancellationToken);
 
-        return View(new UpdateAdvertisementRequestDto
-        {
-            Description = advertisement.Description,
-            MinimumAge = advertisement.MinimumAge,
-            MaximumAge = advertisement.MaximumAge,
-            MinimumSalary = advertisement.MinimumSalary,
-            MaximumSalary = advertisement.MaximumSalary,
-            ExperienceLevel = advertisement.ExperienceLevel,
-            CollaborationType = advertisement.CollaborationType
-        });
+        return View(AdvertisementEditViewModel.FromResponseDto(advertisement));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
-    public async Task<IActionResult> Edit(Guid id, UpdateAdvertisementRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, AdvertisementEditViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {

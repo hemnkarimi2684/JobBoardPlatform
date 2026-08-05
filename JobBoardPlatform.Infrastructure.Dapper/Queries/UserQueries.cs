@@ -69,10 +69,11 @@ public static class UserQueries
                                                FROM Users AS U
                                                INNER JOIN UserRoles AS UR
                                                    ON UR.UserId = U.Id
-                                                  AND UR.RoleId = '42C14691-0D24-4597-83DE-08DEE31DC442'
-                                           	   WHERE 
-                                                U.IsDeleted = 0
-                                           	  	AND U.DeletedAt IS NULL
-                                               ORDER BY U.CreatedAt DESC
-                                               OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+                                               INNER JOIN Roles AS R
+                                                   ON R.Id = UR.RoleId
+                                              WHERE R.NormalizedName = 'JOBSEEKER'
+                                                AND U.IsDeleted = 0
+                                                AND U.DeletedAt IS NULL
+                                              ORDER BY U.CreatedAt DESC, U.Id
+                                              OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
 }

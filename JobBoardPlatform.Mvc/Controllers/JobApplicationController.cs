@@ -3,6 +3,8 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
+using JobBoardPlatform.Mvc.Models.JobApplication;
+using JobBoardPlatform.Mvc.Models.Resume;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -29,7 +31,7 @@ public class JobApplicationController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        return View(result);
+        return View(JobApplicationMyViewModel.FromResponseDto(result));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -40,9 +42,7 @@ public class JobApplicationController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        ViewBag.AdvertisementId = advertisementId;
-
-        return View(result);
+        return View(JobApplicationByAdvertisementViewModel.FromResponseDto(result, advertisementId));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -57,7 +57,7 @@ public class JobApplicationController : Controller
                 CurrentUserId(),
                 cancellationToken);
 
-        return View("~/Views/Resume/ApplicantResume.cshtml", resume);
+        return View("~/Views/Resume/ApplicantResume.cshtml", ResumeApplicantResumeViewModel.FromResponseDto(resume));
     }
 
     [Authorize(Policy = "ActiveJobSeekerOnly")]

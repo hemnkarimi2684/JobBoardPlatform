@@ -5,7 +5,7 @@ namespace JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 
 public abstract class AppException : BaseException
 {
-    public AppException(string message, string statusCode, Exception innerException) : base(message, $"BusinessException_{statusCode}", innerException)
+    public AppException(string message, string statusCode, Exception? innerException) : base(message, $"BusinessException_{statusCode}", innerException)
     {
     }
 

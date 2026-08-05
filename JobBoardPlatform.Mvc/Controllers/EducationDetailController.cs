@@ -2,6 +2,7 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
+using JobBoardPlatform.Mvc.Models.EducationDetail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -26,18 +27,18 @@ public class EducationDetailController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 20 },
             cancellationToken);
 
-        return View(result);
+        return View(EducationDetailIndexViewModel.FromResponseDto(result));
     }
 
     [HttpGet]
     public IActionResult Create()
     {
         PopulateDegrees();
-        return View();
+        return View(new EducationDetailCreateViewModel());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateEducationDetailRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(EducationDetailCreateViewModel model, CancellationToken cancellationToken)
     {
         model.UserId = CurrentUserId();
         ModelState.Remove(nameof(model.UserId));
@@ -62,20 +63,11 @@ public class EducationDetailController : Controller
 
         PopulateDegrees();
 
-        return View(new UpdateEducationDetailRequestDto
-        {
-            CertificateDegree = item.CertificateDegreeName,
-            Major = item.Major,
-            University = item.University,
-            StartDate = item.StartDate,
-            CompletionDate = item.CompletionDate,
-            Percentage = item.Percentage,
-            IsCurrentlyStudying = item.IsCurrentlyStudying
-        });
+        return View(EducationDetailEditViewModel.FromResponseDto(item));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(Guid id, UpdateEducationDetailRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, EducationDetailEditViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {

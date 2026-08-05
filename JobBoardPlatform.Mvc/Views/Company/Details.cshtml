@@ -1,4 +1,4 @@
-@model CompanyDetailResponseDto
+@model CompanyDetailsViewModel
 
 @{
     ViewData["Title"] = Model.Name;
@@ -25,7 +25,16 @@
 
         <div class="detail-grid">
             <div><span>Established In:</span> @Model.YearOfEstablishment.ToString("yyyy")</div>
-            <div><span>Website:</span> <a href="@(Model.WebSiteAddress.StartsWith("http") ? Model.WebSiteAddress : "https://" + Model.WebSiteAddress)" target="_blank" style="color: #1e3a5f; text-decoration: none;">@Model.WebSiteAddress</a></div>
+            <div><span>Website:</span>
+                @if (!string.IsNullOrWhiteSpace(Model.WebSiteAddress))
+                {
+                    <a href="@(Model.WebSiteAddress.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? Model.WebSiteAddress : "https://" + Model.WebSiteAddress)" target="_blank" style="color: #1e3a5f; text-decoration: none;">@Model.WebSiteAddress</a>
+                }
+                else
+                {
+                    <span>-</span>
+                }
+            </div>
             <div><span>Ownership Type:</span> @Model.OwnershipType</div>
             <div><span>Company Size:</span> @Model.CompanySize</div>
             <div><span>Category:</span> @Model.JobCategoryName</div>

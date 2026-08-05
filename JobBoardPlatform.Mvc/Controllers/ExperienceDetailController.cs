@@ -2,6 +2,7 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
+using JobBoardPlatform.Mvc.Models.ExperienceDetail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -26,18 +27,18 @@ public class ExperienceDetailController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 20 },
             cancellationToken);
 
-        return View(result);
+        return View(ExperienceDetailIndexViewModel.FromResponseDto(result));
     }
 
     [HttpGet]
     public IActionResult Create()
     {
         PopulateLevels();
-        return View();
+        return View(new ExperienceDetailCreateViewModel());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateExperienceDetailRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(ExperienceDetailCreateViewModel model, CancellationToken cancellationToken)
     {
         model.UserId = CurrentUserId();
         ModelState.Remove(nameof(model.UserId));
@@ -62,20 +63,11 @@ public class ExperienceDetailController : Controller
 
         PopulateLevels();
 
-        return View(new UpdateExperienceDetailRequestDto
-        {
-            LastJobTitle = item.LastJobTitle,
-            SeniorityLevel = item.SeniorityLevel,
-            JobCategory = item.JobCategory,
-            City = item.City,
-            StartDate = item.StartDate,
-            EndDate = item.EndDate,
-            IsCurrentJob = item.IsCurrentJob
-        });
+        return View(ExperienceDetailEditViewModel.FromResponseDto(item));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(Guid id, UpdateExperienceDetailRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, ExperienceDetailEditViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {

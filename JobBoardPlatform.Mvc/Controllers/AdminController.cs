@@ -16,6 +16,7 @@ using JobBoardPlatform.Application.Interfaces.JobInterface;
 using JobBoardPlatform.Application.Interfaces.ProvinceInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
+using JobBoardPlatform.Mvc.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -61,7 +62,7 @@ public class AdminController : Controller
     {
         var counts = await _adminDashboardService.GetCountsAsync();
 
-        return View(counts);
+        return View(DashboardViewModel.FromResponseDto(counts));
     }
 
     public async Task<IActionResult> Employers(CancellationToken cancellationToken = default)
@@ -69,10 +70,7 @@ public class AdminController : Controller
         var approved = await _userService.GetApprovedEmployersAsync(new PagingRequestDto { PageNumber = 1, PageSize = 100 });
         var unapproved = await _userService.GetUnapprovedEmployersAsync(new PagingRequestDto { PageNumber = 1, PageSize = 100 });
 
-        ViewBag.ApprovedEmployers = approved.Data;
-        ViewBag.UnapprovedEmployers = unapproved.Data;
-
-        return View();
+        return View(EmployersViewModel.FromResponseDto(approved.Data, unapproved.Data));
     }
 
     [HttpPost]
@@ -99,7 +97,7 @@ public class AdminController : Controller
     {
         var result = await _userService.GetJobSeekersAsync(new PagingRequestDto { PageNumber = 1, PageSize = 100 });
 
-        return View(result);
+        return View(JobSeekersViewModel.FromResponseDto(result));
     }
 
     [HttpPost]
@@ -128,7 +126,7 @@ public class AdminController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 20 },
             cancellationToken);
 
-        return View(result);
+        return View(AdvertisementsViewModel.FromResponseDto(result));
     }
 
     [HttpPost]
@@ -198,10 +196,9 @@ public class AdminController : Controller
             new PagingRequestDto { PageNumber = 1, PageSize = 100 },
             cancellationToken);
 
-        ViewBag.Cities = cities.Data;
         ViewBag.Provinces = new SelectList(provinces.Data, nameof(ProvinceResponseDto.ProvinceId), nameof(ProvinceResponseDto.Name));
 
-        return View();
+        return View(CitiesViewModel.FromResponseDto(cities.Data));
     }
 
     [HttpPost]
@@ -227,7 +224,7 @@ public class AdminController : Controller
             new PagingRequestDto { PageNumber = 1, PageSize = 100 },
             cancellationToken);
 
-        return View(result);
+        return View(ProvincesViewModel.FromResponseDto(result));
     }
 
     [HttpPost]
@@ -253,7 +250,7 @@ public class AdminController : Controller
             new PagingRequestDto { PageNumber = 1, PageSize = 100 },
             cancellationToken);
 
-        return View(result);
+        return View(JobCategoriesViewModel.FromResponseDto(result));
     }
 
     [HttpPost]
@@ -279,7 +276,7 @@ public class AdminController : Controller
             new PagingRequestDto { PageNumber = 1, PageSize = 100 },
             cancellationToken);
 
-        return View(result);
+        return View(SkillsViewModel.FromResponseDto(result));
     }
 
     [HttpPost]
@@ -310,10 +307,9 @@ public class AdminController : Controller
             new PagingRequestDto { PageNumber = 1, PageSize = 100 },
             cancellationToken);
 
-        ViewBag.Jobs = jobs.Data;
         ViewBag.JobCategories = new SelectList(categories.Data, nameof(JobCategoryResponseDto.JobCategoryId), nameof(JobCategoryResponseDto.Name));
 
-        return View();
+        return View(JobsViewModel.FromResponseDto(jobs.Data));
     }
 
     [HttpPost]
@@ -338,7 +334,7 @@ public class AdminController : Controller
             new PagingRequestDto { PageNumber = 1, PageSize = 100 },
             cancellationToken);
 
-        return View(result);
+        return View(EmailTemplatesViewModel.FromResponseDto(result));
     }
 
     [HttpPost]

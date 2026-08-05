@@ -6,6 +6,7 @@ using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Mvc.Models.Company;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -35,14 +36,14 @@ public class CompanyController : Controller
 
         ViewBag.Text = text;
 
-        return View(result);
+        return View(CompanyIndexViewModel.FromResponseDto(result));
     }
 
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken = default)
     {
         var company = await _companyService.GetCompanyByIdAsync(id, cancellationToken);
 
-        return View(company);
+        return View(CompanyDetailsViewModel.FromResponseDto(company));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -50,7 +51,7 @@ public class CompanyController : Controller
     {
         var employer = await _userService.GetEmployerWithCompanyAsync(CurrentUserId(), cancellationToken);
 
-        return View(employer);
+        return View(CompanyMyCompanyViewModel.FromResponseDto(employer));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -61,22 +62,12 @@ public class CompanyController : Controller
 
         await PopulateSelectListsAsync(cancellationToken);
 
-        return View(new UpdateCompanyInfoRequestDto
-        {
-            Name = company.Name,
-            YearOfEstablishment = company.YearOfEstablishment,
-            AboutUs = company.AboutUs,
-            WebSiteAddress = company.WebSiteAddress,
-            OwnershipType = company.OwnershipType,
-            CompanySize = company.CompanySize,
-            JobCategoryId = company.JobCategoryId,
-            ActivityType = company.ActivityType
-        });
+        return View(CompanyEditViewModel.FromResponseDto(company));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
-    public async Task<IActionResult> Edit(Guid id, UpdateCompanyInfoRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, CompanyEditViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {

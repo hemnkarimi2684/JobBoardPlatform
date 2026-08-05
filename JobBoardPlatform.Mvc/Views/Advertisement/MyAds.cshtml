@@ -1,56 +1,90 @@
-@model Pagination<AdvertisementDetailResponseDto>
+@model AdvertisementMyAdsViewModel
 
 @{
     ViewData["Title"] = "My Advertisements";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">My Advertisements</h2>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
-
-    <div style="margin-bottom: 18px; display: flex; gap: 10px;">
-        <a class="btn" asp-action="Create">Post New Advertisement</a>
-        <a class="btn" asp-action="Index" style="background:#667;">Back to Job Board</a>
-        <a class="btn" asp-action="Filter" style="background:#667;">Filter Advertisements</a>
+<div class="page-head">
+    <div>
+        <h2>My Advertisements</h2>
     </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn btn-primary" asp-action="Create">+ Post New Advertisement</a>
+        <a class="btn btn-ghost" asp-action="Index">Back to Job Board</a>
+    </div>
+</div>
 
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">You have not posted any advertisements yet.</div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128196;</div>
+        <h3>No advertisements yet</h3>
+        <p>You have not posted any advertisements yet.</p>
+        <a class="btn btn-primary" asp-action="Create">Post your first advertisement</a>
+    </div>
+}
+else
+{
+    <div class="job-grid">
+        @foreach (var item in Model.Data)
         {
-            <div class="card">
-                <h3>@item.JobName</h3>
-                <div class="meta" style="color: #666; margin-bottom: 10px;">
-                    @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <span class="badge">@item.CollaborationType</span>
-                    <span class="badge">Experience: @item.ExperienceLevel years</span>
+            <article class="job-card">
+                <div class="job-card-top">
+                    <div class="job-logo">
+                        @(string.IsNullOrEmpty(item.CompanyName) ? "?" : item.CompanyName.Substring(0, 1))
+                    </div>
+                    <div class="job-heading">
+                        <h3 class="job-title">
+                            <a asp-action="Details" asp-route-id="@item.AdvertisementId">@item.JobName</a>
+                        </h3>
+                        <div class="job-company">@item.CompanyName</div>
+                    </div>
                     @if (item.IsFeatured)
                     {
-                        <span class="badge">Featured</span>
+                        <span class="badge badge-featured">Featured</span>
                     }
                 </div>
-                <p style="margin: 10px 0; color: #445;">
+
+                <div class="job-meta">
+                    <span>&#128205; @item.CityName</span>
+                    <span>&#128197; @item.CreatedAt.ToString("MMM yyyy")</span>
+                </div>
+
+                <div class="job-badges">
+                    <span class="badge">@item.CollaborationType</span>
+                    @if (item.ExperienceLevel > 0)
+                    {
+                        <span class="badge badge-outline">@item.ExperienceLevel yrs exp</span>
+                    }
+                    @if (item.MinimumSalary > 0 || item.MaximumSalary > 0)
+                    {
+                        <span class="badge badge-salary">
+                            &#128176; @item.MinimumSalary.ToString("#,##0") - @item.MaximumSalary.ToString("#,##0")
+                        </span>
+                    }
+                </div>
+
+                <p class="job-desc">
                     @(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)
                 </p>
-                <a class="btn" asp-action="Details" asp-route-id="@item.AdvertisementId">Details</a>
-                <a class="btn" asp-action="Edit" asp-route-id="@item.AdvertisementId" style="background:#667;">Edit</a>
-            </div>
-        }
 
-        @await Html.PartialAsync("_Pager", Model)
-    }
-</div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <a class="btn btn-outline" asp-action="Details" asp-route-id="@item.AdvertisementId">Details</a>
+                    <a class="btn btn-ghost" asp-action="Edit" asp-route-id="@item.AdvertisementId">Edit</a>
+                    <a class="btn" asp-controller="JobApplication" asp-action="ByAdvertisement" asp-route-advertisementId="@item.AdvertisementId">Applications</a>
+                </div>
+            </article>
+        }
+    </div>
+
+    @await Html.PartialAsync("_Pager", Model)
+}

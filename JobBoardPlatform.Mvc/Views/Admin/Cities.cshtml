@@ -1,3 +1,5 @@
+@model CitiesViewModel
+
 @{
     ViewData["Title"] = "Cities";
 }
@@ -43,7 +45,7 @@
 
     <h3 style="margin: 18px 0 10px; color: #1e3a5f;">City List</h3>
     @{
-        var cities = (List<CityDetailResponseDto>)ViewBag.Cities;
+        var cities = Model.Cities;
     }
     @if (cities == null || cities.Count == 0)
     {

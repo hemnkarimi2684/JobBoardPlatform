@@ -1,6 +1,7 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.JobInterface;
+using JobBoardPlatform.Mvc.Models.Job;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.Mvc.Controllers;
@@ -23,7 +24,7 @@ public class JobController : Controller
 
         ViewBag.Text = text;
 
-        return View(result);
+        return View(JobIndexViewModel.FromResponseDto(result));
     }
 
     public async Task<IActionResult> Details(Guid id, int pageNumber = 1, CancellationToken cancellationToken = default)
@@ -33,6 +34,6 @@ public class JobController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        return View(result);
+        return View(JobDetailsViewModel.FromResponseDto(result));
     }
 }

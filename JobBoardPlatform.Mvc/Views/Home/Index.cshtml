@@ -1,17 +1,180 @@
+@model HomeViewModel
+
 @{
     ViewData["Title"] = "Home";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <div class="hero">
-        <h1>Welcome to JobBoard</h1>
-        <p>The easiest way to find jobs and hire the best talent.</p>
-        <a class="btn" asp-controller="Advertisement" asp-action="Index">View Job Ads</a>
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-eyebrow">JobBoard</span>
+        <h1>Find your next job</h1>
+        <p>Discover active job advertisements posted by trusted companies and take the next step in your career.</p>
     </div>
+</section>
 
-    <div class="card">
-        <h3>JobBoard</h3>
-        <p>This section simply displays the active job advertisements registered in the system.</p>
-    </div>
+<div class="search-panel">
+    <form asp-controller="Home" asp-action="Index" method="get" class="search-form">
+        <div class="search-row">
+            <div class="search-box">
+                <span class="search-icon">&#128269;</span>
+                <input type="text" name="searchTerm" value="@Model.SearchTerm"
+                       class="search-input" placeholder="Job title, company or city..." />
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Search</button>
+        </div>
+
+        <div class="filter-row">
+            <div class="field">
+                <label for="jobCategoryId">Category</label>
+                <select id="jobCategoryId" name="jobCategoryId" class="form-control">
+                    <option value="">All categories</option>
+                    @foreach (var category in ViewBag.JobCategories)
+                    {
+                        <option value="@category.Value" selected="@(Model.JobCategoryId?.ToString() == category.Value)">
+                            @category.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="collaborationType">Work type</label>
+                <select id="collaborationType" name="collaborationType" class="form-control">
+                    <option value="">All types</option>
+                    @foreach (var type in ViewBag.CollaborationTypes)
+                    {
+                        <option value="@type.Value" selected="@(((int?)Model.CollaborationType)?.ToString() == type.Value)">
+                            @type.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="minimumSalary">Min salary</label>
+                <input type="number" id="minimumSalary" name="minimumSalary" value="@Model.MinimumSalary"
+                       class="form-control" placeholder="0" />
+            </div>
+
+            <div class="field">
+                <label for="maximumSalary">Max salary</label>
+                <input type="number" id="maximumSalary" name="maximumSalary" value="@Model.MaximumSalary"
+                       class="form-control" placeholder="No limit" />
+            </div>
+
+            <div class="field field-actions">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-ghost">Clear</a>
+            </div>
+        </div>
+    </form>
 </div>
 
+@if (Model.HasActiveCriteria)
+{
+    <div class="results-head">
+        <h2>Search results</h2>
+        <span class="muted">Page @Model.PageNumber of @Model.TotalPageCount</span>
+    </div>
+}
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No jobs found</h3>
+        <p>Try adjusting your search or clearing the filters.</p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline">Browse all jobs</a>
+    </div>
+}
+else
+{
+    <div class="job-grid">
+        @foreach (var item in Model.Data)
+        {
+            <article class="job-card">
+                <div class="job-card-top">
+                    <div class="job-logo">
+                        @(string.IsNullOrEmpty(item.CompanyName) ? "?" : item.CompanyName.Substring(0, 1))
+                    </div>
+                    <div class="job-heading">
+                        <h3 class="job-title">
+                            <a asp-controller="Advertisement" asp-action="Details" asp-route-id="@item.AdvertisementId">
+                                @item.JobName
+                            </a>
+                        </h3>
+                        <div class="job-company">@item.CompanyName</div>
+                    </div>
+                    @if (item.IsFeatured)
+                    {
+                        <span class="badge badge-featured">Featured</span>
+                    }
+                </div>
+
+                <div class="job-meta">
+                    <span>&#128205; @item.CityName</span>
+                    <span>&#128197; @item.CreatedAt.ToString("MMM yyyy")</span>
+                </div>
+
+                <div class="job-badges">
+                    <span class="badge">@item.CollaborationType</span>
+                    @if (item.ExperienceLevel > 0)
+                    {
+                        <span class="badge badge-outline">@item.ExperienceLevel yrs exp</span>
+                    }
+                    @if (item.MinimumSalary > 0 || item.MaximumSalary > 0)
+                    {
+                        <span class="badge badge-salary">
+                            &#128176; @item.MinimumSalary.ToString("#,##0") - @item.MaximumSalary.ToString("#,##0")
+                        </span>
+                    }
+                </div>
+
+                <p class="job-desc">
+                    @(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)
+                </p>
+
+                <a class="btn btn-outline btn-block"
+                   asp-controller="Advertisement" asp-action="Details" asp-route-id="@item.AdvertisementId">
+                    View Details
+                </a>
+            </article>
+        }
+    </div>
+
+    if (Model.TotalPageCount > 1)
+    {
+        <nav class="pager">
+            @if (Model.PageNumber > 1)
+            {
+                <a class="pager-link"
+                   asp-controller="Home" asp-action="Index"
+                   asp-route-searchTerm="@Model.SearchTerm"
+                   asp-route-jobCategoryId="@Model.JobCategoryId"
+                   asp-route-collaborationType="@((int?)Model.CollaborationType)"
+                   asp-route-minimumSalary="@Model.MinimumSalary"
+                   asp-route-maximumSalary="@Model.MaximumSalary"
+                   asp-route-pageNumber="@(Model.PageNumber - 1)">&#8592; Previous</a>
+            }
+            <span class="pager-current">Page @Model.PageNumber of @Model.TotalPageCount</span>
+            @if (Model.PageNumber < Model.TotalPageCount)
+            {
+                <a class="pager-link"
+                   asp-controller="Home" asp-action="Index"
+                   asp-route-searchTerm="@Model.SearchTerm"
+                   asp-route-jobCategoryId="@Model.JobCategoryId"
+                   asp-route-collaborationType="@((int?)Model.CollaborationType)"
+                   asp-route-minimumSalary="@Model.MinimumSalary"
+                   asp-route-maximumSalary="@Model.MaximumSalary"
+                   asp-route-pageNumber="@(Model.PageNumber + 1)">Next &#8594;</a>
+            }
+        </nav>
+    }
+}
+
+<div class="cta-card">
+    <div>
+        <h3>Are you hiring?</h3>
+        <p>Post a job advertisement and reach qualified candidates in minutes.</p>
+    </div>
+    <a class="btn btn-primary" asp-controller="Account" asp-action="RegisterEmployer">Post a Job</a>
+</div>

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace JobBoardPlatform.Mvc.ViewModels;
+namespace JobBoardPlatform.Mvc.Models.Account;
 
 public class LoginViewModel
 {
