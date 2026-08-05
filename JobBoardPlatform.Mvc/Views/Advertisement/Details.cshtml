@@ -78,7 +78,7 @@
             </div>
         }
 
-        <div style="margin-top:18px; display:flex; gap:10px; align-items:center;">
+        <div style="margin-top:18px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
 
             @if (User.IsInRole("JobSeeker"))
             {
@@ -95,10 +95,21 @@
 
                     <button type="submit"
                             class="btn"
-                            style="background-color:#28a745;color:white;">
+                            style="background-color:#28a745; color:white;">
                         Apply for this Job
                     </button>
                 </form>
+            }
+
+            @if (User.IsInRole("Employer") && Model.IsOwner)
+            {
+                <a asp-controller="JobApplication"
+                   asp-action="ByAdvertisement"
+                   asp-route-advertisementId="@Model.AdvertisementId"
+                   class="btn"
+                   style="background-color:#0d6efd; color:white;">
+                    View Applications
+                </a>
             }
 
             <a class="btn" asp-action="Index">

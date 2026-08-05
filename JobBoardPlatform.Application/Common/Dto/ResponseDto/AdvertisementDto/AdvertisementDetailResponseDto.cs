@@ -49,9 +49,11 @@ public class AdvertisementDetailResponseDto
 
     public bool IsActive { get; set; }
 
+    public bool IsOwner { get; set; }
+
     public List<string> SkillNames { get; set; } = new();
 
-    public static AdvertisementDetailResponseDto MapToResponseDto(AdvertisementDetail advertisementDetail)
+    public static AdvertisementDetailResponseDto MapToResponseDto(AdvertisementDetail advertisementDetail, Guid currentUserId)
     {
         return new AdvertisementDetailResponseDto
         {
@@ -77,6 +79,7 @@ public class AdvertisementDetailResponseDto
             FeaturedUntil = advertisementDetail.FeaturedUntil,
             IsFeatured = advertisementDetail.IsFeatured,
             IsActive = advertisementDetail.IsActive,
+            IsOwner = advertisementDetail.EmployerUserId == currentUserId
         };
     }
 }

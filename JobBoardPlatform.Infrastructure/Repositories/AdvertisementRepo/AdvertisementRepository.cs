@@ -57,7 +57,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                              CompanyId = a.CompanyId,
                              FeaturedUntil = a.FeaturedUntil,
                              IsFeatured = a.IsFeatured,
-                             IsActive = a.IsActive
+                             IsActive = a.IsActive,
+                             EmployerUserId = a.Company.OwnedByUserId
                          })
                          .FirstOrDefaultAsync(cancellationToken);
     }

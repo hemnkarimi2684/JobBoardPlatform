@@ -26,4 +26,5 @@ public class AdvertisementDetail
     public Guid CityId { get; init; }
     public Guid CompanyId { get; init; }
     public bool IsActive { get; set; }
+    public Guid EmployerUserId { get; set; }
 }

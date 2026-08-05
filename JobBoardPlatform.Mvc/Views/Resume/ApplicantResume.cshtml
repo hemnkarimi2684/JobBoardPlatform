@@ -1,0 +1,192 @@
+﻿@model ResumeDetailResponseDto
+
+@{
+    ViewData["Title"] = "Applicant Resume";
+
+    var profile = Model.ResumeUserProfiles;
+}
+
+<div style="direction: ltr; text-align: left;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px;">
+        <div>
+            <h2 style="margin: 0; color: #1e3a5f;">Applicant Resume</h2>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Title))
+            {
+                <p style="margin: 7px 0 0; color: #666;">
+                    @Model.Title
+                </p>
+            }
+        </div>
+
+        <a asp-controller="JobApplication"
+           asp-action="ByAdvertisement"
+           class="btn">
+            Back to Applications
+        </a>
+    </div>
+
+    <div class="card" style="margin-bottom: 18px;">
+        <h3>Applicant Information</h3>
+
+        @if (profile is null)
+        {
+            <p style="color: #777;">Applicant profile information is not available.</p>
+        }
+        else
+        {
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                <div>
+                    <strong>Full Name</strong>
+                    <div>@profile.FullName</div>
+                </div>
+
+                <div>
+                    <strong>Gender</strong>
+                    <div>@profile.Gender</div>
+                </div>
+
+                <div>
+                    <strong>Birth Date</strong>
+                    <div>@profile.BirthDate.ToString("yyyy-MM-dd")</div>
+                </div>
+
+                <div>
+                    <strong>City</strong>
+                    <div>@profile.CityName</div>
+                </div>
+
+                <div>
+                    <strong>Address</strong>
+                    <div>@profile.Address</div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(profile.Bio))
+            {
+                <hr style="margin: 16px 0; border: 0; border-top: 1px solid #eee;" />
+
+                <strong>Bio</strong>
+                <p style="margin: 7px 0 0; white-space: pre-line;">
+                    @profile.Bio
+                </p>
+            }
+        }
+    </div>
+
+    <div class="card" style="margin-bottom: 18px;">
+        <h3>Resume File</h3>
+
+        @if (Model.ResumeId.HasValue && Model.ResumeFileId.HasValue)
+        {
+            <p style="color: #555;">
+                The applicant has uploaded a resume file.
+            </p>
+
+            <a asp-controller="Resume"
+               asp-action="Download"
+               asp-route-id="@Model.ResumeFileId.Value"
+               class="btn">
+                Download Resume File
+            </a>
+        }
+        else
+        {
+            <p style="color: #777;">No resume file has been uploaded.</p>
+        }
+    </div>
+
+    <div class="card" style="margin-bottom: 18px;">
+        <h3>Skills</h3>
+
+        @if (Model.ResumeSkills.Any())
+        {
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                @foreach (var skill in Model.ResumeSkills)
+                {
+                    <span class="badge">@skill.SkillName</span>
+                }
+            </div>
+        }
+        else
+        {
+            <p style="color: #777;">No skills have been added.</p>
+        }
+    </div>
+
+    <div class="card" style="margin-bottom: 18px;">
+        <h3>Education History</h3>
+
+        @if (Model.ResumeEducationDetails.Any())
+        {
+            @foreach (var education in Model.ResumeEducationDetails)
+            {
+                <div style="padding: 14px 0; border-bottom: 1px solid #eee;">
+                    <h4 style="margin: 0 0 6px;">
+                        @education.CertificateDegreeName - @education.Major
+                    </h4>
+
+                    <div style="color: #555; margin-bottom: 6px;">
+                        @education.University
+                    </div>
+
+                    <div style="color: #777;">
+                        @education.StartDate.ToString("yyyy-MM-dd")
+                        -
+                        @(education.IsCurrentlyStudying
+                            ? "Present"
+                            : education.CompletionDate?.ToString("yyyy-MM-dd") ?? "Not specified")
+                    </div>
+
+                    @if (education.Percentage.HasValue)
+                    {
+                        <div style="color: #777; margin-top: 5px;">
+                            Percentage: @education.Percentage.Value
+                        </div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <p style="color: #777;">No education history has been added.</p>
+        }
+    </div>
+
+    <div class="card" style="margin-bottom: 18px;">
+        <h3>Work Experience</h3>
+
+        @if (Model.ResumeExperienceDetails.Any())
+        {
+            @foreach (var experience in Model.ResumeExperienceDetails)
+            {
+                <div class="card" style="margin-bottom: 18px;">
+                    <h3>Resume File</h3>
+
+                    @if (Model.ResumeId.HasValue && Model.ResumeFileId.HasValue)
+                    {
+                        <p style="color: #555;">
+                            The applicant has uploaded a resume file.
+                        </p>
+
+                        <a asp-controller="Resume"
+                           asp-action="Download"
+                           asp-route-resumeId="@Model.ResumeId.Value"
+                           class="btn">
+                            Download Resume File
+                        </a>
+                    }
+                    else
+                    {
+                        <p style="color: #777;">No resume file has been uploaded.</p>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <p style="color: #777;">No work experience has been added.</p>
+        }
+    </div>
+</div>
+

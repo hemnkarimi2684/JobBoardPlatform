@@ -53,6 +53,18 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
         return (result, totalDataCount);
     }
 
+    public async Task<Guid?> GetApplicantUserIdIfEmployerOwnsApplicationAsync(
+        Guid jobApplicationId,
+        Guid employerUserId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                        .Where(ja => ja.Id == jobApplicationId)
+                        .Where(ja => ja.Advertisement.Company.OwnedByUserId == employerUserId)
+                        .Select(ja => (Guid?)ja.UserId)
+                        .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<TResult?> GetJobApplicationByIdAsync<TResult>(
         Expression<Func<JobApplication, TResult>> projection,
         Guid jobApplicationId,

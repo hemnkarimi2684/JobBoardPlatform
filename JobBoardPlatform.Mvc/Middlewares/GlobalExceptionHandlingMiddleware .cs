@@ -54,6 +54,8 @@ public sealed class GlobalExceptionHandlingMiddleware : IMiddleware
 
         var tempData = _tempDataFactory.GetTempData(context);
         tempData[ErrorTempDataKey] = result.Message;
+        tempData["StatusCode"] = result.StatusCode;
+        tempData.Save();
 
         context.Response.Redirect(result.RedirectPath);
         return Task.CompletedTask;

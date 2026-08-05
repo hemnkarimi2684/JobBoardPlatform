@@ -3,27 +3,21 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.EmailInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
-using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
-using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Constants;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
-using JobBoardPlatform.Core.Entities.JobEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
-using static JobBoardPlatform.Application.Common.AccessClaims.PermissionClaim.Permissions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static System.Net.Mime.MediaTypeNames;
+
 
 namespace JobBoardPlatform.Application.Implementation.JobApplicationBusiness;
 
@@ -39,15 +33,18 @@ public class JobApplicationService : IJobApplicationService
 
     private readonly IEmailService _emailService;
 
+    private readonly IResumeService _resumeService;
+
     private readonly ILogger<JobApplication> _logger;
 
-    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService, IEmailService emailService, ILogger<JobApplication> logger)
+    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService, IEmailService emailService, IResumeService resumeService, ILogger<JobApplication> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _advertisementService = advertisementService;
         _accessControlService = accessControlService;
         _emailService = emailService;
+        _resumeService = resumeService;
         _logger = logger;
     }
 
@@ -214,6 +211,29 @@ public class JobApplicationService : IJobApplicationService
                                                                  pagingCommand.PageSize,
                                                                  totalDataCount);
     }
+
+
+    public async Task<ResumeDetailResponseDto> GetApplicantResumeByApplicationIdAsync(
+        Guid jobApplicationId,
+        Guid employerUserId,
+        CancellationToken cancellationToken = default)
+    {
+        var applicantUserId = await _unitOfWork.JobApplicationRepository.GetApplicantUserIdIfEmployerOwnsApplicationAsync(
+            jobApplicationId,
+            employerUserId,
+            cancellationToken);
+
+        if (applicantUserId is null)
+            throw new NotFoundException("Job application was not found.");
+
+        var result = await _resumeService.GetResumeDetailAsync(applicantUserId.Value, cancellationToken);
+
+        if (result is null)
+            throw new NotFoundException("The user does not have a complete resume.");
+
+        return result;
+    }
+
 
     public List<EnumResponseDto> GetJobApplicationStatuses()
     {

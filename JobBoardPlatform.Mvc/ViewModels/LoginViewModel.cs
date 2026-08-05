@@ -4,13 +4,13 @@ namespace JobBoardPlatform.Mvc.ViewModels;
 
 public class LoginViewModel
 {
-    [Required(ErrorMessage = "ایمیل یا شماره موبایل الزامی است.")]
+    [Required(ErrorMessage = "Email or phone number is required.")]
     [RegularExpression(
         @"^(?:[^\s@]+@[^\s@]+\.[^\s@]+|(?:\+98|0)9\d{9})$",
-        ErrorMessage = "قالب ایمیل یا شماره موبایل معتبر نیست.")]
+        ErrorMessage = "The email or phone number format is invalid.")]
     public string EmailOrPhoneNumber { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "رمز عبور الزامی است.")]
+    [Required(ErrorMessage = "Password is required.")]
     [DataType(DataType.Password)]
     public string Password { get; set; } = string.Empty;
 

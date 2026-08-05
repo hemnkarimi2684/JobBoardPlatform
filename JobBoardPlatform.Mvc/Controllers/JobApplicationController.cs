@@ -45,6 +45,21 @@ public class JobApplicationController : Controller
         return View(result);
     }
 
+    [Authorize(Policy = "ApprovedEmployerOnly")]
+    [HttpGet]
+    public async Task<IActionResult> ApplicantResume(
+    Guid id,
+    CancellationToken cancellationToken = default)
+    {
+        var resume = await _jobApplicationService
+            .GetApplicantResumeByApplicationIdAsync(
+                id,
+                CurrentUserId(),
+                cancellationToken);
+
+        return View("~/Views/Resume/ApplicantResume.cshtml", resume);
+    }
+
     [Authorize(Policy = "ActiveJobSeekerOnly")]
     [HttpPost]
     public async Task<IActionResult> Apply(Guid advertisementId, CancellationToken cancellationToken)
@@ -76,9 +91,17 @@ public class JobApplicationController : Controller
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
-    public async Task<IActionResult> ChangeStatus(Guid id, JobApplicationStatus status, Guid advertisementId, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangeStatus(
+    Guid id,
+    JobApplicationStatus status,
+    Guid advertisementId,
+    CancellationToken cancellationToken)
     {
-        await _jobApplicationService.UpdateJobApplicationStatusAsync(id, status, cancellationToken);
+        await _jobApplicationService.UpdateJobApplicationStatusAsync(
+            id,
+            status,
+            cancellationToken);
 
         TempData["Success"] = "Application status was updated successfully.";
 

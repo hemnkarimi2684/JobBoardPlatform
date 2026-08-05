@@ -1,11 +1,16 @@
 @{
     ViewData["Title"] = "Error";
+    var errorMessage = TempData["Error"] as string;
 }
 
 <div style="direction: ltr; text-align: left;">
     <div class="card">
         <h3>Error</h3>
-        <p>An error occurred while processing your request. Please try again.</p>
+        <p>
+            @(string.IsNullOrWhiteSpace(errorMessage)
+            ? "An error occurred while processing your request. Please try again."
+            : errorMessage)
+        </p>
         <a class="btn" asp-controller="Home" asp-action="Index">Back to Home</a>
     </div>
 </div>

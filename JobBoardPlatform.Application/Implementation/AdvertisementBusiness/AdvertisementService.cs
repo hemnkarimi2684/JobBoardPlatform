@@ -150,7 +150,7 @@ public class AdvertisementService : IAdvertisementService
         if (advertisementDetail is null)
             throw new NotFoundException("Advertisement was not found.");
 
-        return AdvertisementDetailResponseDto.MapToResponseDto(advertisementDetail);
+        return AdvertisementDetailResponseDto.MapToResponseDto(advertisementDetail, _currentUser.UserId);
     }
 
     public async Task<Pagination<AdvertisementDetailResponseDto>> GetActiveAdvertisementsAsync(

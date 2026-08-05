@@ -14,6 +14,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddInfrastructureDependency(builder.Configuration);
 builder.Services.AddDapperDependency(builder.Configuration);
 builder.Services.AddBusinessDependency(builder.Configuration);
+builder.Services.AddScoped<GlobalExceptionHandlingMiddleware>();
 
 //اینم صرفا میره تنظیمات توی اپ ستینگ برای سری لاگ رو میخونه
 builder.Host.UseSerilog((context, services, configuration) => configuration

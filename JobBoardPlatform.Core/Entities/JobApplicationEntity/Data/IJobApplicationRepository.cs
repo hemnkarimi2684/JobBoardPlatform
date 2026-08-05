@@ -77,4 +77,16 @@ public interface IJobApplicationRepository : IGenericRepository<JobApplication>
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10);
+
+    /// <summary>
+    /// بررسی اینکه کافرمایی که برای دیدن درخوسات کاری دروسات داده ایا کاربر لاگین شده اس یا یکی دیگه اس میخواد یه چیز دیگه ای ببینه
+    /// </summary>
+    /// <param name="jobApplicationId"></param>
+    /// <param name="employerUserId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Guid?> GetApplicantUserIdIfEmployerOwnsApplicationAsync(
+    Guid jobApplicationId,
+    Guid employerUserId,
+    CancellationToken cancellationToken);
 }
