@@ -97,16 +97,9 @@ public class AdvertisementController : Controller
 
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var advertisement = await _advertisementService.GetAdvertisementInfoByIdAsync(id, cancellationToken);
+        var advertisement = await _advertisementService.GetAdvertisementInfoByIdAsync(id, cancellationToken);
 
-            return View(advertisement);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return View(advertisement);
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -141,47 +134,31 @@ public class AdvertisementController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _advertisementService.CreateAdvertisementAsync(model, cancellationToken);
+        await _advertisementService.CreateAdvertisementAsync(model, cancellationToken);
 
-            TempData["Success"] = "Advertisement was created successfully.";
+        TempData["Success"] = "Advertisement was created successfully.";
 
-            return RedirectToAction(nameof(MyAds));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            await PopulateSelectListsAsync(cancellationToken);
-            return View(model);
-        }
+        return RedirectToAction(nameof(MyAds));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var advertisement = await _advertisementService.GetAdvertisementInfoByIdAsync(id, cancellationToken);
+        var advertisement = await _advertisementService.GetAdvertisementInfoByIdAsync(id, cancellationToken);
 
-            await PopulateSelectListsAsync(cancellationToken);
+        await PopulateSelectListsAsync(cancellationToken);
 
-            return View(new UpdateAdvertisementRequestDto
-            {
-                Description = advertisement.Description,
-                MinimumAge = advertisement.MinimumAge,
-                MaximumAge = advertisement.MaximumAge,
-                MinimumSalary = advertisement.MinimumSalary,
-                MaximumSalary = advertisement.MaximumSalary,
-                ExperienceLevel = advertisement.ExperienceLevel,
-                CollaborationType = advertisement.CollaborationType
-            });
-        }
-        catch (NotFoundException)
+        return View(new UpdateAdvertisementRequestDto
         {
-            return NotFound();
-        }
+            Description = advertisement.Description,
+            MinimumAge = advertisement.MinimumAge,
+            MaximumAge = advertisement.MaximumAge,
+            MinimumSalary = advertisement.MinimumSalary,
+            MaximumSalary = advertisement.MaximumSalary,
+            ExperienceLevel = advertisement.ExperienceLevel,
+            CollaborationType = advertisement.CollaborationType
+        });
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -194,20 +171,11 @@ public class AdvertisementController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _advertisementService.UpdateAdvertisementAsync(id, model, cancellationToken);
+        await _advertisementService.UpdateAdvertisementAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "Advertisement was updated successfully.";
+        TempData["Success"] = "Advertisement was updated successfully.";
 
-            return RedirectToAction(nameof(MyAds));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            await PopulateSelectListsAsync(cancellationToken);
-            return View(model);
-        }
+        return RedirectToAction(nameof(MyAds));
     }
 
     private Guid CurrentUserId()

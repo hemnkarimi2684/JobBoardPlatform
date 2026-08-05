@@ -1,10 +1,7 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
-using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
-using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
-using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -51,46 +48,30 @@ public class EducationDetailController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _educationDetailService.CreateEducationDetailAsync(model, cancellationToken);
+        await _educationDetailService.CreateEducationDetailAsync(model, cancellationToken);
 
-            TempData["Success"] = "Education detail was created successfully.";
+        TempData["Success"] = "Education detail was created successfully.";
 
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            PopulateDegrees();
-            return View(model);
-        }
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var item = await _educationDetailService.GetEducationDetailByIdAsync(id, cancellationToken);
+        var item = await _educationDetailService.GetEducationDetailByIdAsync(id, cancellationToken);
 
-            PopulateDegrees();
+        PopulateDegrees();
 
-            return View(new UpdateEducationDetailRequestDto
-            {
-                CertificateDegree = item.CertificateDegreeName,
-                Major = item.Major,
-                University = item.University,
-                StartDate = item.StartDate,
-                CompletionDate = item.CompletionDate,
-                Percentage = item.Percentage,
-                IsCurrentlyStudying = item.IsCurrentlyStudying
-            });
-        }
-        catch (NotFoundException)
+        return View(new UpdateEducationDetailRequestDto
         {
-            return NotFound();
-        }
+            CertificateDegree = item.CertificateDegreeName,
+            Major = item.Major,
+            University = item.University,
+            StartDate = item.StartDate,
+            CompletionDate = item.CompletionDate,
+            Percentage = item.Percentage,
+            IsCurrentlyStudying = item.IsCurrentlyStudying
+        });
     }
 
     [HttpPost]
@@ -102,20 +83,11 @@ public class EducationDetailController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _educationDetailService.UpdateEducationDetailAsync(id, model, cancellationToken);
+        await _educationDetailService.UpdateEducationDetailAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "Education detail was updated successfully.";
+        TempData["Success"] = "Education detail was updated successfully.";
 
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            PopulateDegrees();
-            return View(model);
-        }
+        return RedirectToAction(nameof(Index));
     }
 
     private void PopulateDegrees()

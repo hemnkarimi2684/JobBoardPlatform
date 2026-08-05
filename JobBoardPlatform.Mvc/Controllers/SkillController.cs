@@ -53,16 +53,9 @@ public class SkillController : Controller
     [HttpPost]
     public async Task<IActionResult> Assign(List<Guid> skillsId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _skillService.AddSkillsToUserAsync(CurrentUserId(), skillsId, cancellationToken);
+        await _skillService.AddSkillsToUserAsync(CurrentUserId(), skillsId, cancellationToken);
 
-            TempData["Success"] = "Skills were added successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Skills were added successfully.";
 
         return RedirectToAction(nameof(MySkills));
     }

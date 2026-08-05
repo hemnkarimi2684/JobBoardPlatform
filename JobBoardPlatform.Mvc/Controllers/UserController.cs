@@ -1,11 +1,8 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
-using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
-using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.CityInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
-using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,14 +31,14 @@ public class UserController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create(CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken = default)
     {
         await PopulateCitiesAsync(cancellationToken);
         return View();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateProfileRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(CreateProfileRequestDto model, CancellationToken cancellationToken = default)
     {
         model.UserId = CurrentUserId();
         ModelState.Remove(nameof(model.UserId));
@@ -52,24 +49,15 @@ public class UserController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _userService.CreateProfileAsync(model, cancellationToken);
+        await _userService.CreateProfileAsync(model, cancellationToken);
 
-            TempData["Success"] = "Profile was created successfully.";
+        TempData["Success"] = "Profile was created successfully.";
 
-            return RedirectToAction(nameof(Profile));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            await PopulateCitiesAsync(cancellationToken);
-            return View(model);
-        }
+        return RedirectToAction(nameof(Profile));
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(CancellationToken cancellationToken = default)
     {
         var profile = await _userService.GetUserProfileByUserIdAsync(CurrentUserId(), cancellationToken);
 
@@ -87,7 +75,7 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(UpdateProfileRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(UpdateProfileRequestDto model, CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
@@ -95,66 +83,36 @@ public class UserController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _userService.UpdateProfileAsync(CurrentUserId(), model, cancellationToken);
+        await _userService.UpdateProfileAsync(CurrentUserId(), model, cancellationToken);
 
-            TempData["Success"] = "Profile was updated successfully.";
+        TempData["Success"] = "Profile was updated successfully.";
 
-            return RedirectToAction(nameof(Profile));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            await PopulateCitiesAsync(cancellationToken);
-            return View(model);
-        }
+        return RedirectToAction(nameof(Profile));
     }
 
-    public async Task<IActionResult> DownloadImage(CancellationToken cancellationToken)
+    public async Task<IActionResult> DownloadImage(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var image = await _userService.DownloadUserImageAsync(CurrentUserId(), cancellationToken);
+        var image = await _userService.DownloadUserImageAsync(CurrentUserId(), cancellationToken);
 
-            return File(image.Data, image.ContentType, image.FileName);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return File(image.Data, image.ContentType, image.FileName);
     }
 
     [HttpPost]
-    public async Task<IActionResult> UploadImage(UploadUserImageRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> UploadImage(UploadUserImageRequestDto model, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await _userService.UploadUserImageAsync(CurrentUserId(), model, cancellationToken);
+        await _userService.UploadUserImageAsync(CurrentUserId(), model, cancellationToken);
 
-            TempData["Success"] = "Profile image was uploaded successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Profile image was uploaded successfully.";
 
         return RedirectToAction(nameof(Profile));
     }
 
     [HttpPost]
-    public async Task<IActionResult> DeleteImage(CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteImage(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await _userService.DeleteUserImageAsync(CurrentUserId(), cancellationToken);
+        await _userService.DeleteUserImageAsync(CurrentUserId(), cancellationToken);
 
-            TempData["Success"] = "Profile image was deleted successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Profile image was deleted successfully.";
 
         return RedirectToAction(nameof(Profile));
     }
@@ -169,9 +127,17 @@ public class UserController : Controller
             new PagingRequestDto { PageNumber = 1, PageSize = 100 },
             cancellationToken);
 
-        ViewBag.Cities = new SelectList(cities.Data, nameof(CityDetailResponseDto.CityId), nameof(CityDetailResponseDto.CityName));
+        ViewBag.Cities = new SelectList(
+            cities.Data,
+            nameof(CityDetailResponseDto.CityId),
+            nameof(CityDetailResponseDto.CityName));
+
         ViewBag.Genders = Enum.GetValues<Gender>()
-            .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
+            .Select(e => new SelectListItem
+            {
+                Value = ((int)e).ToString(),
+                Text = e.ToString()
+            })
             .ToList();
     }
 }

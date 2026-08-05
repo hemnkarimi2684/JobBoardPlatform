@@ -1,10 +1,8 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
-using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
-using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -53,75 +51,48 @@ public class JobApplicationController : Controller
     {
         var userId = CurrentUserId();
 
-        try
-        {
-            var resume = await _resumeService.GetResumeDetailAsync(userId, cancellationToken);
+        var resume = await _resumeService.GetResumeDetailAsync(userId, cancellationToken);
 
-            if (resume.ResumeId is null)
+        if (resume.ResumeId is null)
+        {
+            TempData["Error"] = "Please create a resume before applying for this job.";
+
+            return RedirectToAction("Create", "Resume");
+        }
+
+        await _jobApplicationService.CreateJobApplicationAsync(
+            new CreateJobApplicationRequestDto
             {
-                TempData["Error"] = "Please create a resume before applying for this job.";
+                ResumeId = resume.ResumeId.Value,
+                AdvertisementId = advertisementId,
+                UserId = userId
+            },
+            cancellationToken);
 
-                return RedirectToAction("Create", "Resume");
-            }
+        TempData["Success"] = "Your application was submitted successfully.";
 
-            await _jobApplicationService.CreateJobApplicationAsync(
-                new CreateJobApplicationRequestDto
-                {
-                    ResumeId = resume.ResumeId.Value,
-                    AdvertisementId = advertisementId,
-                    UserId = userId
-                },
-                cancellationToken);
-
-            TempData["Success"] = "Your application was submitted successfully.";
-
-            return RedirectToAction("My");
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-
-            return RedirectToAction("Details", "Advertisement", new { id = advertisementId });
-        }
+        return RedirectToAction("My");
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
     public async Task<IActionResult> ChangeStatus(Guid id, JobApplicationStatus status, Guid advertisementId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _jobApplicationService.UpdateJobApplicationStatusAsync(id, status, cancellationToken);
+        await _jobApplicationService.UpdateJobApplicationStatusAsync(id, status, cancellationToken);
 
-            TempData["Success"] = "Application status was updated successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Application status was updated successfully.";
 
         return RedirectToAction(nameof(ByAdvertisement), new { advertisementId });
     }
 
     [Authorize(Policy = "ActiveJobSeekerOnly")]
     [HttpPost]
-    [ValidateAntiForgeryToken] 
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _jobApplicationService.CancelJobApplicationAsync(id, cancellationToken);
-            TempData["Success"] = "Application was canceled successfully.";
-        }
-        
-        catch (Exception ex) when (ex is AppException || ex.GetType().Name == "ValidationException")
-        {
-            TempData["Error"] = ex.Message;
-        }
-        catch (Exception)
-        {
-            TempData["Error"] = "An error occurred while canceling the application. Please try again.";
-        }
+        await _jobApplicationService.CancelJobApplicationAsync(id, cancellationToken);
+
+        TempData["Success"] = "Application was canceled successfully.";
 
         return RedirectToAction(nameof(My));
     }

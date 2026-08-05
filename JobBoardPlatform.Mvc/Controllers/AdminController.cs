@@ -5,12 +5,8 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.JobCategoryDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ProvinceDto;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.SkillDto;
-using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobCategoryDto;
-using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ProvinceDto;
-using JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
-using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.AdminDashboardInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.CityInterface;
@@ -20,7 +16,6 @@ using JobBoardPlatform.Application.Interfaces.JobInterface;
 using JobBoardPlatform.Application.Interfaces.ProvinceInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
-using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -83,16 +78,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> ApproveEmployer(Guid userId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _userService.ApprovedEmployerAsync(userId, cancellationToken);
+        await _userService.ApprovedEmployerAsync(userId, cancellationToken);
 
-            TempData["Success"] = "Employer was approved successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Employer was approved successfully.";
 
         return RedirectToAction(nameof(Employers));
     }
@@ -100,16 +88,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> RejectEmployer(Guid userId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _userService.RejectEmployerAsync(userId, cancellationToken);
+        await _userService.RejectEmployerAsync(userId, cancellationToken);
 
-            TempData["Success"] = "Employer was rejected successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Employer was rejected successfully.";
 
         return RedirectToAction(nameof(Employers));
     }
@@ -124,16 +105,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> ActivateJobSeeker(Guid userId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _userService.ActivateJobSeekerAsync(userId, cancellationToken);
+        await _userService.ActivateJobSeekerAsync(userId, cancellationToken);
 
-            TempData["Success"] = "Job seeker was activated successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Job seeker was activated successfully.";
 
         return RedirectToAction(nameof(JobSeekers));
     }
@@ -141,16 +115,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> DeactivateJobSeeker(Guid userId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _userService.DeactivateJobSeekerAsync(userId, cancellationToken);
+        await _userService.DeactivateJobSeekerAsync(userId, cancellationToken);
 
-            TempData["Success"] = "Job seeker was deactivated successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Job seeker was deactivated successfully.";
 
         return RedirectToAction(nameof(JobSeekers));
     }
@@ -167,16 +134,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> ActivateAdvertisement(Guid advertisementId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _advertisementService.ActivateAdvertisementAsync(advertisementId, cancellationToken);
+        await _advertisementService.ActivateAdvertisementAsync(advertisementId, cancellationToken);
 
-            TempData["Success"] = "Advertisement was activated successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Advertisement was activated successfully.";
 
         return RedirectToAction(nameof(Advertisements));
     }
@@ -184,16 +144,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> DeactivateAdvertisement(Guid advertisementId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _advertisementService.DeactivateAdvertisementAsync(advertisementId, cancellationToken);
+        await _advertisementService.DeactivateAdvertisementAsync(advertisementId, cancellationToken);
 
-            TempData["Success"] = "Advertisement was deactivated successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Advertisement was deactivated successfully.";
 
         return RedirectToAction(nameof(Advertisements));
     }
@@ -201,16 +154,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> DeleteAdvertisement(Guid advertisementId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _advertisementService.SoftDeleteAdvertisementAsync(advertisementId, cancellationToken);
+        await _advertisementService.SoftDeleteAdvertisementAsync(advertisementId, cancellationToken);
 
-            TempData["Success"] = "Advertisement was deleted successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Advertisement was deleted successfully.";
 
         return RedirectToAction(nameof(Advertisements));
     }
@@ -218,16 +164,24 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> PromoteAdvertisement(Guid advertisementId, int durationInDays, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _advertisementService.PromoteAdvertisementAsync(advertisementId, durationInDays, cancellationToken);
+        await _advertisementService.PromoteAdvertisementAsync(advertisementId, durationInDays, cancellationToken);
 
-            TempData["Success"] = "Advertisement was promoted successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Advertisement was promoted successfully.";
+
+        return RedirectToAction(nameof(Advertisements));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DemoteAdvertisement(
+    Guid advertisementId,
+    CancellationToken cancellationToken)
+    {
+        await _advertisementService.DemoteAdvertisementAsync(
+            advertisementId,
+            cancellationToken);
+
+        TempData["Success"] = "Advertisement was removed from featured successfully.";
 
         return RedirectToAction(nameof(Advertisements));
     }
@@ -259,16 +213,9 @@ public class AdminController : Controller
             return RedirectToAction(nameof(Cities));
         }
 
-        try
-        {
-            await _cityService.CreateCityAsync(model, cancellationToken);
+        await _cityService.CreateCityAsync(model, cancellationToken);
 
-            TempData["Success"] = "City was created successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "City was created successfully.";
 
         return RedirectToAction(nameof(Cities));
     }
@@ -292,16 +239,9 @@ public class AdminController : Controller
             return RedirectToAction(nameof(Provinces));
         }
 
-        try
-        {
-            await _provinceService.CreateProvinceAsync(model, cancellationToken);
+        await _provinceService.CreateProvinceAsync(model, cancellationToken);
 
-            TempData["Success"] = "Province was created successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Province was created successfully.";
 
         return RedirectToAction(nameof(Provinces));
     }
@@ -325,16 +265,9 @@ public class AdminController : Controller
             return RedirectToAction(nameof(JobCategories));
         }
 
-        try
-        {
-            await _jobCategoryService.CreateJobCategoryAsync(model, cancellationToken);
+        await _jobCategoryService.CreateJobCategoryAsync(model, cancellationToken);
 
-            TempData["Success"] = "Job category was created successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Job category was created successfully.";
 
         return RedirectToAction(nameof(JobCategories));
     }
@@ -358,16 +291,9 @@ public class AdminController : Controller
             return RedirectToAction(nameof(Skills));
         }
 
-        try
-        {
-            await _skillService.CreateSkillAsync(model, cancellationToken);
+        await _skillService.CreateSkillAsync(model, cancellationToken);
 
-            TempData["Success"] = "Skill was created successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Skill was created successfully.";
 
         return RedirectToAction(nameof(Skills));
     }
@@ -399,16 +325,9 @@ public class AdminController : Controller
             return RedirectToAction(nameof(Jobs));
         }
 
-        try
-        {
-            await _jobService.CreateJobAsync(model, cancellationToken);
+        await _jobService.CreateJobAsync(model, cancellationToken);
 
-            TempData["Success"] = "Job was created successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Job was created successfully.";
 
         return RedirectToAction(nameof(Jobs));
     }
@@ -431,16 +350,9 @@ public class AdminController : Controller
             return RedirectToAction(nameof(EmailTemplates));
         }
 
-        try
-        {
-            await _emailService.UpdateTemplateAsync(id, model, cancellationToken);
+        await _emailService.UpdateTemplateAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "Email template was updated successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Email template was updated successfully.";
 
         return RedirectToAction(nameof(EmailTemplates));
     }
@@ -448,16 +360,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> ActivateTemplate(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _emailService.ActivateTemplateAsync(id, cancellationToken);
+        await _emailService.ActivateTemplateAsync(id, cancellationToken);
 
-            TempData["Success"] = "Email template was activated successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Email template was activated successfully.";
 
         return RedirectToAction(nameof(EmailTemplates));
     }
@@ -465,16 +370,9 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> DeactivateTemplate(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _emailService.DeactivateTemplateAsync(id, cancellationToken);
+        await _emailService.DeactivateTemplateAsync(id, cancellationToken);
 
-            TempData["Success"] = "Email template was deactivated successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Email template was deactivated successfully.";
 
         return RedirectToAction(nameof(EmailTemplates));
     }

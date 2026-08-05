@@ -13,4 +13,14 @@ public class HomeController : Controller
     {
         return View();
     }
+
+    public IActionResult NotFoundPage()
+    {
+        return View("NotFound");
+    }
+
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
 }

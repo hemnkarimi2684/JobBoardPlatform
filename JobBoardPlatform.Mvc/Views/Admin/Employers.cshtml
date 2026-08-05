@@ -5,61 +5,76 @@
 <div style="direction: ltr; text-align: left;">
     <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Employers</h2>
 
+    @* بخش نمایش خلاصه خطاهای مدل یا سرویس *@
+    <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom: 15px;"></div>
+
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
+        <div class="alert alert-success" style="padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 15px;">
+            @TempData["Success"]
+        </div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert text-danger">@TempData["Error"]</div>
+        <div class="alert alert-danger" style="padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 15px;">
+            @TempData["Error"]
+        </div>
     }
 
     <h3 style="margin: 18px 0 10px; color: #1e3a5f;">Pending Employers</h3>
     @{
-        var unapproved = (List<EmployerDetailResponseDto>)ViewBag.UnapprovedEmployers;
+        var unapproved = ViewBag.UnapprovedEmployers as List<EmployerDetailResponseDto>;
     }
     @if (unapproved == null || unapproved.Count == 0)
     {
-        <div class="empty">No pending employers found.</div>
+        <div class="empty" style="padding: 15px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 4px; color: #666;">
+            No pending employers found.
+        </div>
     }
     else
     {
         foreach (var item in unapproved)
         {
-            <div class="card" style="margin-bottom: 15px;">
+            <div class="card" style="margin-bottom: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                 <h3>@item.Email</h3>
-                <div class="meta" style="color: #666;">Phone: @item.PhoneNumber</div>
-                <div style="margin-top:10px;">
+                <div class="meta" style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <strong>Company:</strong> @(string.IsNullOrEmpty(item.CompanyName) ? "Not Created Yet" : item.CompanyName) <br />
+                    <strong>Phone:</strong> @(string.IsNullOrEmpty(item.PhoneNumber) ? "N/A" : item.PhoneNumber)
+                </div>
+                <div style="margin-top:15px;">
                     <form asp-action="ApproveEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn">Approve</button>
+                        <button type="submit" class="btn btn-primary" style="padding: 6px 12px; background: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">Approve</button>
                     </form>
                     <form asp-action="RejectEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn" style="background:#d64545;">Reject</button>
+                        <button type="submit" class="btn btn-danger" style="padding: 6px 12px; background: #dc3545; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Reject</button>
                     </form>
                 </div>
             </div>
         }
     }
 
-    <h3 style="margin: 18px 0 10px; color: #1e3a5f;">Approved Employers</h3>
+    <h3 style="margin: 30px 0 10px; color: #1e3a5f;">Approved Employers</h3>
     @{
-        var approved = (List<EmployerDetailResponseDto>)ViewBag.ApprovedEmployers;
+        var approved = ViewBag.ApprovedEmployers as List<EmployerDetailResponseDto>;
     }
     @if (approved == null || approved.Count == 0)
     {
-        <div class="empty">No approved employers found.</div>
+        <div class="empty" style="padding: 15px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 4px; color: #666;">
+            No approved employers found.
+        </div>
     }
     else
     {
         foreach (var item in approved)
         {
-            <div class="card" style="margin-bottom: 15px;">
-                <h3>@item.CompanyName</h3>
-                <div class="meta" style="color: #666;">@item.Email &nbsp;|&nbsp; Phone: @item.PhoneNumber</div>
+            <div class="card" style="margin-bottom: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <h3>@(string.IsNullOrEmpty(item.CompanyName) ? "No Company Name" : item.CompanyName)</h3>
+                <div class="meta" style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <strong>Email:</strong> @item.Email &nbsp;|&nbsp; <strong>Phone:</strong> @(string.IsNullOrEmpty(item.PhoneNumber) ? "N/A" : item.PhoneNumber)
+                </div>
             </div>
         }
     }
 </div>
-

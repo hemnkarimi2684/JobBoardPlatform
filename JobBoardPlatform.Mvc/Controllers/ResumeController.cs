@@ -39,65 +39,36 @@ public class ResumeController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        try
-        {
-            await _resumeService.CreateResumeAsync(model, cancellationToken);
+        await _resumeService.CreateResumeAsync(model, cancellationToken);
 
-            TempData["Success"] = "Resume was created successfully.";
+        TempData["Success"] = "Resume was created successfully.";
 
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            return View(model);
-        }
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
     public async Task<IActionResult> UploadFile(Guid resumeId, UploadResumeFileRequestDto model, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _resumeService.UploadResumeFileByResumeIdAsync(resumeId, model, cancellationToken);
+        await _resumeService.UploadResumeFileByResumeIdAsync(resumeId, model, cancellationToken);
 
-            TempData["Success"] = "Resume file was uploaded successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Resume file was uploaded successfully.";
 
         return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Download(Guid resumeId, CancellationToken cancellationToken)
     {
-        try
-        {
-            var file = await _resumeService.DownloadResumeFileByResumeIdAsync(resumeId, cancellationToken);
+        var file = await _resumeService.DownloadResumeFileByResumeIdAsync(resumeId, cancellationToken);
 
-            return File(file.Data, file.ContentType, file.FileName);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return File(file.Data, file.ContentType, file.FileName);
     }
 
     [HttpPost]
     public async Task<IActionResult> DeleteFile(Guid resumeId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _resumeService.DeleteResumeFileByIdAsync(resumeId, cancellationToken);
+        await _resumeService.DeleteResumeFileByIdAsync(resumeId, cancellationToken);
 
-            TempData["Success"] = "Resume file was deleted successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Resume file was deleted successfully.";
 
         return RedirectToAction(nameof(Index));
     }

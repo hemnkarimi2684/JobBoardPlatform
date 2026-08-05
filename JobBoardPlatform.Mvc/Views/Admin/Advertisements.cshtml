@@ -5,15 +5,22 @@
 }
 
 <div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Advertisements</h2>
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">
+        Manage Advertisements
+    </h2>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
     }
+
     @if (TempData["Error"] != null)
     {
-        <div class="alert text-danger">@TempData["Error"]</div>
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
     }
 
     @if (Model.Data.Count == 0)
@@ -26,51 +33,146 @@
         {
             <div class="card" style="margin-bottom: 20px; padding: 15px;">
                 <h3 style="margin-top: 0;">@item.JobName</h3>
-                <div class="meta" style="color: #666; font-size: 0.9rem; margin-bottom: 10px;">
-                    @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
+
+                <div class="meta"
+                     style="color: #666; font-size: 0.9rem; margin-bottom: 10px;">
+                    @item.CompanyName
+                    &nbsp;|&nbsp;
+                    @item.CityName
+                    &nbsp;|&nbsp;
+                    @item.CreatedAt.ToString("yyyy/MM/dd")
                 </div>
 
                 <div style="margin-bottom: 12px;">
                     @if (item.IsActive)
                     {
-                        <span class="badge" style="background: #e2f0d9; color: #385723; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; margin-right: 5px;">Active</span>
+                        <span class="badge"
+                              style="background: #e2f0d9;
+                            color: #385723;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                            font-size: 0.85rem;
+                            margin-right: 5px;">
+                            Active
+                        </span>
                     }
                     else
                     {
-                        <span class="badge" style="background: #fdecea; color: #d64545; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; margin-right: 5px;">Inactive</span>
+                        <span class="badge"
+                              style="background: #fdecea;
+                            color: #d64545;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                            font-size: 0.85rem;
+                            margin-right: 5px;">
+                            Inactive
+                        </span>
                     }
+
                     @if (item.IsFeatured)
                     {
-                        <span class="badge" style="background: #e8f4fd; color: #0070c0; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">Featured</span>
+                        <span class="badge"
+                              style="background: #e8f4fd;
+                            color: #0070c0;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                            font-size: 0.85rem;">
+                            Featured
+                        </span>
                     }
                 </div>
 
-                <div style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                <div style="margin-top: 12px;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    align-items: center;">
+
                     @if (item.IsActive)
                     {
-                        <form asp-action="DeactivateAdvertisement" asp-route-advertisementId="@item.AdvertisementId" method="post" style="display:inline;">
+                        <form asp-action="DeactivateAdvertisement"
+                              asp-route-advertisementId="@item.AdvertisementId"
+                              method="post"
+                              style="display:inline;">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn" style="background:#e8a100;">Deactivate</button>
+
+                            <button type="submit"
+                                    class="btn"
+                                    style="background:#e8a100;">
+                                Deactivate
+                            </button>
                         </form>
                     }
                     else
                     {
-                        <form asp-action="ActivateAdvertisement" asp-route-advertisementId="@item.AdvertisementId" method="post" style="display:inline;">
+                        <form asp-action="ActivateAdvertisement"
+                              asp-route-advertisementId="@item.AdvertisementId"
+                              method="post"
+                              style="display:inline;">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn">Activate</button>
+
+                            <button type="submit" class="btn">
+                                Activate
+                            </button>
                         </form>
                     }
 
-                    <form asp-action="DeleteAdvertisement" asp-route-advertisementId="@item.AdvertisementId" method="post" style="display:inline;">
+                    <form asp-action="DeleteAdvertisement"
+                          asp-route-advertisementId="@item.AdvertisementId"
+                          method="post"
+                          style="display:inline;"
+                          onsubmit="return confirm('Are you sure you want to delete this advertisement?');">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn" style="background:#d64545;">Delete</button>
+
+                        <button type="submit"
+                                class="btn"
+                                style="background:#d64545;">
+                            Delete
+                        </button>
                     </form>
 
-                    <form asp-action="PromoteAdvertisement" asp-route-advertisementId="@item.AdvertisementId" method="post" style="display:inline-flex; align-items:center; gap:8px;">
-                        @Html.AntiForgeryToken()
-                        <input type="number" name="durationInDays" min="1" value="7" class="form-control" style="width:100px;" placeholder="Days" />
-                        <button type="submit" class="btn" style="background:#7b3fe4;">Make Featured</button>
-                    </form>
+                    @if (item.IsFeatured)
+                    {
+                        <form asp-action="DemoteAdvertisement"
+                              asp-route-advertisementId="@item.AdvertisementId"
+                              method="post"
+                              style="display:inline;"
+                              onsubmit="return confirm('Are you sure you want to remove this advertisement from featured listings?');">
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn"
+                                    style="background:#6c757d;">
+                                Remove Featured
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="PromoteAdvertisement"
+                              asp-route-advertisementId="@item.AdvertisementId"
+                              method="post"
+                              style="display:inline-flex;
+                            align-items:center;
+                            gap:8px;">
+                            @Html.AntiForgeryToken()
+
+                            <input type="number"
+                                   name="durationInDays"
+                                   min="1"
+                                   value="7"
+                                   class="form-control"
+                                   style="width:100px;"
+                                   aria-label="Featured duration in days"
+                                   placeholder="Days" />
+
+                            <button type="submit"
+                                    class="btn"
+                                    style="background:#7b3fe4;">
+                                Make Featured
+                            </button>
+                        </form>
+                    }
                 </div>
             </div>
         }

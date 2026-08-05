@@ -28,15 +28,8 @@ public class JobCategoryController : Controller
 
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var category = await _jobCategoryService.GetJobCategoryByIdAsync(id, cancellationToken);
+        var category = await _jobCategoryService.GetJobCategoryByIdAsync(id, cancellationToken);
 
-            return View(category);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return View(category);
     }
 }

@@ -3,6 +3,7 @@ using JobBoardPlatform.Application.Common.Extensions;
 using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
+using JobBoardPlatform.Mvc.Middlewares;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
 
@@ -65,6 +66,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.MapControllerRoute(
     name: "default",

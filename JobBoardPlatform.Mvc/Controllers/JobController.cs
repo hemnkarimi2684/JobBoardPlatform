@@ -28,18 +28,11 @@ public class JobController : Controller
 
     public async Task<IActionResult> Details(Guid id, int pageNumber = 1, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var result = await _jobService.GetJobAdvertisementsAsync(
-                id,
-                new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
-                cancellationToken);
+        var result = await _jobService.GetJobAdvertisementsAsync(
+            id,
+            new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
+            cancellationToken);
 
-            return View(result);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return View(result);
     }
 }

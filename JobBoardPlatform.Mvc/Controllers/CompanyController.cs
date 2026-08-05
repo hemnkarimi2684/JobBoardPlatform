@@ -1,8 +1,6 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobCategoryDto;
-using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
-using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
@@ -42,16 +40,9 @@ public class CompanyController : Controller
 
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var company = await _companyService.GetCompanyByIdAsync(id, cancellationToken);
+        var company = await _companyService.GetCompanyByIdAsync(id, cancellationToken);
 
-            return View(company);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return View(company);
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -66,28 +57,21 @@ public class CompanyController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var company = await _companyService.GetCompanyByIdAsync(id, cancellationToken);
+        var company = await _companyService.GetCompanyByIdAsync(id, cancellationToken);
 
-            await PopulateSelectListsAsync(cancellationToken);
+        await PopulateSelectListsAsync(cancellationToken);
 
-            return View(new UpdateCompanyInfoRequestDto
-            {
-                Name = company.Name,
-                YearOfEstablishment = company.YearOfEstablishment,
-                AboutUs = company.AboutUs,
-                WebSiteAddress = company.WebSiteAddress,
-                OwnershipType = company.OwnershipType,
-                CompanySize = company.CompanySize,
-                JobCategoryId = company.JobCategoryId,
-                ActivityType = company.ActivityType
-            });
-        }
-        catch (NotFoundException)
+        return View(new UpdateCompanyInfoRequestDto
         {
-            return NotFound();
-        }
+            Name = company.Name,
+            YearOfEstablishment = company.YearOfEstablishment,
+            AboutUs = company.AboutUs,
+            WebSiteAddress = company.WebSiteAddress,
+            OwnershipType = company.OwnershipType,
+            CompanySize = company.CompanySize,
+            JobCategoryId = company.JobCategoryId,
+            ActivityType = company.ActivityType
+        });
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -100,36 +84,20 @@ public class CompanyController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _companyService.UpdateCompanyIdAsync(id, model, cancellationToken);
+        await _companyService.UpdateCompanyIdAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "Company information was updated successfully.";
+        TempData["Success"] = "Company information was updated successfully.";
 
-            return RedirectToAction(nameof(MyCompany));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            await PopulateSelectListsAsync(cancellationToken);
-            return View(model);
-        }
+        return RedirectToAction(nameof(MyCompany));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
     public async Task<IActionResult> UploadImage(Guid id, UploadCompanyImageRequestDto model, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _companyService.UploadCompanyImageAsync(id, model, cancellationToken);
+        await _companyService.UploadCompanyImageAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "Company logo was uploaded successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Company logo was uploaded successfully.";
 
         return RedirectToAction(nameof(MyCompany));
     }
@@ -138,32 +106,18 @@ public class CompanyController : Controller
     [HttpPost]
     public async Task<IActionResult> DeleteImage(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _companyService.DeleteCompanyImageAsync(id, cancellationToken);
+        await _companyService.DeleteCompanyImageAsync(id, cancellationToken);
 
-            TempData["Success"] = "Company logo was deleted successfully.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Company logo was deleted successfully.";
 
         return RedirectToAction(nameof(MyCompany));
     }
 
     public async Task<IActionResult> DownloadImage(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var image = await _companyService.DownloadCompanyImageAsync(id, cancellationToken);
+        var image = await _companyService.DownloadCompanyImageAsync(id, cancellationToken);
 
-            return File(image.Data, image.ContentType, image.FileName);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return File(image.Data, image.ContentType, image.FileName);
     }
 
     private Guid CurrentUserId()
