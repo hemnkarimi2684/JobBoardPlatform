@@ -87,7 +87,7 @@ public class AdminController : Controller
         {
             await _userService.ApprovedEmployerAsync(userId, cancellationToken);
 
-            TempData["Success"] = "کارفرما تأیید شد.";
+            TempData["Success"] = "Employer was approved successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -104,7 +104,7 @@ public class AdminController : Controller
         {
             await _userService.RejectEmployerAsync(userId, cancellationToken);
 
-            TempData["Success"] = "کارفرما رد شد.";
+            TempData["Success"] = "Employer was rejected successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -128,7 +128,7 @@ public class AdminController : Controller
         {
             await _userService.ActivateJobSeekerAsync(userId, cancellationToken);
 
-            TempData["Success"] = "کارجو فعال شد.";
+            TempData["Success"] = "Job seeker was activated successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -145,7 +145,7 @@ public class AdminController : Controller
         {
             await _userService.DeactivateJobSeekerAsync(userId, cancellationToken);
 
-            TempData["Success"] = "کارجو غیرفعال شد.";
+            TempData["Success"] = "Job seeker was deactivated successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -171,7 +171,7 @@ public class AdminController : Controller
         {
             await _advertisementService.ActivateAdvertisementAsync(advertisementId, cancellationToken);
 
-            TempData["Success"] = "آگهی فعال شد.";
+            TempData["Success"] = "Advertisement was activated successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -188,7 +188,7 @@ public class AdminController : Controller
         {
             await _advertisementService.DeactivateAdvertisementAsync(advertisementId, cancellationToken);
 
-            TempData["Success"] = "آگهی غیرفعال شد.";
+            TempData["Success"] = "Advertisement was deactivated successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -205,7 +205,7 @@ public class AdminController : Controller
         {
             await _advertisementService.SoftDeleteAdvertisementAsync(advertisementId, cancellationToken);
 
-            TempData["Success"] = "آگهی حذف شد.";
+            TempData["Success"] = "Advertisement was deleted successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -222,7 +222,7 @@ public class AdminController : Controller
         {
             await _advertisementService.PromoteAdvertisementAsync(advertisementId, durationInDays, cancellationToken);
 
-            TempData["Success"] = "آگهی ویژه شد.";
+            TempData["Success"] = "Advertisement was promoted successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -255,7 +255,7 @@ public class AdminController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "داده‌های شهر نامعتبر است.";
+            TempData["Error"] = "The city data is invalid.";
             return RedirectToAction(nameof(Cities));
         }
 
@@ -263,7 +263,7 @@ public class AdminController : Controller
         {
             await _cityService.CreateCityAsync(model, cancellationToken);
 
-            TempData["Success"] = "شهر ساخته شد.";
+            TempData["Success"] = "City was created successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -288,7 +288,7 @@ public class AdminController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "داده‌های استان نامعتبر است.";
+            TempData["Error"] = "The province data is invalid.";
             return RedirectToAction(nameof(Provinces));
         }
 
@@ -296,7 +296,7 @@ public class AdminController : Controller
         {
             await _provinceService.CreateProvinceAsync(model, cancellationToken);
 
-            TempData["Success"] = "استان ساخته شد.";
+            TempData["Success"] = "Province was created successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -321,7 +321,7 @@ public class AdminController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "داده‌های دسته‌بندی نامعتبر است.";
+            TempData["Error"] = "The job category data is invalid.";
             return RedirectToAction(nameof(JobCategories));
         }
 
@@ -329,7 +329,7 @@ public class AdminController : Controller
         {
             await _jobCategoryService.CreateJobCategoryAsync(model, cancellationToken);
 
-            TempData["Success"] = "دسته‌بندی شغلی ساخته شد.";
+            TempData["Success"] = "Job category was created successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -354,7 +354,7 @@ public class AdminController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "داده‌های مهارت نامعتبر است.";
+            TempData["Error"] = "The skill data is invalid.";
             return RedirectToAction(nameof(Skills));
         }
 
@@ -362,7 +362,7 @@ public class AdminController : Controller
         {
             await _skillService.CreateSkillAsync(model, cancellationToken);
 
-            TempData["Success"] = "مهارت ساخته شد.";
+            TempData["Success"] = "Skill was created successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -395,7 +395,7 @@ public class AdminController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "داده‌های شغل نامعتبر است.";
+            TempData["Error"] = "The job data is invalid.";
             return RedirectToAction(nameof(Jobs));
         }
 
@@ -403,7 +403,7 @@ public class AdminController : Controller
         {
             await _jobService.CreateJobAsync(model, cancellationToken);
 
-            TempData["Success"] = "شغل ساخته شد.";
+            TempData["Success"] = "Job was created successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -427,7 +427,7 @@ public class AdminController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "داده‌های قالب نامعتبر است.";
+            TempData["Error"] = "The email template data is invalid.";
             return RedirectToAction(nameof(EmailTemplates));
         }
 
@@ -435,7 +435,7 @@ public class AdminController : Controller
         {
             await _emailService.UpdateTemplateAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "قالب ایمیل ویرایش شد.";
+            TempData["Success"] = "Email template was updated successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -452,7 +452,7 @@ public class AdminController : Controller
         {
             await _emailService.ActivateTemplateAsync(id, cancellationToken);
 
-            TempData["Success"] = "قالب ایمیل فعال شد.";
+            TempData["Success"] = "Email template was activated successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -469,7 +469,7 @@ public class AdminController : Controller
         {
             await _emailService.DeactivateTemplateAsync(id, cancellationToken);
 
-            TempData["Success"] = "قالب ایمیل غیرفعال شد.";
+            TempData["Success"] = "Email template was deactivated successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {

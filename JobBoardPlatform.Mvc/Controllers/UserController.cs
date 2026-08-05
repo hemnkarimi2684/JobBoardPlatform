@@ -14,7 +14,7 @@ using System.Security.Claims;
 
 namespace JobBoardPlatform.Mvc.Controllers;
 
-[Authorize(Roles = "JobSeeker")]
+[Authorize(Policy = "ActiveJobSeekerOnly")]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
@@ -56,7 +56,7 @@ public class UserController : Controller
         {
             await _userService.CreateProfileAsync(model, cancellationToken);
 
-            TempData["Success"] = "پروفایل با موفقیت ساخته شد.";
+            TempData["Success"] = "Profile was created successfully.";
 
             return RedirectToAction(nameof(Profile));
         }
@@ -99,7 +99,7 @@ public class UserController : Controller
         {
             await _userService.UpdateProfileAsync(CurrentUserId(), model, cancellationToken);
 
-            TempData["Success"] = "پروفایل با موفقیت ویرایش شد.";
+            TempData["Success"] = "Profile was updated successfully.";
 
             return RedirectToAction(nameof(Profile));
         }
@@ -132,7 +132,7 @@ public class UserController : Controller
         {
             await _userService.UploadUserImageAsync(CurrentUserId(), model, cancellationToken);
 
-            TempData["Success"] = "عکس پروفایل آپلود شد.";
+            TempData["Success"] = "Profile image was uploaded successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -149,7 +149,7 @@ public class UserController : Controller
         {
             await _userService.DeleteUserImageAsync(CurrentUserId(), cancellationToken);
 
-            TempData["Success"] = "عکس پروفایل حذف شد.";
+            TempData["Success"] = "Profile image was deleted successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {

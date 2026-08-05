@@ -54,7 +54,7 @@ public class CompanyController : Controller
         }
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> MyCompany(CancellationToken cancellationToken = default)
     {
         var employer = await _userService.GetEmployerWithCompanyAsync(CurrentUserId(), cancellationToken);
@@ -62,7 +62,7 @@ public class CompanyController : Controller
         return View(employer);
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
@@ -90,7 +90,7 @@ public class CompanyController : Controller
         }
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
     public async Task<IActionResult> Edit(Guid id, UpdateCompanyInfoRequestDto model, CancellationToken cancellationToken)
     {
@@ -104,7 +104,7 @@ public class CompanyController : Controller
         {
             await _companyService.UpdateCompanyIdAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "اطلاعات شرکت با موفقیت ویرایش شد.";
+            TempData["Success"] = "Company information was updated successfully.";
 
             return RedirectToAction(nameof(MyCompany));
         }
@@ -116,7 +116,7 @@ public class CompanyController : Controller
         }
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
     public async Task<IActionResult> UploadImage(Guid id, UploadCompanyImageRequestDto model, CancellationToken cancellationToken)
     {
@@ -124,7 +124,7 @@ public class CompanyController : Controller
         {
             await _companyService.UploadCompanyImageAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "لوگوی شرکت آپلود شد.";
+            TempData["Success"] = "Company logo was uploaded successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -134,7 +134,7 @@ public class CompanyController : Controller
         return RedirectToAction(nameof(MyCompany));
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
     public async Task<IActionResult> DeleteImage(Guid id, CancellationToken cancellationToken)
     {
@@ -142,7 +142,7 @@ public class CompanyController : Controller
         {
             await _companyService.DeleteCompanyImageAsync(id, cancellationToken);
 
-            TempData["Success"] = "لوگوی شرکت حذف شد.";
+            TempData["Success"] = "Company logo was deleted successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {

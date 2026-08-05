@@ -1,4 +1,6 @@
+using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
 using JobBoardPlatform.Application.Common.Extensions;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -17,6 +19,17 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
     .ReadFrom.Services(services)
     .Enrich.FromLogContext());
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApprovedEmployerOnly", policy =>
+        policy.RequireRole(RoleConstants.EmployerRoleName)
+              .RequireClaim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue));
+
+    options.AddPolicy("ActiveJobSeekerOnly", policy =>
+        policy.RequireRole(RoleConstants.JobSeekerRoleName)
+              .RequireClaim(UserClaims.JobSeekerClaimType, UserClaims.IsActiveClaimValue));
+});
 
 builder.Services.AddAuthentication(options =>
 {

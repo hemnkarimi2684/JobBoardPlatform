@@ -23,7 +23,7 @@ public class JobApplicationController : Controller
         _resumeService = resumeService;
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> My(int pageNumber = 1, CancellationToken cancellationToken = default)
     {
         var result = await _jobApplicationService.GetJobApplicationsByUserIdAsync(
@@ -34,7 +34,7 @@ public class JobApplicationController : Controller
         return View(result);
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> ByAdvertisement(Guid advertisementId, int pageNumber = 1, CancellationToken cancellationToken = default)
     {
         var result = await _jobApplicationService.GetAdvertisementJobApplicationsAsync(
@@ -47,7 +47,7 @@ public class JobApplicationController : Controller
         return View(result);
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [HttpPost]
     public async Task<IActionResult> Apply(Guid advertisementId, CancellationToken cancellationToken)
     {
@@ -59,7 +59,7 @@ public class JobApplicationController : Controller
 
             if (resume.ResumeId is null)
             {
-                TempData["Error"] = "برای ارسال درخواست ابتدا باید رزومه بسازید.";
+                TempData["Error"] = "Please create a resume before applying for this job.";
 
                 return RedirectToAction("Create", "Resume");
             }
@@ -73,7 +73,7 @@ public class JobApplicationController : Controller
                 },
                 cancellationToken);
 
-            TempData["Success"] = "درخواست شما با موفقیت ثبت شد.";
+            TempData["Success"] = "Your application was submitted successfully.";
 
             return RedirectToAction("My");
         }
@@ -85,7 +85,7 @@ public class JobApplicationController : Controller
         }
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
     public async Task<IActionResult> ChangeStatus(Guid id, JobApplicationStatus status, Guid advertisementId, CancellationToken cancellationToken)
     {
@@ -93,7 +93,7 @@ public class JobApplicationController : Controller
         {
             await _jobApplicationService.UpdateJobApplicationStatusAsync(id, status, cancellationToken);
 
-            TempData["Success"] = "وضعیت درخواست به‌روزرسانی شد.";
+            TempData["Success"] = "Application status was updated successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -103,7 +103,7 @@ public class JobApplicationController : Controller
         return RedirectToAction(nameof(ByAdvertisement), new { advertisementId });
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [HttpPost]
     [ValidateAntiForgeryToken] 
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
@@ -111,7 +111,7 @@ public class JobApplicationController : Controller
         try
         {
             await _jobApplicationService.CancelJobApplicationAsync(id, cancellationToken);
-            TempData["Success"] = "درخواست با موفقیت کنسل شد.";
+            TempData["Success"] = "Application was canceled successfully.";
         }
         
         catch (Exception ex) when (ex is AppException || ex.GetType().Name == "ValidationException")
@@ -120,7 +120,7 @@ public class JobApplicationController : Controller
         }
         catch (Exception)
         {
-            TempData["Error"] = "خطایی در هنگام لغو درخواست رخ داد.";
+            TempData["Error"] = "An error occurred while canceling the application. Please try again.";
         }
 
         return RedirectToAction(nameof(My));

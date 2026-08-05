@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace JobBoardPlatform.Mvc.Controllers;
 
-[Authorize(Roles = "JobSeeker")]
+[Authorize(Policy = "ActiveJobSeekerOnly")]
 public class EducationDetailController : Controller
 {
     private readonly IEducationDetailService _educationDetailService;
@@ -55,7 +55,7 @@ public class EducationDetailController : Controller
         {
             await _educationDetailService.CreateEducationDetailAsync(model, cancellationToken);
 
-            TempData["Success"] = "سوابق تحصیلی ثبت شد.";
+            TempData["Success"] = "Education detail was created successfully.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -106,7 +106,7 @@ public class EducationDetailController : Controller
         {
             await _educationDetailService.UpdateEducationDetailAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "سوابق تحصیلی ویرایش شد.";
+            TempData["Success"] = "Education detail was updated successfully.";
 
             return RedirectToAction(nameof(Index));
         }

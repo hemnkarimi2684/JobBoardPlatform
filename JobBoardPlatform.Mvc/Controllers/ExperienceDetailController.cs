@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace JobBoardPlatform.Mvc.Controllers;
 
-[Authorize(Roles = "JobSeeker")]
+[Authorize(Policy = "ActiveJobSeekerOnly")]
 public class ExperienceDetailController : Controller
 {
     private readonly IExperienceDetailService _experienceDetailService;
@@ -55,7 +55,7 @@ public class ExperienceDetailController : Controller
         {
             await _experienceDetailService.CreateExperienceDetailAsync(model, cancellationToken);
 
-            TempData["Success"] = "سوابق کاری ثبت شد.";
+            TempData["Success"] = "Experience detail was created successfully.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -106,7 +106,7 @@ public class ExperienceDetailController : Controller
         {
             await _experienceDetailService.UpdateExperienceDetailAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "سوابق کاری ویرایش شد.";
+            TempData["Success"] = "Experience detail was updated successfully.";
 
             return RedirectToAction(nameof(Index));
         }

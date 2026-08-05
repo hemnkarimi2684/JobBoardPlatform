@@ -109,7 +109,7 @@ public class AdvertisementController : Controller
         }
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> MyAds(int pageNumber = 1, CancellationToken cancellationToken = default)
     {
         var employer = await _userService.GetEmployerWithCompanyAsync(CurrentUserId(), cancellationToken);
@@ -122,7 +122,7 @@ public class AdvertisementController : Controller
         return View(result);
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
@@ -131,7 +131,7 @@ public class AdvertisementController : Controller
         return View();
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
     public async Task<IActionResult> Create(CreateAdvertisementRequestDto model, CancellationToken cancellationToken)
     {
@@ -145,7 +145,7 @@ public class AdvertisementController : Controller
         {
             await _advertisementService.CreateAdvertisementAsync(model, cancellationToken);
 
-            TempData["Success"] = "آگهی با موفقیت ثبت شد.";
+            TempData["Success"] = "Advertisement was created successfully.";
 
             return RedirectToAction(nameof(MyAds));
         }
@@ -157,7 +157,7 @@ public class AdvertisementController : Controller
         }
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
@@ -184,7 +184,7 @@ public class AdvertisementController : Controller
         }
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
     public async Task<IActionResult> Edit(Guid id, UpdateAdvertisementRequestDto model, CancellationToken cancellationToken)
     {
@@ -198,7 +198,7 @@ public class AdvertisementController : Controller
         {
             await _advertisementService.UpdateAdvertisementAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "آگهی با موفقیت ویرایش شد.";
+            TempData["Success"] = "Advertisement was updated successfully.";
 
             return RedirectToAction(nameof(MyAds));
         }

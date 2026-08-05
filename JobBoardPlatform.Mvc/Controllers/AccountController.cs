@@ -129,7 +129,7 @@ public class AccountController : Controller
         {
             await _authenticationService.RegisterEmployerAsync(model, cancellationToken);
 
-            TempData["Success"] = "ثبت‌نام شما با موفقیت انجام شد. پس از تأیید ادمین می‌توانید وارد شوید.";
+            TempData["Success"] = "Your registration was completed successfully. You can sign in after admin approval.";
 
             return RedirectToAction(nameof(Login));
         }

@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace JobBoardPlatform.Mvc.Controllers;
 
-[Authorize(Roles = "JobSeeker")]
+[Authorize(Policy = "ActiveJobSeekerOnly")]
 public class ResumeController : Controller
 {
     private readonly IResumeService _resumeService;
@@ -43,7 +43,7 @@ public class ResumeController : Controller
         {
             await _resumeService.CreateResumeAsync(model, cancellationToken);
 
-            TempData["Success"] = "رزومه با موفقیت ساخته شد.";
+            TempData["Success"] = "Resume was created successfully.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -61,7 +61,7 @@ public class ResumeController : Controller
         {
             await _resumeService.UploadResumeFileByResumeIdAsync(resumeId, model, cancellationToken);
 
-            TempData["Success"] = "فایل رزومه آپلود شد.";
+            TempData["Success"] = "Resume file was uploaded successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
@@ -92,7 +92,7 @@ public class ResumeController : Controller
         {
             await _resumeService.DeleteResumeFileByIdAsync(resumeId, cancellationToken);
 
-            TempData["Success"] = "فایل رزومه حذف شد.";
+            TempData["Success"] = "Resume file was deleted successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {

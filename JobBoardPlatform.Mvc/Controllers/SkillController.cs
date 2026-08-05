@@ -29,7 +29,7 @@ public class SkillController : Controller
         return View(result);
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> MySkills(CancellationToken cancellationToken = default)
     {
         var skills = await _skillService.GetUserSkillsAsync(
@@ -49,7 +49,7 @@ public class SkillController : Controller
         return View(skills);
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [HttpPost]
     public async Task<IActionResult> Assign(List<Guid> skillsId, CancellationToken cancellationToken)
     {
@@ -57,7 +57,7 @@ public class SkillController : Controller
         {
             await _skillService.AddSkillsToUserAsync(CurrentUserId(), skillsId, cancellationToken);
 
-            TempData["Success"] = "مهارت‌ها با موفقیت اضافه شدند.";
+            TempData["Success"] = "Skills were added successfully.";
         }
         catch (Exception ex) when (ex is AppException)
         {
