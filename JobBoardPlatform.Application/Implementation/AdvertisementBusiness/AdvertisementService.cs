@@ -13,7 +13,6 @@ using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.AdvertisementSkillEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
-using System.Linq.Expressions;
 
 
 namespace JobBoardPlatform.Application.Implementation.AdvertisementBusiness;
@@ -281,7 +280,7 @@ public class AdvertisementService : IAdvertisementService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        var predicate = BuildSearchFilterPredicate(searchDto, filterDto);
+        var predicate = QueryFilterHelper.BuildSearchFilterPredicate(searchDto, filterDto);
 
         return await _unitOfWork.AdvertisementRepository.QueryAsync(
             a => new AdvertisementDetailResponseDto
@@ -313,82 +312,6 @@ public class AdvertisementService : IAdvertisementService
             cancellationToken,
             pagingCommand.PageNumber,
             pagingCommand.PageSize);
-    }
-
-    private static Expression<Func<Advertisement, bool>> BuildSearchFilterPredicate(
-        AdvertisementSearchRequestDto searchDto,
-        AdvertisementFilterRequestDto filterDto)
-    {
-        var parameter = Expression.Parameter(typeof(Advertisement), "a");
-
-        Expression? combined = null;
-
-        if (!string.IsNullOrWhiteSpace(searchDto.SearchTerm))
-        {
-            var term = searchDto.SearchTerm.Trim();
-            var containsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) });
-            var termConstant = Expression.Constant(term);
-
-            var jobLike = Expression.Call(
-                Expression.Property(Expression.Property(parameter, nameof(Advertisement.Job)), nameof(Advertisement.Job.Name)),
-                containsMethod,
-                termConstant);
-
-            var cityLike = Expression.Call(
-                Expression.Property(Expression.Property(parameter, nameof(Advertisement.City)), nameof(Advertisement.City.Name)),
-                containsMethod,
-                termConstant);
-
-            var companyLike = Expression.Call(
-                Expression.Property(Expression.Property(parameter, nameof(Advertisement.Company)), nameof(Advertisement.Company.Name)),
-                containsMethod,
-                termConstant);
-
-            combined = Expression.OrElse(jobLike, Expression.OrElse(cityLike, companyLike));
-        }
-
-        if (filterDto.JobCategoryId.HasValue)
-        {
-            var jobCategoryId = Expression.Property(
-                Expression.Property(parameter, nameof(Advertisement.Job)),
-                nameof(Advertisement.Job.JobCategoryId));
-
-            var equal = Expression.Equal(jobCategoryId, Expression.Constant(filterDto.JobCategoryId.Value));
-
-            combined = combined is null ? equal : Expression.AndAlso(combined, equal);
-        }
-
-        if (filterDto.CollaborationType.HasValue)
-        {
-            var collaborationType = Expression.Property(parameter, nameof(Advertisement.CollaborationType));
-
-            var equal = Expression.Equal(collaborationType, Expression.Constant(filterDto.CollaborationType.Value));
-
-            combined = combined is null ? equal : Expression.AndAlso(combined, equal);
-        }
-
-        if (filterDto.MinimumSalary.HasValue)
-        {
-            var minimumSalary = Expression.Property(parameter, nameof(Advertisement.MinimumSalary));
-
-            var greaterOrEqual = Expression.GreaterThanOrEqual(minimumSalary, Expression.Constant(filterDto.MinimumSalary.Value));
-
-            combined = combined is null ? greaterOrEqual : Expression.AndAlso(combined, greaterOrEqual);
-        }
-
-        if (filterDto.MaximumSalary.HasValue)
-        {
-            var maximumSalary = Expression.Property(parameter, nameof(Advertisement.MaximumSalary));
-
-            var lessOrEqual = Expression.LessThanOrEqual(maximumSalary, Expression.Constant(filterDto.MaximumSalary.Value));
-
-            combined = combined is null ? lessOrEqual : Expression.AndAlso(combined, lessOrEqual);
-        }
-
-        if (combined is null)
-            combined = Expression.Constant(true);
-
-        return Expression.Lambda<Func<Advertisement, bool>>(combined, parameter);
     }
 
     public async Task<Pagination<AdvertisementDetailResponseDto>> FilterAdvertisementsAsync(
