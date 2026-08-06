@@ -259,7 +259,6 @@ public class CompanyService : ICompanyService
 
     #region DownLoad Company Image
 
-
     public async Task<AttachmentResponseDto> DownloadCompanyImageAsync(
         Guid companyId,
         CancellationToken cancellationToken = default)
@@ -275,12 +274,13 @@ public class CompanyService : ICompanyService
         return await _attachmentService.DownloadAsync(company.CompanyImageFileId.Value, cancellationToken);
     }
 
-
     #endregion
 
     #region Private Methods
 
-    private async Task DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken)
+    private async Task DeleteAttachmentAsync(
+        Guid attachmentId,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -292,7 +292,10 @@ public class CompanyService : ICompanyService
         }
     }
 
-    private async Task UploadImageAsync(Company company, IFormFile image, CancellationToken cancellationToken)
+    private async Task UploadImageAsync(
+        Company company, 
+        IFormFile image,
+        CancellationToken cancellationToken)
     {
         //نگه داشتن ایدی عکس قبلی برای حذف شدن بعد از اپدیت عکس توسط کارفرما
         var oldImageId = company.CompanyImageFileId;
@@ -326,7 +329,8 @@ public class CompanyService : ICompanyService
             await DeleteAttachmentAsync(oldImageId.Value, cancellationToken);
     }
 
-    private CompanyInfoUpdate MapToCompanyInfoUpdate(UpdateCompanyInfoRequestDto updateCompanyInfoCommand)
+    private CompanyInfoUpdate MapToCompanyInfoUpdate(
+        UpdateCompanyInfoRequestDto updateCompanyInfoCommand)
     {
         return new CompanyInfoUpdate
         (
@@ -342,7 +346,12 @@ public class CompanyService : ICompanyService
         );
     }
 
-    private async Task ValidateForCreateAsync(Guid cityId, Guid jobCategoryId, string companyName, Guid ownedByUserId, CancellationToken cancellationToken)
+    private async Task ValidateForCreateAsync(
+        Guid cityId,
+        Guid jobCategoryId, 
+        string companyName,
+        Guid ownedByUserId, 
+        CancellationToken cancellationToken)
     {
         var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(cityId, cancellationToken);
 

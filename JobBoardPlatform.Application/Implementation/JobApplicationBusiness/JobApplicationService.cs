@@ -218,6 +218,8 @@ public class JobApplicationService : IJobApplicationService
         Guid employerUserId,
         CancellationToken cancellationToken = default)
     {
+
+        // اینجا چک میکنم ببینم کسی که درخواست دیدن رزومه کاربر رو کرده ایا اصلا دارای اون اگهیه یا کسی دیگه ایه که میخواد ببینه 
         var applicantUserId = await _unitOfWork.JobApplicationRepository.GetApplicantUserIdIfEmployerOwnsApplicationAsync(
             jobApplicationId,
             employerUserId,
