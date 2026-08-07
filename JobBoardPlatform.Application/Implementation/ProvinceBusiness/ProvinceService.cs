@@ -70,5 +70,15 @@ public class ProvinceService : IProvinceService
         return Pagination<ProvinceResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
     }
 
+    public async Task<List<ProvinceResponseDto>> GetAllForSelectAsync(CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.ProvinceRepository.GetAllForSelectAsync(p => new ProvinceResponseDto
+        {
+            Code = p.ProvinceCode,
+            Name = p.Name,
+            ProvinceId = p.Id
+        }, cancellationToken);
+    }
+
     #endregion
 }

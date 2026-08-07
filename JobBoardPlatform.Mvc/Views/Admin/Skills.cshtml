@@ -9,35 +9,51 @@
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div> @* corrected class to alert-danger *@
+        <div class="alert alert-success" style="padding: 10px; margin-bottom: 15px; border-radius: 4px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
+            @TempData["Success"]
+        </div>
     }
 
-    <div class="card" style="margin-bottom: 25px;">
-        <h3 style="margin-top: 0;">Add New Skill</h3>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" style="padding: 10px; margin-bottom: 15px; border-radius: 4px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="card" style="margin-bottom: 25px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 6px; background-color: #ffffff;">
+        <h3 style="margin-top: 0; color: #333;">Add New Skill</h3>
+
         <form asp-action="CreateSkill" method="post">
             @Html.AntiForgeryToken()
 
-            @* Hidden field for pageNumber to preserve state *@
+            @* حفظ وضعیت صفحه در هنگام ثبت فرم *@
             <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom: 10px;"></div>
 
             <div class="form-group" style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px;">Skill Name</label>
-                <input type="text" name="Name" class="form-control" placeholder="e.g. ASP.NET Core" />
+                <label for="Name" style="display: block; margin-bottom: 5px; font-weight: 600;">Skill Name</label>
+                <input type="text"
+                       id="Name"
+                       name="Name"
+                       class="form-control"
+                       placeholder="e.g. ASP.NET Core"
+                       required
+                       style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
             </div>
 
-            <button type="submit" class="btn">Add Skill</button>
+            <button type="submit" class="btn" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Add Skill
+            </button>
         </form>
     </div>
 
     @if (Model.Data == null || Model.Data.Count == 0)
     {
-        <div class="empty">No skills registered.</div>
+        <div class="empty" style="padding: 15px; background: #f9f9f9; border: 1px solid #eee; text-align: center; color: #666;">
+            No skills registered.
+        </div>
     }
     else
     {
@@ -57,7 +73,7 @@
             </tbody>
         </table>
 
-        @* Custom Pagination Implementation *@
+        @* کنترل‌های صفحه‌بندی *@
         @if (Model.TotalPageCount > 1)
         {
             <div style="margin-top: 20px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
@@ -74,7 +90,7 @@
                 {
                     if (i == Model.PageNumber)
                     {
-                        <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white;">
+                        <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white; font-weight: bold;">
                             @i
                         </span>
                     }
@@ -100,9 +116,3 @@
         }
     }
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

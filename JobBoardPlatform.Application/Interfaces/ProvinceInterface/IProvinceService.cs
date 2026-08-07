@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ProvinceDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ProvinceDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
@@ -29,5 +30,13 @@ public interface IProvinceService
     /// <returns></returns>
     Task CreateProvinceAsync(
         CreateProvinceRequestDto provinceRequestDto,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام استان ها برای دراپ داون 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<ProvinceResponseDto>> GetAllForSelectAsync(
         CancellationToken cancellationToken = default);
 }

@@ -251,36 +251,24 @@ public class AdminController : Controller
     int pageNumber = 1,
     CancellationToken cancellationToken = default)
     {
-        const int cityPageSize = 10;
-        const int provincePageSize = 1000;
+        const int pageSize = 10;
 
         pageNumber = pageNumber <= 0 ? 1 : pageNumber;
 
-        var citiesTask = _cityService.GetAllCitiesAsync(
+        var cities = await _cityService.GetAllCitiesAsync(
             new TextRequestDto(),
             new PagingRequestDto
             {
                 PageNumber = pageNumber,
-                PageSize = cityPageSize
+                PageSize = pageSize
             },
             cancellationToken);
 
-        var provincesTask = _provinceService.GetAllProvincesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto
-            {
-                PageNumber = 1,
-                PageSize = provincePageSize
-            },
+        var provinces = await _provinceService.GetAllForSelectAsync(
             cancellationToken);
-
-        await Task.WhenAll(citiesTask, provincesTask);
-
-        var cities = await citiesTask;
-        var provinces = await provincesTask;
 
         ViewBag.Provinces = new SelectList(
-            provinces.Data,
+            provinces,
             nameof(ProvinceResponseDto.ProvinceId),
             nameof(ProvinceResponseDto.Name));
 
@@ -398,12 +386,12 @@ public class AdminController : Controller
             new { pageNumber });
     }
 
+    [HttpGet]
     public async Task<IActionResult> Skills(
-    int pageNumber = 1,
-    CancellationToken cancellationToken = default)
+            int pageNumber = 1,
+            CancellationToken cancellationToken = default)
     {
         const int pageSize = 10;
-
         pageNumber = pageNumber <= 0 ? 1 : pageNumber;
 
         var result = await _skillService.GetAllSkillsAsync(
@@ -427,8 +415,7 @@ public class AdminController : Controller
     {
         if (!ModelState.IsValid)
         {
-            TempData["Error"] = "The skill data is invalid.";
-
+            TempData["Error"] = "The skill data is invalid. Please check the input.";
             return RedirectToAction(nameof(Skills), new { pageNumber });
         }
 
@@ -484,7 +471,7 @@ public class AdminController : Controller
     int pageNumber = 1,
     CancellationToken cancellationToken = default)
     {
-        const int pageSize = 10; 
+        const int pageSize = 10;
 
         pageNumber = pageNumber <= 0 ? 1 : pageNumber;
 
@@ -504,7 +491,7 @@ public class AdminController : Controller
     public async Task<IActionResult> UpdateTemplate(
         Guid id,
         UpdateTemplateRequestDto model,
-        int pageNumber = 1, 
+        int pageNumber = 1,
         CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
@@ -525,7 +512,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ActivateTemplate(
         Guid id,
-        int pageNumber = 1, 
+        int pageNumber = 1,
         CancellationToken cancellationToken = default)
     {
         await _emailService.ActivateTemplateAsync(id, cancellationToken);
@@ -539,7 +526,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeactivateTemplate(
         Guid id,
-        int pageNumber = 1, 
+        int pageNumber = 1,
         CancellationToken cancellationToken = default)
     {
         await _emailService.DeactivateTemplateAsync(id, cancellationToken);

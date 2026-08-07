@@ -11,9 +11,10 @@
     {
         <div class="alert alert-success">@TempData["Success"]</div>
     }
+
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">@TempData["Error"]</div> @* Use alert-danger for errors *@
+        <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
     @if (Model.Data == null || Model.Data.Count == 0)
@@ -27,6 +28,7 @@
             <div class="card" style="margin-bottom: 20px;">
                 <h3 style="margin-top: 0;">@item.Key</h3>
                 <div class="meta" style="color: #666; margin-bottom: 10px;">@item.Subject</div>
+
                 <div style="margin-bottom: 15px;">
                     @if (item.IsActive)
                     {
@@ -38,10 +40,8 @@
                     }
                 </div>
 
-                @* Form for updating the template *@
                 <form asp-action="UpdateTemplate" asp-route-id="@item.Id" method="post" style="margin-top:12px;">
                     @Html.AntiForgeryToken()
-                    @* Hidden field for pageNumber to preserve state *@
                     <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
 
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -49,25 +49,21 @@
                     <div class="form-group" style="margin-bottom: 10px;">
                         <label>Subject</label>
                         <input type="text" name="Subject" value="@item.Subject" class="form-control" />
-                        <span asp-validation-for="@item.Subject" class="text-danger"></span> @* Add validation message placeholder *@
                     </div>
 
                     <div class="form-group" style="margin-bottom: 10px;">
                         <label>Template Body</label>
                         <textarea name="Body" class="form-control" rows="6">@item.Body</textarea>
-                        <span asp-validation-for="@item.Body" class="text-danger"></span> @* Add validation message placeholder *@
                     </div>
 
                     <button type="submit" class="btn">Save Changes</button>
                 </form>
 
-                @* Activate/Deactivate Form *@
                 <div style="margin-top:15px; border-top: 1px solid #eee; padding-top: 10px;">
                     @if (item.IsActive)
                     {
                         <form asp-action="DeactivateTemplate" asp-route-id="@item.Id" method="post" style="display:inline;">
                             @Html.AntiForgeryToken()
-                            @* Hidden field for pageNumber *@
                             <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
                             <button type="submit" class="btn" style="background:#e8a100;">Deactivate</button>
                         </form>
@@ -76,7 +72,6 @@
                     {
                         <form asp-action="ActivateTemplate" asp-route-id="@item.Id" method="post" style="display:inline;">
                             @Html.AntiForgeryToken()
-                            @* Hidden field for pageNumber *@
                             <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
                             <button type="submit" class="btn">Activate</button>
                         </form>
@@ -85,7 +80,6 @@
             </div>
         }
 
-        @* Custom Pagination Implementation *@
         @if (Model.TotalPageCount > 1)
         {
             <div style="margin-top: 20px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
@@ -128,9 +122,3 @@
         }
     }
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
