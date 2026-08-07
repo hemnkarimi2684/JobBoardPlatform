@@ -53,7 +53,21 @@ public interface ICityService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// دریافت شهر توسط ایدی
+    /// </summary>
+    /// <param name="cityId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task<CityDetailResponseDto> GetCityByIdAsync(
         Guid cityId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام شهر ها برای دراپ داون 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<CityDetailResponseDto>> GetAllForSelectAsync(
         CancellationToken cancellationToken = default);
 }

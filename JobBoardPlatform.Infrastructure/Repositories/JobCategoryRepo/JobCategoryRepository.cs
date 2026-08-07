@@ -19,6 +19,17 @@ public class JobCategoryRepository : GenericRepository<JobCategory>, IJobCategor
                           .AnyAsync(jc => jc.Id == jobCategoryId, cancellationToken);
     }
 
+    public async Task<List<TResult>> GetAllForSelectAsync<TResult>(
+        Expression<Func<JobCategory, TResult>> projection,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+            .AsNoTracking()
+            .OrderBy(category => category.Name)
+            .Select(projection)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<(List<TResult> Items, int TotalDataCount)> GetAllJobCategoriesAsync<TResult>(
         Expression<Func<JobCategory, TResult>> projection,
         string? text,
@@ -55,7 +66,7 @@ public class JobCategoryRepository : GenericRepository<JobCategory>, IJobCategor
 
     public async Task<TResult?> GetJobCategoryByProjectionAsync<TResult>(
         Expression<Func<JobCategory, TResult>> projection,
-        Guid jobCategoryId, 
+        Guid jobCategoryId,
         CancellationToken cancellationToken)
     {
         return await Entities

@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
+using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Core.Entities.CityEntity.Data;
@@ -74,4 +75,17 @@ public interface ICityRepository : IGenericRepository<City>
         Expression<Func<City,TResult>> projection,
         Guid cityId,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// دریافت تمام شهر ها برای دراپ داون توی یو ای 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<TResult>> GetAllForSelectAsync<TResult>(
+        Expression<Func<City, TResult>> projection,
+        CancellationToken cancellationToken);
+
+
 }

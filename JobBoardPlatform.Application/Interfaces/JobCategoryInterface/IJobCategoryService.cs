@@ -38,4 +38,12 @@ public interface IJobCategoryService
     Task<JobCategoryDetailResponseDto> GetJobCategoryByIdAsync(
         Guid jobCategoryId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام دسته بندی های شغلی برای دراپ داون 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<JobCategoryResponseDto>> GetAllForSelectAsync(
+        CancellationToken cancellationToken = default);
 }

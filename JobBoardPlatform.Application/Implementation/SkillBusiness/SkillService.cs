@@ -45,7 +45,7 @@ public class SkillService : ISkillService
         {
             foreach (var skillId in skillsId.Distinct())
             {
-                var isDuplicateSkillForUser = await _unitOfWork.UserSkillRepository.IsDuplicateSkillForUserAsync(userId, skillId,cancellationToken);
+                var isDuplicateSkillForUser = await _unitOfWork.UserSkillRepository.IsDuplicateSkillForUserAsync(userId, skillId, cancellationToken);
 
                 if (isDuplicateSkillForUser)
                     throw new ConflictException($"user already has skill");
@@ -102,6 +102,15 @@ public class SkillService : ISkillService
                                                                pagingCommand.PageSize,
                                                                totalDataCount
                                                                );
+    }
+
+    public async Task<List<SkillDetailResponseDto>> GetAllForSelectAsync(CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.SkillRepository.GetAllForSelectAsync(s => new SkillDetailResponseDto
+        {
+            SkillId = s.Id,
+            SkillName = s.Name
+        }, cancellationToken);
     }
 
     public async Task<SkillDetailResponseDto> GetSkillByIdAsync(

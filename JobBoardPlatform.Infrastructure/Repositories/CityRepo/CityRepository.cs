@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Core.Entities.CityEntity.Data;
 using JobBoardPlatform.Core.Entities.CityEntity.Entity;
+using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,17 @@ public class CityRepository : GenericRepository<City>, ICityRepository
                              .ToListAsync(cancellationToken);
 
         return (result, totalDataCount);
+    }
+
+    public async Task<List<TResult>> GetAllForSelectAsync<TResult>(
+        Expression<Func<City, TResult>> projection,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                    .AsNoTracking()
+                    .OrderBy(city => city.Name)
+                    .Select(projection)
+                    .ToListAsync(cancellationToken);
     }
 
     public async Task<TResult?> GetCityByIdAsync<TResult>(

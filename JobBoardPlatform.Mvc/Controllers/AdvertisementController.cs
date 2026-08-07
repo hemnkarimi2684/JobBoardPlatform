@@ -83,12 +83,10 @@ public class AdvertisementController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        var categories = await _jobCategoryService.GetAllJobCategoriesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var categories = await _jobCategoryService.GetAllForSelectAsync(
             cancellationToken);
 
-        ViewBag.JobCategories = new SelectList(categories.Data, nameof(JobCategoryResponseDto.JobCategoryId), nameof(JobCategoryResponseDto.Name));
+        ViewBag.JobCategories = new SelectList(categories, nameof(JobCategoryResponseDto.JobCategoryId), nameof(JobCategoryResponseDto.Name));
         ViewBag.CollaborationTypes = Enum.GetValues<CollaborationType>()
             .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
             .ToList();
@@ -175,26 +173,20 @@ public class AdvertisementController : Controller
 
     private async Task PopulateSelectListsAsync(CancellationToken cancellationToken)
     {
-        var jobs = await _jobService.GetAllJobsAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var jobs = await _jobService.GetAllForSelectAsync(
             cancellationToken);
 
-        var cities = await _cityService.GetAllCitiesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var cities = await _cityService.GetAllForSelectAsync(
             cancellationToken);
 
-        var skills = await _skillService.GetAllSkillsAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var skills = await _skillService.GetAllForSelectAsync(
             cancellationToken);
 
         var employer = await _userService.GetEmployerWithCompanyAsync(CurrentUserId(), cancellationToken);
 
-        ViewBag.Jobs = new SelectList(jobs.Data, "JobId", "Name");
-        ViewBag.Cities = new SelectList(cities.Data, nameof(CityDetailResponseDto.CityId), nameof(CityDetailResponseDto.CityName));
-        ViewBag.Skills = new MultiSelectList(skills.Data, nameof(SkillDetailResponseDto.SkillId), nameof(SkillDetailResponseDto.SkillName));
+        ViewBag.Jobs = new SelectList(jobs, "JobId", "Name");
+        ViewBag.Cities = new SelectList(cities, nameof(CityDetailResponseDto.CityId), nameof(CityDetailResponseDto.CityName));
+        ViewBag.Skills = new MultiSelectList(skills, nameof(SkillDetailResponseDto.SkillId), nameof(SkillDetailResponseDto.SkillName));
         ViewBag.CollaborationTypes = Enum.GetValues<CollaborationType>()
             .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
             .ToList();

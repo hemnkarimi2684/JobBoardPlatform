@@ -225,34 +225,39 @@ public class AccountController : Controller
         }
     }
 
-    private async Task PopulateSelectListsAsync(CancellationToken cancellationToken)
+    private async Task PopulateSelectListsAsync(
+    CancellationToken cancellationToken)
     {
-        var cities = await _cityService.GetAllCitiesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var cities = await _cityService.GetAllForSelectAsync(
+            cancellationToken);
+
+        var jobCategories = await _jobCategoryService.GetAllForSelectAsync(
             cancellationToken);
 
         ViewBag.Cities = new SelectList(
-            cities.Data,
+            cities,
             nameof(CityDetailResponseDto.CityId),
             nameof(CityDetailResponseDto.CityName));
 
-        var jobCategories = await _jobCategoryService.GetAllJobCategoriesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
-            cancellationToken);
-
         ViewBag.JobCategories = new SelectList(
-            jobCategories.Data,
+            jobCategories,
             nameof(JobCategoryResponseDto.JobCategoryId),
             nameof(JobCategoryResponseDto.Name));
 
         ViewBag.OwnershipTypes = Enum.GetValues<OwnershipType>()
-            .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
+            .Select(value => new SelectListItem
+            {
+                Value = ((int)value).ToString(),
+                Text = value.ToString()
+            })
             .ToList();
 
         ViewBag.CompanySizes = Enum.GetValues<CompanySizeEnum>()
-            .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
+            .Select(value => new SelectListItem
+            {
+                Value = ((int)value).ToString(),
+                Text = value.ToString()
+            })
             .ToList();
     }
 }

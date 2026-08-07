@@ -20,6 +20,7 @@
         <h3 style="margin-top: 0;">Add New Province</h3>
         <form asp-action="CreateProvince" method="post">
             @Html.AntiForgeryToken()
+            <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group" style="margin-bottom: 15px;">
@@ -60,6 +61,45 @@
             </tbody>
         </table>
 
-        <partial name="_Pager" model="Model" />
+        @if (Model.TotalPageCount > 1)
+        {
+            <div style="margin-top: 20px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                @if (Model.PageNumber > 1)
+                {
+                    <a asp-action="Provinces"
+                       asp-route-pageNumber="@(Model.PageNumber - 1)"
+                       style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                        Previous
+                    </a>
+                }
+
+                @for (var i = 1; i <= Model.TotalPageCount; i++)
+                {
+                    if (i == Model.PageNumber)
+                    {
+                        <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white;">
+                            @i
+                        </span>
+                    }
+                    else
+                    {
+                        <a asp-action="Provinces"
+                           asp-route-pageNumber="@i"
+                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                            @i
+                        </a>
+                    }
+                }
+
+                @if (Model.PageNumber < Model.TotalPageCount)
+                {
+                    <a asp-action="Provinces"
+                       asp-route-pageNumber="@(Model.PageNumber + 1)"
+                       style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                        Next
+                    </a>
+                }
+            </div>
+        }
     }
 </div>

@@ -5,7 +5,6 @@ using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
-using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Mvc.Models.Company;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -116,12 +115,10 @@ public class CompanyController : Controller
 
     private async Task PopulateSelectListsAsync(CancellationToken cancellationToken)
     {
-        var categories = await _jobCategoryService.GetAllJobCategoriesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var categories = await _jobCategoryService.GetAllForSelectAsync(
             cancellationToken);
 
-        ViewBag.JobCategories = new SelectList(categories.Data, nameof(JobCategoryResponseDto.JobCategoryId), nameof(JobCategoryResponseDto.Name));
+        ViewBag.JobCategories = new SelectList(categories, nameof(JobCategoryResponseDto.JobCategoryId), nameof(JobCategoryResponseDto.Name));
         ViewBag.OwnershipTypes = Enum.GetValues<OwnershipType>()
             .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
             .ToList();

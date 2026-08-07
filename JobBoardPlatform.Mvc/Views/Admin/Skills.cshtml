@@ -13,13 +13,17 @@
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert text-danger">@TempData["Error"]</div>
+        <div class="alert alert-danger">@TempData["Error"]</div> @* corrected class to alert-danger *@
     }
 
     <div class="card" style="margin-bottom: 25px;">
         <h3 style="margin-top: 0;">Add New Skill</h3>
         <form asp-action="CreateSkill" method="post">
             @Html.AntiForgeryToken()
+
+            @* Hidden field for pageNumber to preserve state *@
+            <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group" style="margin-bottom: 15px;">
@@ -31,7 +35,7 @@
         </form>
     </div>
 
-    @if (Model.Data.Count == 0)
+    @if (Model.Data == null || Model.Data.Count == 0)
     {
         <div class="empty">No skills registered.</div>
     }
@@ -53,6 +57,52 @@
             </tbody>
         </table>
 
-        <partial name="_Pager" model="Model" />
+        @* Custom Pagination Implementation *@
+        @if (Model.TotalPageCount > 1)
+        {
+            <div style="margin-top: 20px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                @if (Model.PageNumber > 1)
+                {
+                    <a asp-action="Skills"
+                       asp-route-pageNumber="@(Model.PageNumber - 1)"
+                       style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                        Previous
+                    </a>
+                }
+
+                @for (var i = 1; i <= Model.TotalPageCount; i++)
+                {
+                    if (i == Model.PageNumber)
+                    {
+                        <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white;">
+                            @i
+                        </span>
+                    }
+                    else
+                    {
+                        <a asp-action="Skills"
+                           asp-route-pageNumber="@i"
+                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                            @i
+                        </a>
+                    }
+                }
+
+                @if (Model.PageNumber < Model.TotalPageCount)
+                {
+                    <a asp-action="Skills"
+                       asp-route-pageNumber="@(Model.PageNumber + 1)"
+                       style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                        Next
+                    </a>
+                }
+            </div>
+        }
     }
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

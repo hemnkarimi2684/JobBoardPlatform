@@ -65,59 +65,121 @@ public class AdminController : Controller
         return View(DashboardViewModel.FromResponseDto(counts));
     }
 
-    public async Task<IActionResult> Employers(CancellationToken cancellationToken = default)
+    [HttpGet]
+    public async Task<IActionResult> Employers(
+        int approvedPage = 1,
+        int unapprovedPage = 1)
     {
-        var approved = await _userService.GetApprovedEmployersAsync(new PagingRequestDto { PageNumber = 1, PageSize = 100 });
-        var unapproved = await _userService.GetUnapprovedEmployersAsync(new PagingRequestDto { PageNumber = 1, PageSize = 100 });
+        const int pageSize = 10;
 
-        return View(EmployersViewModel.FromResponseDto(approved.Data, unapproved.Data));
+        approvedPage = approvedPage <= 0 ? 1 : approvedPage;
+        unapprovedPage = unapprovedPage <= 0 ? 1 : unapprovedPage;
+
+        var approvedResponse =
+            await _userService.GetApprovedEmployersAsync(
+                new PagingRequestDto
+                {
+                    PageNumber = approvedPage,
+                    PageSize = pageSize
+                });
+
+        var unapprovedResponse =
+            await _userService.GetUnapprovedEmployersAsync(
+                new PagingRequestDto
+                {
+                    PageNumber = unapprovedPage,
+                    PageSize = pageSize
+                });
+
+        var model = EmployersViewModel.FromResponseDto(
+            approvedResponse,
+            unapprovedResponse);
+
+        return View(model);
     }
 
     [HttpPost]
-    public async Task<IActionResult> ApproveEmployer(Guid userId, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ApproveEmployer(
+        Guid userId,
+        int approvedPage = 1,
+        int unapprovedPage = 1,
+        CancellationToken cancellationToken = default)
     {
         await _userService.ApprovedEmployerAsync(userId, cancellationToken);
 
         TempData["Success"] = "Employer was approved successfully.";
 
-        return RedirectToAction(nameof(Employers));
+        return RedirectToAction(nameof(Employers), new
+        {
+            approvedPage,
+            unapprovedPage
+        });
     }
 
     [HttpPost]
-    public async Task<IActionResult> RejectEmployer(Guid userId, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RejectEmployer(
+        Guid userId,
+        int approvedPage = 1,
+        int unapprovedPage = 1,
+        CancellationToken cancellationToken = default)
     {
         await _userService.RejectEmployerAsync(userId, cancellationToken);
 
         TempData["Success"] = "Employer was rejected successfully.";
 
-        return RedirectToAction(nameof(Employers));
+        return RedirectToAction(nameof(Employers), new
+        {
+            approvedPage,
+            unapprovedPage
+        });
     }
 
-    public async Task<IActionResult> JobSeekers(CancellationToken cancellationToken = default)
+    [HttpGet]
+    public async Task<IActionResult> JobSeekers(
+        int pageNumber = 1)
     {
-        var result = await _userService.GetJobSeekersAsync(new PagingRequestDto { PageNumber = 1, PageSize = 100 });
+        const int pageSize = 10;
+
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+
+        var result = await _userService.GetJobSeekersAsync(
+            new PagingRequestDto
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            });
 
         return View(JobSeekersViewModel.FromResponseDto(result));
     }
 
     [HttpPost]
-    public async Task<IActionResult> ActivateJobSeeker(Guid userId, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ActivateJobSeeker(
+        Guid userId,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
     {
         await _userService.ActivateJobSeekerAsync(userId, cancellationToken);
 
         TempData["Success"] = "Job seeker was activated successfully.";
 
-        return RedirectToAction(nameof(JobSeekers));
+        return RedirectToAction(nameof(JobSeekers), new { pageNumber });
     }
 
     [HttpPost]
-    public async Task<IActionResult> DeactivateJobSeeker(Guid userId, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeactivateJobSeeker(
+        Guid userId,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
     {
         await _userService.DeactivateJobSeekerAsync(userId, cancellationToken);
 
         TempData["Success"] = "Job seeker was deactivated successfully.";
 
-        return RedirectToAction(nameof(JobSeekers));
+        return RedirectToAction(nameof(JobSeekers), new { pageNumber });
     }
 
     public async Task<IActionResult> Advertisements(int pageNumber = 1, CancellationToken cancellationToken = default)
@@ -184,192 +246,306 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Advertisements));
     }
 
-    public async Task<IActionResult> Cities(CancellationToken cancellationToken = default)
+    [HttpGet]
+    public async Task<IActionResult> Cities(
+    int pageNumber = 1,
+    CancellationToken cancellationToken = default)
     {
-        var cities = await _cityService.GetAllCitiesAsync(
+        const int cityPageSize = 10;
+        const int provincePageSize = 1000;
+
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+
+        var citiesTask = _cityService.GetAllCitiesAsync(
             new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+            new PagingRequestDto
+            {
+                PageNumber = pageNumber,
+                PageSize = cityPageSize
+            },
             cancellationToken);
 
-        var provinces = await _provinceService.GetAllProvincesAsync(
+        var provincesTask = _provinceService.GetAllProvincesAsync(
             new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+            new PagingRequestDto
+            {
+                PageNumber = 1,
+                PageSize = provincePageSize
+            },
             cancellationToken);
 
-        ViewBag.Provinces = new SelectList(provinces.Data, nameof(ProvinceResponseDto.ProvinceId), nameof(ProvinceResponseDto.Name));
+        await Task.WhenAll(citiesTask, provincesTask);
 
-        return View(CitiesViewModel.FromResponseDto(cities.Data));
+        var cities = await citiesTask;
+        var provinces = await provincesTask;
+
+        ViewBag.Provinces = new SelectList(
+            provinces.Data,
+            nameof(ProvinceResponseDto.ProvinceId),
+            nameof(ProvinceResponseDto.Name));
+
+        return View(CitiesViewModel.FromResponseDto(cities));
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateCity(CreateCityRequestDto model, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateCity(
+        CreateCityRequestDto model,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "The city data is invalid.";
-            return RedirectToAction(nameof(Cities));
+
+            return RedirectToAction(nameof(Cities), new { pageNumber });
         }
 
         await _cityService.CreateCityAsync(model, cancellationToken);
 
         TempData["Success"] = "City was created successfully.";
 
-        return RedirectToAction(nameof(Cities));
+        return RedirectToAction(nameof(Cities), new { pageNumber });
     }
 
-    public async Task<IActionResult> Provinces(CancellationToken cancellationToken = default)
+    [HttpGet]
+    public async Task<IActionResult> Provinces(
+    int pageNumber = 1,
+    CancellationToken cancellationToken = default)
     {
+        const int provincePageSize = 10;
+
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+
         var result = await _provinceService.GetAllProvincesAsync(
             new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+            new PagingRequestDto
+            {
+                PageNumber = pageNumber,
+                PageSize = provincePageSize
+            },
             cancellationToken);
 
         return View(ProvincesViewModel.FromResponseDto(result));
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateProvince(CreateProvinceRequestDto model, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateProvince(
+        CreateProvinceRequestDto model,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "The province data is invalid.";
-            return RedirectToAction(nameof(Provinces));
+            return RedirectToAction(nameof(Provinces), new { pageNumber });
         }
 
         await _provinceService.CreateProvinceAsync(model, cancellationToken);
 
         TempData["Success"] = "Province was created successfully.";
-
-        return RedirectToAction(nameof(Provinces));
+        return RedirectToAction(nameof(Provinces), new { pageNumber });
     }
 
-    public async Task<IActionResult> JobCategories(CancellationToken cancellationToken = default)
+    [HttpGet]
+    public async Task<IActionResult> JobCategories(
+    int pageNumber = 1,
+    CancellationToken cancellationToken = default)
     {
+        const int pageSize = 10;
+
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+
         var result = await _jobCategoryService.GetAllJobCategoriesAsync(
             new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+            new PagingRequestDto
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            },
             cancellationToken);
 
         return View(JobCategoriesViewModel.FromResponseDto(result));
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateJobCategory(CreateJobCategoryRequestDto model, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateJobCategory(
+        CreateJobCategoryRequestDto model,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
     {
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "The job category data is invalid.";
-            return RedirectToAction(nameof(JobCategories));
+
+            return RedirectToAction(
+                nameof(JobCategories),
+                new { pageNumber });
         }
 
-        await _jobCategoryService.CreateJobCategoryAsync(model, cancellationToken);
+        await _jobCategoryService.CreateJobCategoryAsync(
+            model,
+            cancellationToken);
 
         TempData["Success"] = "Job category was created successfully.";
 
-        return RedirectToAction(nameof(JobCategories));
+        return RedirectToAction(
+            nameof(JobCategories),
+            new { pageNumber });
     }
 
-    public async Task<IActionResult> Skills(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Skills(
+    int pageNumber = 1,
+    CancellationToken cancellationToken = default)
     {
+        const int pageSize = 10;
+
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+
         var result = await _skillService.GetAllSkillsAsync(
             new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+            new PagingRequestDto
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            },
             cancellationToken);
 
         return View(SkillsViewModel.FromResponseDto(result));
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateSkill(CreateSkillRequestDto model, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateSkill(
+        CreateSkillRequestDto model,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "The skill data is invalid.";
-            return RedirectToAction(nameof(Skills));
+
+            return RedirectToAction(nameof(Skills), new { pageNumber });
         }
 
         await _skillService.CreateSkillAsync(model, cancellationToken);
 
         TempData["Success"] = "Skill was created successfully.";
 
-        return RedirectToAction(nameof(Skills));
+        return RedirectToAction(nameof(Skills), new { pageNumber });
     }
 
-    public async Task<IActionResult> Jobs(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Jobs(
+    int pageNumber = 1,
+    CancellationToken cancellationToken = default)
     {
-        var jobs = await _jobService.GetAllJobsAsync(
+        const int pageSize = 10;
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+
+        var jobsResult = await _jobService.GetAllJobsAsync(
             new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+            new PagingRequestDto { PageNumber = pageNumber, PageSize = pageSize },
             cancellationToken);
 
         var categories = await _jobCategoryService.GetAllJobCategoriesAsync(
             new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+            new PagingRequestDto { PageNumber = 1, PageSize = 1000 },
             cancellationToken);
 
         ViewBag.JobCategories = new SelectList(categories.Data, nameof(JobCategoryResponseDto.JobCategoryId), nameof(JobCategoryResponseDto.Name));
 
-        return View(JobsViewModel.FromResponseDto(jobs.Data));
+        return View(JobsViewModel.FromResponseDto(jobsResult));
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateJob(CreateJobRequestDto model, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateJob(
+        CreateJobRequestDto model,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "The job data is invalid.";
-            return RedirectToAction(nameof(Jobs));
+            return RedirectToAction(nameof(Jobs), new { pageNumber });
         }
 
         await _jobService.CreateJobAsync(model, cancellationToken);
-
         TempData["Success"] = "Job was created successfully.";
 
-        return RedirectToAction(nameof(Jobs));
+        return RedirectToAction(nameof(Jobs), new { pageNumber });
     }
 
-    public async Task<IActionResult> EmailTemplates(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> EmailTemplates(
+    int pageNumber = 1,
+    CancellationToken cancellationToken = default)
     {
-        var result = await _emailService.GetAllAsync(
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        const int pageSize = 10; 
+
+        pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+
+        var templatesPaginatedResult = await _emailService.GetAllAsync(
+            new PagingRequestDto
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            },
             cancellationToken);
 
-        return View(EmailTemplatesViewModel.FromResponseDto(result));
+        return View(EmailTemplatesViewModel.FromResponseDto(templatesPaginatedResult));
     }
 
     [HttpPost]
-    public async Task<IActionResult> UpdateTemplate(Guid id, UpdateTemplateRequestDto model, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateTemplate(
+        Guid id,
+        UpdateTemplateRequestDto model,
+        int pageNumber = 1, 
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
             TempData["Error"] = "The email template data is invalid.";
-            return RedirectToAction(nameof(EmailTemplates));
+
+            return RedirectToAction(nameof(EmailTemplates), new { pageNumber });
         }
 
         await _emailService.UpdateTemplateAsync(id, model, cancellationToken);
 
         TempData["Success"] = "Email template was updated successfully.";
 
-        return RedirectToAction(nameof(EmailTemplates));
+        return RedirectToAction(nameof(EmailTemplates), new { pageNumber });
     }
 
     [HttpPost]
-    public async Task<IActionResult> ActivateTemplate(Guid id, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ActivateTemplate(
+        Guid id,
+        int pageNumber = 1, 
+        CancellationToken cancellationToken = default)
     {
         await _emailService.ActivateTemplateAsync(id, cancellationToken);
 
         TempData["Success"] = "Email template was activated successfully.";
 
-        return RedirectToAction(nameof(EmailTemplates));
+        return RedirectToAction(nameof(EmailTemplates), new { pageNumber });
     }
 
     [HttpPost]
-    public async Task<IActionResult> DeactivateTemplate(Guid id, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeactivateTemplate(
+        Guid id,
+        int pageNumber = 1, 
+        CancellationToken cancellationToken = default)
     {
         await _emailService.DeactivateTemplateAsync(id, cancellationToken);
 
         TempData["Success"] = "Email template was deactivated successfully.";
 
-        return RedirectToAction(nameof(EmailTemplates));
+        return RedirectToAction(nameof(EmailTemplates), new { pageNumber });
     }
 }

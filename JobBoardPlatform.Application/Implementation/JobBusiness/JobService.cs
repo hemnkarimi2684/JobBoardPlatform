@@ -75,6 +75,15 @@ public class JobService : IJobService
         return Pagination<JobResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
     }
 
+    public async Task<List<JobResponseDto>> GetAllForSelectAsync(CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.JobRepository.GetAllForSelectAsync(j => new JobResponseDto
+        {
+            JobId = j.Id,
+            Name = j.Name
+        }, cancellationToken);
+    }
+
     public async Task<Pagination<JobAdvertisementListItemResponseDto>> GetJobAdvertisementsAsync(
     Guid jobId,
     PagingRequestDto pagingCommand,

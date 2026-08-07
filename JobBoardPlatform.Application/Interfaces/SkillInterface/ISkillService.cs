@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.SkillDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
@@ -61,5 +62,13 @@ public interface ISkillService
     /// <returns></returns>
     Task<SkillDetailResponseDto> GetSkillByIdAsync(
         Guid skillId,
+        CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// دریافت تمام مهارت های برای دراپ داون 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<SkillDetailResponseDto>> GetAllForSelectAsync(
         CancellationToken cancellationToken = default);
 }

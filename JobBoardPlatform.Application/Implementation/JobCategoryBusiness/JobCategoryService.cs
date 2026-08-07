@@ -90,5 +90,14 @@ public class JobCategoryService : IJobCategoryService
         return jobCategory;
     }
 
+    public async Task<List<JobCategoryResponseDto>> GetAllForSelectAsync(CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.JobCategoryRepository.GetAllForSelectAsync(jc => new JobCategoryResponseDto
+        {
+            JobCategoryId = jc.Id,
+            Name = jc.Name
+        }, cancellationToken);
+    }
+
     #endregion
 }

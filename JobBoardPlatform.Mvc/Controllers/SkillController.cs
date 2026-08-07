@@ -35,17 +35,15 @@ public class SkillController : Controller
     {
         var skills = await _skillService.GetUserSkillsAsync(
             CurrentUserId(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+            new PagingRequestDto { PageNumber = 1, PageSize = 1000 },
             cancellationToken);
 
-        var all = await _skillService.GetAllSkillsAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var all = await _skillService.GetAllForSelectAsync(
             cancellationToken);
 
         var ownedIds = skills.Data.Select(s => s.SkillId).ToHashSet();
 
-        var availableSkills = all.Data.Where(s => !ownedIds.Contains(s.SkillId)).ToList();
+        var availableSkills = all.Where(s => !ownedIds.Contains(s.SkillId)).ToList();
 
         return View(SkillMySkillsViewModel.FromResponseDto(skills, availableSkills));
     }

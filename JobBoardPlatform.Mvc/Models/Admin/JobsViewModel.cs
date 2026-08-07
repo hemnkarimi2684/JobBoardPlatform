@@ -1,11 +1,16 @@
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobDto;
+using JobBoardPlatform.Core.Entities.Common.Dto;
 
 namespace JobBoardPlatform.Mvc.Models.Admin;
 
-public class JobsViewModel
+public class JobsViewModel : Pagination<JobResponseDto>
 {
-    public List<JobResponseDto> Jobs { get; set; } = new();
-
-    public static JobsViewModel FromResponseDto(List<JobResponseDto> jobs)
-        => new() { Jobs = jobs };
+    public static JobsViewModel FromResponseDto(Pagination<JobResponseDto> source)
+        => new()
+        {
+            Data = source.Data,
+            PageNumber = source.PageNumber,
+            PageSize = source.PageSize,
+            TotalPageCount = source.TotalPageCount
+        };
 }

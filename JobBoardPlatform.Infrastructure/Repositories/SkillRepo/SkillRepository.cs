@@ -14,6 +14,15 @@ public class SkillRepository : GenericRepository<Skill>, ISkillRepository
     {
     }
 
+    public async Task<List<TResult>> GetAllForSelectAsync<TResult>(Expression<Func<Skill, TResult>> projection, CancellationToken cancellationToken)
+    {
+        return await Entities
+                        .AsNoTracking()
+                        .OrderBy(s => s.Name)
+                        .Select(projection)
+                        .ToListAsync(cancellationToken);
+    }
+
     public async Task<(List<TResult> Items, int TotalDataCount)> GetAllSkillsAsync<TResult>(
         Expression<Func<Skill, TResult>> projection,
         string? text,
