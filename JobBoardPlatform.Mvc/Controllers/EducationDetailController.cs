@@ -1,5 +1,4 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
-using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
 using JobBoardPlatform.Mvc.Models.EducationDetail;
