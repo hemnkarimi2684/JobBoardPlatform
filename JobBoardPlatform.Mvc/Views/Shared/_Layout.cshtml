@@ -989,7 +989,12 @@
                         }
                         @if (User.IsInRole("Admin"))
                         {
-                            <li><a asp-controller="Admin" asp-action="Dashboard">Admin Dashboard</a></li>
+                            <li>
+                                <a asp-controller="Admin" asp-action="Dashboard">Admin Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="/hangfire" target="_blank">Background Jobs</a>
+                            </li>
                         }
                         <li><span class="nav-user">@User.FindFirst(ClaimTypes.Email)?.Value</span></li>
                         <li>

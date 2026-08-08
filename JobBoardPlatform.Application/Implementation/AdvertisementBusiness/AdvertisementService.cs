@@ -495,7 +495,7 @@ public class AdvertisementService : IAdvertisementService
         if (advertisement == null)
             throw new NotFoundException("Advertisement was not found.");
 
-        //با این شرط اینجا گذاشتم اون اگهی هایی که تاریخ انقضاشون گشذشته هم کامل منقضی میکنم 
+        //با این شرط اینجا گذاشتم اون اگهی هایی که تاریخ انقضاشون گذشته هم کامل منقضی میکنم 
         if (advertisement.FeaturedUntil == null && advertisement.IsFeatured == false)
             throw new ValidationException("The advertisement is already in normal (not featured) status.");
 

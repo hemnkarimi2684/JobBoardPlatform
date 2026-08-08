@@ -1,5 +1,7 @@
+using Hangfire;
 using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
 using JobBoardPlatform.Application.Common.Extensions;
+using JobBoardPlatform.Application.Implementation.ReportJobBusiness;
 using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
@@ -57,6 +59,14 @@ builder.Services.AddSwaggerGen(c =>
 
 #endregion
 
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddHangfireServer();
+
 //اینم صرفا میره تنظیمات توی اپ ستینگ برای سری لاگ رو میخونه
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .ReadFrom.Configuration(context.Configuration)
@@ -96,4 +106,14 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+
+    recurringJobManager.AddOrUpdate<ReportJobService>(
+        "demote-expired-advertisements",
+        service => service.DemoteAdvertisementsAsync(CancellationToken.None),
+        Cron.Daily
+    );
+}
 app.Run();

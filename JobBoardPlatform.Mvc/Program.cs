@@ -1,8 +1,10 @@
+using Hangfire;
 using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
 using JobBoardPlatform.Application.Common.Extensions;
 using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
+using JobBoardPlatform.Mvc.Filters;
 using JobBoardPlatform.Mvc.Middlewares;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
@@ -15,6 +17,12 @@ builder.Services.AddInfrastructureDependency(builder.Configuration);
 builder.Services.AddDapperDependency(builder.Configuration);
 builder.Services.AddBusinessDependency(builder.Configuration);
 builder.Services.AddScoped<GlobalExceptionHandlingMiddleware>();
+
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //اینم صرفا میره تنظیمات توی اپ ستینگ برای سری لاگ رو میخونه
 builder.Host.UseSerilog((context, services, configuration) => configuration
@@ -67,6 +75,11 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireAuthorizationFilter() }
+});
 
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 

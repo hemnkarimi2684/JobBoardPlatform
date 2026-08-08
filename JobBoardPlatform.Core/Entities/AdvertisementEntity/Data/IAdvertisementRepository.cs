@@ -157,5 +157,11 @@ public interface IAdvertisementRepository : IGenericRepository<Advertisement>
     Task<string?> GetAdvertisementOwnerEmailAsync(
         Guid advertisementId,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// غیرفعال کردن اگهی های ویژه ای که تاریخشون گذشته 
+    /// </summary>
+    /// <returns></returns>
+    Task DemoteAdvertisementsAsync();
 }
 

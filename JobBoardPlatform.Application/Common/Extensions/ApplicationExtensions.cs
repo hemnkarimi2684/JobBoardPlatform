@@ -21,6 +21,7 @@ using JobBoardPlatform.Application.Implementation.PaymentBusiness;
 using JobBoardPlatform.Application.Implementation.ProvinceBusiness;
 using JobBoardPlatform.Application.Implementation.RedisBusiness;
 using JobBoardPlatform.Application.Implementation.RefreshTokenBusiness;
+using JobBoardPlatform.Application.Implementation.ReportJobBusiness;
 using JobBoardPlatform.Application.Implementation.ResumeBusiness;
 using JobBoardPlatform.Application.Implementation.SkillBusiness;
 using JobBoardPlatform.Application.Implementation.UserBusiness;
@@ -42,6 +43,7 @@ using JobBoardPlatform.Application.Interfaces.PaymentInterface;
 using JobBoardPlatform.Application.Interfaces.ProvinceInterface;
 using JobBoardPlatform.Application.Interfaces.RedisInterface;
 using JobBoardPlatform.Application.Interfaces.RefreshTokenInterface;
+using JobBoardPlatform.Application.Interfaces.ReportJobBusiness;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
@@ -145,6 +147,7 @@ public static class ApplicationExtensions
         services.AddScoped<IResumeService, ResumeService>();
         services.AddScoped<ISkillService, SkillService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IReportJobService, ReportJobService>();
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser.Implementation.CurrentUser>();

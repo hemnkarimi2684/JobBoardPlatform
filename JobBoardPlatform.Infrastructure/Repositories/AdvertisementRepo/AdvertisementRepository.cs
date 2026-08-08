@@ -261,4 +261,15 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                           .Select(a => a.Company.OwnedByUser.Email)
                           .FirstOrDefaultAsync(cancellationToken);
     }
+
+    public async Task DemoteAdvertisementsAsync()
+    {
+        var advertisements = Entities
+                                 .Where(a => a.IsActive && a.FeaturedUntil != null && a.FeaturedUntil <= DateTime.UtcNow && a.IsFeatured);
+
+        await advertisements.ForEachAsync(a =>
+              {
+                  a.UpdateFeatured(false, null);
+              });
+    }
 }
