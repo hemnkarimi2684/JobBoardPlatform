@@ -47,19 +47,19 @@ public class ResumeService : IResumeService
         var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(resumeCommand.UserId, cancellationToken);
 
         if (!isUserExist)
-            throw new NotFoundException($"the user with id {resumeCommand.UserId} was not found");
+            throw new NotFoundException("User was not found.");
 
         var isUserHasProfile = await _unitOfWork.UserProfileRepository.IsUserHasProfileAsync(resumeCommand.UserId, cancellationToken);
 
         if (!isUserHasProfile)
-            throw new NotFoundException($"The user with id '{resumeCommand.UserId}' does not have a complete profile.");
+            throw new NotFoundException("The user does not have a complete profile.");
 
         _accessControlService.EnsureApplicant(resumeCommand.UserId, _currentUser);
 
         var isDuplicateResumeFortUser = await _unitOfWork.ResumeRepository.IsDuplicateResumeForUserAsync(resumeCommand.UserId, cancellationToken);
 
         if (isDuplicateResumeFortUser)
-            throw new ConflictException($"the user with id {resumeCommand.UserId} already has resume");
+            throw new ConflictException("This user already has a resume.");
 
         var resume = new Resume(resumeCommand.Title, resumeCommand.UserId, null, _currentUser.UserId);
 
@@ -79,7 +79,7 @@ public class ResumeService : IResumeService
         var resume = await _unitOfWork.ResumeRepository.GetByIdAsync(resumeId, cancellationToken, true);
 
         if (resume == null)
-            throw new NotFoundException($"The resume with id {resumeId} was not found.");
+            throw new NotFoundException("Resume was not found.");
 
         _accessControlService.EnsureApplicant(resume.UserId, _currentUser);
 
@@ -104,7 +104,7 @@ public class ResumeService : IResumeService
             var deleted = await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
 
             if (!deleted)
-                throw new InvalidOperationException("Failed to delete the attachment file or database record.");
+                throw new InvalidOperationException("The resume file could not be deleted. Please try again.");
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
         }
@@ -130,7 +130,7 @@ public class ResumeService : IResumeService
         var resumeId = await _unitOfWork.ResumeRepository.GetResumeIdByUserIdAsync(userId, cancellationToken);
 
         if (resumeId == null)
-            throw new NotFoundException($"the resume for user with id {userId} not found");
+            throw new NotFoundException("Resume was not found.");
 
         await EnsureUserCanAccessResumeAsync(resumeId.Value, userId, _currentUser, cancellationToken);
 
@@ -185,7 +185,7 @@ public class ResumeService : IResumeService
           userId, cancellationToken);
 
         if (result is null)
-            throw new NotFoundException($"The user with id '{userId}' does not have a complete resume/profile.");
+            throw new NotFoundException("The user does not have a complete resume.");
 
         return result!;
 
@@ -201,12 +201,12 @@ public class ResumeService : IResumeService
         CancellationToken cancellationToken = default)
     {
         if (uploadResumeFile?.File is null)
-            throw new ValidationException("Resume file is required.");
+            throw new ValidationException("Please select a resume file to upload.");
 
         var resume = await _unitOfWork.ResumeRepository.GetByIdAsync(resumeId, cancellationToken, true);
 
         if (resume == null)
-            throw new NotFoundException($"The resume with id {resumeId} was not found.");
+            throw new NotFoundException("Resume was not found.");
 
         _accessControlService.EnsureApplicant(resume.UserId, _currentUser);
 
@@ -219,17 +219,17 @@ public class ResumeService : IResumeService
         CancellationToken cancellationToken = default)
     {
         if (uploadResumeFile?.File is null)
-            throw new ValidationException("Resume file is required.");
+            throw new ValidationException("Please select a resume file to upload.");
 
         var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId, cancellationToken);
 
         if (!isUserExist)
-            throw new NotFoundException($"the user with id {userId} was not found");
+            throw new NotFoundException("User was not found.");
 
         var resume = await _unitOfWork.ResumeRepository.GetResumeByUserIdAsync(userId, cancellationToken);
 
         if (resume == null)
-            throw new NotFoundException($"the user with id {userId} dont have any resume.");
+            throw new NotFoundException("The user does not have a resume.");
 
         _accessControlService.EnsureApplicant(resume.UserId, _currentUser);
 
@@ -247,10 +247,10 @@ public class ResumeService : IResumeService
         var resume = await _unitOfWork.ResumeRepository.GetByIdAsync(resumeId, cancellationToken);
 
         if (resume == null)
-            throw new NotFoundException($"The resume with id '{resumeId}' was not found.");
+            throw new NotFoundException("Resume was not found.");
 
         if (resume.LastUploadedFileId == null)
-            throw new NotFoundException($"The resume with id '{resume.Id}' does not have an attached file.");
+            throw new NotFoundException("This resume does not have an attached file.");
 
         await EnsureUserCanAccessResumeAsync(resume.Id, resume.UserId, _currentUser, cancellationToken);
 
@@ -264,10 +264,10 @@ public class ResumeService : IResumeService
         var resume = await _unitOfWork.ResumeRepository.GetResumeByUserIdAsync(userId, cancellationToken);
 
         if (resume == null)
-            throw new NotFoundException($"The user with id '{userId}' does not have a resume.");
+            throw new NotFoundException("The user does not have a resume.");
 
         if (resume.LastUploadedFileId == null)
-            throw new NotFoundException($"The user with id '{userId}' does not have an attached file.");
+            throw new NotFoundException("This resume does not have an attached file.");
 
         await EnsureUserCanAccessResumeAsync(resume.Id, resume.UserId, _currentUser, cancellationToken);
 

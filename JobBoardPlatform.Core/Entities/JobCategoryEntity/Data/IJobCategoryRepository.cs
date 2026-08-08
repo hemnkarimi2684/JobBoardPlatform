@@ -56,4 +56,15 @@ public interface IJobCategoryRepository : IGenericRepository<JobCategory>
     Task<bool> ExistAsync(
         Guid jobCategoryId,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// دریافت تمام دسته بندی های شغلی برای دراپ داون توی یو ای 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<TResult>> GetAllForSelectAsync<TResult>(
+        Expression<Func<JobCategory,TResult>> projection,
+        CancellationToken cancellationToken);
 }

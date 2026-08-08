@@ -1,11 +1,11 @@
-@model CreateResumeRequestDto
+@model ResumeCreateViewModel
 
 @{
-    ViewData["Title"] = "ساخت رزومه";
+    ViewData["Title"] = "Create Resume";
 }
 
-<div class="card" style="max-width:520px;margin:0 auto;">
-    <h3>ساخت رزومه</h3>
+<div class="card" style="max-width:520px; margin:0 auto;">
+    <h3>Create Resume</h3>
 
     @if (TempData["Success"] != null)
     {
@@ -13,18 +13,20 @@
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert" style="background:#fdecea;color:#b3392f;border:1px solid #f5c6c2;">@TempData["Error"]</div>
+        // Using the standard danger alert for errors.
+        <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
     <form asp-action="Create" method="post">
+        @* ModelOnly displays all validation errors if the model state is invalid. *@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
-            <label asp-for="Title"></label>
-            <input asp-for="Title" class="form-control" placeholder="عنوان رزومه" />
+            <label asp-for="Title">Resume Title</label>
+            <input asp-for="Title" class="form-control" placeholder="Enter resume title" />
             <span asp-validation-for="Title" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn">ساخت رزومه</button>
+        <button type="submit" class="btn">Create Resume</button>
     </form>
 </div>

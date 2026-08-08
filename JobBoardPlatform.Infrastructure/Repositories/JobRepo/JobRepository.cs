@@ -1,4 +1,5 @@
 ﻿using Azure;
+using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobEntity.Data;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
@@ -12,6 +13,18 @@ public class JobRepository : GenericRepository<Job>, IJobRepository
 {
     public JobRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
+    }
+
+    public async Task<List<TResult>> GetAllForSelectAsync<TResult>(
+        Expression<Func<Job, TResult>> projection,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                        .AsNoTracking()
+                        .OrderBy(j => j.Name)
+                        .Select(projection)
+                        .ToListAsync(cancellationToken);
+
     }
 
     public async Task<(List<TResult> Items, int TotalDataCount)> GetAllJobsAsync<TResult>(

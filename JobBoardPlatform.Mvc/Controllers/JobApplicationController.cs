@@ -1,10 +1,10 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
-using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
-using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Mvc.Models.JobApplication;
+using JobBoardPlatform.Mvc.Models.Resume;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -23,7 +23,7 @@ public class JobApplicationController : Controller
         _resumeService = resumeService;
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> My(int pageNumber = 1, CancellationToken cancellationToken = default)
     {
         var result = await _jobApplicationService.GetJobApplicationsByUserIdAsync(
@@ -31,10 +31,10 @@ public class JobApplicationController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        return View(result);
+        return View(JobApplicationMyViewModel.FromResponseDto(result));
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> ByAdvertisement(Guid advertisementId, int pageNumber = 1, CancellationToken cancellationToken = default)
     {
         var result = await _jobApplicationService.GetAdvertisementJobApplicationsAsync(
@@ -42,81 +42,80 @@ public class JobApplicationController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        ViewBag.AdvertisementId = advertisementId;
-
-        return View(result);
+        return View(JobApplicationByAdvertisementViewModel.FromResponseDto(result, advertisementId));
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
+    [HttpGet]
+    public async Task<IActionResult> ApplicantResume(
+    Guid id,
+    CancellationToken cancellationToken = default)
+    {
+        var resume = await _jobApplicationService
+            .GetApplicantResumeByApplicationIdAsync(
+                id,
+                CurrentUserId(),
+                cancellationToken);
+
+        return View("~/Views/Resume/ApplicantResume.cshtml", ResumeApplicantResumeViewModel.FromResponseDto(resume));
+    }
+
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [HttpPost]
     public async Task<IActionResult> Apply(Guid advertisementId, CancellationToken cancellationToken)
     {
         var userId = CurrentUserId();
 
-        try
-        {
-            var resume = await _resumeService.GetResumeDetailAsync(userId, cancellationToken);
+        var resume = await _resumeService.GetResumeDetailAsync(userId, cancellationToken);
 
-            if (resume.ResumeId is null)
+        if (resume.ResumeId is null)
+        {
+            TempData["Error"] = "Please create a resume before applying for this job.";
+
+            return RedirectToAction("Create", "Resume");
+        }
+
+        await _jobApplicationService.CreateJobApplicationAsync(
+            new CreateJobApplicationRequestDto
             {
-                TempData["Error"] = "برای ارسال درخواست ابتدا باید رزومه بسازید.";
+                ResumeId = resume.ResumeId.Value,
+                AdvertisementId = advertisementId,
+                UserId = userId
+            },
+            cancellationToken);
 
-                return RedirectToAction("Create", "Resume");
-            }
+        TempData["Success"] = "Your application was submitted successfully.";
 
-            await _jobApplicationService.CreateJobApplicationAsync(
-                new CreateJobApplicationRequestDto
-                {
-                    ResumeId = resume.ResumeId.Value,
-                    AdvertisementId = advertisementId,
-                    UserId = userId
-                },
-                cancellationToken);
-
-            TempData["Success"] = "درخواست شما با موفقیت ثبت شد.";
-
-            return RedirectToAction("My");
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-
-            return RedirectToAction("Details", "Advertisement", new { id = advertisementId });
-        }
+        return RedirectToAction("My");
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
-    public async Task<IActionResult> ChangeStatus(Guid id, JobApplicationStatus status, Guid advertisementId, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangeStatus(
+    Guid id,
+    JobApplicationStatus status,
+    Guid advertisementId,
+    CancellationToken cancellationToken)
     {
-        try
-        {
-            await _jobApplicationService.UpdateJobApplicationStatusAsync(id, status, cancellationToken);
+        await _jobApplicationService.UpdateJobApplicationStatusAsync(
+            id,
+            status,
+            cancellationToken);
 
-            TempData["Success"] = "وضعیت درخواست به‌روزرسانی شد.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Application status was updated successfully.";
 
         return RedirectToAction(nameof(ByAdvertisement), new { advertisementId });
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _jobApplicationService.CancelJobApplicationAsync(id, cancellationToken);
+        await _jobApplicationService.CancelJobApplicationAsync(id, cancellationToken);
 
-            TempData["Success"] = "درخواست کنسل شد.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Application was canceled successfully.";
 
         return RedirectToAction(nameof(My));
     }

@@ -2,6 +2,7 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Mvc.Models.Skill;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -26,43 +27,34 @@ public class SkillController : Controller
 
         ViewBag.Text = text;
 
-        return View(result);
+        return View(SkillIndexViewModel.FromResponseDto(result));
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> MySkills(CancellationToken cancellationToken = default)
     {
         var skills = await _skillService.GetUserSkillsAsync(
             CurrentUserId(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+            new PagingRequestDto { PageNumber = 1, PageSize = 1000 },
             cancellationToken);
 
-        var all = await _skillService.GetAllSkillsAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var all = await _skillService.GetAllForSelectAsync(
             cancellationToken);
 
         var ownedIds = skills.Data.Select(s => s.SkillId).ToHashSet();
 
-        ViewBag.AvailableSkills = all.Data.Where(s => !ownedIds.Contains(s.SkillId)).ToList();
+        var availableSkills = all.Where(s => !ownedIds.Contains(s.SkillId)).ToList();
 
-        return View(skills);
+        return View(SkillMySkillsViewModel.FromResponseDto(skills, availableSkills));
     }
 
-    [Authorize(Roles = "JobSeeker")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     [HttpPost]
     public async Task<IActionResult> Assign(List<Guid> skillsId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _skillService.AddSkillsToUserAsync(CurrentUserId(), skillsId, cancellationToken);
+        await _skillService.AddSkillsToUserAsync(CurrentUserId(), skillsId, cancellationToken);
 
-            TempData["Success"] = "مهارت‌ها با موفقیت اضافه شدند.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Skills were added successfully.";
 
         return RedirectToAction(nameof(MySkills));
     }

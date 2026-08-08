@@ -1,11 +1,16 @@
-@model Pagination<AdvertisementDetailResponseDto>
+@model AdvertisementSearchViewModel
 
 @{
-    ViewData["Title"] = "جستجو در آگهی‌ها";
+    ViewData["Title"] = "Search Job Advertisements";
     var searchTerm = ViewBag.SearchTerm as string;
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">جستجو در آگهی‌ها</h2>
+<div class="page-head">
+    <div>
+        <h2>Search Job Advertisements</h2>
+    </div>
+    <a class="btn btn-ghost" asp-action="Index">&#8592; Back to Job Board</a>
+</div>
 
 @if (TempData["Success"] != null)
 {
@@ -13,44 +18,78 @@
 }
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-success">@TempData["Error"]</div>
+    <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
-<div class="card" style="margin-bottom: 20px;">
-    <form asp-action="Search" method="get" style="display: flex; gap: 10px; align-items: flex-end;">
-        <div class="form-group" style="flex: 1; margin-bottom: 0;">
-            <label for="searchTerm">عبارت جستجو</label>
-            <input type="text" id="searchTerm" name="searchTerm" class="form-control" value="@searchTerm" placeholder="عنوان آگهی، شرکت یا شهر..." />
+<div class="panel">
+    <form asp-action="Search" method="get" class="search-row">
+        <div class="search-box">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" name="searchTerm" value="@searchTerm"
+                   class="search-input" placeholder="Search by job title, company, or city..." />
         </div>
-        <button type="submit" class="btn">جستجو</button>
+        <button type="submit" class="btn btn-primary">Search</button>
     </form>
 </div>
 
 @if (Model.Data.Count == 0)
 {
-    <div class="empty">نتیجه‌ای برای جستجوی شما یافت نشد.</div>
+    <div class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No results found</h3>
+        <p>No results found for your search query.</p>
+        <a class="btn btn-outline" asp-action="Index">Browse all jobs</a>
+    </div>
 }
 else
 {
-    foreach (var item in Model.Data)
-    {
-        <div class="card">
-            <h3>@item.JobName</h3>
-            <div class="meta">
-                @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
-            </div>
-            <div>
-                <span class="badge">@item.CollaborationType</span>
-                <span class="badge">سطح: @item.ExperienceLevel</span>
-                @if (item.IsFeatured)
-                {
-                    <span class="badge">ویژه</span>
-                }
-            </div>
-            <p style="margin: 10px 0; color: #445;">@(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)</p>
-            <a class="btn" asp-action="Details" asp-route-id="@item.AdvertisementId">جزئیات</a>
-        </div>
-    }
+    <div class="job-grid">
+        @foreach (var item in Model.Data)
+        {
+            <article class="job-card">
+                <div class="job-card-top">
+                    <div class="job-logo">
+                        @(string.IsNullOrEmpty(item.CompanyName) ? "?" : item.CompanyName.Substring(0, 1))
+                    </div>
+                    <div class="job-heading">
+                        <h3 class="job-title">
+                            <a asp-action="Details" asp-route-id="@item.AdvertisementId">@item.JobName</a>
+                        </h3>
+                        <div class="job-company">@item.CompanyName</div>
+                    </div>
+                    @if (item.IsFeatured)
+                    {
+                        <span class="badge badge-featured">Featured</span>
+                    }
+                </div>
+
+                <div class="job-meta">
+                    <span>&#128205; @item.CityName</span>
+                    <span>&#128197; @item.CreatedAt.ToString("MMM yyyy")</span>
+                </div>
+
+                <div class="job-badges">
+                    <span class="badge">@item.CollaborationType</span>
+                    @if (item.ExperienceLevel > 0)
+                    {
+                        <span class="badge badge-outline">@item.ExperienceLevel yrs exp</span>
+                    }
+                    @if (item.MinimumSalary > 0 || item.MaximumSalary > 0)
+                    {
+                        <span class="badge badge-salary">
+                            &#128176; @item.MinimumSalary.ToString("#,##0") - @item.MaximumSalary.ToString("#,##0")
+                        </span>
+                    }
+                </div>
+
+                <p class="job-desc">
+                    @(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)
+                </p>
+
+                <a class="btn btn-outline btn-block" asp-action="Details" asp-route-id="@item.AdvertisementId">View Details</a>
+            </article>
+        }
+    </div>
 
     @await Html.PartialAsync("_Pager", Model)
 }

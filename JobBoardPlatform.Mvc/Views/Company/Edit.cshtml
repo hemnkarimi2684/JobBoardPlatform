@@ -1,79 +1,82 @@
-@model UpdateCompanyInfoRequestDto
+@model CompanyEditViewModel
 
 @{
-    ViewData["Title"] = "ویرایش شرکت";
+    ViewData["Title"] = "Edit Company";
     var companyId = Context.Request.RouteValues["id"];
 }
 
-<div class="card" style="max-width:560px;margin:0 auto;">
-    <h3>ویرایش اطلاعات شرکت</h3>
+<div style="direction: ltr; text-align: left;">
+    <div class="card" style="max-width:560px; margin:0 auto;">
+        <h3>Edit Company Information</h3>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert" style="background:#fdecea;color:#a43d3d;border:1px solid #f5c6cb;">@TempData["Error"]</div>
-    }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert" style="background:#fdecea; color:#a43d3d; border:1px solid #f5c6cb;">@TempData["Error"]</div>
+        }
 
-    <form asp-action="Edit" asp-route-id="@companyId" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Edit" asp-route-id="@companyId" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-group">
-            <label asp-for="Name"></label>
-            <input asp-for="Name" class="form-control" placeholder="نام شرکت" />
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="Name">Company Name</label>
+                <input asp-for="Name" class="form-control" placeholder="Enter company name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="YearOfEstablishment"></label>
-            <input asp-for="YearOfEstablishment" class="form-control" />
-            <span asp-validation-for="YearOfEstablishment" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="YearOfEstablishment">Year of Establishment</label>
+                <input asp-for="YearOfEstablishment" class="form-control" />
+                <span asp-validation-for="YearOfEstablishment" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="AboutUs"></label>
-            <textarea asp-for="AboutUs" class="form-control" rows="5" placeholder="درباره ما (حداقل ۵۰ کاراکتر)"></textarea>
-            <span asp-validation-for="AboutUs" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="AboutUs">About Us</label>
+                <textarea asp-for="AboutUs" class="form-control" rows="5" placeholder="About us (minimum 50 characters)"></textarea>
+                <span asp-validation-for="AboutUs" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="WebSiteAddress"></label>
-            <input asp-for="WebSiteAddress" class="form-control" placeholder="آدرس وب‌سایت" />
-            <span asp-validation-for="WebSiteAddress" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="WebSiteAddress">Website Address</label>
+                <input asp-for="WebSiteAddress" class="form-control" placeholder="e.g., www.company.com" />
+                <span asp-validation-for="WebSiteAddress" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="OwnershipType"></label>
-            <select asp-for="OwnershipType" asp-items="ViewBag.OwnershipTypes" class="form-control">
-                <option value="">انتخاب کنید</option>
-            </select>
-            <span asp-validation-for="OwnershipType" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="OwnershipType">Ownership Type</label>
+                <select asp-for="OwnershipType" asp-items="ViewBag.OwnershipTypes" class="form-control">
+                    <option value="">-- Select Ownership Type --</option>
+                </select>
+                <span asp-validation-for="OwnershipType" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="CompanySize"></label>
-            <select asp-for="CompanySize" asp-items="ViewBag.CompanySizes" class="form-control">
-                <option value="">انتخاب کنید</option>
-            </select>
-            <span asp-validation-for="CompanySize" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="CompanySize">Company Size</label>
+                <select asp-for="CompanySize" asp-items="ViewBag.CompanySizes" class="form-control">
+                    <option value="">-- Select Company Size --</option>
+                </select>
+                <span asp-validation-for="CompanySize" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="JobCategoryId"></label>
-            <select asp-for="JobCategoryId" asp-items="ViewBag.JobCategories" class="form-control">
-                <option value="">انتخاب کنید</option>
-            </select>
-            <span asp-validation-for="JobCategoryId" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="JobCategoryId">Industry / Category</label>
+                <select asp-for="JobCategoryId" asp-items="ViewBag.JobCategories" class="form-control">
+                    <option value="">-- Select Category --</option>
+                </select>
+                <span asp-validation-for="JobCategoryId" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="ActivityType"></label>
-            <input asp-for="ActivityType" class="form-control" placeholder="نوع فعالیت (اختیاری)" />
-            <span asp-validation-for="ActivityType" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="ActivityType">Activity Type</label>
+                <input asp-for="ActivityType" class="form-control" placeholder="e.g., Software Development (Optional)" />
+                <span asp-validation-for="ActivityType" class="text-danger"></span>
+            </div>
 
-        <button type="submit" class="btn">ذخیره تغییرات</button>
-    </form>
+            <button type="submit" class="btn">Save Changes</button>
+        </form>
+    </div>
 </div>

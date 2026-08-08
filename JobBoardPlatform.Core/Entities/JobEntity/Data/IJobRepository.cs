@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.Common.Data;
+﻿using JobBoardPlatform.Core.Entities.CityEntity.Entity;
+using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 using System.Linq.Expressions;
 
@@ -43,4 +44,15 @@ public interface IJobRepository : IGenericRepository<Job>
         CancellationToken cancellationToken,
         int pageNumber = 1,
         int pageSize = 10);
+
+    /// <summary>
+    /// دریافت تمام کار های برای دراپ داون یو ای
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<TResult>> GetAllForSelectAsync<TResult>(
+        Expression<Func<Job, TResult>> projection,
+        CancellationToken cancellationToken);
 }

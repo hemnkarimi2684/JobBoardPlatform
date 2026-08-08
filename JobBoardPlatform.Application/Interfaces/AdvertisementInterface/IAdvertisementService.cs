@@ -127,6 +127,20 @@ public interface IAdvertisementService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// جستجو و فیلتر همزمان در اگهی های فعال
+    /// </summary>
+    /// <param name="searchDto"></param>
+    /// <param name="filterDto"></param>
+    /// <param name="pagingCommand"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Pagination<AdvertisementDetailResponseDto>> SearchAndFilterAdvertisementsAsync(
+        AdvertisementSearchRequestDto searchDto,
+        AdvertisementFilterRequestDto filterDto,
+        PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// دریافت تمام اگهی های فعال و غیر فعال 
     /// </summary>
     /// <param name="pagingCommand"></param>

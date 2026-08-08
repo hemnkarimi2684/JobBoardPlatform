@@ -26,6 +26,7 @@ public class AdvertisementFilterRequestDto
             JobCategoryId = JobCategoryId,
             MaximumSalary = MaximumSalary,
             MinimumSalary = MinimumSalary,
+            CollabrationType = CollaborationType,
             SkillIds = SkillIds
         };
     }

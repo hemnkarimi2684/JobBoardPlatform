@@ -57,7 +57,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                              CompanyId = a.CompanyId,
                              FeaturedUntil = a.FeaturedUntil,
                              IsFeatured = a.IsFeatured,
-                             IsActive = a.IsActive
+                             IsActive = a.IsActive,
+                             EmployerUserId = a.Company.OwnedByUserId
                          })
                          .FirstOrDefaultAsync(cancellationToken);
     }
@@ -259,5 +260,16 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                           .Where(a => a.Id == advertisementId)
                           .Select(a => a.Company.OwnedByUser.Email)
                           .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task DemoteAdvertisementsAsync()
+    {
+        var advertisements = Entities
+                                 .Where(a => a.IsActive && a.FeaturedUntil != null && a.FeaturedUntil <= DateTime.UtcNow && a.IsFeatured);
+
+        await advertisements.ForEachAsync(a =>
+              {
+                  a.UpdateFeatured(false, null);
+              });
     }
 }

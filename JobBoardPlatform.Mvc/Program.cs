@@ -1,7 +1,13 @@
+using Hangfire;
+using JobBoardPlatform.Application.Common.AccessClaims.UserClaim;
 using JobBoardPlatform.Application.Common.Extensions;
+using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
 using JobBoardPlatform.Infrastructure.Common.Extensions;
 using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
+using JobBoardPlatform.Mvc.Filters;
+using JobBoardPlatform.Mvc.Middlewares;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +16,30 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddInfrastructureDependency(builder.Configuration);
 builder.Services.AddDapperDependency(builder.Configuration);
 builder.Services.AddBusinessDependency(builder.Configuration);
+builder.Services.AddScoped<GlobalExceptionHandlingMiddleware>();
+
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+//اینم صرفا میره تنظیمات توی اپ ستینگ برای سری لاگ رو میخونه
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApprovedEmployerOnly", policy =>
+        policy.RequireRole(RoleConstants.EmployerRoleName)
+              .RequireClaim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue));
+
+    options.AddPolicy("ActiveJobSeekerOnly", policy =>
+        policy.RequireRole(RoleConstants.JobSeekerRoleName)
+              .RequireClaim(UserClaims.JobSeekerClaimType, UserClaims.IsActiveClaimValue));
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -35,6 +65,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+//به ازای هر ریکوست میاد با تمام جزئیات لاگشون میکنه و نگه میداره 
+app.UseSerilogRequestLogging();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -42,6 +75,13 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireAuthorizationFilter() }
+});
+
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.MapControllerRoute(
     name: "default",

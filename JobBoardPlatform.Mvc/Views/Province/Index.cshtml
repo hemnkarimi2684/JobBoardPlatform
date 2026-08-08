@@ -1,40 +1,46 @@
-@model Pagination<ProvinceResponseDto>
+@model ProvinceIndexViewModel
 
 @{
-    ViewData["Title"] = "استان‌ها";
+    ViewData["Title"] = "Provinces";
+    // Retrieve the search text from ViewBag, defaulting to empty string if not present.
+    var searchText = ViewBag.Text as string ?? "";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">لیست استان‌ها</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Provinces List</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert" style="background:#fdecea;color:#a43d3d;border:1px solid #f5c6cb;">@TempData["Error"]</div>
-}
-
-<form asp-action="Index" method="get" style="margin-bottom: 18px;">
-    <div class="form-group" style="display:flex;gap:8px;margin-bottom:0;">
-        <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="جستجوی استان..." />
-        <button type="submit" class="btn">جستجو</button>
-    </div>
-</form>
-
-@if (Model.Data.Count == 0)
-{
-    <div class="empty">استانی یافت نشد.</div>
-}
-else
-{
-    foreach (var item in Model.Data)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.Name</h3>
-            <div class="meta">کد استان: @item.Code</div>
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        // Using the standard danger alert for errors.
+        <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
-    @await Html.PartialAsync("_Pager", Model);
-}
+    <form asp-action="Index" method="get" style="margin-bottom: 18px;">
+        <div class="form-group" style="display:flex; gap:8px; margin-bottom:0;">
+            <input type="text" name="text" value="@searchText" class="form-control" placeholder="Search province..." />
+            <button type="submit" class="btn">Search</button>
+        </div>
+    </form>
+
+    @if (Model.Data.Count == 0)
+    {
+        <div class="empty">No provinces found.</div>
+    }
+    else
+    {
+        foreach (var item in Model.Data)
+        {
+            <div class="card">
+                <h3>@item.Name</h3>
+                <div class="meta">Province Code: @item.Code</div>
+            </div>
+        }
+
+        @await Html.PartialAsync("_Pager", Model)
+    ;
+    }
+</div>

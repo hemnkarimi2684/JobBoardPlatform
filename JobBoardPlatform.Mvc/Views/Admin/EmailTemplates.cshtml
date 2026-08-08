@@ -1,74 +1,124 @@
-@model Pagination<EmailTemplateResponseDto>
+@model EmailTemplatesViewModel
 
 @{
-    ViewData["Title"] = "قالب‌های ایمیل";
+    ViewData["Title"] = "Email Templates";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">مدیریت قالب‌های ایمیل</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Email Templates</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert text-danger">@TempData["Error"]</div>
-}
-
-@if (Model.Data.Count == 0)
-{
-    <div class="empty">قالب ایمیلی ثبت نشده است.</div>
-}
-else
-{
-    foreach (var item in Model.Data)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.Key</h3>
-            <div class="meta">@item.Subject</div>
-            <div>
-                @if (item.IsActive)
-                {
-                    <span class="badge">فعال</span>
-                }
-                else
-                {
-                    <span class="badge" style="background:#fdecea;color:#d64545;">غیرفعال</span>
-                }
-            </div>
-
-            <form asp-action="UpdateTemplate" asp-route-id="@item.Id" method="post" style="margin-top:12px;">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                <div class="form-group">
-                    <label>موضوع</label>
-                    <input type="text" name="Subject" value="@item.Subject" class="form-control" />
-                </div>
-
-                <div class="form-group">
-                    <label>متن قالب</label>
-                    <textarea name="Body" class="form-control" rows="6">@item.Body</textarea>
-                </div>
-
-                <button type="submit" class="btn">ذخیره تغییرات</button>
-            </form>
-
-            <div style="margin-top:10px;">
-                @if (item.IsActive)
-                {
-                    <form asp-action="DeactivateTemplate" asp-route-id="@item.Id" method="post" style="display:inline;">
-                        <button type="submit" class="btn" style="background:#e8a100;">غیرفعال‌سازی</button>
-                    </form>
-                }
-                else
-                {
-                    <form asp-action="ActivateTemplate" asp-route-id="@item.Id" method="post" style="display:inline;">
-                        <button type="submit" class="btn">فعال‌سازی</button>
-                    </form>
-                }
-            </div>
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
     }
 
-    <partial name="_Pager" model="Model" />
-}
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (Model.Data == null || Model.Data.Count == 0)
+    {
+        <div class="empty">No email templates registered.</div>
+    }
+    else
+    {
+        foreach (var item in Model.Data)
+        {
+            <div class="card" style="margin-bottom: 20px;">
+                <h3 style="margin-top: 0;">@item.Key</h3>
+                <div class="meta" style="color: #666; margin-bottom: 10px;">@item.Subject</div>
+
+                <div style="margin-bottom: 15px;">
+                    @if (item.IsActive)
+                    {
+                        <span class="badge" style="background: #e2f0d9; color: #385723; padding: 4px 8px; border-radius: 4px;">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge" style="background: #fdecea; color: #d64545; padding: 4px 8px; border-radius: 4px;">Inactive</span>
+                    }
+                </div>
+
+                <form asp-action="UpdateTemplate" asp-route-id="@item.Id" method="post" style="margin-top:12px;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label>Subject</label>
+                        <input type="text" name="Subject" value="@item.Subject" class="form-control" />
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label>Template Body</label>
+                        <textarea name="Body" class="form-control" rows="6">@item.Body</textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Save Changes</button>
+                </form>
+
+                <div style="margin-top:15px; border-top: 1px solid #eee; padding-top: 10px;">
+                    @if (item.IsActive)
+                    {
+                        <form asp-action="DeactivateTemplate" asp-route-id="@item.Id" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+                            <button type="submit" class="btn" style="background:#e8a100;">Deactivate</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="ActivateTemplate" asp-route-id="@item.Id" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+                            <button type="submit" class="btn">Activate</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (Model.TotalPageCount > 1)
+        {
+            <div style="margin-top: 20px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                @if (Model.PageNumber > 1)
+                {
+                    <a asp-action="EmailTemplates"
+                       asp-route-pageNumber="@(Model.PageNumber - 1)"
+                       style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                        Previous
+                    </a>
+                }
+
+                @for (var i = 1; i <= Model.TotalPageCount; i++)
+                {
+                    if (i == Model.PageNumber)
+                    {
+                        <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white;">
+                            @i
+                        </span>
+                    }
+                    else
+                    {
+                        <a asp-action="EmailTemplates"
+                           asp-route-pageNumber="@i"
+                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                            @i
+                        </a>
+                    }
+                }
+
+                @if (Model.PageNumber < Model.TotalPageCount)
+                {
+                    <a asp-action="EmailTemplates"
+                       asp-route-pageNumber="@(Model.PageNumber + 1)"
+                       style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                        Next
+                    </a>
+                }
+            </div>
+        }
+    }
+</div>

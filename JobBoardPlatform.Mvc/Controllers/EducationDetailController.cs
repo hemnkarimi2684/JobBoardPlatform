@@ -1,10 +1,7 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
-using JobBoardPlatform.Application.Common.Dto.RequestDto.EducationDetailDto;
-using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
-using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Enums;
-using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Mvc.Models.EducationDetail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,7 +9,7 @@ using System.Security.Claims;
 
 namespace JobBoardPlatform.Mvc.Controllers;
 
-[Authorize(Roles = "JobSeeker")]
+[Authorize(Policy = "ActiveJobSeekerOnly")]
 public class EducationDetailController : Controller
 {
     private readonly IEducationDetailService _educationDetailService;
@@ -29,18 +26,18 @@ public class EducationDetailController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 20 },
             cancellationToken);
 
-        return View(result);
+        return View(EducationDetailIndexViewModel.FromResponseDto(result));
     }
 
     [HttpGet]
     public IActionResult Create()
     {
         PopulateDegrees();
-        return View();
+        return View(new EducationDetailCreateViewModel());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateEducationDetailRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(EducationDetailCreateViewModel model, CancellationToken cancellationToken)
     {
         model.UserId = CurrentUserId();
         ModelState.Remove(nameof(model.UserId));
@@ -51,50 +48,25 @@ public class EducationDetailController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _educationDetailService.CreateEducationDetailAsync(model, cancellationToken);
+        await _educationDetailService.CreateEducationDetailAsync(model, cancellationToken);
 
-            TempData["Success"] = "سوابق تحصیلی ثبت شد.";
+        TempData["Success"] = "Education detail was created successfully.";
 
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            PopulateDegrees();
-            return View(model);
-        }
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var item = await _educationDetailService.GetEducationDetailByIdAsync(id, cancellationToken);
+        var item = await _educationDetailService.GetEducationDetailByIdAsync(id, cancellationToken);
 
-            PopulateDegrees();
+        PopulateDegrees();
 
-            return View(new UpdateEducationDetailRequestDto
-            {
-                CertificateDegree = item.CertificateDegreeName,
-                Major = item.Major,
-                University = item.University,
-                StartDate = item.StartDate,
-                CompletionDate = item.CompletionDate,
-                Percentage = item.Percentage,
-                IsCurrentlyStudying = item.IsCurrentlyStudying
-            });
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return View(EducationDetailEditViewModel.FromResponseDto(item));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(Guid id, UpdateEducationDetailRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, EducationDetailEditViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -102,20 +74,11 @@ public class EducationDetailController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _educationDetailService.UpdateEducationDetailAsync(id, model, cancellationToken);
+        await _educationDetailService.UpdateEducationDetailAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "سوابق تحصیلی ویرایش شد.";
+        TempData["Success"] = "Education detail was updated successfully.";
 
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            PopulateDegrees();
-            return View(model);
-        }
+        return RedirectToAction(nameof(Index));
     }
 
     private void PopulateDegrees()

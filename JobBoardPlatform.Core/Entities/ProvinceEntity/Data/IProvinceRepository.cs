@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.Common.Data;
+﻿using JobBoardPlatform.Core.Entities.CityEntity.Entity;
+using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 using System.Linq.Expressions;
 using System.Transactions;
@@ -42,7 +43,18 @@ public interface IProvinceRepository : IGenericRepository<Province>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> IsDuplicateNameOrCodeAsync(
-        string name, 
+        string name,
         int code,
+        CancellationToken cancellationToken);
+
+    /// <summary>
+    /// دریافت تمام استان ها برای دراپ داون 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<TResult>> GetAllForSelectAsync<TResult>(
+        Expression<Func<Province, TResult>> projection,
         CancellationToken cancellationToken);
 }

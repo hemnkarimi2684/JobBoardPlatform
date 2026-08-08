@@ -1,16 +1,14 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ResumeDto;
 using JobBoardPlatform.Application.Common.Dto.ResumeDto.Command;
-using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
-using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
-using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Mvc.Models.Resume;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace JobBoardPlatform.Mvc.Controllers;
 
-[Authorize(Roles = "JobSeeker")]
+[Authorize]
 public class ResumeController : Controller
 {
     private readonly IResumeService _resumeService;
@@ -20,18 +18,21 @@ public class ResumeController : Controller
         _resumeService = resumeService;
     }
 
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
     {
         var resume = await _resumeService.GetResumeDetailAsync(CurrentUserId(), cancellationToken);
 
-        return View(resume);
+        return View(ResumeIndexViewModel.FromResponseDto(resume));
     }
 
     [HttpGet]
-    public IActionResult Create() => View();
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
+    public IActionResult Create() => View(new ResumeCreateViewModel());
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateResumeRequestDto model, CancellationToken cancellationToken)
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
+    public async Task<IActionResult> Create(ResumeCreateViewModel model, CancellationToken cancellationToken)
     {
         model.UserId = CurrentUserId();
         ModelState.Remove(nameof(model.UserId));
@@ -39,65 +40,39 @@ public class ResumeController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        try
-        {
-            await _resumeService.CreateResumeAsync(model, cancellationToken);
+        await _resumeService.CreateResumeAsync(model, cancellationToken);
 
-            TempData["Success"] = "رزومه با موفقیت ساخته شد.";
-
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            return View(model);
-        }
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> UploadFile(Guid resumeId, UploadResumeFileRequestDto model, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await _resumeService.UploadResumeFileByResumeIdAsync(resumeId, model, cancellationToken);
-
-            TempData["Success"] = "فایل رزومه آپلود شد.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Resume was created successfully.";
 
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
+    public async Task<IActionResult> UploadFile(Guid resumeId, UploadResumeFileRequestDto model, CancellationToken cancellationToken)
+    {
+        await _resumeService.UploadResumeFileByResumeIdAsync(resumeId, model, cancellationToken);
+
+        TempData["Success"] = "Resume file was uploaded successfully.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Download(Guid resumeId, CancellationToken cancellationToken)
     {
-        try
-        {
-            var file = await _resumeService.DownloadResumeFileByResumeIdAsync(resumeId, cancellationToken);
+        var file = await _resumeService.DownloadResumeFileByResumeIdAsync(resumeId, cancellationToken);
 
-            return File(file.Data, file.ContentType, file.FileName);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return File(file.Data, file.ContentType, file.FileName);
     }
 
     [HttpPost]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
     public async Task<IActionResult> DeleteFile(Guid resumeId, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _resumeService.DeleteResumeFileByIdAsync(resumeId, cancellationToken);
+        await _resumeService.DeleteResumeFileByIdAsync(resumeId, cancellationToken);
 
-            TempData["Success"] = "فایل رزومه حذف شد.";
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            TempData["Error"] = ex.Message;
-        }
+        TempData["Success"] = "Resume file was deleted successfully.";
 
         return RedirectToAction(nameof(Index));
     }

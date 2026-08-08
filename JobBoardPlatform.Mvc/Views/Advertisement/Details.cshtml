@@ -1,47 +1,103 @@
-@model AdvertisementDetailResponseDto
+@model AdvertisementDetailsViewModel
 
 @{
     ViewData["Title"] = Model.JobName;
 }
 
-<div class="card">
-    <h3>@Model.JobName</h3>
-    <div class="meta">
-        @Model.CompanyName &nbsp;|&nbsp; @Model.CityName &nbsp;|&nbsp; @Model.CreatedAt.ToString("yyyy/MM/dd")
+<div class="page-head">
+    <div>
+        <h2>@Model.JobName</h2>
+        <p class="muted">@Model.CompanyName &middot; @Model.CityName &middot; Posted on @Model.CreatedAt.ToString("yyyy/MM/dd")</p>
     </div>
-    <div style="margin-bottom: 14px;">
+    <a class="btn btn-ghost" asp-action="Index">&#8592; Back to List</a>
+</div>
+
+<section class="panel">
+    <div class="job-badges" style="margin-bottom: 8px;">
         <span class="badge">@Model.CollaborationType</span>
-        <span class="badge">سطح: @Model.ExperienceLevel</span>
+        @if (Model.ExperienceLevel > 0)
+        {
+            <span class="badge badge-outline">@Model.ExperienceLevel yrs exp</span>
+        }
         @if (Model.IsFeatured)
         {
-            <span class="badge">ویژه</span>
+            <span class="badge badge-featured">Featured</span>
         }
     </div>
 
     <div class="detail-grid">
-        <div><span>حداقل سن</span> @Model.MinimumAge سال</div>
-        <div><span>حداکثر سن</span> @Model.MaximumAge سال</div>
-        <div><span>حداقل حقوق</span> @Model.MinimumSalary.ToString("N0")</div>
-        <div><span>حداکثر حقوق</span> @Model.MaximumSalary.ToString("N0")</div>
-        <div><span>دسته‌بندی</span> @Model.CompanyJobCategoryName</div>
-        <div><span>شرکت</span> @Model.AboutCompany</div>
+        <div class="detail-item">
+            <span class="detail-label">Minimum Age</span>
+            <span class="detail-value">@Model.MinimumAge years</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Maximum Age</span>
+            <span class="detail-value">@Model.MaximumAge years</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Minimum Salary</span>
+            <span class="detail-value">@Model.MinimumSalary.ToString("N0")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Maximum Salary</span>
+            <span class="detail-value">@Model.MaximumSalary.ToString("N0")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Category</span>
+            <span class="detail-value">@Model.CompanyJobCategoryName</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Company</span>
+            <span class="detail-value">@Model.CompanyName</span>
+        </div>
     </div>
+</section>
 
-    <h4 style="margin: 16px 0 8px; color: #1e3a5f;">درباره موقعیت</h4>
-    <p style="line-height: 1.8;">@Model.Description</p>
+<section class="panel">
+    <div class="panel-head">
+        <h3>Job Description</h3>
+    </div>
+    <p style="line-height: 1.8; white-space: pre-line;">@Model.Description</p>
 
-    @if (Model.SkillNames.Count > 0)
+    @if (Model.SkillNames != null && Model.SkillNames.Any())
     {
-        <h4 style="margin: 16px 0 8px; color: #1e3a5f;">مهارت‌های مورد نیاز</h4>
-        <div>
+        <h3 style="margin: 20px 0 10px; font-size: 1rem;">Required Skills</h3>
+        <div class="chips">
             @foreach (var skill in Model.SkillNames)
             {
-                <span class="skill">@skill</span>
+                <span class="chip">@skill</span>
             }
         </div>
     }
+</section>
 
-    <div style="margin-top: 18px;">
-        <a class="btn" asp-action="Index">بازگشت به لیست</a>
-    </div>
+@if (Model.AboutCompany != null)
+{
+    <section class="panel">
+        <div class="panel-head">
+            <h3>About the Company</h3>
+        </div>
+        <p style="white-space: pre-line;">@Model.AboutCompany</p>
+    </section>
+}
+
+<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    @if (User.IsInRole("JobSeeker"))
+    {
+        <form asp-controller="JobApplication" asp-action="Apply" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="advertisementId" value="@Model.AdvertisementId" />
+            <button type="submit" class="btn btn-primary">Apply for this Job</button>
+        </form>
+    }
+
+    @if (User.IsInRole("Employer") && Model.IsOwner)
+    {
+        <a class="btn btn-primary"
+           asp-controller="JobApplication"
+           asp-action="ByAdvertisement"
+           asp-route-advertisementId="@Model.AdvertisementId">
+            View Applications
+        </a>
+    }
 </div>

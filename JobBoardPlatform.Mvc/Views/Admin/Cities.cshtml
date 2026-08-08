@@ -1,71 +1,124 @@
+@model CitiesViewModel
+
 @{
-    ViewData["Title"] = "شهرها";
+    ViewData["Title"] = "Cities";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">مدیریت شهرها</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Cities</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert text-danger">@TempData["Error"]</div>
-}
-
-<div class="card">
-    <h3>افزودن شهر جدید</h3>
-    <form asp-action="CreateCity" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <div class="form-group">
-            <label>نام شهر</label>
-            <input type="text" name="Name" class="form-control" placeholder="نام شهر" />
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success" style="margin-bottom: 15px;">
+            @TempData["Success"]
         </div>
-
-        <div class="form-group">
-            <label>کد شهر</label>
-            <input type="number" name="Code" class="form-control" placeholder="کد شهر" />
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" style="margin-bottom: 15px;">
+            @TempData["Error"]
         </div>
+    }
 
-        <div class="form-group">
-            <label>استان</label>
-            <select name="ProvinceId" class="form-control" asp-items="ViewBag.Provinces">
-                <option value="">انتخاب استان</option>
-            </select>
-        </div>
+    <div class="card" style="margin-bottom: 25px; padding: 15px;">
+        <h3>Add New City</h3>
 
-        <button type="submit" class="btn">افزودن شهر</button>
-    </form>
-</div>
+        <form asp-action="CreateCity" method="post">
+            @Html.AntiForgeryToken()
 
-<h3 style="margin: 18px 0 10px; color: #1e3a5f;">فهرست شهرها</h3>
-@{
-    var cities = (List<CityDetailResponseDto>)ViewBag.Cities;
-}
-@if (cities.Count == 0)
-{
-    <div class="empty">شهری ثبت نشده است.</div>
-}
-else
-{
-    <table style="width:100%;border-collapse:collapse;">
-        <thead>
-            <tr style="background:#e8f0fb;">
-                <th style="padding:10px;border:1px solid #cfd8e3;text-align:right;">نام شهر</th>
-                <th style="padding:10px;border:1px solid #cfd8e3;text-align:right;">کد شهر</th>
-                <th style="padding:10px;border:1px solid #cfd8e3;text-align:right;">استان</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in cities)
-            {
-                <tr>
-                    <td style="padding:10px;border:1px solid #cfd8e3;">@item.CityName</td>
-                    <td style="padding:10px;border:1px solid #cfd8e3;">@item.CityCode</td>
-                    <td style="padding:10px;border:1px solid #cfd8e3;">@item.ProvinceName</td>
+            <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>City Name</label>
+                <input type="text" name="Name" class="form-control" placeholder="Enter city name" />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>City Code</label>
+                <input type="number" name="Code" class="form-control" placeholder="Enter city code" />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Province</label>
+                <select name="ProvinceId" class="form-control" asp-items="ViewBag.Provinces">
+                    <option value="">-- Select Province --</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Add City</button>
+        </form>
+    </div>
+
+    <h3 style="margin: 18px 0 10px; color: #1e3a5f;">City List</h3>
+
+    @if (Model.Cities == null || Model.Cities.Count == 0)
+    {
+        <div class="empty">No cities registered yet.</div>
+    }
+    else
+    {
+        <table style="width:100%; border-collapse:collapse; margin-top: 10px;">
+            <thead>
+                <tr style="background:#e8f0fb;">
+                    <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">City Name</th>
+                    <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">City Code</th>
+                    <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">Province</th>
                 </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Cities)
+                {
+                    <tr>
+                        <td style="padding:10px; border:1px solid #cfd8e3;">@item.CityName</td>
+                        <td style="padding:10px; border:1px solid #cfd8e3;">@item.CityCode</td>
+                        <td style="padding:10px; border:1px solid #cfd8e3;">@item.ProvinceName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (Model.TotalPageCount > 1)
+    {
+        <div style="margin-top: 20px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+
+            @if (Model.PageNumber > 1)
+            {
+                <a asp-action="Cities"
+                   asp-route-pageNumber="@(Model.PageNumber - 1)"
+                   style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                    Previous
+                </a>
             }
-        </tbody>
-    </table>
-}
+
+            @for (var i = 1; i <= Model.TotalPageCount; i++)
+            {
+                if (i == Model.PageNumber)
+                {
+                    <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white;">
+                        @i
+                    </span>
+                }
+                else
+                {
+                    <a asp-action="Cities"
+                       asp-route-pageNumber="@i"
+                       style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                        @i
+                    </a>
+                }
+            }
+
+            @if (Model.PageNumber < Model.TotalPageCount)
+            {
+                <a asp-action="Cities"
+                   asp-route-pageNumber="@(Model.PageNumber + 1)"
+                   style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                    Next
+                </a>
+            }
+        </div>
+    }
+</div>

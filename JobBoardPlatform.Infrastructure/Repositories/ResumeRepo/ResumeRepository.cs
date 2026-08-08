@@ -49,7 +49,7 @@ public class ResumeRepository : GenericRepository<Resume>, IResumeRepository
         return await Entities
                         .AsNoTracking()
                         .Where(r => r.UserId == userId)
-                        .Select(r => r.UserId)
+                        .Select(r => r.Id)
                         .FirstOrDefaultAsync(cancellationToken);
     }
 

@@ -2,6 +2,7 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 
@@ -80,4 +81,16 @@ public interface IJobApplicationService
     /// </summary>
     /// <returns></returns>
     List<EnumResponseDto> GetJobApplicationStatuses();
+
+    /// <summary>
+    /// دریافت رزومه ای که با اون درخواست داده شده 
+    /// </summary>
+    /// <param name="jobApplicationId"></param>
+    /// <param name="employerUserId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<ResumeDetailResponseDto> GetApplicantResumeByApplicationIdAsync(
+    Guid jobApplicationId,
+    Guid employerUserId,
+    CancellationToken cancellationToken = default);
 }

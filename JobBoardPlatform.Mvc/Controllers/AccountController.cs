@@ -8,7 +8,7 @@ using AccountAuthenticationService = JobBoardPlatform.Application.Interfaces.Aut
 using JobBoardPlatform.Application.Interfaces.CityInterface;
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
-using JobBoardPlatform.Mvc.ViewModels;
+using JobBoardPlatform.Mvc.Models.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -27,29 +27,33 @@ public class AccountController : Controller
     private readonly ICityService _cityService;
     private readonly IJobCategoryService _jobCategoryService;
     private readonly IOptions<JwtSettings> _jwtSettings;
+    private readonly ILogger<AccountController> _logger;
 
     public AccountController(
         AccountAuthenticationService authenticationService,
         ICityService cityService,
         IJobCategoryService jobCategoryService,
-        IOptions<JwtSettings> jwtSettings)
+        IOptions<JwtSettings> jwtSettings,
+        ILogger<AccountController> logger)
     {
         _authenticationService = authenticationService;
         _cityService = cityService;
         _jobCategoryService = jobCategoryService;
         _jwtSettings = jwtSettings;
+        _logger = logger;
     }
 
     [HttpGet]
     public IActionResult Login()
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Index), "Home");
 
         return View();
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
@@ -67,9 +71,9 @@ public class AccountController : Controller
 
             await SignInWithTokenAsync(result, model.RememberMe);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Index), "Home");
         }
-        catch (Exception ex) when (ex is AppException)
+        catch (AppException ex)
         {
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
@@ -80,13 +84,14 @@ public class AccountController : Controller
     public IActionResult RegisterJobSeeker()
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Index), "Home");
 
-        return View();
+        return View(new RegisterJobSeekerViewModel());
     }
 
     [HttpPost]
-    public async Task<IActionResult> RegisterJobSeeker(RegisterJobSeekerRequestDto model, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegisterJobSeeker(RegisterJobSeekerViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
             return View(model);
@@ -97,9 +102,9 @@ public class AccountController : Controller
 
             await SignInWithTokenAsync(result, isPersistent: false);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Index), "Home");
         }
-        catch (Exception ex) when (ex is AppException)
+        catch (AppException ex)
         {
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
@@ -110,14 +115,15 @@ public class AccountController : Controller
     public async Task<IActionResult> RegisterEmployer(CancellationToken cancellationToken)
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Index), "Home");
 
         await PopulateSelectListsAsync(cancellationToken);
-        return View();
+        return View(new RegisterEmployerViewModel());
     }
 
     [HttpPost]
-    public async Task<IActionResult> RegisterEmployer(RegisterEmployerRequestDto model, CancellationToken cancellationToken)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegisterEmployer(RegisterEmployerViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -129,12 +135,14 @@ public class AccountController : Controller
         {
             await _authenticationService.RegisterEmployerAsync(model, cancellationToken);
 
-            TempData["Success"] = "ثبت‌نام شما با موفقیت انجام شد. پس از تأیید ادمین می‌توانید وارد شوید.";
+            TempData["Success"] = "Your registration was completed successfully. You can sign in after admin approval.";
 
             return RedirectToAction(nameof(Login));
         }
-        catch (Exception ex) when (ex is AppException)
+        catch (AppException ex)
         {
+            _logger.LogWarning(ex, "Employer registration failed.");
+
             ModelState.AddModelError(string.Empty, ex.Message);
             await PopulateSelectListsAsync(cancellationToken);
             return View(model);
@@ -142,11 +150,12 @@ public class AccountController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
         var refreshToken = User.FindFirst("refresh_token")?.Value;
 
-        if (!string.IsNullOrEmpty(refreshToken))
+        if (!string.IsNullOrWhiteSpace(refreshToken))
         {
             try
             {
@@ -154,14 +163,19 @@ public class AccountController : Controller
                     new LogoutRequestDto { RefreshToken = refreshToken },
                     cancellationToken);
             }
-            catch (Exception)
+            catch (AppException ex)
             {
+                _logger.LogWarning(ex, "Logout service failed while revoking refresh token.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred during logout.");
             }
         }
 
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction(nameof(Index), "Home");
     }
 
     private async Task SignInWithTokenAsync(TokenLoginResponseDto tokenResult, bool isPersistent)
@@ -204,34 +218,46 @@ public class AccountController : Controller
         {
             return new JwtSecurityTokenHandler().ValidateToken(accessToken, validationParameters, out _);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Failed to read principal from access token.");
             return null;
         }
     }
 
-    private async Task PopulateSelectListsAsync(CancellationToken cancellationToken)
+    private async Task PopulateSelectListsAsync(
+    CancellationToken cancellationToken)
     {
-        var cities = await _cityService.GetAllCitiesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var cities = await _cityService.GetAllForSelectAsync(
             cancellationToken);
 
-        ViewBag.Cities = new SelectList(cities.Data, nameof(CityDetailResponseDto.CityId), nameof(CityDetailResponseDto.CityName));
-
-        var jobCategories = await _jobCategoryService.GetAllJobCategoriesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var jobCategories = await _jobCategoryService.GetAllForSelectAsync(
             cancellationToken);
 
-        ViewBag.JobCategories = new SelectList(jobCategories.Data, nameof(JobCategoryResponseDto.JobCategoryId), nameof(JobCategoryResponseDto.Name));
+        ViewBag.Cities = new SelectList(
+            cities,
+            nameof(CityDetailResponseDto.CityId),
+            nameof(CityDetailResponseDto.CityName));
+
+        ViewBag.JobCategories = new SelectList(
+            jobCategories,
+            nameof(JobCategoryResponseDto.JobCategoryId),
+            nameof(JobCategoryResponseDto.Name));
 
         ViewBag.OwnershipTypes = Enum.GetValues<OwnershipType>()
-            .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
+            .Select(value => new SelectListItem
+            {
+                Value = ((int)value).ToString(),
+                Text = value.ToString()
+            })
             .ToList();
 
         ViewBag.CompanySizes = Enum.GetValues<CompanySizeEnum>()
-            .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
+            .Select(value => new SelectListItem
+            {
+                Value = ((int)value).ToString(),
+                Text = value.ToString()
+            })
             .ToList();
     }
 }

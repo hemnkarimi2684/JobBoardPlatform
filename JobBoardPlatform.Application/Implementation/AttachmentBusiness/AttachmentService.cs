@@ -36,7 +36,7 @@ public class AttachmentService : IAttachmentService
         }, attachmentId, cancellationToken);
 
         if (attachment == null)
-            throw new NotFoundException($"the attachment with id {attachmentId} was not found");
+            throw new NotFoundException("attachment was not found");
 
         return attachment;
     }
@@ -49,7 +49,7 @@ public class AttachmentService : IAttachmentService
         var result = await _unitOfWork.AttachmentRepository.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
 
         if (!result)
-            throw new NotFoundException($"the attachment with id {attachmentId} was not found");
+            throw new NotFoundException("attachment was not found");
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }

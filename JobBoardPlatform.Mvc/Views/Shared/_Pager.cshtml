@@ -3,20 +3,24 @@
     var pager = (dynamic)Model;
     var pageNumber = (int)pager.PageNumber;
     var totalPages = (int)pager.TotalPageCount;
-    var query = Context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
-    query["pageNumber"] = "";
 }
 @if (totalPages > 1)
 {
-    <div class="pager">
+    <nav class="pager">
         @if (pageNumber > 1)
         {
-            <a href="@Context.Request.Path?pageNumber=@(pageNumber - 1)">قبلی</a>
+            var prevQuery = Context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
+            prevQuery["pageNumber"] = (pageNumber - 1).ToString();
+            var prevUrl = Context.Request.Path + "?" + string.Join("&", prevQuery.Select(x => x.Key + "=" + x.Value));
+            <a class="pager-link" href="@prevUrl">&#8592; Previous</a>
         }
-        <span class="current">صفحه @pageNumber از @totalPages</span>
+        <span class="pager-current">Page @pageNumber of @totalPages</span>
         @if (pageNumber < totalPages)
         {
-            <a href="@Context.Request.Path?pageNumber=@(pageNumber + 1)">بعدی</a>
+            var nextQuery = Context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
+            nextQuery["pageNumber"] = (pageNumber + 1).ToString();
+            var nextUrl = Context.Request.Path + "?" + string.Join("&", nextQuery.Select(x => x.Key + "=" + x.Value));
+            <a class="pager-link" href="@nextUrl">Next &#8594;</a>
         }
-    </div>
+    </nav>
 }

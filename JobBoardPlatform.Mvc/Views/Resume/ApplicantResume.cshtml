@@ -1,0 +1,186 @@
+﻿@model ResumeApplicantResumeViewModel
+
+@{
+    ViewData["Title"] = "Applicant Resume";
+
+    var profile = Model.ResumeUserProfiles;
+}
+
+<div class="page-head">
+    <div>
+        <h2>Applicant Resume</h2>
+        @if (!string.IsNullOrWhiteSpace(Model.Title))
+        {
+            <p class="muted">@Model.Title</p>
+        }
+    </div>
+    <a asp-controller="JobApplication" asp-action="ByAdvertisement" class="btn btn-ghost">&#8592; Back to Applications</a>
+</div>
+
+@* Applicant profile *@
+<section class="panel">
+    <div class="panel-head">
+        <h3>Applicant Information</h3>
+    </div>
+
+    @if (profile is null)
+    {
+        <p class="muted">Applicant profile information is not available.</p>
+    }
+    else
+    {
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span class="detail-label">Full Name</span>
+                <span class="detail-value">@profile.FullName</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Gender</span>
+                <span class="detail-value">@profile.Gender</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Birth Date</span>
+                <span class="detail-value">@profile.BirthDate.ToString("yyyy-MM-dd")</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">City</span>
+                <span class="detail-value">@profile.CityName</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Address</span>
+                <span class="detail-value">@profile.Address</span>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(profile.Bio))
+        {
+            <div class="bio">
+                <span class="detail-label">Bio</span>
+                <p>@profile.Bio</p>
+            </div>
+        }
+    }
+</section>
+
+@* Uploaded resume file *@
+<section class="panel">
+    <div class="panel-head">
+        <h3>Uploaded Resume File</h3>
+    </div>
+
+    @if (Model.ResumeFileId.HasValue)
+    {
+        <div class="file-row">
+            <div>
+                <div class="file-name">Resume.pdf</div>
+                <p class="muted">The applicant has uploaded a resume file.</p>
+            </div>
+            <a asp-controller="Resume"
+               asp-action="Download"
+               asp-route-resumeId="@Model.ResumeId"
+               class="btn btn-primary">&#128196; Download Resume File</a>
+        </div>
+    }
+    else
+    {
+        <p class="muted">No resume file has been uploaded.</p>
+    }
+</section>
+
+@* Skills *@
+<section class="panel">
+    <div class="panel-head">
+        <h3>Skills</h3>
+    </div>
+
+    @if (Model.ResumeSkills.Any())
+    {
+        <div class="chips">
+            @foreach (var skill in Model.ResumeSkills)
+            {
+                <span class="chip">@skill.SkillName</span>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="muted">No skills have been added.</p>
+    }
+</section>
+
+@* Education *@
+<section class="panel">
+    <div class="panel-head">
+        <h3>Education History</h3>
+    </div>
+
+    @if (Model.ResumeEducationDetails.Any())
+    {
+        <div class="timeline">
+            @foreach (var education in Model.ResumeEducationDetails)
+            {
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-body">
+                        <h4>@education.Major</h4>
+                        <div class="timeline-sub">@education.CertificateDegreeName &mdash; @education.University</div>
+                        <div class="timeline-date">
+                            @education.StartDate.ToString("yyyy-MM-dd") &mdash;
+                            @(education.IsCurrentlyStudying
+                                ? "Present"
+                                : education.CompletionDate?.ToString("yyyy-MM-dd") ?? "Not specified")
+                        </div>
+                        @if (education.Percentage.HasValue)
+                        {
+                            <div class="timeline-date">Percentage: @education.Percentage.Value</div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="muted">No education history has been added.</p>
+    }
+</section>
+
+@* Work experience *@
+<section class="panel">
+    <div class="panel-head">
+        <h3>Work Experience</h3>
+    </div>
+
+    @if (Model.ResumeExperienceDetails.Any())
+    {
+        <div class="timeline">
+            @foreach (var experience in Model.ResumeExperienceDetails)
+            {
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-body">
+                        <h4>@experience.LastJobTitle</h4>
+                        <div class="timeline-sub">
+                            @experience.JobCategory
+                            @if (!string.IsNullOrWhiteSpace(experience.City))
+                            {
+                                <text> &mdash; @experience.City</text>
+                            }
+                        </div>
+                        <div class="timeline-date">
+                            @experience.StartDate.ToString("yyyy-MM-dd") &mdash;
+                            @(experience.IsCurrentJob
+                                ? "Present"
+                                : experience.EndDate?.ToString("yyyy-MM-dd") ?? "Not specified")
+                        </div>
+                        <span class="chip chip-level">@experience.SeniorityLevel</span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="muted">No work experience has been added.</p>
+    }
+</section>

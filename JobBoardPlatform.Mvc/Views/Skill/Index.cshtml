@@ -1,27 +1,27 @@
-@model Pagination<SkillDetailResponseDto>
-
+@model SkillIndexViewModel
 @{
-    ViewData["Title"] = "مهارت‌ها";
+    ViewData["Title"] = "Skills";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">مهارت‌ها</h2>
+<h2 style="margin-bottom: 18px; color: #1e3a5f;">Skills</h2>
 
 <form asp-action="Index" method="get" style="margin-bottom: 18px;">
-    <div style="display:flex;gap:8px;">
-        <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="جستجوی مهارت" />
-        <button type="submit" class="btn">جستجو</button>
+    <div style="display:flex; gap:8px;">
+        <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="Search skills" />
+        <button type="submit" class="btn">Search</button>
     </div>
 </form>
 
 @if (Model.Data.Count == 0)
 {
-    <div class="empty">مهارتی یافت نشد.</div>
+    <div class="empty">No skills found.</div>
 }
 else
 {
     <div class="card">
         @foreach (var skill in Model.Data)
         {
+            // Assuming SkillName is the property to display. If it's different, adjust accordingly.
             <span class="skill">@skill.SkillName</span>
         }
     </div>

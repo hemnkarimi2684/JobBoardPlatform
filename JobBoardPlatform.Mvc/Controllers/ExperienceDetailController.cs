@@ -1,10 +1,8 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.ExperienceDetailDto;
-using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
-using JobBoardPlatform.Application.Common.Exceptions.BaseAppExceptionModel;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
-using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Mvc.Models.ExperienceDetail;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,7 +10,7 @@ using System.Security.Claims;
 
 namespace JobBoardPlatform.Mvc.Controllers;
 
-[Authorize(Roles = "JobSeeker")]
+[Authorize(Policy = "ActiveJobSeekerOnly")]
 public class ExperienceDetailController : Controller
 {
     private readonly IExperienceDetailService _experienceDetailService;
@@ -29,18 +27,18 @@ public class ExperienceDetailController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 20 },
             cancellationToken);
 
-        return View(result);
+        return View(ExperienceDetailIndexViewModel.FromResponseDto(result));
     }
 
     [HttpGet]
     public IActionResult Create()
     {
         PopulateLevels();
-        return View();
+        return View(new ExperienceDetailCreateViewModel());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateExperienceDetailRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(ExperienceDetailCreateViewModel model, CancellationToken cancellationToken)
     {
         model.UserId = CurrentUserId();
         ModelState.Remove(nameof(model.UserId));
@@ -51,50 +49,25 @@ public class ExperienceDetailController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _experienceDetailService.CreateExperienceDetailAsync(model, cancellationToken);
+        await _experienceDetailService.CreateExperienceDetailAsync(model, cancellationToken);
 
-            TempData["Success"] = "سوابق کاری ثبت شد.";
+        TempData["Success"] = "Experience detail was created successfully.";
 
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            PopulateLevels();
-            return View(model);
-        }
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var item = await _experienceDetailService.GetExperienceDetailByIdAsync(id, cancellationToken);
+        var item = await _experienceDetailService.GetExperienceDetailByIdAsync(id, cancellationToken);
 
-            PopulateLevels();
+        PopulateLevels();
 
-            return View(new UpdateExperienceDetailRequestDto
-            {
-                LastJobTitle = item.LastJobTitle,
-                SeniorityLevel = item.SeniorityLevel,
-                JobCategory = item.JobCategory,
-                City = item.City,
-                StartDate = item.StartDate,
-                EndDate = item.EndDate,
-                IsCurrentJob = item.IsCurrentJob
-            });
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return View(ExperienceDetailEditViewModel.FromResponseDto(item));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(Guid id, UpdateExperienceDetailRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, ExperienceDetailEditViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -102,20 +75,11 @@ public class ExperienceDetailController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _experienceDetailService.UpdateExperienceDetailAsync(id, model, cancellationToken);
+        await _experienceDetailService.UpdateExperienceDetailAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "سوابق کاری ویرایش شد.";
+        TempData["Success"] = "Experience detail was updated successfully.";
 
-            return RedirectToAction(nameof(Index));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            PopulateLevels();
-            return View(model);
-        }
+        return RedirectToAction(nameof(Index));
     }
 
     private void PopulateLevels()

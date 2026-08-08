@@ -3,24 +3,21 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Common.Helper;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.EmailInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
-using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
-using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Constants;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
-using static JobBoardPlatform.Application.Common.AccessClaims.PermissionClaim.Permissions;
+
 
 namespace JobBoardPlatform.Application.Implementation.JobApplicationBusiness;
 
@@ -36,15 +33,18 @@ public class JobApplicationService : IJobApplicationService
 
     private readonly IEmailService _emailService;
 
+    private readonly IResumeService _resumeService;
+
     private readonly ILogger<JobApplication> _logger;
 
-    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService, IEmailService emailService, ILogger<JobApplication> logger)
+    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService, IEmailService emailService, IResumeService resumeService, ILogger<JobApplication> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _advertisementService = advertisementService;
         _accessControlService = accessControlService;
         _emailService = emailService;
+        _resumeService = resumeService;
         _logger = logger;
     }
 
@@ -69,7 +69,7 @@ public class JobApplicationService : IJobApplicationService
         var result = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
 
         if (!result)
-            throw new ValidationException("Something went wrong while creating the job application.");
+            throw new ValidationException("The job application could not be created. Please try again.");
 
         var ownerEmail = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerEmailAsync(createCommand.AdvertisementId, cancellationToken);
 
@@ -110,7 +110,7 @@ public class JobApplicationService : IJobApplicationService
         var userId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
 
         if (userId == null)
-            throw new NotFoundException($"Advertisement with id {advertisementId} not found.");
+            throw new NotFoundException("Advertisement was not found.");
 
         _accessControlService.EnsureOwnerEmployer(userId.Value, _currentUser);
 
@@ -150,12 +150,12 @@ public class JobApplicationService : IJobApplicationService
         var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId, cancellationToken);
 
         if (jobApplication == null)
-            throw new NotFoundException($"the job application with id {jobApplicationId} was not found");
+            throw new NotFoundException("Job application was not found.");
 
         var ownerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(jobApplication.AdvertisementId, cancellationToken);
 
         if (ownerId == null)
-            throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
+            throw new NotFoundException("Advertisement was not found.");
 
         _accessControlService.EnsureApplicantOrOwnerEmployer(ownerId.Value, jobApplication.UserId, _currentUser);
 
@@ -212,12 +212,37 @@ public class JobApplicationService : IJobApplicationService
                                                                  totalDataCount);
     }
 
+
+    public async Task<ResumeDetailResponseDto> GetApplicantResumeByApplicationIdAsync(
+        Guid jobApplicationId,
+        Guid employerUserId,
+        CancellationToken cancellationToken = default)
+    {
+
+        // اینجا چک میکنم ببینم کسی که درخواست دیدن رزومه کاربر رو کرده ایا اصلا دارای اون اگهیه یا کسی دیگه ایه که میخواد ببینه 
+        var applicantUserId = await _unitOfWork.JobApplicationRepository.GetApplicantUserIdIfEmployerOwnsApplicationAsync(
+            jobApplicationId,
+            employerUserId,
+            cancellationToken);
+
+        if (applicantUserId is null)
+            throw new NotFoundException("Job application was not found.");
+
+        var result = await _resumeService.GetResumeDetailAsync(applicantUserId.Value, cancellationToken);
+
+        if (result is null)
+            throw new NotFoundException("The user does not have a complete resume.");
+
+        return result;
+    }
+
+
     public List<EnumResponseDto> GetJobApplicationStatuses()
     {
         var jobApplicationStatuses = EnumHelper.GetEnumValues<JobApplicationStatus>();
 
         if (jobApplicationStatuses is null)
-            throw new NotFoundException("there is no jobApplication status in the system.");
+            throw new NotFoundException("No job application statuses are currently available.");
 
         return jobApplicationStatuses;
     }
@@ -234,12 +259,12 @@ public class JobApplicationService : IJobApplicationService
         var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId, cancellationToken, true);
 
         if (jobApplication == null)
-            throw new NotFoundException($"the job application with id {jobApplicationId} was not found");
+            throw new NotFoundException("Job application was not found.");
 
         var ownerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(jobApplication.AdvertisementId, cancellationToken);
 
         if (ownerId == null)
-            throw new NotFoundException($"Advertisement with id {jobApplication.AdvertisementId} not found.");
+            throw new NotFoundException("Advertisement was not found.");
 
         _accessControlService.EnsureOwnerEmployer(ownerId.Value, _currentUser);
 
@@ -250,7 +275,7 @@ public class JobApplicationService : IJobApplicationService
         var result = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
 
         if (!result)
-            throw new ValidationException("Something went wrong while updating the job application.");
+            throw new ValidationException("The job application status could not be updated.Please try again.");
 
         await HandelEmailSendingForJobApplicationStatusAsync(jobApplication, status, cancellationToken);
     }
@@ -262,7 +287,7 @@ public class JobApplicationService : IJobApplicationService
         var jobApplication = await _unitOfWork.JobApplicationRepository.GetByIdAsync(jobApplicationId, cancellationToken, true);
 
         if (jobApplication == null)
-            throw new NotFoundException($"the job application with id {jobApplicationId} was not found.");
+            throw new NotFoundException("Job application was not found.");
 
         _accessControlService.EnsureApplicant(jobApplication.UserId, _currentUser);
 
@@ -282,46 +307,40 @@ public class JobApplicationService : IJobApplicationService
         var isResumeExist = await _unitOfWork.ResumeRepository.IsResumeExistAsync(resumeId, cancellationToken);
 
         if (!isResumeExist)
-            throw new NotFoundException($"the resume with id {resumeId} was not found");
+            throw new NotFoundException("Resume was not found.");
 
         var isAdvertisementExist = await _unitOfWork.AdvertisementRepository.IsAdvertisementExistAsync(advertisementId, cancellationToken);
 
         if (!isAdvertisementExist)
-            throw new NotFoundException($"the advertisement with id {advertisementId} was not found");
+            throw new NotFoundException("Advertisement was not found.");
 
         var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId, cancellationToken);
 
         if (!isUserExist)
-            throw new NotFoundException($"the user with id {userId} was not found");
+            throw new NotFoundException("User was not found.");
 
         var isDuplicateJobApplication = await _unitOfWork.JobApplicationRepository.IsDuplicateJobApplicationAsync(advertisementId, userId, cancellationToken);
 
         if (isDuplicateJobApplication)
-            throw new ConflictException($" the user with id {userId} for advertisement with id {advertisementId} already has jobApplication");
+            throw new ConflictException("You have already applied for this job.");
     }
 
     private void ValidateJobApplicationStatus(JobApplication jobApplication, JobApplicationStatus jobApplicationStatus)
     {
         if (jobApplicationStatus == JobApplicationStatus.Pending)
-            throw new ValidationException("the jobApplication cannot return to a pending status");
+            throw new ValidationException("A job application cannot be moved back to pending status.");
 
         if (jobApplication.Status == JobApplicationStatus.Accepted)
-            throw new ValidationException("You cannot change the Accepted status.");
+            throw new ValidationException("The status of an accepted application cannot be changed.");
 
         if (jobApplication.Status == JobApplicationStatus.Rejected)
-            throw new ValidationException("You cannot change the rejected status.");
+            throw new ValidationException("The status of a rejected application cannot be changed.");
 
-        if (jobApplication.Status == JobApplicationStatus.Reviewing)
-        {
-            if (jobApplicationStatus == JobApplicationStatus.Accepted)
-                throw new ValidationException("Applications currently under review cannot be accepted directly without an interview stage.");
-        }
+        if (jobApplication.Status == JobApplicationStatus.Reviewing && jobApplicationStatus == JobApplicationStatus.Accepted)
+            throw new ValidationException("An application under review cannot be accepted directly. An interview stage is required first.");
 
-        if (jobApplication.Status == JobApplicationStatus.Interview)
-        {
-            if (jobApplicationStatus == JobApplicationStatus.Reviewing)
-                throw new ValidationException("The status cannot be reverted from Interviewing to Under Review, as the review has already been completed.");
-        }
+        if (jobApplication.Status == JobApplicationStatus.Interview && jobApplicationStatus == JobApplicationStatus.Reviewing)
+            throw new ValidationException("An application cannot be moved back to the review stage after the interview stage has started.");
     }
 
     private async Task HandelEmailSendingForJobApplicationStatusAsync(

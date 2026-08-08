@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.ProvinceEntity.Data;
+﻿using JobBoardPlatform.Core.Entities.CityEntity.Entity;
+using JobBoardPlatform.Core.Entities.ProvinceEntity.Data;
 using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
@@ -11,6 +12,17 @@ public class ProvinceRepository : GenericRepository<Province>, IProvinceReposito
 {
     public ProvinceRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
+    }
+
+    public async Task<List<TResult>> GetAllForSelectAsync<TResult>(
+        Expression<Func<Province, TResult>> projection,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                        .AsNoTracking()
+                        .OrderBy(p => p.Name)
+                        .Select(projection)
+                        .ToListAsync(cancellationToken);
     }
 
     public async Task<(List<TResult> Items, int TotalDataCount)> GetAllProvincesAsync<TResult>(

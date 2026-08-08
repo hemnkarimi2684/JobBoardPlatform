@@ -1,58 +1,61 @@
-@model CreateEducationDetailRequestDto
+@model EducationDetailCreateViewModel
 
 @{
-    ViewData["Title"] = "افزودن سوابق تحصیلی";
+    ViewData["Title"] = "Add Education";
 }
 
-<div class="card" style="max-width:560px;margin:0 auto;">
-    <h3>افزودن سوابق تحصیلی</h3>
+<div style="direction: ltr; text-align: left;">
+    <div class="card" style="max-width:560px; margin:0 auto;">
+        <h3>Add Education Record</h3>
 
-    <form asp-action="Create" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-group">
-            <label asp-for="CertificateDegree"></label>
-            <select asp-for="CertificateDegree" asp-items="ViewBag.CertificateDegrees" class="form-control"></select>
-            <span asp-validation-for="CertificateDegree" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="CertificateDegree">Degree</label>
+                <select asp-for="CertificateDegree" asp-items="ViewBag.CertificateDegrees" class="form-control">
+                    <option value="">-- Select Degree --</option>
+                </select>
+                <span asp-validation-for="CertificateDegree" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="Major"></label>
-            <input asp-for="Major" class="form-control" />
-            <span asp-validation-for="Major" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="Major">Major / Field of Study</label>
+                <input asp-for="Major" class="form-control" placeholder="e.g., Computer Science" />
+                <span asp-validation-for="Major" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="University"></label>
-            <input asp-for="University" class="form-control" />
-            <span asp-validation-for="University" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="University">University / Institution</label>
+                <input asp-for="University" class="form-control" placeholder="e.g., University of Technology" />
+                <span asp-validation-for="University" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="StartDate"></label>
-            <input asp-for="StartDate" class="form-control" type="date" />
-            <span asp-validation-for="StartDate" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="StartDate">Start Date</label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="CompletionDate"></label>
-            <input asp-for="CompletionDate" class="form-control" type="date" />
-            <span asp-validation-for="CompletionDate" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="CompletionDate">Completion Date</label>
+                <input asp-for="CompletionDate" class="form-control" type="date" />
+                <span asp-validation-for="CompletionDate" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="Percentage"></label>
-            <input asp-for="Percentage" class="form-control" />
-            <span asp-validation-for="Percentage" class="text-danger"></span>
-        </div>
+            <div class="form-group">
+                <label asp-for="Percentage">GPA / Percentage</label>
+                <input asp-for="Percentage" class="form-control" placeholder="e.g., 18.5 or 90" />
+                <span asp-validation-for="Percentage" class="text-danger"></span>
+            </div>
 
-        <div class="form-group">
-            <label asp-for="IsCurrentlyStudying">
+            <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
                 <input asp-for="IsCurrentlyStudying" />
-                در حال تحصیل
-            </label>
-        </div>
+                <label asp-for="IsCurrentlyStudying" style="margin-bottom: 0;">Currently Studying</label>
+            </div>
 
-        <button type="submit" class="btn">ثبت</button>
-    </form>
+            <button type="submit" class="btn">Save Record</button>
+        </form>
+    </div>
 </div>

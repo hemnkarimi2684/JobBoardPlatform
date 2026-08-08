@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobDto;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 
@@ -37,5 +38,13 @@ public interface IJobService
     Task<Pagination<JobAdvertisementListItemResponseDto>> GetJobAdvertisementsAsync(
         Guid jobId,
         PagingRequestDto pagingCommand,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// دریافت تمام شغل ها برای دراپ داون 
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<JobResponseDto>> GetAllForSelectAsync(
         CancellationToken cancellationToken = default);
 }

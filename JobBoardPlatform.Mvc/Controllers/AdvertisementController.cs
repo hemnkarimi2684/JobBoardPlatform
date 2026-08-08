@@ -14,6 +14,7 @@ using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.RoleEntity.Constants;
+using JobBoardPlatform.Mvc.Models.Advertisement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -52,7 +53,7 @@ public class AdvertisementController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        return View(result);
+        return View(AdvertisementIndexViewModel.FromResponseDto(result));
     }
 
     [HttpGet]
@@ -65,7 +66,7 @@ public class AdvertisementController : Controller
 
         ViewBag.SearchTerm = searchTerm;
 
-        return View(result);
+        return View(AdvertisementSearchViewModel.FromResponseDto(result));
     }
 
     [HttpGet]
@@ -82,34 +83,25 @@ public class AdvertisementController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        var categories = await _jobCategoryService.GetAllJobCategoriesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var categories = await _jobCategoryService.GetAllForSelectAsync(
             cancellationToken);
 
-        ViewBag.JobCategories = new SelectList(categories.Data, nameof(JobCategoryResponseDto.JobCategoryId), nameof(JobCategoryResponseDto.Name));
+        ViewBag.JobCategories = new SelectList(categories, nameof(JobCategoryResponseDto.JobCategoryId), nameof(JobCategoryResponseDto.Name));
         ViewBag.CollaborationTypes = Enum.GetValues<CollaborationType>()
             .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
             .ToList();
 
-        return View(result);
+        return View(AdvertisementFilterViewModel.FromResponseDto(result));
     }
 
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var advertisement = await _advertisementService.GetAdvertisementInfoByIdAsync(id, cancellationToken);
+        var advertisement = await _advertisementService.GetAdvertisementInfoByIdAsync(id, cancellationToken);
 
-            return View(advertisement);
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return View(AdvertisementDetailsViewModel.FromResponseDto(advertisement));
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     public async Task<IActionResult> MyAds(int pageNumber = 1, CancellationToken cancellationToken = default)
     {
         var employer = await _userService.GetEmployerWithCompanyAsync(CurrentUserId(), cancellationToken);
@@ -119,21 +111,21 @@ public class AdvertisementController : Controller
             employer.CompanyId,
             cancellationToken);
 
-        return View(result);
+        return View(AdvertisementMyAdsViewModel.FromResponseDto(result));
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
         await PopulateSelectListsAsync(cancellationToken);
 
-        return View();
+        return View(new AdvertisementCreateViewModel());
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
-    public async Task<IActionResult> Create(CreateAdvertisementRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(AdvertisementCreateViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -141,52 +133,27 @@ public class AdvertisementController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _advertisementService.CreateAdvertisementAsync(model, cancellationToken);
+        await _advertisementService.CreateAdvertisementAsync(model, cancellationToken);
 
-            TempData["Success"] = "آگهی با موفقیت ثبت شد.";
+        TempData["Success"] = "Advertisement was created successfully.";
 
-            return RedirectToAction(nameof(MyAds));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            await PopulateSelectListsAsync(cancellationToken);
-            return View(model);
-        }
+        return RedirectToAction(nameof(MyAds));
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var advertisement = await _advertisementService.GetAdvertisementInfoByIdAsync(id, cancellationToken);
+        var advertisement = await _advertisementService.GetAdvertisementInfoByIdAsync(id, cancellationToken);
 
-            await PopulateSelectListsAsync(cancellationToken);
+        await PopulateSelectListsAsync(cancellationToken);
 
-            return View(new UpdateAdvertisementRequestDto
-            {
-                Description = advertisement.Description,
-                MinimumAge = advertisement.MinimumAge,
-                MaximumAge = advertisement.MaximumAge,
-                MinimumSalary = advertisement.MinimumSalary,
-                MaximumSalary = advertisement.MaximumSalary,
-                ExperienceLevel = advertisement.ExperienceLevel,
-                CollaborationType = advertisement.CollaborationType
-            });
-        }
-        catch (NotFoundException)
-        {
-            return NotFound();
-        }
+        return View(AdvertisementEditViewModel.FromResponseDto(advertisement));
     }
 
-    [Authorize(Roles = "Employer")]
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpPost]
-    public async Task<IActionResult> Edit(Guid id, UpdateAdvertisementRequestDto model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, AdvertisementEditViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -194,20 +161,11 @@ public class AdvertisementController : Controller
             return View(model);
         }
 
-        try
-        {
-            await _advertisementService.UpdateAdvertisementAsync(id, model, cancellationToken);
+        await _advertisementService.UpdateAdvertisementAsync(id, model, cancellationToken);
 
-            TempData["Success"] = "آگهی با موفقیت ویرایش شد.";
+        TempData["Success"] = "Advertisement was updated successfully.";
 
-            return RedirectToAction(nameof(MyAds));
-        }
-        catch (Exception ex) when (ex is AppException)
-        {
-            ModelState.AddModelError(string.Empty, ex.Message);
-            await PopulateSelectListsAsync(cancellationToken);
-            return View(model);
-        }
+        return RedirectToAction(nameof(MyAds));
     }
 
     private Guid CurrentUserId()
@@ -215,26 +173,20 @@ public class AdvertisementController : Controller
 
     private async Task PopulateSelectListsAsync(CancellationToken cancellationToken)
     {
-        var jobs = await _jobService.GetAllJobsAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var jobs = await _jobService.GetAllForSelectAsync(
             cancellationToken);
 
-        var cities = await _cityService.GetAllCitiesAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var cities = await _cityService.GetAllForSelectAsync(
             cancellationToken);
 
-        var skills = await _skillService.GetAllSkillsAsync(
-            new TextRequestDto(),
-            new PagingRequestDto { PageNumber = 1, PageSize = 100 },
+        var skills = await _skillService.GetAllForSelectAsync(
             cancellationToken);
 
         var employer = await _userService.GetEmployerWithCompanyAsync(CurrentUserId(), cancellationToken);
 
-        ViewBag.Jobs = new SelectList(jobs.Data, "JobId", "Name");
-        ViewBag.Cities = new SelectList(cities.Data, nameof(CityDetailResponseDto.CityId), nameof(CityDetailResponseDto.CityName));
-        ViewBag.Skills = new MultiSelectList(skills.Data, nameof(SkillDetailResponseDto.SkillId), nameof(SkillDetailResponseDto.SkillName));
+        ViewBag.Jobs = new SelectList(jobs, "JobId", "Name");
+        ViewBag.Cities = new SelectList(cities, nameof(CityDetailResponseDto.CityId), nameof(CityDetailResponseDto.CityName));
+        ViewBag.Skills = new MultiSelectList(skills, nameof(SkillDetailResponseDto.SkillId), nameof(SkillDetailResponseDto.SkillName));
         ViewBag.CollaborationTypes = Enum.GetValues<CollaborationType>()
             .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
             .ToList();

@@ -1,52 +1,56 @@
-@model Pagination<JobAdvertisementListItemResponseDto>
+@model JobDetailsViewModel
 
 @{
-    ViewData["Title"] = "آگهی‌های شغل";
-    var jobName = Model.Data.FirstOrDefault()?.JobName ?? "آگهی‌های شغل";
+    ViewData["Title"] = "Job Ads";
+    // Dynamically set title if a specific job name is available, otherwise use default.
+    var pageTitle = Model.Data.FirstOrDefault()?.JobName ?? "Job Ads";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">@jobName</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">@pageTitle</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-success">@TempData["Error"]</div>
-}
-
-@if (Model.Data.Count == 0)
-{
-    <div class="empty">آگهی فعالی برای این شغل وجود ندارد.</div>
-}
-else
-{
-    foreach (var item in Model.Data)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.JobName</h3>
-            <div class="meta">
-                @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
-            </div>
-            <div>
-                <span class="badge">@item.CollaborationType</span>
-                <span class="badge">سطح: @item.ExperienceLevel</span>
-                <span class="badge">حقوق: @item.MinimumSalary.ToString("N0") تا @item.MaximumSalary.ToString("N0")</span>
-            </div>
-            <p style="margin: 10px 0; color: #445;">@(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)</p>
-            @if (item.SkillNames.Count > 0)
-            {
-                <div style="margin-bottom: 10px;">
-                    @foreach (var skill in item.SkillNames)
-                    {
-                        <span class="skill">@skill</span>
-                    }
-                </div>
-            }
-            <a class="btn" asp-controller="Advertisement" asp-action="Details" asp-route-id="@item.AdvertisementId">مشاهده آگهی</a>
-        </div>
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        // Assuming this should also be an alert, corrected type from original.
+        <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
-    @await Html.PartialAsync("_Pager", Model)
-}
+    @if (Model.Data.Count == 0)
+    {
+        <div class="empty">No active job listings found for this position.</div>
+    }
+    else
+    {
+        foreach (var item in Model.Data)
+        {
+            <div class="card">
+                <h3>@item.JobName</h3>
+                <div class="meta" style="color: #666; margin-bottom: 15px;">
+                    @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy-MM-dd")
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <span class="badge">@item.CollaborationType</span>
+                    <span class="badge">Level: @item.ExperienceLevel</span>
+                    <span class="badge">Salary: @item.MinimumSalary.ToString("N0") - @item.MaximumSalary.ToString("N0")</span>
+                </div>
+                <p style="margin: 10px 0; color: #445;">@(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)</p>
+                @if (item.SkillNames.Count > 0)
+                {
+                    <div style="margin-bottom: 10px;">
+                        @foreach (var skill in item.SkillNames)
+                        {
+                            <span class="skill">@skill</span>
+                        }
+                    </div>
+                }
+                <a class="btn" asp-controller="Advertisement" asp-action="Details" asp-route-id="@item.AdvertisementId">View Ad</a>
+            </div>
+        }
+
+        @await Html.PartialAsync("_Pager", Model)
+    }
+</div>

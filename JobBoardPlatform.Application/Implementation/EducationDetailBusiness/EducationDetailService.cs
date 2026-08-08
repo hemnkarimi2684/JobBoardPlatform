@@ -42,7 +42,7 @@ public class EducationDetailService : IEducationDetailService
         var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(createCommand.UserId, cancellationToken);
 
         if (!isUserExist)
-            throw new NotFoundException($"user with id {createCommand.UserId} was not found");
+            throw new NotFoundException($"user was not found");
 
         var educationDetail = new EducationDetail(
                                            createCommand.CertificateDegree,
@@ -105,7 +105,7 @@ public class EducationDetailService : IEducationDetailService
         var educationDetail = await _unitOfWork.EducationDetailRepository.GetByIdAsync(educationDetailId, cancellationToken);
 
         if (educationDetail == null)
-            throw new NotFoundException($"The education detail with id {educationDetailId} was not found.");
+            throw new NotFoundException($"education was not found.");
 
         _accessControlService.EnsureApplicant(educationDetail.UserId, _currentUser);
 
@@ -125,12 +125,12 @@ public class EducationDetailService : IEducationDetailService
 
     public List<EnumResponseDto> GetCertificateDegrees()
     {
-        var CertificateDegrees = EnumHelper.GetEnumValues<CertificateDegree>();
+        var certificateDegrees = EnumHelper.GetEnumValues<CertificateDegree>();
 
-        if (CertificateDegrees == null)
-            throw new NotFoundException("there is not CertificateDegrees in the system");
+        if (certificateDegrees == null)
+            throw new NotFoundException("No certificate degrees are currently available.");
 
-        return CertificateDegrees;
+        return certificateDegrees;
     }
 
     #endregion
@@ -145,7 +145,7 @@ public class EducationDetailService : IEducationDetailService
         var userId = await _unitOfWork.EducationDetailRepository.GetEducationDetailUserIdAsync(educationDetailId, cancellationToken);
 
         if (userId == null)
-            throw new NotFoundException($"The education detail with id {educationDetailId} was not found.");
+            throw new NotFoundException($"education detail was not found.");
 
         _accessControlService.EnsureApplicantOrAdmin(userId.Value, _currentUser);
 
@@ -155,7 +155,7 @@ public class EducationDetailService : IEducationDetailService
                                                                                             MapToUpdateEducationDetail(updateCommand));
 
         if (!result)
-            throw new NotFoundException($"the educationDetail with id {educationDetailId} was not found");
+            throw new NotFoundException($"education detail was not found.");
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }

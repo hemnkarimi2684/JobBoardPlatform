@@ -72,7 +72,7 @@ public class CompanyService : ICompanyService
         var saveResult = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
 
         if (!saveResult)
-            throw new ValidationException("something went wring in create companu plaese try again!");
+            throw new ValidationException("The company could not be created. Please try again.");
 
         return company.Id;
     }
@@ -133,7 +133,7 @@ public class CompanyService : ICompanyService
           companyId, cancellationToken);
 
         if (company is null)
-            throw new NotFoundException($"the company with this id {companyId} not found");
+            throw new NotFoundException("Company was not found.");
 
         return company;
     }
@@ -143,7 +143,7 @@ public class CompanyService : ICompanyService
         var companySizes = EnumHelper.GetEnumValues<CompanySizeEnum>();
 
         if (companySizes is null)
-            throw new NotFoundException("there is no company size in the system");
+            throw new NotFoundException("No company sizes are currently available.");
 
         return companySizes;
     }
@@ -153,7 +153,7 @@ public class CompanyService : ICompanyService
         var ownerShipTypes = EnumHelper.GetEnumValues<OwnershipType>();
 
         if (ownerShipTypes is null)
-            throw new NotFoundException("there is no ownerShip types in the system");
+            throw new NotFoundException("No ownership types are currently available.");
 
         return ownerShipTypes;
     }
@@ -196,12 +196,12 @@ public class CompanyService : ICompanyService
         var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken, true);
 
         if (company == null)
-            throw new NotFoundException($"the company with id {companyId} was not found");
+            throw new NotFoundException("Company was not found.");
 
         _accessControlService.EnsureOwnerEmployer(company.OwnedByUserId, _currentUser);
 
         if (company.CompanyImageFileId == null)
-            throw new ValidationException("this company does not have any image");
+            throw new ValidationException("This company does not have an image.");
 
         var attachmentId = company.CompanyImageFileId.Value;
 
@@ -218,7 +218,7 @@ public class CompanyService : ICompanyService
             var deleted = await _attachmentService.HardDeleteAttachmentAsync(attachmentId, cancellationToken);
 
             if (!deleted)
-                throw new InvalidOperationException("Failed to delete the attachment file or database record.");
+                throw new ValidationException("The company image could not be deleted. Please try again.");
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
         }
@@ -248,7 +248,7 @@ public class CompanyService : ICompanyService
         var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken, true);
 
         if (company == null)
-            throw new NotFoundException($"The company with id {companyId} was not found.");
+            throw new NotFoundException("Company was not found.");
 
         _accessControlService.EnsureOwnerEmployerOrAdmin(company.OwnedByUserId, _currentUser);
 
@@ -259,7 +259,6 @@ public class CompanyService : ICompanyService
 
     #region DownLoad Company Image
 
-
     public async Task<AttachmentResponseDto> DownloadCompanyImageAsync(
         Guid companyId,
         CancellationToken cancellationToken = default)
@@ -267,20 +266,21 @@ public class CompanyService : ICompanyService
         var company = await _unitOfWork.CompanyRepository.GetByIdAsync(companyId, cancellationToken);
 
         if (company == null)
-            throw new NotFoundException($"The company with id {companyId} was not found.");
+            throw new NotFoundException("Company was not found.");
 
         if (company.CompanyImageFileId == null)
-            throw new NotFoundException($"The company with id '{companyId}' does not have an attached image.");
+            throw new NotFoundException("This company does not have an image.");
 
         return await _attachmentService.DownloadAsync(company.CompanyImageFileId.Value, cancellationToken);
     }
-
 
     #endregion
 
     #region Private Methods
 
-    private async Task DeleteAttachmentAsync(Guid attachmentId, CancellationToken cancellationToken)
+    private async Task DeleteAttachmentAsync(
+        Guid attachmentId,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -292,7 +292,10 @@ public class CompanyService : ICompanyService
         }
     }
 
-    private async Task UploadImageAsync(Company company, IFormFile image, CancellationToken cancellationToken)
+    private async Task UploadImageAsync(
+        Company company, 
+        IFormFile image,
+        CancellationToken cancellationToken)
     {
         //نگه داشتن ایدی عکس قبلی برای حذف شدن بعد از اپدیت عکس توسط کارفرما
         var oldImageId = company.CompanyImageFileId;
@@ -326,7 +329,8 @@ public class CompanyService : ICompanyService
             await DeleteAttachmentAsync(oldImageId.Value, cancellationToken);
     }
 
-    private CompanyInfoUpdate MapToCompanyInfoUpdate(UpdateCompanyInfoRequestDto updateCompanyInfoCommand)
+    private CompanyInfoUpdate MapToCompanyInfoUpdate(
+        UpdateCompanyInfoRequestDto updateCompanyInfoCommand)
     {
         return new CompanyInfoUpdate
         (
@@ -342,27 +346,32 @@ public class CompanyService : ICompanyService
         );
     }
 
-    private async Task ValidateForCreateAsync(Guid cityId, Guid jobCategoryId, string companyName, Guid ownedByUserId, CancellationToken cancellationToken)
+    private async Task ValidateForCreateAsync(
+        Guid cityId,
+        Guid jobCategoryId, 
+        string companyName,
+        Guid ownedByUserId, 
+        CancellationToken cancellationToken)
     {
         var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(cityId, cancellationToken);
 
         if (!doesCityExist)
-            throw new NotFoundException($"City with id {cityId} was not found.");
+            throw new NotFoundException("The selected city was not found.");
 
         var doesJobCategoryExist = await _unitOfWork.JobCategoryRepository.ExistAsync(jobCategoryId, cancellationToken);
 
         if (!doesJobCategoryExist)
-            throw new NotFoundException($"the job category with id {jobCategoryId} was not found.");
+            throw new NotFoundException("The selected job category was not found.");
 
         var companyExistsByName = await _unitOfWork.CompanyRepository.IsCompanyExistByNameAsync(companyName, cancellationToken);
 
         if (companyExistsByName)
-            throw new ConflictException($"the company with this name {companyName} already exist");
+            throw new ConflictException("A company with this name already exists.");
 
         var companyExistsForOwner = await _unitOfWork.CompanyRepository.IsCompanyExistForOwnerId(ownedByUserId, cancellationToken);
 
         if (companyExistsForOwner)
-            throw new ConflictException($"this owner already has company");
+            throw new ConflictException("This owner already has a company.");
     }
 
     #endregion

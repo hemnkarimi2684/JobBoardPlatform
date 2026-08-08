@@ -1,4 +1,5 @@
-﻿using JobBoardPlatform.Core.Entities.Common.Data;
+﻿using JobBoardPlatform.Core.Entities.CityEntity.Entity;
+using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.SkillEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserSkillEntity.Entity;
 using System.Linq.Expressions;
@@ -32,4 +33,14 @@ public interface ISkillRepository : IGenericRepository<Skill>
                                                           CancellationToken cancellationToken,
                                                           int pageNumber = 1,
                                                           int pageSize = 10);
+    /// <summary>
+    /// دریافت تمام مهارت ها برای دراپ داون 
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="projection"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<List<TResult>> GetAllForSelectAsync<TResult>(
+        Expression<Func<Skill, TResult>> projection,
+        CancellationToken cancellationToken);
 }

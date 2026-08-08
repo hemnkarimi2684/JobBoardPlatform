@@ -23,6 +23,8 @@ public class RefreshTokenService : IRefreshTokenService
         _jwtSettings = options.Value;
     }
 
+    #region Create Methods
+
     public async Task<RefreshToken> CreateRefreshTokenAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var token = GenerateRefreshToken();
@@ -38,6 +40,10 @@ public class RefreshTokenService : IRefreshTokenService
         return refreshToken;
     }
 
+    #endregion
+
+    #region Get Methods 
+
     public async Task<RefreshToken> GetRefreshTokenByTokenAsync(string token, CancellationToken cancellationToken = default, bool tracking = false)
     {
         var refreshToken = await _unitOfWork.RefreshTokenRepository.GetRefreshTokenByTokenAsync(token, cancellationToken, tracking);
@@ -47,6 +53,10 @@ public class RefreshTokenService : IRefreshTokenService
 
         return refreshToken;
     }
+
+    #endregion
+
+    #region Update Methods
 
     public async Task RevokeAllActiveTokensAsync(Guid userId, CancellationToken cancellationToken = default)
     {
@@ -72,9 +82,15 @@ public class RefreshTokenService : IRefreshTokenService
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }
 
+    #endregion
+
+    #region Private Methods
+
     private string GenerateRefreshToken()
     {
         var randomBytes = RandomNumberGenerator.GetBytes(64);
         return Convert.ToBase64String(randomBytes);
     }
+
+    #endregion
 }

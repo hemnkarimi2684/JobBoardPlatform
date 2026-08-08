@@ -1,60 +1,201 @@
+@model EmployersViewModel
+
 @{
-    ViewData["Title"] = "کارفرمایان";
+    ViewData["Title"] = "Employers";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">مدیریت کارفرمایان</h2>
+<div style="direction: ltr; text-align: left;">
+    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Employers</h2>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert text-danger">@TempData["Error"]</div>
-}
+    <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom: 15px;"></div>
 
-<h3 style="margin: 18px 0 10px; color: #1e3a5f;">کارفرمایان تأیید نشده</h3>
-@{
-    var unapproved = (List<EmployerDetailResponseDto>)ViewBag.UnapprovedEmployers;
-}
-@if (unapproved.Count == 0)
-{
-    <div class="empty">کارفرمایی در انتظار تأیید وجود ندارد.</div>
-}
-else
-{
-    foreach (var item in unapproved)
+    @if (TempData["Success"] != null)
     {
-        <div class="card">
-            <h3>@item.Email</h3>
-            <div class="meta">تلفن: @item.PhoneNumber</div>
-            <div style="margin-top:10px;">
-                <form asp-action="ApproveEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
-                    <button type="submit" class="btn">تأیید</button>
-                </form>
-                <form asp-action="RejectEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
-                    <button type="submit" class="btn" style="background:#d64545;">رد</button>
-                </form>
+        <div class="alert alert-success" style="padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 15px;">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" style="padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 15px;">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- Pending Employers -->
+    <h3 style="margin: 18px 0 10px; color: #1e3a5f;">Pending Employers</h3>
+
+    @{
+        var unapproved = Model.UnapprovedEmployers;
+    }
+
+    @if (unapproved == null || unapproved.Count == 0)
+    {
+        <div class="empty" style="padding: 15px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 4px; color: #666;">
+            No pending employers found.
+        </div>
+    }
+    else
+    {
+        foreach (var item in unapproved)
+        {
+            <div class="card" style="margin-bottom: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <h3>@item.Email</h3>
+                <div class="meta" style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <strong>Company:</strong> @(string.IsNullOrEmpty(item.CompanyName) ? "Not Created Yet" : item.CompanyName) <br />
+                    <strong>Phone:</strong> @(string.IsNullOrEmpty(item.PhoneNumber) ? "N/A" : item.PhoneNumber)
+                </div>
+
+                <div style="margin-top:15px;">
+                    <form asp-action="ApproveEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="approvedPage" value="@Model.ApprovedCurrentPage" />
+                        <input type="hidden" name="unapprovedPage" value="@Model.UnapprovedCurrentPage" />
+
+                        <button type="submit"
+                                class="btn btn-primary"
+                                style="padding: 6px 12px; background: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">
+                            Approve
+                        </button>
+                    </form>
+
+                    <form asp-action="RejectEmployer" asp-route-userId="@item.EmployerId" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="approvedPage" value="@Model.ApprovedCurrentPage" />
+                        <input type="hidden" name="unapprovedPage" value="@Model.UnapprovedCurrentPage" />
+
+                        <button type="submit"
+                                class="btn btn-danger"
+                                style="padding: 6px 12px; background: #dc3545; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+                            Reject
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
-    }
-}
+        }
 
-<h3 style="margin: 18px 0 10px; color: #1e3a5f;">کارفرمایان تأیید شده</h3>
-@{
-    var approved = (List<EmployerDetailResponseDto>)ViewBag.ApprovedEmployers;
-}
-@if (approved.Count == 0)
-{
-    <div class="empty">کارفرمایی تأیید شده وجود ندارد.</div>
-}
-else
-{
-    foreach (var item in approved)
+        @if (Model.UnapprovedTotalPages > 1)
+        {
+            <div style="margin-top: 20px; margin-bottom: 30px;">
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+
+                    @if (Model.UnapprovedCurrentPage > 1)
+                    {
+                        <a asp-action="Employers"
+                           asp-route-approvedPage="@Model.ApprovedCurrentPage"
+                           asp-route-unapprovedPage="@(Model.UnapprovedCurrentPage - 1)"
+                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                            Previous
+                        </a>
+                    }
+
+                    @for (int i = 1; i <= Model.UnapprovedTotalPages; i++)
+                    {
+                        if (i == Model.UnapprovedCurrentPage)
+                        {
+                            <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white;">
+                                @i
+                            </span>
+                        }
+                        else
+                        {
+                            <a asp-action="Employers"
+                               asp-route-approvedPage="@Model.ApprovedCurrentPage"
+                               asp-route-unapprovedPage="@i"
+                               style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                                @i
+                            </a>
+                        }
+                    }
+
+                    @if (Model.UnapprovedCurrentPage < Model.UnapprovedTotalPages)
+                    {
+                        <a asp-action="Employers"
+                           asp-route-approvedPage="@Model.ApprovedCurrentPage"
+                           asp-route-unapprovedPage="@(Model.UnapprovedCurrentPage + 1)"
+                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                            Next
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    }
+
+    <!-- Approved Employers -->
+    <h3 style="margin: 30px 0 10px; color: #1e3a5f;">Approved Employers</h3>
+
+    @{
+        var approved = Model.ApprovedEmployers;
+    }
+
+    @if (approved == null || approved.Count == 0)
     {
-        <div class="card">
-            <h3>@item.CompanyName</h3>
-            <div class="meta">@item.Email &nbsp;|&nbsp; تلفن: @item.PhoneNumber</div>
+        <div class="empty" style="padding: 15px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 4px; color: #666;">
+            No approved employers found.
         </div>
     }
-}
+    else
+    {
+        foreach (var item in approved)
+        {
+            <div class="card" style="margin-bottom: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <h3>@(string.IsNullOrEmpty(item.CompanyName) ? "No Company Name" : item.CompanyName)</h3>
+                <div class="meta" style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <strong>Email:</strong> @item.Email &nbsp;|&nbsp;
+                    <strong>Phone:</strong> @(string.IsNullOrEmpty(item.PhoneNumber) ? "N/A" : item.PhoneNumber)
+                </div>
+            </div>
+        }
+
+        @if (Model.ApprovedTotalPages > 1)
+        {
+            <div style="margin-top: 20px; margin-bottom: 30px;">
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+
+                    @if (Model.ApprovedCurrentPage > 1)
+                    {
+                        <a asp-action="Employers"
+                           asp-route-approvedPage="@(Model.ApprovedCurrentPage - 1)"
+                           asp-route-unapprovedPage="@Model.UnapprovedCurrentPage"
+                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                            Previous
+                        </a>
+                    }
+
+                    @for (int i = 1; i <= Model.ApprovedTotalPages; i++)
+                    {
+                        if (i == Model.ApprovedCurrentPage)
+                        {
+                            <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white;">
+                                @i
+                            </span>
+                        }
+                        else
+                        {
+                            <a asp-action="Employers"
+                               asp-route-approvedPage="@i"
+                               asp-route-unapprovedPage="@Model.UnapprovedCurrentPage"
+                               style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                                @i
+                            </a>
+                        }
+                    }
+
+                    @if (Model.ApprovedCurrentPage < Model.ApprovedTotalPages)
+                    {
+                        <a asp-action="Employers"
+                           asp-route-approvedPage="@(Model.ApprovedCurrentPage + 1)"
+                           asp-route-unapprovedPage="@Model.UnapprovedCurrentPage"
+                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
+                            Next
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

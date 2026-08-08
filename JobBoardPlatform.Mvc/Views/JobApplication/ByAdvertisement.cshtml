@@ -1,51 +1,93 @@
-@model Pagination<JobApplicationDetailResponseDto>
+@model JobApplicationByAdvertisementViewModel
 
 @{
-    ViewData["Title"] = "درخواست‌های آگهی";
+    ViewData["Title"] = "Job Application Requests";
+
     var statuses = Enum.GetValues<JobApplicationStatus>()
-        .Select(e => new SelectListItem { Value = ((int)e).ToString(), Text = e.ToString() })
+        .Select(status => new SelectListItem
+        {
+            Value = ((int)status).ToString(),
+            Text = status.ToString()
+        })
         .ToList();
+
+    var advertisementId = Model.AdvertisementId;
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">درخواست‌های آگهی</h2>
+<div class="page-head">
+    <div>
+        <h2>Job Application Requests</h2>
+    </div>
+    <a class="btn btn-ghost" asp-controller="Advertisement" asp-action="MyAds">&#8592; Back to My Ads</a>
+</div>
 
-@if (TempData["Success"] != null)
+@if (TempData["Success"] is not null)
 {
     <div class="alert alert-success">@TempData["Success"]</div>
 }
-@if (TempData["Error"] != null)
+@if (TempData["Error"] is not null)
 {
-    <div class="alert" style="background:#fdecea;color:#b3392f;border:1px solid #f5c6c2;">@TempData["Error"]</div>
+    <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
 @if (Model.Data.Count == 0)
 {
-    <div class="empty">درخواستی برای این آگهی ثبت نشده است.</div>
+    <div class="empty-state">
+        <div class="empty-icon">&#128203;</div>
+        <h3>No applications yet</h3>
+        <p>No applications have been submitted for this advertisement.</p>
+    </div>
 }
 else
 {
-    foreach (var item in Model.Data)
-    {
-        <div class="card">
-            <h3>@item.UserProfileName</h3>
-            <div class="meta">
-                @item.JobTitle &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy/MM/dd")
+    <div style="display:flex; flex-direction:column; gap:16px;">
+        @foreach (var item in Model.Data)
+        {
+            <div class="panel" style="margin-bottom:0;">
+                <div class="application-card-top">
+                    <div class="job-logo">
+                        @(string.IsNullOrEmpty(item.UserProfileName) ? "?" : item.UserProfileName.Substring(0, 1))
+                    </div>
+                    <div class="job-heading">
+                        <h3 style="font-size:1.05rem;">@item.UserProfileName</h3>
+                        <div class="job-meta">
+                            <span>&#128188; @item.JobTitle</span>
+                            <span>&#128197; @item.CreatedAt.ToString("yyyy-MM-dd")</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-outline">@item.Status</span>
+                </div>
+
+                <div class="application-actions">
+                    <form asp-action="ChangeStatus"
+                          asp-route-id="@item.JobApplicationId"
+                          asp-route-advertisementId="@advertisementId"
+                          method="post"
+                          class="application-form">
+                        @Html.AntiForgeryToken()
+
+                        <select name="status" class="form-control">
+                            @foreach (var status in statuses)
+                            {
+                                <option value="@status.Value"
+                                        selected="@(status.Value == ((int)item.Status).ToString())">
+                                    @status.Text
+                                </option>
+                            }
+                        </select>
+
+                        <button type="submit" class="btn btn-ghost">Update Status</button>
+                    </form>
+
+                    <a asp-action="ApplicantResume"
+                       asp-route-id="@item.JobApplicationId"
+                       class="btn btn-outline">
+                        View Applicant Resume
+                    </a>
+                </div>
             </div>
-            <div style="margin-bottom: 12px;">
-                <span class="badge">@item.Status</span>
-            </div>
-            <form asp-action="ChangeStatus" asp-route-id="@item.JobApplicationId" asp-route-advertisementId="@ViewBag.AdvertisementId" method="post" style="display:flex;gap:8px;align-items:center;">
-                <input type="hidden" name="advertisementId" value="@ViewBag.AdvertisementId" />
-                <select name="status" class="form-control" style="width:auto;">
-                    @foreach (var s in statuses)
-                    {
-                        <option value="@s.Value" selected="@(s.Value == ((int)item.Status).ToString() ? "selected" : null)">@s.Text</option>
-                    }
-                </select>
-                <button type="submit" class="btn">ثبت تغییر</button>
-            </form>
-        </div>
-    }
+        }
+    </div>
 
     <partial name="_Pager" model="@Model" />
 }

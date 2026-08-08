@@ -150,9 +150,22 @@ public class CityService : ICityService
         cityId, cancellationToken);
 
         if (city == null)
-            throw new NotFoundException($"teh city with id {cityId} was not found.");
+            throw new NotFoundException("city was not found.");
 
         return city;
+    }
+
+    public async Task<List<CityDetailResponseDto>> GetAllForSelectAsync(CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.CityRepository.GetAllForSelectAsync(c => new CityDetailResponseDto
+        {
+            CityCode = c.CityCode,
+            CityId = c.Id,
+            CityName = c.Name,
+            ProvinceCode = c.ProvinceCode,
+            ProvinceId = c.ProvinceId,
+            ProvinceName = c.Province.Name
+        }, cancellationToken);
     }
 
     #endregion
