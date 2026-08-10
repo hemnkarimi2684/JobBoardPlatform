@@ -103,10 +103,10 @@ public static class QueryFilterHelper
             combined = combined is null ? lessOrEqual : Expression.AndAlso(combined, lessOrEqual);
         }
 
-        // سر اخرم برای نال نشده اینجا برای اینه که هر وقت هیچکدوم از شرط ها اعمال نشد 
-        // این میاد یه شرط همیشه ترو میسازه که در این صورت رفت به دیتابیس به صورت خالی نره بلکه تمام دیتا ها رو بیاره
-        if (combined is null)
-            combined = Expression.Constant(true);
+        var isActiveProperty = Expression.Property(parameter, nameof(Advertisement.IsActive));
+        var isActiveEqual = Expression.Equal(isActiveProperty, Expression.Constant(true));
+
+        combined = combined is null ? isActiveEqual : Expression.AndAlso(combined, isActiveEqual);
 
         //آخرین قطعه از پازل ساختن Expression Tree داینامیک
         // اینجا lamba کارش اینه که 

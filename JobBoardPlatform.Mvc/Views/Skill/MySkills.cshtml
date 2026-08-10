@@ -29,7 +29,14 @@
             @* Added flex wrap for better display of skills *@
             @foreach (var skill in Model.Data)
             {
-                <span class="skill">@skill.SkillName</span>
+                <div style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span class="skill">@skill.SkillName</span>
+                    <form asp-action="RemoveSkill" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove this skill?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="skillsId" value="@skill.SkillId" />
+                        <button type="submit" style="padding: 2px 8px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove</button>
+                    </form>
+                </div>
             }
         </div>
     }

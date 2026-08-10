@@ -149,19 +149,6 @@ public class AuthenticationService : IAuthenticationService
             if (!addToRoleResult.Succeeded)
                 throw new ValidationException(string.Join(" ", addToRoleResult.Errors.Select(e => e.Description)));
 
-            var claim = new Claim(UserClaims.EmployerClaimType, UserClaims.IsApprovedClaimValue);
-
-            var employerClaims = await _userManager.GetClaimsAsync(user);
-
-            if (!employerClaims.Any(c => c.Type == claim.Type && c.Value == claim.Value))
-            {
-
-                var result = await _userManager.AddClaimAsync(user, claim);
-
-                if (!result.Succeeded)
-                    throw new ValidationException(string.Join(" ", result.Errors.Select(e => e.Description)));
-            }
-
             var createdCompanyId = await _companyService.CreateCompanyAsync(registerCommand.ToCreateCompanyRequestDto(user.Id));
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);

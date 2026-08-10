@@ -21,6 +21,7 @@ public class User : IdentityUser<Guid>, IEntity
     {
         Email = email;
         PhoneNumber = phoneNumber;
+        PhoneNumber = PhoneNumber.FixPhoneNumberFormat();
         UserName = PhoneNumber;
         IsApproved = isApproved;
         CreatedById = createdById;
@@ -28,7 +29,6 @@ public class User : IdentityUser<Guid>, IEntity
         IsActive = true;
 
         //Methods
-        PhoneNumber.FixPhoneNumberFormat();
         Validate();
     }
 

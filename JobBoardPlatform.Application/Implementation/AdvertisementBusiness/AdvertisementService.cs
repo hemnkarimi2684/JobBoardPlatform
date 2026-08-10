@@ -479,7 +479,7 @@ public class AdvertisementService : IAdvertisementService
         // بزرگتر یا مساوی از تاریخ امروز باشه یعنی هنوز فعاله
         var featuredUntil = DateTime.UtcNow.AddDays(durationInDays);
 
-        advertisement.UpdateFeatured(true, featuredUntil);
+        advertisement.UpdateFeatured(true, featuredUntil, _currentUser.UserId);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
@@ -499,7 +499,7 @@ public class AdvertisementService : IAdvertisementService
         if (advertisement.FeaturedUntil == null && advertisement.IsFeatured == false)
             throw new ValidationException("The advertisement is already in normal (not featured) status.");
 
-        advertisement.UpdateFeatured(false, null);
+        advertisement.UpdateFeatured(false, null, _currentUser.UserId);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }

@@ -82,6 +82,17 @@ public class ExperienceDetailController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        await _experienceDetailService.SoftDeleteAsync(id, cancellationToken);
+
+        TempData["Success"] = "Experience detail was deleted successfully.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
     private void PopulateLevels()
     {
         ViewBag.SeniorityLevels = Enum.GetValues<SeniorityLevel>()

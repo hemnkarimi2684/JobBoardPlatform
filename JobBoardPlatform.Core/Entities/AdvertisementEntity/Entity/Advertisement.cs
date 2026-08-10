@@ -160,6 +160,12 @@ public class Advertisement : BaseEntity
         if (MaximumSalary < 1_000_000 || MaximumSalary > 600_000_000)
             throw new DomainException(DomainErrors.MaximumSalaryOutOfRange);
 
+        if (MinimumSalary < 1_000_000 || MinimumSalary > 600_000_000)
+            throw new DomainException(DomainErrors.MinimumSalaryOutOfRange);
+
+        if (MinimumSalary > MaximumSalary)
+            throw new DomainException(DomainErrors.MinimumSalaryCannotExceedMaximumSalary);
+
         if (ExperienceLevel < 0)
             throw new DomainException(DomainErrors.ExperienceLevelOutOfRange);
 
@@ -185,10 +191,12 @@ public class Advertisement : BaseEntity
         Update(modifierId);
     }
 
-    public void UpdateFeatured(bool isFeatured, DateTime? featuredUntil)
+    public void UpdateFeatured(bool isFeatured, DateTime? featuredUntil, Guid? modifiedById = null)
     {
         IsFeatured = isFeatured;
         FeaturedUntil = featuredUntil;
+
+        Update(modifiedById);
     }
 
     public void UpdateAdvertisementInfo(UpdateAdvertisementInfo updateAdvertisement)

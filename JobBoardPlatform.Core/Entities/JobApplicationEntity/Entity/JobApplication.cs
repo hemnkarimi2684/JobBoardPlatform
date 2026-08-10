@@ -5,7 +5,6 @@ using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
-using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
 namespace JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
@@ -154,10 +153,10 @@ public class JobApplication : BaseEntity
     public void Cancel(Guid? modifiedById)
     {
         if (Status == JobApplicationStatus.Cancelled)
-            throw new ValidationException("The job application is already cancelled.");
+            throw new DomainException(DomainErrors.JobApplicationAlreadyCancelled);
 
         if (Status != JobApplicationStatus.Pending)
-            throw new ValidationException("You can only cancel a pending job application.");
+            throw new DomainException(DomainErrors.JobApplicationOnlyPendingCanBeCancelled);
 
         Status = JobApplicationStatus.Cancelled;
 

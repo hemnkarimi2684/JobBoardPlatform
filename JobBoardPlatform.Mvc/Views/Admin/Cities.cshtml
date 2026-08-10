@@ -65,6 +65,7 @@
                     <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">City Name</th>
                     <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">City Code</th>
                     <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">Province</th>
+                    <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -74,6 +75,14 @@
                         <td style="padding:10px; border:1px solid #cfd8e3;">@item.CityName</td>
                         <td style="padding:10px; border:1px solid #cfd8e3;">@item.CityCode</td>
                         <td style="padding:10px; border:1px solid #cfd8e3;">@item.ProvinceName</td>
+                        <td style="padding:10px; border:1px solid #cfd8e3;">
+                            <form asp-action="DeleteCity" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this city?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="cityId" value="@item.CityId" />
+                                <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+                                <button type="submit" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 }
             </tbody>

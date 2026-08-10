@@ -40,10 +40,10 @@ public static class DomainExtensions
         if (string.IsNullOrWhiteSpace(phoneNumber))
             throw new DomainException(DomainErrors.PhoneNumberIsRequired);
 
+        phoneNumber = phoneNumber.Trim();
+
         if (phoneNumber.Length != 11)
             throw new DomainException(DomainErrors.PhoneNumberInvalidFormat);
-
-        phoneNumber = phoneNumber.Trim();
 
         if (!phoneNumber.All(char.IsDigit))
             throw new DomainException(DomainErrors.PhoneNumberInvalidFormat);
@@ -53,10 +53,17 @@ public static class DomainExtensions
     /// تغییر فرمت شماره تلفن 
     /// </summary>
     /// <param name="phoneNumber"></param>
-    public static void FixPhoneNumberFormat(this string phoneNumber)
+    public static string FixPhoneNumberFormat(this string phoneNumber)
     {
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+            return phoneNumber;
+
+        phoneNumber = phoneNumber.Trim();
+
         if (phoneNumber.StartsWith("+98"))
-            phoneNumber = $"09{phoneNumber.Substring(3)}";
+            return $"09{phoneNumber.Substring(3)}";
+
+        return phoneNumber;
     }
 
     /// <summary>

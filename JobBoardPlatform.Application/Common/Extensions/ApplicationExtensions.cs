@@ -165,7 +165,7 @@ public static class ApplicationExtensions
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = configuration.GetConnectionString("Redis");
-            options.InstanceName = "VehicleInspectionAppointmentSystem:";
+            options.InstanceName = "JobBoardPlatform:";
         });
 
         services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));

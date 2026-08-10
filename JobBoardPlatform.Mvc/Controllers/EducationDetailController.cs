@@ -81,6 +81,17 @@ public class EducationDetailController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        await _educationDetailService.SoftDeleteAsync(id, cancellationToken);
+
+        TempData["Success"] = "Education detail was deleted successfully.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
     private void PopulateDegrees()
     {
         ViewBag.CertificateDegrees = Enum.GetValues<CertificateDegree>()
