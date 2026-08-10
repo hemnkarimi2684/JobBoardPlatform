@@ -3,24 +3,90 @@
     var pager = (dynamic)Model;
     var pageNumber = (int)pager.PageNumber;
     var totalPages = (int)pager.TotalPageCount;
+
+    string BuildPageUrl(int targetPage)
+    {
+        var queryPairs = new List<string>();
+
+        foreach (var key in Context.Request.Query.Keys)
+        {
+            if (string.Equals(key, "pageNumber", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var value = Context.Request.Query[key];
+            queryPairs.Add(System.Net.WebUtility.UrlEncode(key) + "=" + System.Net.WebUtility.UrlEncode(value.ToString()));
+        }
+
+        queryPairs.Add("pageNumber=" + targetPage);
+
+        return Context.Request.Path + "?" + string.Join("&", queryPairs);
+    }
+
+    List<int?> BuildPageList()
+    {
+        var pages = new List<int?>();
+        const int windowSize = 2;
+
+        if (totalPages <= 9)
+        {
+            for (var i = 1; i <= totalPages; i++)
+                pages.Add(i);
+
+            return pages;
+        }
+
+        pages.Add(1);
+
+        var start = Math.Max(2, pageNumber - windowSize);
+        var end = Math.Min(totalPages - 1, pageNumber + windowSize);
+
+        if (start > 2)
+            pages.Add(null);
+
+        for (var i = start; i <= end; i++)
+            pages.Add(i);
+
+        if (end < totalPages - 1)
+            pages.Add(null);
+
+        pages.Add(totalPages);
+
+        return pages;
+    }
 }
 @if (totalPages > 1)
 {
-    <nav class="pager">
+    var pageList = BuildPageList();
+    <nav class="pager" aria-label="Pagination">
         @if (pageNumber > 1)
         {
-            var prevQuery = Context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
-            prevQuery["pageNumber"] = (pageNumber - 1).ToString();
-            var prevUrl = Context.Request.Path + "?" + string.Join("&", prevQuery.Select(x => x.Key + "=" + x.Value));
-            <a class="pager-link" href="@prevUrl">&#8592; Previous</a>
+            <a class="pager-link pager-prev" href="@BuildPageUrl(pageNumber - 1)" aria-label="Previous page">&#8592; Previous</a>
         }
-        <span class="pager-current">Page @pageNumber of @totalPages</span>
+
+        <div class="pager-pages">
+            @foreach (var p in pageList)
+            {
+                @if (p.HasValue)
+                {
+                    if (p.Value == pageNumber)
+                    {
+                        <span class="pager-current" aria-current="page">@p.Value</span>
+                    }
+                    else
+                    {
+                        <a class="pager-link" href="@BuildPageUrl(p.Value)" aria-label="Page @p.Value">@p.Value</a>
+                    }
+                }
+                else
+                {
+                    <span class="pager-gap">&hellip;</span>
+                }
+            }
+        </div>
+
         @if (pageNumber < totalPages)
         {
-            var nextQuery = Context.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
-            nextQuery["pageNumber"] = (pageNumber + 1).ToString();
-            var nextUrl = Context.Request.Path + "?" + string.Join("&", nextQuery.Select(x => x.Key + "=" + x.Value));
-            <a class="pager-link" href="@nextUrl">Next &#8594;</a>
+            <a class="pager-link pager-next" href="@BuildPageUrl(pageNumber + 1)" aria-label="Next page">Next &#8594;</a>
         }
     </nav>
 }

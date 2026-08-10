@@ -82,17 +82,17 @@ public sealed class GlobalExceptionHandlingMiddleware : IMiddleware
 
             ConflictException ex => new ExceptionHandlingResult(
                 StatusCodes.Status409Conflict,
-                Routes.Error,
+                GetBackRedirectPath(context),
                 GetMessageOrDefault(ex.Message, "A conflict occurred while processing your request.")),
 
             ValidationException ex => new ExceptionHandlingResult(
                 StatusCodes.Status400BadRequest,
-                Routes.Error,
+                GetBackRedirectPath(context),
                 GetMessageOrDefault(ex.Message, "The submitted data is invalid.")),
 
             DomainException ex => new ExceptionHandlingResult(
                 StatusCodes.Status400BadRequest,
-                Routes.Error,
+                GetBackRedirectPath(context),
                 GetMessageOrDefault(ex.Message, "A business rule violation occurred.")),
 
             EmailSendingException ex => new ExceptionHandlingResult(
@@ -102,7 +102,7 @@ public sealed class GlobalExceptionHandlingMiddleware : IMiddleware
 
             BadHttpRequestException ex => new ExceptionHandlingResult(
                 StatusCodes.Status400BadRequest,
-                Routes.Error,
+                GetBackRedirectPath(context),
                 GetMessageOrDefault(ex.Message, "The request is invalid.")),
 
             OperationCanceledException => new ExceptionHandlingResult(
@@ -148,6 +148,22 @@ public sealed class GlobalExceptionHandlingMiddleware : IMiddleware
         return context.User.Identity?.IsAuthenticated == true
             ? Routes.AccessDenied
             : Routes.Login;
+    }
+
+    private static string GetBackRedirectPath(HttpContext context)
+    {
+        var referer = context.Request.Headers.Referer.ToString();
+
+        if (string.IsNullOrWhiteSpace(referer))
+            return Routes.Error;
+
+        var refererUri = Uri.TryCreate(referer, UriKind.Absolute, out var uri) ? uri : null;
+
+        if (refererUri == null ||
+            !string.Equals(context.Request.Scheme + "://" + context.Request.Host.Value, refererUri.GetLeftPart(UriPartial.Authority), StringComparison.OrdinalIgnoreCase))
+            return Routes.Error;
+
+        return refererUri.AbsolutePath + refererUri.Query;
     }
 
     private static string GetUnauthorizedMessage(HttpContext context, string? message)

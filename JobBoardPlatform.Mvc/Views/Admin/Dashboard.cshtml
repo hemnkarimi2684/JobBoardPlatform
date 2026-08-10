@@ -2,12 +2,60 @@
 
 @{
     ViewData["Title"] = "Admin Dashboard";
+
+    var statusCounts = Model.JobApplicationStatusCounts ?? new List<JobApplicationStatusCount>();
+    var totalApplications = statusCounts.Sum(s => s.CountPerStatus);
+    var hasStatusData = totalApplications > 0;
+
+    var userTotal = Model.JobSeekersCount + Model.EmployersCount + Model.PendingEmployersCount;
+    userTotal = userTotal == 0 ? 1 : userTotal;
+    var adsTotal = Model.ActiveAdvertisementsCount + Model.InactiveAdvertisementsCount;
+    adsTotal = adsTotal == 0 ? 1 : adsTotal;
+
+    string StatusColor(JobApplicationStatus status) => status switch
+    {
+        JobApplicationStatus.Pending => "#f59e0b",
+        JobApplicationStatus.Reviewing => "#0ea5e9",
+        JobApplicationStatus.Interview => "#8b5cf6",
+        JobApplicationStatus.Accepted => "#16a34a",
+        JobApplicationStatus.Rejected => "#ef4444",
+        JobApplicationStatus.Cancelled => "#94a3b8",
+        _ => "#94a3b8"
+    };
+
+    string StatusLabel(JobApplicationStatus status) => status switch
+    {
+        JobApplicationStatus.Pending => "Pending",
+        JobApplicationStatus.Reviewing => "Reviewing",
+        JobApplicationStatus.Interview => "Interview",
+        JobApplicationStatus.Accepted => "Accepted",
+        JobApplicationStatus.Rejected => "Rejected",
+        JobApplicationStatus.Cancelled => "Cancelled",
+        _ => status.ToString()
+    };
+
+    var stopAngle = 0.0;
+    var gradientParts = new List<string>();
+    foreach (var item in statusCounts)
+    {
+        if (item.CountPerStatus <= 0) continue;
+        var start = stopAngle;
+        stopAngle += (double)item.CountPerStatus / totalApplications * 360;
+        gradientParts.Add($"{StatusColor(item.StatusName)} {start:F1}deg {stopAngle:F1}deg");
+    }
+    var donutBackground = gradientParts.Count == 0
+        ? "var(--border)"
+        : string.Join(", ", gradientParts);
 }
 
 <div class="page-head">
     <div>
         <h1 class="page-title">Admin Dashboard</h1>
         <p class="subtitle">Overview of your job board platform.</p>
+    </div>
+    <div class="section-head-actions">
+        <a class="btn btn-outline btn-sm" asp-controller="Admin" asp-action="Employers">Review Employers</a>
+        <a class="btn btn-primary btn-sm" asp-controller="Advertisement" asp-action="Index">View Site</a>
     </div>
 </div>
 
@@ -55,7 +103,7 @@
     </a>
 
     <a class="card stat-card" asp-action="Advertisements">
-        <div class="stat-icon">
+        <div class="stat-icon red">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15c-2.743 0-5.357-.467-7.827-1.47-.254-.085-.48-.215-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m16.5 0V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m-7.5 0a48.114 48.114 0 0 1 3.413-.387m-7.5 0c.106.97.505 1.85 1.162 2.554m-1.162-2.554a11.986 11.986 0 0 0-4.252.06M18 4.5A3 3 0 0 1 21 7.5m-3-3A3 3 0 0 0 15 7.5m3-3A3 3 0 0 1 18 7.5" /></svg>
         </div>
         <div>
@@ -68,59 +116,184 @@
     </a>
 </div>
 
-<div class="stat-grid">
-    <a class="card stat-card" asp-action="Cities">
-        <div class="stat-label">Manage Cities</div>
-        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
-    </a>
-    <a class="card stat-card" asp-action="Provinces">
-        <div class="stat-label">Manage Provinces</div>
-        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
-    </a>
-    <a class="card stat-card" asp-action="JobCategories">
-        <div class="stat-label">Manage Job Categories</div>
-        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
-    </a>
-    <a class="card stat-card" asp-action="Skills">
-        <div class="stat-label">Manage Skills</div>
-        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
-    </a>
-    <a class="card stat-card" asp-action="Jobs">
-        <div class="stat-label">Manage Jobs</div>
-        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
-    </a>
-    <a class="card stat-card" asp-action="EmailTemplates">
-        <div class="stat-label">Manage Email Templates</div>
-        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
-    </a>
+<div class="dashboard-section-title">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg>
+    Platform Analytics
 </div>
 
-<section class="panel">
-    <div class="panel-head">
-        <h3>Job Applications Status</h3>
-    </div>
-    @if (Model.JobApplicationStatusCounts == null || Model.JobApplicationStatusCounts.Count == 0)
-    {
-        <p class="meta">No job applications registered yet.</p>
-    }
-    else
-    {
-        <div class="chips" style="justify-content: flex-start;">
-            @foreach (var item in Model.JobApplicationStatusCounts)
-            {
-                var statusLabel = item.StatusName switch
-                {
-                    JobApplicationStatus.Pending => "Pending",
-                    JobApplicationStatus.Reviewing => "Reviewing",
-                    JobApplicationStatus.Interview => "Interview",
-                    JobApplicationStatus.Accepted => "Accepted",
-                    JobApplicationStatus.Rejected => "Rejected",
-                    JobApplicationStatus.Cancelled => "Cancelled",
-                    _ => item.StatusName.ToString()
-                };
-                <span class="chip">@statusLabel: @item.CountPerStatus</span>
-            }
+<div class="chart-grid">
+    <section class="panel chart-card">
+        <div class="panel-head">
+            <h3>
+                <span class="chart-title-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                </span>
+                Job Applications by Status
+            </h3>
         </div>
-    }
-</section>
+        @if (!hasStatusData)
+        {
+            <p class="meta">No job applications registered yet.</p>
+        }
+        else
+        {
+            <div class="donut-wrap">
+                <div class="donut-chart" style="background: conic-gradient(@donutBackground);">
+                    <div class="donut-center">
+                        <span class="donut-total">@totalApplications</span>
+                        <span class="donut-caption">Applications</span>
+                    </div>
+                </div>
+                <div class="donut-legend">
+                    @foreach (var item in statusCounts)
+                    {
+                        <div class="legend-row">
+                            <span class="legend-dot" style="background: @StatusColor(item.StatusName);"></span>
+                            <span class="legend-name">@StatusLabel(item.StatusName)</span>
+                            <span class="legend-value">@item.CountPerStatus</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </section>
 
+    <section class="panel chart-card">
+        <div class="panel-head">
+            <h3>
+                <span class="chart-title-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg>
+                </span>
+                Users Breakdown
+            </h3>
+        </div>
+        <div class="bars">
+            <div class="bar-row">
+                <div class="bar-head">
+                    <span class="bar-name">Job Seekers</span>
+                    <span class="bar-pct">@((int)Math.Round((double)Model.JobSeekersCount / userTotal * 100))%</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill green" style="width: @((double)Model.JobSeekersCount / userTotal * 100)%"></div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-head">
+                    <span class="bar-name">Employers</span>
+                    <span class="bar-pct">@((int)Math.Round((double)Model.EmployersCount / userTotal * 100))%</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: @((double)Model.EmployersCount / userTotal * 100)%"></div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-head">
+                    <span class="bar-name">Pending Approval</span>
+                    <span class="bar-pct">@((int)Math.Round((double)Model.PendingEmployersCount / userTotal * 100))%</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill amber" style="width: @((double)Model.PendingEmployersCount / userTotal * 100)%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel chart-card">
+        <div class="panel-head">
+            <h3>
+                <span class="chart-title-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" /></svg>
+                </span>
+                Advertisements
+            </h3>
+        </div>
+        <div class="bars">
+            <div class="bar-row">
+                <div class="bar-head">
+                    <span class="bar-name">Active Ads</span>
+                    <span class="bar-pct">@((int)Math.Round((double)Model.ActiveAdvertisementsCount / adsTotal * 100))%</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill green" style="width: @((double)Model.ActiveAdvertisementsCount / adsTotal * 100)%"></div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <div class="bar-head">
+                    <span class="bar-name">Inactive Ads</span>
+                    <span class="bar-pct">@((int)Math.Round((double)Model.InactiveAdvertisementsCount / adsTotal * 100))%</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill red" style="width: @((double)Model.InactiveAdvertisementsCount / adsTotal * 100)%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="dashboard-section-title">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" /></svg>
+    Management
+</div>
+
+<div class="quick-grid">
+    <a class="quick-link" asp-action="Cities">
+        <span class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
+        </span>
+        <span class="quick-link-copy">
+            <span class="quick-link-title">Cities</span>
+            <span class="quick-link-sub">Manage locations</span>
+        </span>
+        <span class="arrow">&#8594;</span>
+    </a>
+    <a class="quick-link" asp-action="Provinces">
+        <span class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+        </span>
+        <span class="quick-link-copy">
+            <span class="quick-link-title">Provinces</span>
+            <span class="quick-link-sub">Manage regions</span>
+        </span>
+        <span class="arrow">&#8594;</span>
+    </a>
+    <a class="quick-link" asp-action="JobCategories">
+        <span class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" /></svg>
+        </span>
+        <span class="quick-link-copy">
+            <span class="quick-link-title">Job Categories</span>
+            <span class="quick-link-sub">Organize positions</span>
+        </span>
+        <span class="arrow">&#8594;</span>
+    </a>
+    <a class="quick-link" asp-action="Skills">
+        <span class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+        </span>
+        <span class="quick-link-copy">
+            <span class="quick-link-title">Skills</span>
+            <span class="quick-link-sub">Manage skill tags</span>
+        </span>
+        <span class="arrow">&#8594;</span>
+    </a>
+    <a class="quick-link" asp-action="Jobs">
+        <span class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15c-2.743 0-5.357-.467-7.827-1.47-.254-.085-.48-.215-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m16.5 0V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m-7.5 0a48.114 48.114 0 0 1 3.413-.387m-7.5 0c.106.97.505 1.85 1.162 2.554m-1.162-2.554a11.986 11.986 0 0 0-4.252.06M18 4.5A3 3 0 0 1 21 7.5m-3-3A3 3 0 0 0 15 7.5m3-3A3 3 0 0 1 18 7.5" /></svg>
+        </span>
+        <span class="quick-link-copy">
+            <span class="quick-link-title">Jobs</span>
+            <span class="quick-link-sub">Manage job positions</span>
+        </span>
+        <span class="arrow">&#8594;</span>
+    </a>
+    <a class="quick-link" asp-action="EmailTemplates">
+        <span class="quick-link-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+        </span>
+        <span class="quick-link-copy">
+            <span class="quick-link-title">Email Templates</span>
+            <span class="quick-link-sub">Configure notifications</span>
+        </span>
+        <span class="arrow">&#8594;</span>
+    </a>
+</div>
