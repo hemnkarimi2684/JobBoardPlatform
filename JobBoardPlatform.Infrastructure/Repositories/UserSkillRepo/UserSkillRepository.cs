@@ -13,6 +13,17 @@ public class UserSkillRepository : GenericRepository<UserSkill>, IUserSkillRepos
     {
     }
 
+    public async Task<Guid?> GetByUserIdAndSkillIdAsync(
+        Guid userId,
+        Guid skillId,
+        CancellationToken cancellationToken)
+    {
+        return await Entities
+                        .Where(us => us.SkillId == skillId && us.UserId == userId)
+                        .Select(us => us.Id)
+                        .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<(List<TResult> Items, int TotalDataCount)> GetUserSkillsAsync<TResult>(
         Expression<Func<UserSkill, TResult>> projection,
         Guid userId,

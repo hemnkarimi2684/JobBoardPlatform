@@ -39,4 +39,14 @@ public interface IProvinceService
     /// <returns></returns>
     Task<List<ProvinceResponseDto>> GetAllForSelectAsync(
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// حذف نرم استان
+    /// </summary>
+    /// <param name="provinceId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task SoftDeleteAsync(
+        Guid provinceId,
+        CancellationToken cancellationToken = default);
 }

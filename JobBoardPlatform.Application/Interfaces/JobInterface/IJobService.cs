@@ -47,4 +47,14 @@ public interface IJobService
     /// <returns></returns>
     Task<List<JobResponseDto>> GetAllForSelectAsync(
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// حذف نرم شغل 
+    /// </summary>
+    /// <param name="jobId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task SoftDeleteAsync(
+        Guid jobId,
+        CancellationToken cancellationToken = default);
 }

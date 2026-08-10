@@ -3,7 +3,6 @@ using JobBoardPlatform.Application.Interfaces.CityInterface;
 using JobBoardPlatform.WebApi.Filters;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Admins.Cities;
@@ -27,6 +26,16 @@ public class AdminCitiesController : ControllerBase
     CancellationToken cancellationToken)
     {
         await _cityService.CreateCityAsync(requestDto, cancellationToken);
+
+        return Ok(Result.Success());
+    }
+
+    [HttpDelete("{cityId:guid}")]
+    public async Task<IActionResult> DeleteAsync(
+    [FromRoute] Guid cityId,
+    CancellationToken cancellationToken)
+    {
+        await _cityService.SoftDeleteAsync(cityId, cancellationToken);
 
         return Ok(Result.Success());
     }

@@ -81,4 +81,22 @@ public class ProvinceService : IProvinceService
     }
 
     #endregion
+
+    #region Delete Methods
+
+    public async Task SoftDeleteAsync(
+        Guid provinceId,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var result = await _unitOfWork.ProvinceRepository.SoftDeleteAsync(provinceId, _currentUser.UserId, cancellationToken);
+
+        if (!result)
+            throw new ValidationException("Could not delete province");
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    #endregion
 }

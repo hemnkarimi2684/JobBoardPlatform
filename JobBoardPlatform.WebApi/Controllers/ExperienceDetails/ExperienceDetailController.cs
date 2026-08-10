@@ -71,6 +71,17 @@ public class ExperienceDetailController : ControllerBase
         return Ok(Result.Success());
     }
 
+    [HttpDelete("{experienceDetailId:guid}")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] Guid experienceDetailId,
+        CancellationToken cancellationToken)
+    {
+        await _experienceDetailService.SoftDeleteAsync(experienceDetailId, cancellationToken);
+
+        return Ok(Result.Success());
+    }
+
     [HttpGet("seniority-levels")]
     [AllowAnonymous]
     public async Task<IActionResult> GetSeniorityLevels()

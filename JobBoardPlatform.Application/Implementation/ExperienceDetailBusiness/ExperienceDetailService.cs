@@ -9,12 +9,9 @@ using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
-using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Dto;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Enums;
-using JobBoardPlatform.Core.Entities.UserEntity.Entity;
-using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
 
 namespace JobBoardPlatform.Application.Implementation.ExperienceDetailBusiness;
 
@@ -100,8 +97,9 @@ public class ExperienceDetailService : IExperienceDetailService
                                                             totalDataCount);
     }
 
-
-    public async Task<ExperienceHistoryResponseDto> GetExperienceDetailByIdAsync(Guid experienceDetailId, CancellationToken cancellationToken = default)
+    public async Task<ExperienceHistoryResponseDto> GetExperienceDetailByIdAsync(
+        Guid experienceDetailId,
+        CancellationToken cancellationToken = default)
     {
         var experienceDetail = await _unitOfWork.ExperienceDetailRepository.GetByIdAsync(experienceDetailId, cancellationToken);
 
@@ -132,6 +130,29 @@ public class ExperienceDetailService : IExperienceDetailService
             throw new NotFoundException("No seniority levels are currently available.");
 
         return seniorityLevels;
+    }
+
+    #endregion
+
+    #region Delete Methods
+
+    public async Task SoftDeleteAsync(
+        Guid experienceDetailId,
+        CancellationToken cancellationToken = default)
+    {
+        var userId = await _unitOfWork.ExperienceDetailRepository.GetExperienceDetailUserIdAsync(experienceDetailId, cancellationToken);
+
+        if (userId == null)
+            throw new NotFoundException("the exprience detail not found");
+
+        _accessControlService.EnsureApplicant(userId.Value, _currentUser);
+
+        var result = await _unitOfWork.ExperienceDetailRepository.SoftDeleteAsync(experienceDetailId, _currentUser.UserId, cancellationToken);
+
+        if (!result)
+            throw new ValidationException("Could not delete exprience detail");
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);  
     }
 
     #endregion

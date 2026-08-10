@@ -72,6 +72,17 @@ public class EducationDetailController : ControllerBase
         return Ok(Result.Success());
     }
 
+    [HttpDelete("{educationDetailId:guid}")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] Guid educationDetailId,
+        CancellationToken cancellationToken)
+    {
+        await _educationDetailService.SoftDeleteAsync(educationDetailId, cancellationToken);
+
+        return Ok(Result.Success());
+    }
+
     [HttpGet("certificate-degrees")]
     [AllowAnonymous]
     public async Task<IActionResult> GetCertificateDegrees()

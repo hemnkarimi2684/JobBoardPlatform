@@ -21,10 +21,20 @@ public class AdminSkillsController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> CreateSkillAsync(
-   [FromBody] CreateSkillRequestDto skillRequestDto,
-    CancellationToken cancellationToken)
+        [FromBody] CreateSkillRequestDto skillRequestDto,
+        CancellationToken cancellationToken)
     {
         await _skillService.CreateSkillAsync(skillRequestDto, cancellationToken);
+
+        return Ok(Result.Success());
+    }
+
+    [HttpDelete("{skillId:guid}")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] Guid skillId,
+        CancellationToken cancellationToken)
+    {
+        await _skillService.SoftDeleteAsync(skillId, cancellationToken);
 
         return Ok(Result.Success());
     }

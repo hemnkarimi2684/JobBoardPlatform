@@ -58,4 +58,14 @@ public interface IExperienceDetailService
     /// </summary>
     /// <returns></returns>
     List<EnumResponseDto> GetSeniorityLevels();
+
+    /// <summary>
+    /// حذف نرم تجربه کاری 
+    /// </summary>
+    /// <param name="experienceDetailId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task SoftDeleteAsync(
+        Guid experienceDetailId,
+        CancellationToken cancellationToken = default);
 }

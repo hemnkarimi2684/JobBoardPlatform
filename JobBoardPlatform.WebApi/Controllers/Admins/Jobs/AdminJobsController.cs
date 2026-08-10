@@ -28,4 +28,14 @@ public class AdminJobsController : ControllerBase
 
         return Ok(Result.Success());
     }
+
+    [HttpDelete("{jobId:guid}")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] Guid jobId,
+        CancellationToken cancellationToken)
+    {
+        await _jobService.SoftDeleteAsync(jobId, cancellationToken);
+
+        return Ok(Result.Success());
+    }
 }
