@@ -3,27 +3,40 @@
     ViewData["Title"] = "Skills";
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">Skills</h2>
-
-<form asp-action="Index" method="get" style="margin-bottom: 18px;">
-    <div style="display:flex; gap:8px;">
-        <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="Search skills" />
-        <button type="submit" class="btn">Search</button>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Skills</h1>
+        <p class="subtitle">Browse available skills.</p>
     </div>
-</form>
+</div>
+
+<div class="panel">
+    <form asp-action="Index" method="get" class="search-row">
+        <div class="search-box" style="flex: 1;">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" name="text" value="@ViewBag.Text" class="search-input" placeholder="Search skills" />
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+</div>
 
 @if (Model.Data.Count == 0)
 {
-    <div class="empty">No skills found.</div>
+    <div class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No skills found</h3>
+        <p>Try a different search term.</p>
+    </div>
 }
 else
 {
-    <div class="card">
-        @foreach (var skill in Model.Data)
-        {
-            // Assuming SkillName is the property to display. If it's different, adjust accordingly.
-            <span class="skill">@skill.SkillName</span>
-        }
+    <div class="panel">
+        <div class="chips" style="justify-content: flex-start;">
+            @foreach (var skill in Model.Data)
+            {
+                <span class="chip">@skill.SkillName</span>
+            }
+        </div>
     </div>
 
     <partial name="_Pager" model="@Model" />

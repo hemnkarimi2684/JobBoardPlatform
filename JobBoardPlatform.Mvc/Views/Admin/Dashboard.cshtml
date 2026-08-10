@@ -4,100 +4,123 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Admin Dashboard</h2>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert text-danger">@TempData["Error"]</div>
-    }
-
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:14px;">
-        <div class="card">
-            <h3>Total Users</h3>
-            <div style="font-size:1.8rem; font-weight:bold; color:#2c7be5;">@Model.TotalUsersCount</div>
-        </div>
-
-        <a class="card" asp-action="Employers" style="text-decoration:none; color:inherit; display:block;">
-            <h3>Employers</h3>
-            <div style="font-size:1.8rem; font-weight:bold; color:#2c7be5;">@Model.EmployersCount</div>
-            <span class="badge" style="background:#fff3cd; color:#856404; padding:4px 8px; border-radius:4px; font-size:0.85rem;">
-                @Model.PendingEmployersCount Pending Approval
-            </span>
-        </a>
-
-        <a class="card" asp-action="JobSeekers" style="text-decoration:none; color:inherit; display:block;">
-            <h3>Job Seekers</h3>
-            <div style="font-size:1.8rem; font-weight:bold; color:#2c7be5;">@Model.JobSeekersCount</div>
-        </a>
-
-        <a class="card" asp-action="Advertisements" style="text-decoration:none; color:inherit; display:block;">
-            <h3>Active Ads</h3>
-            <div style="font-size:1.8rem; font-weight:bold; color:#1e7e34;">@Model.ActiveAdvertisementsCount</div>
-            <span class="badge" style="background:#f8d7da; color:#721c24; padding:4px 8px; border-radius:4px; font-size:0.85rem;">
-                Inactive: @Model.InactiveAdvertisementsCount
-            </span>
-        </a>
-    </div>
-
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:14px;">
-        <a class="card" asp-action="Cities" style="text-decoration:none; color:inherit; display:block;">
-            <h3>Cities</h3>
-            <div class="meta" style="color: #666;">Manage Cities</div>
-        </a>
-        <a class="card" asp-action="Provinces" style="text-decoration:none; color:inherit; display:block;">
-            <h3>Provinces</h3>
-            <div class="meta" style="color: #666;">Manage Provinces</div>
-        </a>
-        <a class="card" asp-action="JobCategories" style="text-decoration:none; color:inherit; display:block;">
-            <h3>Job Categories</h3>
-            <div class="meta" style="color: #666;">Manage Categories</div>
-        </a>
-        <a class="card" asp-action="Skills" style="text-decoration:none; color:inherit; display:block;">
-            <h3>Skills</h3>
-            <div class="meta" style="color: #666;">Manage Skills</div>
-        </a>
-        <a class="card" asp-action="Jobs" style="text-decoration:none; color:inherit; display:block;">
-            <h3>Jobs</h3>
-            <div class="meta" style="color: #666;">Manage Jobs</div>
-        </a>
-        <a class="card" asp-action="EmailTemplates" style="text-decoration:none; color:inherit; display:block;">
-            <h3>Email Templates</h3>
-            <div class="meta" style="color: #666;">Manage Templates</div>
-        </a>
-    </div>
-
-    <div class="card">
-        <h3 style="margin-bottom: 15px;">Job Applications Status</h3>
-        @if (Model.JobApplicationStatusCounts == null || Model.JobApplicationStatusCounts.Count == 0)
-        {
-            <div class="empty">No job applications registered yet.</div>
-        }
-        else
-        {
-            <div style="display:flex; flex-wrap:wrap; gap:10px;">
-                @foreach (var item in Model.JobApplicationStatusCounts)
-                {
-                    var statusLabel = item.StatusName switch
-                    {
-                        JobApplicationStatus.Pending => "Pending",
-                        JobApplicationStatus.Reviewing => "Reviewing",
-                        JobApplicationStatus.Interview => "Interview",
-                        JobApplicationStatus.Accepted => "Accepted",
-                        JobApplicationStatus.Rejected => "Rejected",
-                        JobApplicationStatus.Cancelled => "Cancelled",
-                        _ => item.StatusName.ToString()
-                    };
-                    <span class="skill" style="background:#f1f3f5; padding:6px 12px; border-radius:20px; font-size:0.9rem;">
-                        @statusLabel: @item.CountPerStatus
-                    </span>
-                }
-            </div>
-        }
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Admin Dashboard</h1>
+        <p class="subtitle">Overview of your job board platform.</p>
     </div>
 </div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="stat-grid">
+    <div class="card stat-card">
+        <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg>
+        </div>
+        <div>
+            <div class="stat-value">@Model.TotalUsersCount</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+
+    <a class="card stat-card" asp-action="Employers">
+        <div class="stat-icon amber">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" /></svg>
+        </div>
+        <div>
+            <div class="stat-value">@Model.EmployersCount</div>
+            <div class="stat-label">Employers</div>
+            <div class="stat-sub">
+                <span class="badge badge-warning">@Model.PendingEmployersCount Pending Approval</span>
+            </div>
+        </div>
+    </a>
+
+    <a class="card stat-card" asp-action="JobSeekers">
+        <div class="stat-icon green">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+        </div>
+        <div>
+            <div class="stat-value">@Model.JobSeekersCount</div>
+            <div class="stat-label">Job Seekers</div>
+        </div>
+    </a>
+
+    <a class="card stat-card" asp-action="Advertisements">
+        <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15c-2.743 0-5.357-.467-7.827-1.47-.254-.085-.48-.215-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m16.5 0V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m-7.5 0a48.114 48.114 0 0 1 3.413-.387m-7.5 0c.106.97.505 1.85 1.162 2.554m-1.162-2.554a11.986 11.986 0 0 0-4.252.06M18 4.5A3 3 0 0 1 21 7.5m-3-3A3 3 0 0 0 15 7.5m3-3A3 3 0 0 1 18 7.5" /></svg>
+        </div>
+        <div>
+            <div class="stat-value">@Model.ActiveAdvertisementsCount</div>
+            <div class="stat-label">Active Ads</div>
+            <div class="stat-sub">
+                <span class="badge badge-danger">Inactive: @Model.InactiveAdvertisementsCount</span>
+            </div>
+        </div>
+    </a>
+</div>
+
+<div class="stat-grid">
+    <a class="card stat-card" asp-action="Cities">
+        <div class="stat-label">Manage Cities</div>
+        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
+    </a>
+    <a class="card stat-card" asp-action="Provinces">
+        <div class="stat-label">Manage Provinces</div>
+        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
+    </a>
+    <a class="card stat-card" asp-action="JobCategories">
+        <div class="stat-label">Manage Job Categories</div>
+        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
+    </a>
+    <a class="card stat-card" asp-action="Skills">
+        <div class="stat-label">Manage Skills</div>
+        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
+    </a>
+    <a class="card stat-card" asp-action="Jobs">
+        <div class="stat-label">Manage Jobs</div>
+        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
+    </a>
+    <a class="card stat-card" asp-action="EmailTemplates">
+        <div class="stat-label">Manage Email Templates</div>
+        <div style="margin-left:auto;" class="btn btn-ghost btn-sm">Open</div>
+    </a>
+</div>
+
+<section class="panel">
+    <div class="panel-head">
+        <h3>Job Applications Status</h3>
+    </div>
+    @if (Model.JobApplicationStatusCounts == null || Model.JobApplicationStatusCounts.Count == 0)
+    {
+        <p class="meta">No job applications registered yet.</p>
+    }
+    else
+    {
+        <div class="chips" style="justify-content: flex-start;">
+            @foreach (var item in Model.JobApplicationStatusCounts)
+            {
+                var statusLabel = item.StatusName switch
+                {
+                    JobApplicationStatus.Pending => "Pending",
+                    JobApplicationStatus.Reviewing => "Reviewing",
+                    JobApplicationStatus.Interview => "Interview",
+                    JobApplicationStatus.Accepted => "Accepted",
+                    JobApplicationStatus.Rejected => "Rejected",
+                    JobApplicationStatus.Cancelled => "Cancelled",
+                    _ => item.StatusName.ToString()
+                };
+                <span class="chip">@statusLabel: @item.CountPerStatus</span>
+            }
+        </div>
+    }
+</section>
 

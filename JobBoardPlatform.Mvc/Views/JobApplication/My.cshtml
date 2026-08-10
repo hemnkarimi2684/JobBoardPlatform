@@ -4,39 +4,48 @@
     ViewData["Title"] = "My Job Applications";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">
-        My Job Applications
-    </h2>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">My Job Applications</h1>
+        <p class="subtitle">Track the status of your applications.</p>
+    </div>
+</div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["Success"]
-        </div>
-    }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">
-            @TempData["Error"]
-        </div>
-    }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
 
-    @if (Model.Data == null || Model.Data.Count == 0)
-    {
-        <div class="empty">
-            You have not submitted any applications yet.
-        </div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (Model.Data == null || Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128203;</div>
+        <h3>No applications yet</h3>
+        <p>You have not submitted any applications yet.</p>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Browse Jobs</a>
+    </div>
+}
+else
+{
+    <div class="job-list">
+        @foreach (var item in Model.Data)
         {
             <div class="card">
-                <h3>@item.JobTitle</h3>
+                <div class="card-between">
+                    <h3 style="margin-bottom: 0;">@item.JobTitle</h3>
+                    <span class="badge badge-outline">@item.Status</span>
+                </div>
 
-                <div class="meta" style="color: #666; margin-bottom: 15px;">
+                <div class="meta" style="margin-top: 10px;">
                     @item.CompanyName
                     &nbsp;|&nbsp;
                     @item.CityName
@@ -44,26 +53,26 @@
                     @item.CreatedAt.ToString("yyyy-MM-dd")
                 </div>
 
-                <div style="margin-bottom: 12px;">
+                <div class="job-badges">
                     <span class="badge">@item.CollaborationType</span>
-                    <span class="badge">@item.Status</span>
                 </div>
 
                 @if (item.Status == JobApplicationStatus.Pending)
                 {
                     <form asp-action="Cancel"
                           asp-route-id="@item.JobApplicationId"
-                          method="post">
+                          method="post"
+                          style="margin-top: 12px;">
                         @Html.AntiForgeryToken()
 
-                        <button type="submit" class="btn">
+                        <button type="submit" class="btn btn-danger btn-sm">
                             Cancel Application
                         </button>
                     </form>
                 }
             </div>
         }
+    </div>
 
-        <partial name="_Pager" model="@Model" />
-    }
-</div>
+    <partial name="_Pager" model="@Model" />
+}

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create Resume";
 }
 
-<div class="card" style="max-width:520px; margin:0 auto;">
+<div class="card auth-card">
     <h3>Create Resume</h3>
 
     @if (TempData["Success"] != null)
@@ -13,12 +13,10 @@
     }
     @if (TempData["Error"] != null)
     {
-        // Using the standard danger alert for errors.
         <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
     <form asp-action="Create" method="post">
-        @* ModelOnly displays all validation errors if the model state is invalid. *@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
@@ -27,6 +25,6 @@
             <span asp-validation-for="Title" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn">Create Resume</button>
+        <button type="submit" class="btn btn-primary btn-block">Create Resume</button>
     </form>
 </div>

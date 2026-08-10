@@ -4,69 +4,59 @@
     ViewData["Title"] = "Job Seekers";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Job Seekers</h2>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Manage Job Seekers</h1>
+        <p class="subtitle">Activate or deactivate registered job seeker accounts.</p>
+    </div>
+</div>
 
-    <div asp-validation-summary="ModelOnly"
-         class="text-danger"
-         style="margin-bottom: 15px;"></div>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success"
-             style="padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 15px;">
-            @TempData["Success"]
-        </div>
-    }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger"
-             style="padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 15px;">
-            @TempData["Error"]
-        </div>
-    }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    @if (Model.Data == null || Model.Data.Count == 0)
-    {
-        <div class="empty"
-             style="padding: 15px; background: #f8f9fa; border: 1px dashed #ccc; border-radius: 4px; color: #666;">
-            No job seekers registered.
-        </div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (Model.Data == null || Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128100;</div>
+        <h3>No job seekers registered</h3>
+        <p>No job seekers registered.</p>
+    </div>
+}
+else
+{
+    <div class="job-list">
+        @foreach (var item in Model.Data)
         {
-            <div class="card"
-                 style="margin-bottom: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div class="card">
+                <h3 style="margin-bottom: 0;">@item.Email</h3>
 
-                <h3>@item.Email</h3>
-
-                <div class="meta" style="color: #666; font-size: 14px; margin-top: 5px;">
+                <div class="meta" style="margin-top: 6px;">
                     <strong>Phone:</strong> @(string.IsNullOrEmpty(item.PhoneNumber) ? "N/A" : item.PhoneNumber)
-                    <br />
+                    &nbsp;|&nbsp;
                     <strong>Registration Date:</strong> @item.CreatedAt.ToString("yyyy/MM/dd")
                 </div>
 
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 12px;">
                     @if (item.IsActive)
                     {
-                        <span class="badge"
-                              style="background:#e2f0d9; color:#385723; padding:4px 8px; border-radius:4px;">
-                            Active
-                        </span>
+                        <span class="badge badge-success">Active</span>
                     }
                     else
                     {
-                        <span class="badge"
-                              style="background:#fdecea; color:#d64545; padding:4px 8px; border-radius:4px;">
-                            Inactive
-                        </span>
+                        <span class="badge badge-danger">Inactive</span>
                     }
                 </div>
 
-                <div style="margin-top: 15px;">
+                <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
                     @if (item.IsActive)
                     {
                         <form asp-action="DeactivateJobSeeker"
@@ -75,11 +65,7 @@
                               style="display:inline;">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
-                            <button type="submit"
-                                    class="btn btn-danger"
-                                    style="padding: 6px 12px; background: #dc3545; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
-                                Deactivate
-                            </button>
+                            <button type="submit" class="btn btn-danger">Deactivate</button>
                         </form>
                     }
                     else
@@ -90,59 +76,30 @@
                               style="display:inline;">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
-                            <button type="submit"
-                                    class="btn btn-primary"
-                                    style="padding: 6px 12px; background: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
-                                Activate
-                            </button>
+                            <button type="submit" class="btn btn-success">Activate</button>
                         </form>
                     }
                 </div>
             </div>
         }
+    </div>
 
-        @if (Model.TotalPageCount > 1)
-        {
-            <div style="margin-top: 20px; margin-bottom: 30px;">
-                <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+    @if (Model.TotalPageCount > 1)
+    {
+        <nav class="pager" style="margin: 24px 0;">
+            @if (Model.PageNumber > 1)
+            {
+                <a class="pager-link" asp-action="JobSeekers"
+                   asp-route-pageNumber="@(Model.PageNumber - 1)">&#8592; Previous</a>
+            }
 
-                    @if (Model.PageNumber > 1)
-                    {
-                        <a asp-action="JobSeekers"
-                           asp-route-pageNumber="@(Model.PageNumber - 1)"
-                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
-                            Previous
-                        </a>
-                    }
+            <span class="pager-current">Page @Model.PageNumber of @Model.TotalPageCount</span>
 
-                    @for (var i = 1; i <= Model.TotalPageCount; i++)
-                    {
-                        if (i == Model.PageNumber)
-                        {
-                            <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white;">
-                                @i
-                            </span>
-                        }
-                        else
-                        {
-                            <a asp-action="JobSeekers"
-                               asp-route-pageNumber="@i"
-                               style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
-                                @i
-                            </a>
-                        }
-                    }
-
-                    @if (Model.PageNumber < Model.TotalPageCount)
-                    {
-                        <a asp-action="JobSeekers"
-                           asp-route-pageNumber="@(Model.PageNumber + 1)"
-                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
-                            Next
-                        </a>
-                    }
-                </div>
-            </div>
-        }
+            @if (Model.PageNumber < Model.TotalPageCount)
+            {
+                <a class="pager-link" asp-action="JobSeekers"
+                   asp-route-pageNumber="@(Model.PageNumber + 1)">Next &#8594;</a>
+            }
+        </nav>
     }
-</div>
+}

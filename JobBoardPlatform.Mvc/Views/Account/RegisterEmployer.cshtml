@@ -3,55 +3,55 @@
     ViewData["Title"] = "Employer Registration";
 }
 
-<div class="card" style="max-width:560px; margin: 0 auto; direction: ltr; text-align: left;">
-    <h3 style="margin-bottom: 20px;">Employer Registration</h3>
+<div class="card auth-card" style="max-width: 620px;">
+    <h3>Employer Registration</h3>
 
     <form asp-action="RegisterEmployer" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="Email">Email Address</label>
             <input asp-for="Email" class="form-control" placeholder="example@company.com" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="PhoneNumber">Phone Number</label>
             <input asp-for="PhoneNumber" class="form-control" placeholder="e.g. 0912..." />
             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="Password">Password</label>
             <input asp-for="Password" class="form-control" type="password" placeholder="Minimum 8 characters" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="Name">Company Name</label>
             <input asp-for="Name" class="form-control" placeholder="Enter company name" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="YearOfEstablishment">Year of Establishment</label>
             <input asp-for="YearOfEstablishment" class="form-control" placeholder="e.g. 2020" />
             <span asp-validation-for="YearOfEstablishment" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="WebSiteAddress">Website Address</label>
             <input asp-for="WebSiteAddress" class="form-control" placeholder="https://www.example.com" />
             <span asp-validation-for="WebSiteAddress" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="AboutUs">About Us</label>
             <textarea asp-for="AboutUs" class="form-control" rows="4" placeholder="Minimum 50 characters about the company"></textarea>
             <span asp-validation-for="AboutUs" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="OwnershipType">Ownership Type</label>
             <select asp-for="OwnershipType" asp-items="ViewBag.OwnershipTypes" class="form-control">
                 <option value="">-- Select --</option>
@@ -59,7 +59,7 @@
             <span asp-validation-for="OwnershipType" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="CompanySize">Company Size</label>
             <select asp-for="CompanySize" asp-items="ViewBag.CompanySizes" class="form-control">
                 <option value="">-- Select --</option>
@@ -67,7 +67,7 @@
             <span asp-validation-for="CompanySize" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="CityId">City</label>
             <select asp-for="CityId" asp-items="ViewBag.Cities" class="form-control">
                 <option value="">-- Select City --</option>
@@ -75,7 +75,7 @@
             <span asp-validation-for="CityId" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="JobCategoryId">Industry / Category</label>
             <select asp-for="JobCategoryId" asp-items="ViewBag.JobCategories" class="form-control">
                 <option value="">-- Select Category --</option>
@@ -83,22 +83,22 @@
             <span asp-validation-for="JobCategoryId" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="Location">Office Location</label>
             <input asp-for="Location" class="form-control" placeholder="Full office address" />
             <span asp-validation-for="Location" class="text-danger"></span>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
+        <div class="form-group">
             <label asp-for="ActivityType">Type of Activity</label>
             <input asp-for="ActivityType" class="form-control" placeholder="Optional" />
             <span asp-validation-for="ActivityType" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Register</button>
+        <button type="submit" class="btn btn-primary btn-block">Register</button>
     </form>
 
-    <div style="margin-top: 20px; font-size: .9rem; border-top: 1px solid #eee; padding-top: 15px;">
-        Already have an account? <a asp-action="Login" class="text-primary">Login</a>
+    <div class="auth-footer">
+        Already have an account? <a asp-action="Login">Login</a>
     </div>
 </div>

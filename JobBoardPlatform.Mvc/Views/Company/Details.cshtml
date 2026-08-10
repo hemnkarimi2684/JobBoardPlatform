@@ -4,49 +4,73 @@
     ViewData["Title"] = Model.Name;
 }
 
-<div style="direction: ltr; text-align: left;">
-    @if (TempData["Success"] != null)
+<div class="page-head">
+    <div>
+        <h1 class="page-title">@Model.Name</h1>
+        <p class="subtitle">@Model.JobCategoryName</p>
+    </div>
+    <a class="btn btn-ghost" asp-action="Index">&#8592; Back to List</a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<section class="panel">
+    @if (Model.CompanyImageFileId.HasValue)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert" style="background:#fdecea; color:#a43d3d; border:1px solid #f5c6cb;">@TempData["Error"]</div>
+        <img src="@Url.Action("DownloadImage", "Company", new { id = Model.Id })" alt="@Model.Name" class="company-logo" />
     }
 
-    <div class="card">
-        @if (Model.CompanyImageFileId.HasValue)
-        {
-            <img src="@Url.Action("DownloadImage", "Company", new { id = Model.Id })" alt="@Model.Name" style="max-width:180px; border-radius:8px; margin-bottom:12px; display: block;" />
-        }
-
-        <h3>@Model.Name</h3>
-        <div class="meta" style="color: #666; margin-bottom: 15px;">@Model.JobCategoryName</div>
-
-        <div class="detail-grid">
-            <div><span>Established In:</span> @Model.YearOfEstablishment.ToString("yyyy")</div>
-            <div><span>Website:</span>
+    <div class="detail-grid">
+        <div class="detail-item">
+            <span class="detail-label">Established In</span>
+            <span class="detail-value">@Model.YearOfEstablishment.ToString("yyyy")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Website</span>
+            <span class="detail-value">
                 @if (!string.IsNullOrWhiteSpace(Model.WebSiteAddress))
                 {
-                    <a href="@(Model.WebSiteAddress.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? Model.WebSiteAddress : "https://" + Model.WebSiteAddress)" target="_blank" style="color: #1e3a5f; text-decoration: none;">@Model.WebSiteAddress</a>
+                    <a href="@(Model.WebSiteAddress.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? Model.WebSiteAddress : "https://" + Model.WebSiteAddress)" target="_blank">@Model.WebSiteAddress</a>
                 }
                 else
                 {
                     <span>-</span>
                 }
-            </div>
-            <div><span>Ownership Type:</span> @Model.OwnershipType</div>
-            <div><span>Company Size:</span> @Model.CompanySize</div>
-            <div><span>Category:</span> @Model.JobCategoryName</div>
-            <div><span>Activity Type:</span> @Model.ActivityType</div>
-            <div><span>Active Cities Count:</span> @Model.Cities.Count</div>
+            </span>
         </div>
-
-        <h4 style="margin: 16px 0 8px; color: #1e3a5f;">About Company</h4>
-        <p style="line-height: 1.8; color: #445;">@Model.AboutUs</p>
-
-        <div style="margin-top: 18px;">
-            <a class="btn" asp-action="Index">Back to List</a>
+        <div class="detail-item">
+            <span class="detail-label">Ownership Type</span>
+            <span class="detail-value">@Model.OwnershipType</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Company Size</span>
+            <span class="detail-value">@Model.CompanySize</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Category</span>
+            <span class="detail-value">@Model.JobCategoryName</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Activity Type</span>
+            <span class="detail-value">@Model.ActivityType</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Active Cities Count</span>
+            <span class="detail-value">@Model.Cities.Count</span>
         </div>
     </div>
-</div>
+</section>
+
+<section class="panel">
+    <div class="panel-head">
+        <h3>About Company</h3>
+    </div>
+    <p style="line-height: 1.8; white-space: pre-line;">@Model.AboutUs</p>
+</section>

@@ -5,58 +5,66 @@
     var id = Context.Request.RouteValues["id"]?.ToString();
 }
 
-<div style="direction: ltr; text-align: left;">
-    <div class="card" style="max-width:560px; margin:0 auto;">
-        <h3>Edit Work Experience</h3>
-
-        <form asp-action="Edit" asp-route-id="@id" method="post">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group">
-                <label asp-for="LastJobTitle">Job Title</label>
-                <input asp-for="LastJobTitle" class="form-control" placeholder="e.g., Senior ASP.NET Developer" />
-                <span asp-validation-for="LastJobTitle" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="SeniorityLevel">Seniority Level</label>
-                <select asp-for="SeniorityLevel" asp-items="ViewBag.SeniorityLevels" class="form-control">
-                    <option value="">-- Select Seniority Level --</option>
-                </select>
-                <span asp-validation-for="SeniorityLevel" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="JobCategory">Job Category</label>
-                <input asp-for="JobCategory" class="form-control" placeholder="e.g., Software Engineering" />
-                <span asp-validation-for="JobCategory" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="City">City</label>
-                <input asp-for="City" class="form-control" placeholder="e.g., Tehran" />
-                <span asp-validation-for="City" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="StartDate">Start Date</label>
-                <input asp-for="StartDate" class="form-control" type="date" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="EndDate">End Date</label>
-                <input asp-for="EndDate" class="form-control" type="date" />
-                <span asp-validation-for="EndDate" class="text-danger"></span>
-            </div>
-
-            <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
-                <input asp-for="IsCurrentJob" />
-                <label asp-for="IsCurrentJob" style="margin-bottom: 0;">This is my current job</label>
-            </div>
-
-            <button type="submit" class="btn">Save Changes</button>
-        </form>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Edit Work Experience</h1>
+        <p class="subtitle">Update the details of this experience entry.</p>
     </div>
+    <a class="btn btn-ghost" asp-action="Index">&#8592; Back to Work Experience</a>
+</div>
+
+<div class="card auth-card" style="max-width: 620px;">
+    <h3>Edit Work Experience</h3>
+
+    <form asp-action="Edit" asp-route-id="@id" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="LastJobTitle">Job Title</label>
+            <input asp-for="LastJobTitle" class="form-control" placeholder="e.g., Senior ASP.NET Developer" />
+            <span asp-validation-for="LastJobTitle" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="SeniorityLevel">Seniority Level</label>
+            <select asp-for="SeniorityLevel" asp-items="ViewBag.SeniorityLevels" class="form-control">
+                <option value="">-- Select Seniority Level --</option>
+            </select>
+            <span asp-validation-for="SeniorityLevel" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="JobCategory">Job Category</label>
+            <input asp-for="JobCategory" class="form-control" placeholder="e.g., Software Engineering" />
+            <span asp-validation-for="JobCategory" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="City">City</label>
+            <input asp-for="City" class="form-control" placeholder="e.g., Tehran" />
+            <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StartDate">Start Date</label>
+            <input asp-for="StartDate" class="form-control" type="date" />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="EndDate">End Date</label>
+            <input asp-for="EndDate" class="form-control" type="date" />
+            <span asp-validation-for="EndDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-check">
+                <input asp-for="IsCurrentJob" />
+                <span>This is my current job</span>
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
 </div>

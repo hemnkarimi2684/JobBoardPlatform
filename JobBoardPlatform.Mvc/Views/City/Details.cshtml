@@ -4,38 +4,47 @@
     ViewData["Title"] = "Companies in City";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Companies in City</h2>
+<div class="page-head">
+    <h1 class="page-title">Companies in City</h1>
+    <p class="subtitle">Companies located in this city.</p>
+</div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert" style="background:#fdecea; color:#a43d3d; border:1px solid #f5c6cb;">@TempData["Error"]</div>
-    }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">No companies were found in this city.</div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No companies found</h3>
+        <p>No companies were found in this city.</p>
+    </div>
+}
+else
+{
+    <div class="job-list">
+        @foreach (var item in Model.Data)
         {
-            <div class="card">
-                <h3>@item.CompanyName</h3>
-                <div class="meta" style="color: #666; margin-bottom: 10px;">
+            <div class="card card-hover">
+                <div class="card-between">
+                    <h3 style="margin-bottom: 0;">@item.CompanyName</h3>
+                    <a class="btn btn-outline" asp-controller="Company" asp-action="Details" asp-route-id="@item.CompanyId">View Company Details</a>
+                </div>
+                <div class="meta" style="margin-top: 10px;">
                     @item.CityName &nbsp;|&nbsp; @item.JobCategoryName
                 </div>
                 <p style="margin: 10px 0; color: #445;">
                     @(item.AboutUs.Length > 120 ? item.AboutUs.Substring(0, 120) + "..." : item.AboutUs)
                 </p>
-                <a class="btn" asp-controller="Company" asp-action="Details" asp-route-id="@item.CompanyId">View Company Details</a>
             </div>
         }
+    </div>
 
-        @await Html.PartialAsync("_Pager", Model)
-    }
-</div>
+    @await Html.PartialAsync("_Pager", Model)
+}

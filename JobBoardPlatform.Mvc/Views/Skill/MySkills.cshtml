@@ -5,7 +5,12 @@
     var availableSkills = Model.AvailableSkills;
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">My Skills</h2>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">My Skills</h1>
+        <p class="subtitle">Manage the skills on your resume.</p>
+    </div>
+</div>
 
 @if (TempData["Success"] != null)
 {
@@ -13,56 +18,60 @@
 }
 @if (TempData["Error"] != null)
 {
-    // Using the alert-danger class defined in _Layout.cshtml for consistency
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
-<div class="card">
-    <h3>Earned Skills</h3>
+<section class="panel">
+    <div class="panel-head">
+        <h3>Earned Skills</h3>
+    </div>
     @if (Model.Data.Count == 0)
     {
-        <div class="empty">You haven't added any skills yet.</div>
+        <p class="meta">You haven't added any skills yet.</p>
     }
     else
     {
-        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-            @* Added flex wrap for better display of skills *@
+        <div class="chips" style="justify-content: flex-start;">
             @foreach (var skill in Model.Data)
             {
-                <div style="display: inline-flex; align-items: center; gap: 6px;">
-                    <span class="skill">@skill.SkillName</span>
+                <div class="chip" style="gap: 6px;">
+                    @skill.SkillName
                     <form asp-action="RemoveSkill" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove this skill?');">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="skillsId" value="@skill.SkillId" />
-                        <button type="submit" style="padding: 2px 8px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Remove</button>
+                        <button type="submit" class="chip-remove" title="Remove @skill.SkillName" aria-label="Remove @skill.SkillName">&times;</button>
                     </form>
                 </div>
             }
         </div>
     }
-</div>
+</section>
 
 @if (availableSkills.Count > 0)
 {
-    <div class="card">
-        <h3>Add Skill</h3>
+    <section class="panel">
+        <div class="panel-head">
+            <h3>Add Skill</h3>
+        </div>
         <form asp-action="Assign" method="post">
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px;">
-                @* Using grid for checkboxes *@
+            <div class="chips" style="justify-content: flex-start; margin-bottom: 16px;">
                 @foreach (var skill in availableSkills)
                 {
-                    <label style="display: block; margin-bottom: 8px; align-items: center; display: flex;">
-                        @* Aligned items to center vertically *@
-                        <input type="checkbox" name="skillsId" value="@skill.SkillId" style="margin-right: 8px;" /> @* Added margin-right for LTR checkbox spacing *@
-                        @skill.SkillName
+                    <label class="form-check">
+                        <input type="checkbox" name="skillsId" value="@skill.SkillId" />
+                        <span>@skill.SkillName</span>
                     </label>
                 }
             </div>
-            <button type="submit" class="btn">Add Skill</button>
+            <button type="submit" class="btn btn-primary">Add Skill</button>
         </form>
-    </div>
+    </section>
 }
 else
 {
-    <div class="empty">No more skills to add.</div>
+    <div class="empty-state">
+        <div class="empty-icon">&#10003;</div>
+        <h3>All skills added</h3>
+        <p>No more skills to add.</p>
+    </div>
 }

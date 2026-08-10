@@ -4,40 +4,52 @@
     ViewData["Title"] = "Cities";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">List of Cities</h2>
+<div class="page-head">
+    <h1 class="page-title">Cities</h1>
+    <p class="subtitle">Browse cities where jobs and companies are located.</p>
+</div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert" style="background:#fdecea; color:#a43d3d; border:1px solid #f5c6cb;">@TempData["Error"]</div>
-    }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    <form asp-action="Index" method="get" style="margin-bottom: 18px;">
-        <div class="form-group" style="display:flex; gap:8px; margin-bottom:0;">
-            <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="Search cities..." />
-            <button type="submit" class="btn">Search</button>
+<div class="panel">
+    <form asp-action="Index" method="get" class="search-row">
+        <div class="search-box" style="flex: 1;">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" name="text" value="@ViewBag.Text" class="search-input" placeholder="Search cities..." />
         </div>
+        <button type="submit" class="btn btn-primary">Search</button>
     </form>
+</div>
 
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">No cities found.</div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No cities found</h3>
+        <p>Try a different search term.</p>
+    </div>
+}
+else
+{
+    <div class="job-list">
+        @foreach (var item in Model.Data)
         {
-            <div class="card">
-                <h3>@item.CityName</h3>
-                <div class="meta" style="color: #666; margin-bottom: 10px;">@item.ProvinceName</div>
-                <a class="btn" asp-action="Details" asp-route-id="@item.CityId">Details</a>
+            <div class="card card-hover card-between">
+                <div>
+                    <h3 style="margin-bottom: 4px;">@item.CityName</h3>
+                    <div class="meta">@item.ProvinceName</div>
+                </div>
+                <a class="btn btn-outline" asp-action="Details" asp-route-id="@item.CityId">Details</a>
             </div>
         }
+    </div>
 
-        @await Html.PartialAsync("_Pager", Model)
-    }
-</div>
+    @await Html.PartialAsync("_Pager", Model)
+}
