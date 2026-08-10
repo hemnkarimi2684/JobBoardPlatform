@@ -6,9 +6,21 @@
     var pageTitle = Model.Data.FirstOrDefault()?.JobName ?? "Job Ads";
 }
 
-<div class="page-head">
-    <h1 class="page-title">@pageTitle</h1>
-    <p class="subtitle">Active job listings for this position.</p>
+<div class="detail-hero">
+    <div class="detail-hero-main">
+        <div class="detail-hero-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15c-2.743 0-5.357-.467-7.827-1.47-.254-.085-.48-.215-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m16.5 0V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m-7.5 0a48.114 48.114 0 0 1 3.413-.387m-7.5 0c.106.97.505 1.85 1.162 2.554m-1.162-2.554a11.986 11.986 0 0 0-4.252.06M18 4.5A3 3 0 0 1 21 7.5m-3-3A3 3 0 0 0 15 7.5m3-3A3 3 0 0 1 18 7.5" /></svg>
+        </div>
+        <div>
+            <h1 class="detail-hero-title">@pageTitle</h1>
+            <div class="detail-hero-meta">
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
+                    Active job listings for this position
+                </span>
+            </div>
+        </div>
+    </div>
 </div>
 
 @if (TempData["Success"] != null)
@@ -33,7 +45,7 @@ else
     <div class="job-list">
         @foreach (var item in Model.Data)
         {
-            <div class="card">
+            <div class="card card-hover">
                 <div class="card-between">
                     <h3 style="margin-bottom: 0;">@item.JobName</h3>
                     <a class="btn btn-primary" asp-controller="Advertisement" asp-action="Details" asp-route-id="@item.AdvertisementId">View Ad</a>
@@ -46,7 +58,7 @@ else
                     <span class="badge badge-outline">Level: @item.ExperienceLevel</span>
                     <span class="badge badge-salary">&#128176; @item.MinimumSalary.ToString("N0") - @item.MaximumSalary.ToString("N0")</span>
                 </div>
-                <p style="margin: 10px 0; color: #445;">@(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)</p>
+                <p style="margin: 10px 0; color: var(--muted);">@(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)</p>
                 @if (item.SkillNames.Count > 0)
                 {
                     <div class="chips">
