@@ -1,4 +1,5 @@
 @model DashboardViewModel
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Admin Dashboard";
@@ -7,7 +8,8 @@
     var totalApplications = statusCounts.Sum(s => s.CountPerStatus);
     var hasStatusData = totalApplications > 0;
 
-    var userTotal = Model.JobSeekersCount + Model.EmployersCount + Model.PendingEmployersCount;
+    var approvedEmployersCount = Math.Max(0, Model.EmployersCount - Model.PendingEmployersCount);
+    var userTotal = Model.JobSeekersCount + Model.EmployersCount;
     userTotal = userTotal == 0 ? 1 : userTotal;
     var adsTotal = Model.ActiveAdvertisementsCount + Model.InactiveAdvertisementsCount;
     adsTotal = adsTotal == 0 ? 1 : adsTotal;
@@ -41,11 +43,19 @@
         if (item.CountPerStatus <= 0) continue;
         var start = stopAngle;
         stopAngle += (double)item.CountPerStatus / totalApplications * 360;
-        gradientParts.Add($"{StatusColor(item.StatusName)} {start:F1}deg {stopAngle:F1}deg");
+        gradientParts.Add($"{StatusColor(item.StatusName)} {start.ToString("F1", CultureInfo.InvariantCulture)}deg {stopAngle.ToString("F1", CultureInfo.InvariantCulture)}deg");
     }
     var donutBackground = gradientParts.Count == 0
         ? "var(--border)"
         : string.Join(", ", gradientParts);
+
+    string BarFillStyle(double value, int total, string from, string to)
+    {
+        var pct = total <= 0 ? 0 : (double)value / total * 100;
+        return $"width:{pct.ToString("0.#", CultureInfo.InvariantCulture)}%;height:100%;border-radius:999px;background:linear-gradient(90deg,{from},{to});";
+    }
+
+    string BarTrackStyle() => "height:14px;border-radius:999px;background:#e2e8f0;overflow:hidden;";
 }
 
 <div class="page-head">
@@ -150,7 +160,10 @@
                         <div class="legend-row">
                             <span class="legend-dot" style="background: @StatusColor(item.StatusName);"></span>
                             <span class="legend-name">@StatusLabel(item.StatusName)</span>
-                            <span class="legend-value">@item.CountPerStatus</span>
+                            <span class="legend-value">
+                                @item.CountPerStatus
+                                <span class="legend-pct">@((int)Math.Round((double)item.CountPerStatus / totalApplications * 100))%</span>
+                            </span>
                         </div>
                     }
                 </div>
@@ -170,29 +183,29 @@
         <div class="bars">
             <div class="bar-row">
                 <div class="bar-head">
-                    <span class="bar-name">Job Seekers</span>
+                    <span class="bar-name">Job Seekers <span class="bar-count">@Model.JobSeekersCount</span></span>
                     <span class="bar-pct">@((int)Math.Round((double)Model.JobSeekersCount / userTotal * 100))%</span>
                 </div>
-                <div class="bar-track">
-                    <div class="bar-fill green" style="width: @((double)Model.JobSeekersCount / userTotal * 100)%"></div>
+                <div class="bar-track" style="@BarTrackStyle()">
+                    <div class="bar-fill" style="@BarFillStyle(Model.JobSeekersCount, userTotal, "#16a34a", "#4ade80")"></div>
                 </div>
             </div>
             <div class="bar-row">
                 <div class="bar-head">
-                    <span class="bar-name">Employers</span>
-                    <span class="bar-pct">@((int)Math.Round((double)Model.EmployersCount / userTotal * 100))%</span>
+                    <span class="bar-name">Employers <span class="bar-count">@approvedEmployersCount</span></span>
+                    <span class="bar-pct">@((int)Math.Round((double)approvedEmployersCount / userTotal * 100))%</span>
                 </div>
-                <div class="bar-track">
-                    <div class="bar-fill" style="width: @((double)Model.EmployersCount / userTotal * 100)%"></div>
+                <div class="bar-track" style="@BarTrackStyle()">
+                    <div class="bar-fill" style="@BarFillStyle(approvedEmployersCount, userTotal, "#0284c7", "#38bdf8")"></div>
                 </div>
             </div>
             <div class="bar-row">
                 <div class="bar-head">
-                    <span class="bar-name">Pending Approval</span>
+                    <span class="bar-name">Pending Approval <span class="bar-count">@Model.PendingEmployersCount</span></span>
                     <span class="bar-pct">@((int)Math.Round((double)Model.PendingEmployersCount / userTotal * 100))%</span>
                 </div>
-                <div class="bar-track">
-                    <div class="bar-fill amber" style="width: @((double)Model.PendingEmployersCount / userTotal * 100)%"></div>
+                <div class="bar-track" style="@BarTrackStyle()">
+                    <div class="bar-fill" style="@BarFillStyle(Model.PendingEmployersCount, userTotal, "#d97706", "#fbbf24")"></div>
                 </div>
             </div>
         </div>
@@ -210,20 +223,20 @@
         <div class="bars">
             <div class="bar-row">
                 <div class="bar-head">
-                    <span class="bar-name">Active Ads</span>
+                    <span class="bar-name">Active Ads <span class="bar-count">@Model.ActiveAdvertisementsCount</span></span>
                     <span class="bar-pct">@((int)Math.Round((double)Model.ActiveAdvertisementsCount / adsTotal * 100))%</span>
                 </div>
-                <div class="bar-track">
-                    <div class="bar-fill green" style="width: @((double)Model.ActiveAdvertisementsCount / adsTotal * 100)%"></div>
+                <div class="bar-track" style="@BarTrackStyle()">
+                    <div class="bar-fill" style="@BarFillStyle(Model.ActiveAdvertisementsCount, adsTotal, "#16a34a", "#4ade80")"></div>
                 </div>
             </div>
             <div class="bar-row">
                 <div class="bar-head">
-                    <span class="bar-name">Inactive Ads</span>
+                    <span class="bar-name">Inactive Ads <span class="bar-count">@Model.InactiveAdvertisementsCount</span></span>
                     <span class="bar-pct">@((int)Math.Round((double)Model.InactiveAdvertisementsCount / adsTotal * 100))%</span>
                 </div>
-                <div class="bar-track">
-                    <div class="bar-fill red" style="width: @((double)Model.InactiveAdvertisementsCount / adsTotal * 100)%"></div>
+                <div class="bar-track" style="@BarTrackStyle()">
+                    <div class="bar-fill" style="@BarFillStyle(Model.InactiveAdvertisementsCount, adsTotal, "#dc2626", "#f87171")"></div>
                 </div>
             </div>
         </div>
