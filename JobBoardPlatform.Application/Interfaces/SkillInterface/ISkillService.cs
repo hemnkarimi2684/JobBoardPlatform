@@ -63,12 +63,34 @@ public interface ISkillService
     Task<SkillDetailResponseDto> GetSkillByIdAsync(
         Guid skillId,
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// دریافت تمام مهارت های برای دراپ داون 
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<List<SkillDetailResponseDto>> GetAllForSelectAsync(
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// برداشتن مهارت از یک کاربر
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="skillsId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task RemoveSkillFromUserAsync(
+        Guid userId,
+        List<Guid> skillsId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// حذف نرم مهارت
+    /// </summary>
+    /// <param name="skillId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task SoftDeleteAsync(
+        Guid skillId,
         CancellationToken cancellationToken = default);
 }

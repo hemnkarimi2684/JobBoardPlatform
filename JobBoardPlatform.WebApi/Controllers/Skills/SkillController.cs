@@ -66,4 +66,16 @@ public class SkillController : ControllerBase
 
         return Ok(Result<SkillDetailResponseDto>.Success(result));
     }
+
+    [HttpDelete("remove-from-user/{userId:guid}")]
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
+    public async Task<IActionResult> RemoveSkillFromUserAsync(
+        [FromRoute] Guid userId,
+        [FromBody] List<Guid> SkillsId,
+        CancellationToken cancellationToken)
+    {
+        await _skillService.RemoveSkillFromUserAsync(userId, SkillsId, cancellationToken);
+
+        return Ok(Result.Success());
+    }
 }

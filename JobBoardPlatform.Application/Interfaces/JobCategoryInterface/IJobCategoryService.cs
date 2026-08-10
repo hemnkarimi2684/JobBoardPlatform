@@ -46,4 +46,14 @@ public interface IJobCategoryService
     /// <returns></returns>
     Task<List<JobCategoryResponseDto>> GetAllForSelectAsync(
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// حذف نرم دسته بندی شغلی
+    /// </summary>
+    /// <param name="jobCategoryId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task SoftDeleteAsync(
+        Guid jobCategoryId,
+        CancellationToken cancellationToken = default);
 }

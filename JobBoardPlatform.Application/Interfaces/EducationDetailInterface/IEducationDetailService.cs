@@ -57,4 +57,14 @@ public interface IEducationDetailService
     /// </summary>
     /// <returns></returns>
     List<EnumResponseDto> GetCertificateDegrees();
+
+    /// <summary>
+    /// حذف نرم مدرک تحصیلی
+    /// </summary>
+    /// <param name="educationDetailId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task SoftDeleteAsync(
+        Guid educationDetailId,
+        CancellationToken cancellationToken = default);
 }

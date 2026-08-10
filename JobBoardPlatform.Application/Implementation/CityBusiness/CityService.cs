@@ -9,7 +9,6 @@ using JobBoardPlatform.Application.Interfaces.CityInterface;
 using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
-using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 
 namespace JobBoardPlatform.Application.Implementation.CityBusiness;
 
@@ -166,6 +165,22 @@ public class CityService : ICityService
             ProvinceId = c.ProvinceId,
             ProvinceName = c.Province.Name
         }, cancellationToken);
+    }
+
+    #endregion
+
+    #region Delete Methods
+
+    public async Task SoftDeleteAsync(Guid cityId, CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var result = await _unitOfWork.CityRepository.SoftDeleteAsync(cityId, _currentUser.UserId, cancellationToken);
+
+        if (!result)
+            throw new ValidationException($"Could not delete city");
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     #endregion

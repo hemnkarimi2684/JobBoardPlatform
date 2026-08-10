@@ -29,4 +29,14 @@ public class AdminProvincesController : ControllerBase
         return Ok(Result.Success());
     }
 
+    [HttpDelete("{provinceId:guid}")]
+    public async Task<IActionResult> DeleteAsync(
+       [FromRoute] Guid provinceId,
+        CancellationToken cancellationToken)
+    {
+        await _provinceService.SoftDeleteAsync(provinceId, cancellationToken);
+
+        return Ok(Result.Success());
+    }
+
 }

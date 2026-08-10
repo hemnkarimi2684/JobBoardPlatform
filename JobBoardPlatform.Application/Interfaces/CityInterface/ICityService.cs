@@ -70,4 +70,14 @@ public interface ICityService
     /// <returns></returns>
     Task<List<CityDetailResponseDto>> GetAllForSelectAsync(
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// حذف نرم شهر 
+    /// </summary>
+    /// <param name="cityId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task SoftDeleteAsync(
+        Guid cityId, 
+        CancellationToken cancellationToken = default);
 }

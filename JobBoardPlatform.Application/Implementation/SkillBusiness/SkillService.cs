@@ -155,4 +155,58 @@ public class SkillService : ISkillService
     }
 
     #endregion
+
+    #region Delete Methods 
+
+    public async Task RemoveSkillFromUserAsync(
+        Guid userId,
+        List<Guid> skillsId,
+        CancellationToken cancellationToken = default)
+    {
+        var isUserExist = await _unitOfWork.UserRepository
+            .IsUserExistAsync(userId, cancellationToken);
+
+        if (!isUserExist)
+            throw new NotFoundException("User was not found");
+
+        _accessControlService.EnsureApplicant(userId, _currentUser);
+
+        if (skillsId is not null && skillsId.Any())
+        {
+            foreach (var skillId in skillsId.Distinct())
+            {
+                var userSkillId = await _unitOfWork.UserSkillRepository
+                    .GetByUserIdAndSkillIdAsync(
+                        userId,
+                        skillId,
+                        cancellationToken);
+
+                if (userSkillId.HasValue)
+                {
+                    await _unitOfWork.UserSkillRepository.SoftDeleteAsync(
+                        userSkillId.Value,
+                        _currentUser.UserId,
+                        cancellationToken);
+                }
+            }
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task SoftDeleteAsync(
+        Guid skillId,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var result = await _unitOfWork.SkillRepository.SoftDeleteAsync(skillId, _currentUser.UserId, cancellationToken);
+
+        if (!result)
+            throw new ValidationException("Could not delete skill");
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    #endregion
 }

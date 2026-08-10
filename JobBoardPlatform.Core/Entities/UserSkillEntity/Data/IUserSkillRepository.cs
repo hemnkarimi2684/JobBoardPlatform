@@ -34,4 +34,16 @@ public interface IUserSkillRepository : IGenericRepository<UserSkill>
         Guid userId,
         Guid skillId,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// دریافت شناسه مهارت کاربر توسط شناسه کاربر و شناسه مهارت 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="skillId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<Guid?> GetByUserIdAndSkillIdAsync(
+        Guid userId, 
+        Guid skillId,
+        CancellationToken cancellationToken);
 }

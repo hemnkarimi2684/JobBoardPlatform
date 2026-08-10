@@ -8,7 +8,6 @@ using JobBoardPlatform.Application.Interfaces.JobInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace JobBoardPlatform.Application.Implementation.JobBusiness;
 
@@ -119,6 +118,20 @@ public class JobService : IJobService
             pagingCommand.PageSize);
 
         return Pagination<JobAdvertisementListItemResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
+    }
+
+    public async Task SoftDeleteAsync(
+        Guid jobId,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var result = await _unitOfWork.JobRepository.SoftDeleteAsync(jobId, _currentUser.UserId, cancellationToken);
+
+        if (!result)
+            throw new ValidationException("Could not delete job");
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     #endregion

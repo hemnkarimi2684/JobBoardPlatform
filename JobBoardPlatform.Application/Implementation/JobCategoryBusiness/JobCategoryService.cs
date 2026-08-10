@@ -100,4 +100,22 @@ public class JobCategoryService : IJobCategoryService
     }
 
     #endregion
+
+    #region Delete Methods
+
+    public async Task SoftDeleteAsync(
+        Guid jobCategoryId,
+        CancellationToken cancellationToken = default)
+    {
+        _accessControlService.EnsureAdmin(_currentUser);
+
+        var result = await _unitOfWork.JobCategoryRepository.SoftDeleteAsync(jobCategoryId, _currentUser.UserId, cancellationToken);
+
+        if (!result)
+            throw new ValidationException("Could not delete job category");
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    #endregion
 }

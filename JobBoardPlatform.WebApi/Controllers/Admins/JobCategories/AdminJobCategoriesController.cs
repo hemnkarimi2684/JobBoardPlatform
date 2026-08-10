@@ -2,7 +2,6 @@
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
 using JobBoardPlatform.WebApi.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobBoardPlatform.WebApi.Controllers.Admins.JobCategories;
@@ -22,9 +21,19 @@ public class AdminJobCategoriesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateJobCategoryAsync(
         [FromBody] CreateJobCategoryRequestDto jobCategoryRequestDto,
-         CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
         await _jobCategoryService.CreateJobCategoryAsync(jobCategoryRequestDto, cancellationToken);
+
+        return Ok(Result.Success());
+    }
+
+    [HttpDelete("{jobCategoryId:guid}")]
+    public async Task<IActionResult> DeleteAsync(
+        [FromRoute] Guid jobCategoryId,
+        CancellationToken cancellationToken)
+    {
+        await _jobCategoryService.SoftDeleteAsync(jobCategoryId, cancellationToken);
 
         return Ok(Result.Success());
     }

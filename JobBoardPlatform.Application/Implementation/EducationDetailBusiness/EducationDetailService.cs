@@ -135,6 +135,29 @@ public class EducationDetailService : IEducationDetailService
 
     #endregion
 
+    #region Delete Methods
+
+    public async Task SoftDeleteAsync(
+        Guid educationDetailId,
+        CancellationToken cancellationToken = default)
+    {
+        var userId = await _unitOfWork.EducationDetailRepository.GetEducationDetailUserIdAsync(educationDetailId, cancellationToken);
+
+        if (userId == null)
+            throw new NotFoundException("education detail was not found");
+
+        _accessControlService.EnsureApplicant(userId.Value, _currentUser);
+
+        var result = await _unitOfWork.EducationDetailRepository.SoftDeleteAsync(educationDetailId, _currentUser.UserId, cancellationToken);
+
+        if (!result)
+            throw new ValidationException("Could not delete education detail");
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    #endregion
+
     #region Update Methods
 
     public async Task<bool> UpdateEducationDetailAsync(
