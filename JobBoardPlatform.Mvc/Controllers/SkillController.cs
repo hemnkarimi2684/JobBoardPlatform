@@ -59,6 +59,18 @@ public class SkillController : Controller
         return RedirectToAction(nameof(MySkills));
     }
 
+    [Authorize(Policy = "ActiveJobSeekerOnly")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveSkill(List<Guid> skillsId, CancellationToken cancellationToken)
+    {
+        await _skillService.RemoveSkillFromUserAsync(CurrentUserId(), skillsId, cancellationToken);
+
+        TempData["Success"] = "Skill was removed successfully.";
+
+        return RedirectToAction(nameof(MySkills));
+    }
+
     private Guid CurrentUserId()
         => Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : Guid.Empty;
 }

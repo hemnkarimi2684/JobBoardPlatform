@@ -296,6 +296,20 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Cities), new { pageNumber });
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteCity(
+        Guid cityId,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
+    {
+        await _cityService.SoftDeleteAsync(cityId, cancellationToken);
+
+        TempData["Success"] = "City was deleted successfully.";
+
+        return RedirectToAction(nameof(Cities), new { pageNumber });
+    }
+
     [HttpGet]
     public async Task<IActionResult> Provinces(
     int pageNumber = 1,
@@ -333,6 +347,20 @@ public class AdminController : Controller
         await _provinceService.CreateProvinceAsync(model, cancellationToken);
 
         TempData["Success"] = "Province was created successfully.";
+        return RedirectToAction(nameof(Provinces), new { pageNumber });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteProvince(
+        Guid provinceId,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
+    {
+        await _provinceService.SoftDeleteAsync(provinceId, cancellationToken);
+
+        TempData["Success"] = "Province was deleted successfully.";
+
         return RedirectToAction(nameof(Provinces), new { pageNumber });
     }
 
@@ -386,6 +414,22 @@ public class AdminController : Controller
             new { pageNumber });
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteJobCategory(
+        Guid jobCategoryId,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
+    {
+        await _jobCategoryService.SoftDeleteAsync(jobCategoryId, cancellationToken);
+
+        TempData["Success"] = "Job category was deleted successfully.";
+
+        return RedirectToAction(
+            nameof(JobCategories),
+            new { pageNumber });
+    }
+
     [HttpGet]
     public async Task<IActionResult> Skills(
             int pageNumber = 1,
@@ -422,6 +466,20 @@ public class AdminController : Controller
         await _skillService.CreateSkillAsync(model, cancellationToken);
 
         TempData["Success"] = "Skill was created successfully.";
+
+        return RedirectToAction(nameof(Skills), new { pageNumber });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteSkill(
+        Guid skillId,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
+    {
+        await _skillService.SoftDeleteAsync(skillId, cancellationToken);
+
+        TempData["Success"] = "Skill was deleted successfully.";
 
         return RedirectToAction(nameof(Skills), new { pageNumber });
     }
@@ -463,6 +521,20 @@ public class AdminController : Controller
 
         await _jobService.CreateJobAsync(model, cancellationToken);
         TempData["Success"] = "Job was created successfully.";
+
+        return RedirectToAction(nameof(Jobs), new { pageNumber });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteJob(
+        Guid jobId,
+        int pageNumber = 1,
+        CancellationToken cancellationToken = default)
+    {
+        await _jobService.SoftDeleteAsync(jobId, cancellationToken);
+
+        TempData["Success"] = "Job was deleted successfully.";
 
         return RedirectToAction(nameof(Jobs), new { pageNumber });
     }

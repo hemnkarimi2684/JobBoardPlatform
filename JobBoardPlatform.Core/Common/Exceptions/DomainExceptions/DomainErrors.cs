@@ -112,6 +112,8 @@ public static class DomainErrors
     public static Error MaximumAgeOutOfRange => new Error("Maximum age must be between 18 and 65.", "Advertisement_MaximumAge_Out_Of_Range");
     public static Error MinimumAgeCannotExceedMaximumAge => new Error("Minimum age cannot be greater than maximum age.", "Advertisement_MinimumAge_Cannot_Exceed_MaximumAge");
     public static Error MaximumSalaryOutOfRange => new Error("Maximum salary must be between 1,000,000 and 600,000,000.", "Advertisement_MaximumSalary_Out_Of_Range");
+    public static Error MinimumSalaryOutOfRange => new Error("Minimum salary must be between 1,000,000 and 600,000,000.", "Advertisement_MinimumSalary_Out_Of_Range");
+    public static Error MinimumSalaryCannotExceedMaximumSalary => new Error("Minimum salary cannot be greater than maximum salary.", "Advertisement_MinimumSalary_Cannot_Exceed_MaximumSalary");
     public static Error ExperienceLevelOutOfRange => new Error("Experience level must be Positive", "Advertisement_ExperienceLevel_Out_Of_Range");
     public static Error AdvertisementJobIdIsRequired => new Error("JobId is required.", "Advertisement_JobId_Is_Required");
     public static Error AdvertisementCityIdIsRequired => new Error("CityId is required.", "Advertisement_CityId_Is_Required");
@@ -156,6 +158,8 @@ public static class DomainErrors
     public static Error FullNameIsRequired => new Error("user full name is required", "JobApplication_UserFullName_Is_Required");
     public static Error FullNameInvalidLength => new Error("user full name length must be between 3 and 200 characters", "JobApplication_UserFullName_Invalid_Length");
     public static Error JobApplicationExperienceLevelOutOfRange => new Error("Experience level must be Positive", "JobApplication_ExperienceLevel_Out_Of_Range");
+    public static Error JobApplicationAlreadyCancelled => new Error("The job application is already cancelled.", "JobApplication_Already_Cancelled");
+    public static Error JobApplicationOnlyPendingCanBeCancelled => new Error("You can only cancel a pending job application.", "JobApplication_Only_Pending_Can_Be_Cancelled");
     #endregion
 
     #region Notifier Errors

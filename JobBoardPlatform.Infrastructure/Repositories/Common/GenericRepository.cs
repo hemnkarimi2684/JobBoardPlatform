@@ -46,13 +46,15 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         if (!tracking)
             query = query.AsNoTracking();
 
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
         var result = await query
         .OrderByDescending(b => b.CreatedAt)
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
         .Select(selector).ToListAsync(cancellationToken);
 
-        return Pagination<TResult>.GetPagination(result, page, pageSize, result.Count());
+        return Pagination<TResult>.GetPagination(result, page, pageSize, totalDataCount);
     }
 
     public async Task<Pagination<TResult>> QueryAsync<TResult>(
@@ -90,7 +92,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         if (!tracking)
             query = query.AsNoTracking();
 
-        return await Entities.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
     public async Task<bool> SoftDeleteAsync(Guid id, Guid? deletedById, CancellationToken cancellationToken)

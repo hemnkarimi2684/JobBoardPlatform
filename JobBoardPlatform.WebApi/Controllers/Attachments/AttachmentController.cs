@@ -8,7 +8,7 @@ namespace JobBoardPlatform.WebApi.Controllers.Attachments;
 
 [Route("api/attachments")]
 [ApiController]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class AttachmentController : ControllerBase
 {
     private readonly IAttachmentService _attachmentService;
@@ -19,9 +19,8 @@ public class AttachmentController : ControllerBase
     }
 
     [HttpPost]
-    [AllowAnonymous]
     public async Task<IActionResult> UploadAsync(
-        [FromBody] UploadFileRequestDto uploadFile,
+        [FromForm] UploadFileRequestDto uploadFile,
         CancellationToken cancellationToken)
     {
         var result = await _attachmentService.UploadAsync(uploadFile.File, uploadFile.AttachmentType, cancellationToken);
@@ -30,7 +29,6 @@ public class AttachmentController : ControllerBase
     }
 
     [HttpGet("{attachmentId:guid}")]
-    [AllowAnonymous]
     public async Task<IActionResult> DownloadAsync(
         [FromRoute] Guid attachmentId,
         CancellationToken cancellationToken)

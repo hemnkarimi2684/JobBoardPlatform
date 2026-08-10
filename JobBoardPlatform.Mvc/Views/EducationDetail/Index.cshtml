@@ -37,6 +37,11 @@
                 </div>
                 <div style="margin-top: 12px;">
                     <a class="btn" asp-action="Edit" asp-route-id="@item.EducationDetailId">Edit</a>
+                    <form asp-action="Delete" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this education record?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@item.EducationDetailId" />
+                        <button type="submit" class="btn" style="background-color: #dc3545; color: white; border: none;">Delete</button>
+                    </form>
                 </div>
             </div>
         }
