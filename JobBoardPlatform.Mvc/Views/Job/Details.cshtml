@@ -6,51 +6,59 @@
     var pageTitle = Model.Data.FirstOrDefault()?.JobName ?? "Job Ads";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">@pageTitle</h2>
+<div class="page-head">
+    <h1 class="page-title">@pageTitle</h1>
+    <p class="subtitle">Active job listings for this position.</p>
+</div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        // Assuming this should also be an alert, corrected type from original.
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">No active job listings found for this position.</div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No active listings</h3>
+        <p>No active job listings found for this position.</p>
+    </div>
+}
+else
+{
+    <div class="job-list">
+        @foreach (var item in Model.Data)
         {
             <div class="card">
-                <h3>@item.JobName</h3>
-                <div class="meta" style="color: #666; margin-bottom: 15px;">
+                <div class="card-between">
+                    <h3 style="margin-bottom: 0;">@item.JobName</h3>
+                    <a class="btn btn-primary" asp-controller="Advertisement" asp-action="Details" asp-route-id="@item.AdvertisementId">View Ad</a>
+                </div>
+                <div class="meta" style="margin-top: 10px;">
                     @item.CompanyName &nbsp;|&nbsp; @item.CityName &nbsp;|&nbsp; @item.CreatedAt.ToString("yyyy-MM-dd")
                 </div>
-                <div style="margin-bottom: 10px;">
+                <div class="job-badges">
                     <span class="badge">@item.CollaborationType</span>
-                    <span class="badge">Level: @item.ExperienceLevel</span>
-                    <span class="badge">Salary: @item.MinimumSalary.ToString("N0") - @item.MaximumSalary.ToString("N0")</span>
+                    <span class="badge badge-outline">Level: @item.ExperienceLevel</span>
+                    <span class="badge badge-salary">&#128176; @item.MinimumSalary.ToString("N0") - @item.MaximumSalary.ToString("N0")</span>
                 </div>
                 <p style="margin: 10px 0; color: #445;">@(item.Description.Length > 120 ? item.Description.Substring(0, 120) + "..." : item.Description)</p>
                 @if (item.SkillNames.Count > 0)
                 {
-                    <div style="margin-bottom: 10px;">
+                    <div class="chips">
                         @foreach (var skill in item.SkillNames)
                         {
-                            <span class="skill">@skill</span>
+                            <span class="chip">@skill</span>
                         }
                     </div>
                 }
-                <a class="btn" asp-controller="Advertisement" asp-action="Details" asp-route-id="@item.AdvertisementId">View Ad</a>
             </div>
         }
+    </div>
 
-        @await Html.PartialAsync("_Pager", Model)
-    }
-</div>
+    @await Html.PartialAsync("_Pager", Model)
+}

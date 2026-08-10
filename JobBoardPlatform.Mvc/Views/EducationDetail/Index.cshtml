@@ -4,52 +4,73 @@
     ViewData["Title"] = "Education History";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Education History</h2>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Education History</h1>
+        <p class="subtitle">Manage the education records on your resume.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">+ Add Education Record</a>
+</div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert" style="background:#fdecea; color:#b3392f; border:1px solid #f5c6c2;">@TempData["Error"]</div>
-    }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">No education records have been recorded yet.</div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#127891;</div>
+        <h3>No education records</h3>
+        <p>No education records have been recorded yet.</p>
+        <a class="btn btn-primary" asp-action="Create">Add Education Record</a>
+    </div>
+}
+else
+{
+    <div class="job-list">
+        @foreach (var item in Model.Data)
         {
             <div class="card">
-                <h3>@item.Major</h3>
-                <div class="meta" style="color: #666; margin-bottom: 15px;">
+                <div class="card-between">
+                    <h3 style="margin-bottom: 0;">@item.Major</h3>
+                    <div style="display:flex; gap:8px;">
+                        <a class="btn btn-outline btn-sm" asp-action="Edit" asp-route-id="@item.EducationDetailId">Edit</a>
+                        <form asp-action="Delete" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this education record?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.EducationDetailId" />
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="meta" style="margin-top: 10px;">
                     @item.University &nbsp;|&nbsp; @item.CertificateDegreeName
                 </div>
                 <div class="detail-grid">
-                    <div><span>Start Date:</span> @item.StartDate.ToString("yyyy-MM-dd")</div>
-                    <div><span>Completion Date:</span> @(item.CompletionDate?.ToString("yyyy-MM-dd") ?? "-")</div>
-                    <div><span>GPA / Percentage:</span> @(item.Percentage?.ToString("N0") ?? "-")</div>
-                    <div><span>Currently Studying:</span> @(item.IsCurrentlyStudying ? "Yes" : "No")</div>
-                </div>
-                <div style="margin-top: 12px;">
-                    <a class="btn" asp-action="Edit" asp-route-id="@item.EducationDetailId">Edit</a>
-                    <form asp-action="Delete" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this education record?');">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@item.EducationDetailId" />
-                        <button type="submit" class="btn" style="background-color: #dc3545; color: white; border: none;">Delete</button>
-                    </form>
+                    <div class="detail-item">
+                        <span class="detail-label">Start Date</span>
+                        <span class="detail-value">@item.StartDate.ToString("yyyy-MM-dd")</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Completion Date</span>
+                        <span class="detail-value">@(item.CompletionDate?.ToString("yyyy-MM-dd") ?? "-")</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">GPA / Percentage</span>
+                        <span class="detail-value">@(item.Percentage?.ToString("N0") ?? "-")</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Currently Studying</span>
+                        <span class="detail-value">@(item.IsCurrentlyStudying ? "Yes" : "No")</span>
+                    </div>
                 </div>
             </div>
         }
-
-        <partial name="_Pager" model="@Model" />
-    }
-
-    <div style="margin-top: 14px;">
-        <a class="btn" asp-action="Create">Add Education Record</a>
     </div>
-</div>
+
+    <partial name="_Pager" model="@Model" />
+}

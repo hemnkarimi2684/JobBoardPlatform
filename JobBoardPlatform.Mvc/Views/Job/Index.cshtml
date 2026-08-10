@@ -6,43 +6,49 @@
     var searchText = ViewBag.Text as string ?? "";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Jobs</h2>
+<div class="page-head">
+    <h1 class="page-title">Jobs</h1>
+    <p class="subtitle">Browse job positions and find the right fit for you.</p>
+</div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        // Correcting the alert type for errors.
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    <div class="card" style="margin-bottom: 20px;">
-        <form asp-action="Index" method="get" style="display: flex; gap: 10px; align-items: flex-end;">
-            <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                <label for="searchText">Search Jobs</label>
-                <input type="text" id="searchText" name="text" class="form-control" value="@searchText" placeholder="Job title..." />
-            </div>
-            <button type="submit" class="btn">Search</button>
-        </form>
+<div class="panel">
+    <form asp-action="Index" method="get" class="search-row">
+        <div class="search-box" style="flex: 1;">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" id="searchText" name="text" class="search-input" value="@searchText" placeholder="Job title..." />
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+</div>
+
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No jobs found</h3>
+        <p>Try a different search term or browse all jobs.</p>
     </div>
-
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">No jobs found.</div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+}
+else
+{
+    <div class="job-list">
+        @foreach (var item in Model.Data)
         {
-            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="card card-hover card-between">
                 <h3 style="margin-bottom: 0;">@item.Name</h3>
-                <a class="btn" asp-action="Details" asp-route-id="@item.JobId">View Ads</a>
+                <a class="btn btn-outline" asp-action="Details" asp-route-id="@item.JobId">View Ads</a>
             </div>
         }
+    </div>
 
-        @await Html.PartialAsync("_Pager", Model)
-    }
-</div>
+    @await Html.PartialAsync("_Pager", Model)
+}

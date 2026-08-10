@@ -5,7 +5,13 @@
     var email = User.FindFirst(ClaimTypes.Email)?.Value;
 }
 
-<h2 style="margin-bottom: 18px; color: #1e3a5f;">My Profile</h2>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">My Profile</h1>
+        <p class="subtitle">@email</p>
+    </div>
+    <a class="btn btn-outline" asp-action="Edit">Edit Profile</a>
+</div>
 
 @if (TempData["Success"] != null)
 {
@@ -13,57 +19,74 @@
 }
 @if (TempData["Error"] != null)
 {
-    // Using the alert-danger class defined in _Layout.cshtml for consistency
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
 @if (string.IsNullOrWhiteSpace(Model.FullName))
 {
-    <div class="card">
-        <div class="empty">Your user profile is not yet complete.</div>
-        <div style="text-align:center;margin-top:10px;">
-            <a class="btn" asp-action="Create">Create Profile</a> @* Translated button text *@
-        </div>
+    <div class="empty-state">
+        <div class="empty-icon">&#128100;</div>
+        <h3>Profile not complete</h3>
+        <p>Your user profile is not yet complete.</p>
+        <a class="btn btn-primary" asp-action="Create">Create Profile</a>
     </div>
 }
 else
 {
-    <div class="card">
-        <h3>@Model.FullName</h3>
+    <section class="panel">
         @if (Model.UserImageFileId != null)
         {
-            <div style="margin-bottom: 14px;">
-                @* Assuming DownloadImage action returns the image URL or stream *@
-                <img src="@Url.Action("DownloadImage", "User")" alt="@Model.FullName" style="max-width:160px;border-radius:10px;" />
+            <div style="margin-bottom: 16px;">
+                <img src="@Url.Action("DownloadImage", "User")" alt="@Model.FullName" class="company-logo" />
             </div>
         }
         <div class="detail-grid">
-            <div><span>Full Name</span> @Model.FullName</div> @* Translated labels *@
-            <div><span>Gender</span> @Model.Gender</div>
-            <div><span>Date of Birth</span> @Model.BirthDate.ToString("yyyy/MM/dd")</div> @* Date format remains consistent *@
-            <div><span>City</span> @Model.CityName</div>
-            <div><span>Address</span> @Model.Address</div>
-            <div><span>Email</span> @email</div>
-            <div><span>About Me</span> @Model.Bio</div>
+            <div class="detail-item">
+                <span class="detail-label">Full Name</span>
+                <span class="detail-value">@Model.FullName</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Gender</span>
+                <span class="detail-value">@Model.Gender</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Date of Birth</span>
+                <span class="detail-value">@Model.BirthDate.ToString("yyyy/MM/dd")</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">City</span>
+                <span class="detail-value">@Model.CityName</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Address</span>
+                <span class="detail-value">@Model.Address</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Email</span>
+                <span class="detail-value">@email</span>
+            </div>
         </div>
-        <div style="margin-top: 16px;">
-            <a class="btn" asp-action="Edit">Edit Profile</a> @* Translated button text *@
+        <div class="bio">
+            <h3>About Me</h3>
+            <p>@Model.Bio</p>
         </div>
-    </div>
+    </section>
 
-    <div class="card">
-        <h3>Profile Picture</h3> @* Translated section title *@
+    <section class="panel">
+        <div class="panel-head">
+            <h3>Profile Picture</h3>
+        </div>
         <form asp-action="UploadImage" method="post" enctype="multipart/form-data" style="margin-bottom: 12px;">
             <div class="form-group">
                 <input type="file" name="Image" class="form-control" />
             </div>
-            <button type="submit" class="btn">Upload Photo</button> @* Translated button text *@
+            <button type="submit" class="btn btn-primary">Upload Photo</button>
         </form>
         @if (Model.UserImageFileId != null)
         {
             <form asp-action="DeleteImage" method="post">
-                <button type="submit" class="btn">Delete Photo</button> @* Translated button text *@
+                <button type="submit" class="btn btn-danger">Delete Photo</button>
             </form>
         }
-    </div>
+    </section>
 }

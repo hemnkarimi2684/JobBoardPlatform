@@ -4,43 +4,64 @@
     ViewData["Title"] = "Companies";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">List of Companies</h2>
+<div class="page-head">
+    <h1 class="page-title">Companies</h1>
+    <p class="subtitle">Browse companies and explore the jobs they offer.</p>
+</div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert" style="background:#fdecea; color:#a43d3d; border:1px solid #f5c6cb;">@TempData["Error"]</div>
-    }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    <form asp-action="Index" method="get" style="margin-bottom: 18px;">
-        <div class="form-group" style="display:flex; gap:8px; margin-bottom:0;">
-            <input type="text" name="text" value="@ViewBag.Text" class="form-control" placeholder="Search companies..." />
-            <button type="submit" class="btn">Search</button>
+<div class="panel">
+    <form asp-action="Index" method="get" class="search-row">
+        <div class="search-box" style="flex: 1;">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" name="text" value="@ViewBag.Text" class="search-input" placeholder="Search companies..." />
         </div>
+        <button type="submit" class="btn btn-primary">Search</button>
     </form>
+</div>
 
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">No companies found.</div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No companies found</h3>
+        <p>Try a different search term.</p>
+    </div>
+}
+else
+{
+    <div class="job-grid">
+        @foreach (var item in Model.Data)
         {
-            <div class="card">
-                <h3>@item.Name</h3>
-                <div class="meta" style="color: #666; margin-bottom: 10px;">@item.JobCategoryName</div>
-                <p style="margin: 10px 0; color: #445;">
+            <article class="job-card">
+                <div class="job-card-top">
+                    <div class="job-logo">
+                        @(string.IsNullOrEmpty(item.Name) ? "?" : item.Name.Substring(0, 1))
+                    </div>
+                    <div class="job-heading">
+                        <h3 class="job-title">
+                            <a asp-action="Details" asp-route-id="@item.Id">@item.Name</a>
+                        </h3>
+                        <div class="job-company">@item.JobCategoryName</div>
+                    </div>
+                </div>
+
+                <p class="job-desc">
                     @(item.AboutUs != null && item.AboutUs.Length > 120 ? item.AboutUs.Substring(0, 120) + "..." : item.AboutUs)
                 </p>
-                <a class="btn" asp-action="Details" asp-route-id="@item.Id">Details</a>
-            </div>
-        }
 
-        @await Html.PartialAsync("_Pager", Model)
-    }
-</div>
+                <a class="btn btn-outline btn-block" asp-action="Details" asp-route-id="@item.Id">View Company</a>
+            </article>
+        }
+    </div>
+
+    @await Html.PartialAsync("_Pager", Model)
+}

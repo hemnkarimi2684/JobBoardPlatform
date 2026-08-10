@@ -4,51 +4,69 @@
     ViewData["Title"] = "Work Experience";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Work Experience</h2>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Work Experience</h1>
+        <p class="subtitle">Manage the experience on your resume.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create">+ Add Work Experience</a>
+</div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert" style="background:#fdecea; color:#b3392f; border:1px solid #f5c6c2;">@TempData["Error"]</div>
-    }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    @if (Model.Data.Count == 0)
-    {
-        <div class="empty">No work experience has been recorded yet.</div>
-    }
-    else
-    {
-        foreach (var item in Model.Data)
+@if (Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128188;</div>
+        <h3>No work experience</h3>
+        <p>No work experience has been recorded yet.</p>
+        <a class="btn btn-primary" asp-action="Create">Add Work Experience</a>
+    </div>
+}
+else
+{
+    <div class="job-list">
+        @foreach (var item in Model.Data)
         {
             <div class="card">
-                <h3>@item.LastJobTitle</h3>
-                <div class="meta" style="color: #666; margin-bottom: 15px;">
+                <div class="card-between">
+                    <h3 style="margin-bottom: 0;">@item.LastJobTitle</h3>
+                    <div style="display:flex; gap:8px;">
+                        <a class="btn btn-outline btn-sm" asp-action="Edit" asp-route-id="@item.ExperienceDetailId">Edit</a>
+                        <form asp-action="Delete" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this work experience?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.ExperienceDetailId" />
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="meta" style="margin-top: 10px;">
                     @item.JobCategory &nbsp;|&nbsp; @item.City &nbsp;|&nbsp; @item.SeniorityLevel
                 </div>
                 <div class="detail-grid">
-                    <div><span>Start Date:</span> @item.StartDate.ToString("yyyy-MM-dd")</div>
-                    <div><span>End Date:</span> @(item.EndDate?.ToString("yyyy-MM-dd") ?? "-")</div>
-                    <div><span>Current Job:</span> @(item.IsCurrentJob ? "Yes" : "No")</div>
-                </div>
-                <div style="margin-top: 12px;">
-                    <a class="btn" asp-action="Edit" asp-route-id="@item.ExperienceDetailId">Edit</a>
-                    <form asp-action="Delete" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this work experience?');">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@item.ExperienceDetailId" />
-                        <button type="submit" class="btn" style="background-color: #dc3545; color: white; border: none;">Delete</button>
-                    </form>
+                    <div class="detail-item">
+                        <span class="detail-label">Start Date</span>
+                        <span class="detail-value">@item.StartDate.ToString("yyyy-MM-dd")</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">End Date</span>
+                        <span class="detail-value">@(item.EndDate?.ToString("yyyy-MM-dd") ?? "-")</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Current Job</span>
+                        <span class="detail-value">@(item.IsCurrentJob ? "Yes" : "No")</span>
+                    </div>
                 </div>
             </div>
         }
-
-        <partial name="_Pager" model="@Model" />
-    }
-
-    <div style="margin-top: 14px;">
-        <a class="btn" asp-action="Create">Add Work Experience</a>
     </div>
-</div>
+
+    <partial name="_Pager" model="@Model" />
+}

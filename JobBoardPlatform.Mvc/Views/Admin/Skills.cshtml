@@ -4,124 +4,97 @@
     ViewData["Title"] = "Skills";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">Manage Skills</h2>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success" style="padding: 10px; margin-bottom: 15px; border-radius: 4px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
-            @TempData["Success"]
-        </div>
-    }
-
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger" style="padding: 10px; margin-bottom: 15px; border-radius: 4px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
-            @TempData["Error"]
-        </div>
-    }
-
-    <div class="card" style="margin-bottom: 25px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 6px; background-color: #ffffff;">
-        <h3 style="margin-top: 0; color: #333;">Add New Skill</h3>
-
-        <form asp-action="CreateSkill" method="post">
-            @Html.AntiForgeryToken()
-
-            @* حفظ وضعیت صفحه در هنگام ثبت فرم *@
-            <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
-
-            <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom: 10px;"></div>
-
-            <div class="form-group" style="margin-bottom: 15px;">
-                <label for="Name" style="display: block; margin-bottom: 5px; font-weight: 600;">Skill Name</label>
-                <input type="text"
-                       id="Name"
-                       name="Name"
-                       class="form-control"
-                       placeholder="e.g. ASP.NET Core"
-                       required
-                       style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-            </div>
-
-            <button type="submit" class="btn" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                Add Skill
-            </button>
-        </form>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Manage Skills</h1>
+        <p class="subtitle">Add and manage skills on the platform.</p>
     </div>
+</div>
 
-    @if (Model.Data == null || Model.Data.Count == 0)
-    {
-        <div class="empty" style="padding: 15px; background: #f9f9f9; border: 1px solid #eee; text-align: center; color: #666;">
-            No skills registered.
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="panel">
+    <h3 class="section-title">Add New Skill</h3>
+
+    <form asp-action="CreateSkill" method="post">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label for="Name">Skill Name</label>
+            <input type="text"
+                   id="Name"
+                   name="Name"
+                   class="form-control"
+                   placeholder="e.g. ASP.NET Core"
+                   required />
         </div>
-    }
-    else
-    {
-        <table style="width:100%; border-collapse:collapse; margin-bottom: 20px;">
+
+        <button type="submit" class="btn btn-primary">Add Skill</button>
+    </form>
+</div>
+
+@if (Model.Data == null || Model.Data.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128269;</div>
+        <h3>No skills yet</h3>
+        <p>No skills registered.</p>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table">
             <thead>
-                <tr style="background:#e8f0fb;">
-                    <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">Skill Name</th>
-                    <th style="padding:10px; border:1px solid #cfd8e3; text-align:left;">Actions</th>
+                <tr>
+                    <th>Skill Name</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model.Data)
                 {
                     <tr>
-                        <td style="padding:10px; border:1px solid #cfd8e3; text-align:left;">@item.SkillName</td>
-                        <td style="padding:10px; border:1px solid #cfd8e3; text-align:left;">
+                        <td>@item.SkillName</td>
+                        <td>
                             <form asp-action="DeleteSkill" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this skill?');">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="skillId" value="@item.SkillId" />
                                 <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
-                                <button type="submit" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                             </form>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
+    </div>
 
-        @* کنترل‌های صفحه‌بندی *@
-        @if (Model.TotalPageCount > 1)
-        {
-            <div style="margin-top: 20px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-                @if (Model.PageNumber > 1)
-                {
-                    <a asp-action="Skills"
-                       asp-route-pageNumber="@(Model.PageNumber - 1)"
-                       style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
-                        Previous
-                    </a>
-                }
+    @if (Model.TotalPageCount > 1)
+    {
+        <nav class="pager">
+            @if (Model.PageNumber > 1)
+            {
+                <a class="pager-link" asp-action="Skills" asp-route-pageNumber="@(Model.PageNumber - 1)">&#8592; Previous</a>
+            }
 
-                @for (var i = 1; i <= Model.TotalPageCount; i++)
-                {
-                    if (i == Model.PageNumber)
-                    {
-                        <span style="padding: 6px 12px; border: 1px solid #007bff; border-radius: 4px; background: #007bff; color: white; font-weight: bold;">
-                            @i
-                        </span>
-                    }
-                    else
-                    {
-                        <a asp-action="Skills"
-                           asp-route-pageNumber="@i"
-                           style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
-                            @i
-                        </a>
-                    }
-                }
+            <span class="pager-current">Page @Model.PageNumber of @Model.TotalPageCount</span>
 
-                @if (Model.PageNumber < Model.TotalPageCount)
-                {
-                    <a asp-action="Skills"
-                       asp-route-pageNumber="@(Model.PageNumber + 1)"
-                       style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333;">
-                        Next
-                    </a>
-                }
-            </div>
-        }
+            @if (Model.PageNumber < Model.TotalPageCount)
+            {
+                <a class="pager-link" asp-action="Skills" asp-route-pageNumber="@(Model.PageNumber + 1)">Next &#8594;</a>
+            }
+        </nav>
     }
-</div>
+}

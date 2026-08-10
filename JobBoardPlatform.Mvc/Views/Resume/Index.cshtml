@@ -4,111 +4,152 @@
     ViewData["Title"] = "My Resume";
 }
 
-<div style="direction: ltr; text-align: left;">
-    <h2 style="margin-bottom: 18px; color: #1e3a5f;">My Resume</h2>
-
-    @if (TempData["Success"] != null)
+<div class="page-head">
+    <div>
+        <h1 class="page-title">My Resume</h1>
+        <p class="subtitle">Manage your resume and supporting details.</p>
+    </div>
+    @if (Model.ResumeId is not null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        // Using the standard danger alert for errors.
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
-
-    @if (Model.ResumeId is null)
-    {
-        <div class="card">
-            <div class="empty">You have not created a resume yet.</div>
-            <div style="text-align:center; margin-top:10px;">
-                <a class="btn" asp-action="Create">Create Resume</a>
-            </div>
-        </div>
-        <div style="margin-top: 14px; text-align: center; font-size: .9rem;">
-            <a asp-controller="User" asp-action="Create">Complete User Profile</a> |
-            <a asp-controller="Skill" asp-action="MySkills">Manage Skills</a>
-        </div>
-    }
-    else
-    {
-        <div class="card">
-            <h3>@Model.Title</h3>
-            @if (Model.ResumeUserProfiles != null)
-            {
-                <div class="meta">@Model.ResumeUserProfiles.FullName</div>
-                <p style="color:#445;">@Model.ResumeUserProfiles.Bio</p>
-            }
-        </div>
-
-        @if (Model.ResumeEducationDetails.Count > 0)
-        {
-            <div class="card">
-                <h3>Education History</h3>
-                @foreach (var edu in Model.ResumeEducationDetails)
-                {
-                    <div style="padding: 8px 0; border-bottom: 1px solid #eef;">
-                        <strong>@edu.Major</strong> - @edu.University
-                        <div class="meta">@edu.CertificateDegreeName | @edu.StartDate.ToString("yyyy-MM")</div>
-                    </div>
-                }
-            </div>
-        }
-
-        @if (Model.ResumeExperienceDetails.Count > 0)
-        {
-            <div class="card">
-                <h3>Work Experience</h3>
-                @foreach (var exp in Model.ResumeExperienceDetails)
-                {
-                    <div style="padding: 8px 0; border-bottom: 1px solid #eef;">
-                        <strong>@exp.LastJobTitle</strong>
-                        <div class="meta">@exp.JobCategory | @exp.City | @exp.SeniorityLevel</div>
-                    </div>
-                }
-            </div>
-        }
-
-        @if (Model.ResumeSkills.Count > 0)
-        {
-            <div class="card">
-                <h3>Skills</h3>
-                <div>
-                    @foreach (var skill in Model.ResumeSkills)
-                    {
-                        <span class="skill">@skill.SkillName</span>
-                    }
-                </div>
-            </div>
-        }
-
-        <div class="card">
-            <h3>Resume File</h3>
-            @if (Model.ResumeFileId != null)
-            {
-                <div style="margin-bottom: 12px;">
-                    <a class="btn" asp-action="Download" asp-route-resumeId="@Model.ResumeId">Download File</a>
-                    <form asp-action="DeleteFile" asp-route-resumeId="@Model.ResumeId" method="post" style="display:inline; margin-left:8px;">
-                        <button type="submit" class="btn">Delete File</button>
-                    </form>
-                </div>
-            }
-            else
-            {
-                <div class="meta" style="margin-bottom: 12px;">No file has been uploaded.</div>
-            }
-            <form asp-action="UploadFile" asp-route-resumeId="@Model.ResumeId" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <input type="file" name="File" class="form-control" />
-                </div>
-                <button type="submit" class="btn">Upload File</button>
-            </form>
-        </div>
-
-        <div style="margin-top: 14px;">
-            <a class="btn" asp-controller="EducationDetail" asp-action="Index">Manage Education History</a>
-            <a class="btn" asp-controller="ExperienceDetail" asp-action="Index">Manage Work Experience</a>
-            <a class="btn" asp-controller="Skill" asp-action="MySkills">Manage Skills</a>
-        </div>
+        <a class="btn btn-primary" asp-action="Create">Create Resume</a>
     }
 </div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (Model.ResumeId is null)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128196;</div>
+        <h3>No resume yet</h3>
+        <p>You have not created a resume yet.</p>
+        <a class="btn btn-primary" asp-action="Create">Create Resume</a>
+    </div>
+    <div style="margin-top: 16px; text-align: center; font-size: .9rem;">
+        <a asp-controller="User" asp-action="Create">Complete User Profile</a> |
+        <a asp-controller="Skill" asp-action="MySkills">Manage Skills</a>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="panel-head">
+            <h3>@Model.Title</h3>
+        </div>
+        @if (Model.ResumeUserProfiles != null)
+        {
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Full Name</span>
+                    <span class="detail-value">@Model.ResumeUserProfiles.FullName</span>
+                </div>
+            </div>
+            <div class="bio">
+                <p>@Model.ResumeUserProfiles.Bio</p>
+            </div>
+        }
+    </section>
+
+    @if (Model.ResumeEducationDetails.Count > 0)
+    {
+        <section class="panel">
+            <div class="panel-head">
+                <h3>Education History</h3>
+            </div>
+            <div class="timeline">
+                @foreach (var edu in Model.ResumeEducationDetails)
+                {
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-body">
+                            <h4>@edu.Major</h4>
+                            <div class="timeline-sub">@edu.CertificateDegreeName</div>
+                            <div class="timeline-date">@edu.StartDate.ToString("yyyy-MM")</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.ResumeExperienceDetails.Count > 0)
+    {
+        <section class="panel">
+            <div class="panel-head">
+                <h3>Work Experience</h3>
+            </div>
+            <div class="timeline">
+                @foreach (var exp in Model.ResumeExperienceDetails)
+                {
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-body">
+                            <h4>@exp.LastJobTitle</h4>
+                            <div class="timeline-sub">@exp.JobCategory @if (!string.IsNullOrWhiteSpace(exp.City)) {<text>&mdash; @exp.City</text>}</div>
+                            <span class="chip chip-level">@exp.SeniorityLevel</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.ResumeSkills.Count > 0)
+    {
+        <section class="panel">
+            <div class="panel-head">
+                <h3>Skills</h3>
+            </div>
+            <div class="chips">
+                @foreach (var skill in Model.ResumeSkills)
+                {
+                    <span class="chip">@skill.SkillName</span>
+                }
+            </div>
+        </section>
+    }
+
+    <section class="panel">
+        <div class="panel-head">
+            <h3>Resume File</h3>
+        </div>
+        @if (Model.ResumeFileId != null)
+        {
+            <div class="file-row">
+                <div>
+                    <div class="file-name">Resume file</div>
+                    <p class="muted">A resume file has been uploaded.</p>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <a class="btn btn-primary" asp-action="Download" asp-route-resumeId="@Model.ResumeId">Download File</a>
+                    <form asp-action="DeleteFile" asp-route-resumeId="@Model.ResumeId" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete File</button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p class="meta" style="margin-bottom: 12px;">No file has been uploaded.</p>
+        }
+        <form asp-action="UploadFile" asp-route-resumeId="@Model.ResumeId" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" name="File" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-outline">Upload File</button>
+        </form>
+    </section>
+
+    <div style="margin-top: 14px; display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn btn-outline" asp-controller="EducationDetail" asp-action="Index">Manage Education History</a>
+        <a class="btn btn-outline" asp-controller="ExperienceDetail" asp-action="Index">Manage Work Experience</a>
+        <a class="btn btn-outline" asp-controller="Skill" asp-action="MySkills">Manage Skills</a>
+    </div>
+}

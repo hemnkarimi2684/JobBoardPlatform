@@ -4,66 +4,87 @@
     ViewData["Title"] = "My Company";
 }
 
-<div style="direction: ltr; text-align: left;">
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert" style="background:#fdecea; color:#a43d3d; border:1px solid #f5c6cb;">@TempData["Error"]</div>
-    }
-
-    <div class="card">
-        <h3>@Model.Name</h3>
-        <div class="meta" style="color: #666; margin-bottom: 15px;">
-            @Model.Email &nbsp;|&nbsp; @Model.PhoneNumber
-        </div>
-
-        <div class="detail-grid">
-            <div><span>Established Year:</span> @Model.YearOfEstablishment.ToString("yyyy")</div>
-            <div><span>Website:</span> @Model.WebSiteAddress</div>
-            <div><span>Ownership Type:</span> @Model.OwnershipType</div>
-            <div><span>Company Size:</span> @Model.CompanySize</div>
-            <div><span>Category:</span> @Model.JobCategoryName</div>
-            <div><span>Activity Type:</span> @Model.ActivityType</div>
-        </div>
-
-        <h4 style="margin: 16px 0 8px; color: #1e3a5f;">About Company</h4>
-        <p style="line-height: 1.8; color: #445;">@Model.AboutUs</p>
-
-        <div style="margin-top: 18px;">
-            <a class="btn" asp-action="Edit" asp-route-id="@Model.CompanyId">Edit Information</a>
-        </div>
+<div class="page-head">
+    <div>
+        <h1 class="page-title">@Model.Name</h1>
+        <p class="subtitle">@Model.Email &nbsp;|&nbsp; @Model.PhoneNumber</p>
     </div>
-
-    <div class="card">
-        <h3>Company Logo</h3>
-
-        @if (Model.CompanyImageFileId.HasValue)
-        {
-            <img src="@Url.Action("DownloadImage", "Company", new { id = Model.CompanyId })" alt="@Model.Name" style="max-width:180px; border-radius:8px; margin-bottom:12px; display: block;" />
-        }
-        else
-        {
-            <p class="meta" style="color: #666;">No logo has been uploaded for this company.</p>
-        }
-
-        <form asp-action="UploadImage" asp-route-id="@Model.CompanyId" method="post" enctype="multipart/form-data" style="margin-top: 12px;">
-            @Html.AntiForgeryToken()
-            <div class="form-group">
-                <label>New Logo</label>
-                <input type="file" name="Image" class="form-control" />
-            </div>
-            <button type="submit" class="btn">Upload Logo</button>
-        </form>
-
-        @if (Model.CompanyImageFileId.HasValue)
-        {
-            <form asp-action="DeleteImage" asp-route-id="@Model.CompanyId" method="post" style="margin-top: 12px;">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn" style="background: #a43d3d;">Delete Logo</button>
-            </form>
-        }
-    </div>
+    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.CompanyId">Edit Information</a>
 </div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<section class="panel">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <span class="detail-label">Established Year</span>
+            <span class="detail-value">@Model.YearOfEstablishment.ToString("yyyy")</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Website</span>
+            <span class="detail-value">@Model.WebSiteAddress</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Ownership Type</span>
+            <span class="detail-value">@Model.OwnershipType</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Company Size</span>
+            <span class="detail-value">@Model.CompanySize</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Category</span>
+            <span class="detail-value">@Model.JobCategoryName</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Activity Type</span>
+            <span class="detail-value">@Model.ActivityType</span>
+        </div>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel-head">
+        <h3>About Company</h3>
+    </div>
+    <p style="line-height: 1.8; white-space: pre-line;">@Model.AboutUs</p>
+</section>
+
+<section class="panel">
+    <div class="panel-head">
+        <h3>Company Logo</h3>
+    </div>
+
+    @if (Model.CompanyImageFileId.HasValue)
+    {
+        <img src="@Url.Action("DownloadImage", "Company", new { id = Model.CompanyId })" alt="@Model.Name" class="company-logo" />
+    }
+    else
+    {
+        <p class="meta">No logo has been uploaded for this company.</p>
+    }
+
+    <form asp-action="UploadImage" asp-route-id="@Model.CompanyId" method="post" enctype="multipart/form-data" style="margin-top: 12px;">
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <label>New Logo</label>
+            <input type="file" name="Image" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Upload Logo</button>
+    </form>
+
+    @if (Model.CompanyImageFileId.HasValue)
+    {
+        <form asp-action="DeleteImage" asp-route-id="@Model.CompanyId" method="post" style="margin-top: 12px;">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-danger">Delete Logo</button>
+        </form>
+    }
+</section>
