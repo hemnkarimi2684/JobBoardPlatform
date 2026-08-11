@@ -12,6 +12,24 @@ namespace JobBoardPlatform.Core.Entities.AdvertisementEntity.Data;
 public interface IAdvertisementRepository : IGenericRepository<Advertisement>
 {
     /// <summary>
+    /// دریافت اگهی ها (اگهی های ویژه در ابتدا و سپس جدیدترین ها)
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="selector"></param>
+    /// <param name="filter"></param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="page"></param>
+    /// <param name="pageSize"></param>
+    /// <param name="tracking"></param>
+    /// <returns></returns>
+    Task<Pagination<TResult>> GetAdvertisementsAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> selector,
+        Expression<Func<Advertisement, bool>>? filter,
+        CancellationToken cancellationToken,
+        int page = 1, int pageSize = 10,
+        bool tracking = false);
+
+    /// <summary>
     /// تغییر دادن وضعیت فعال یا غیرفعال بودن اگهی
     /// </summary>
     /// <param name="advertisementId"></param>
