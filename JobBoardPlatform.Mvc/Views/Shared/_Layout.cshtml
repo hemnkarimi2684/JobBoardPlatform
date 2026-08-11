@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <script>
         (function () {
@@ -167,6 +168,47 @@
                     try { localStorage.setItem('jobboard-theme', next); } catch (e) { }
                 });
             }
+        })();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js"></script>
+    <script>
+        (function () {
+            if (typeof Choices === 'undefined') return;
+
+            var selects = document.querySelectorAll('select.form-control');
+
+            selects.forEach(function (select) {
+                if (select.disabled) return;
+
+                var optionCount = select.querySelectorAll('option').length;
+                var hasPlaceholder = false;
+                var placeholder = '';
+
+                select.querySelectorAll('option').forEach(function (opt) {
+                    if (opt.value === '') {
+                        hasPlaceholder = true;
+                        placeholder = (opt.textContent || '').trim();
+                    }
+                });
+
+                var searchEnabled = optionCount > 15;
+
+                new Choices(select, {
+                    allowHTML: false,
+                    removeItemButton: false,
+                    itemSelectText: '',
+                    shouldSort: false,
+                    placeholder: hasPlaceholder,
+                    placeholderValue: hasPlaceholder ? placeholder : '',
+                    searchEnabled: searchEnabled,
+                    searchPlaceholderValue: searchEnabled ? 'Type to search...' : '',
+                    searchFloor: searchEnabled ? 1 : -1,
+                    searchResultLimit: searchEnabled ? -1 : 4,
+                    noChoicesText: 'No matching options',
+                    noResultsText: 'No matching options'
+                });
+            });
         })();
     </script>
 </body>
