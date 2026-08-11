@@ -55,7 +55,7 @@
         return $"width:{pct.ToString("0.#", CultureInfo.InvariantCulture)}%;height:100%;border-radius:999px;background:linear-gradient(90deg,{from},{to});";
     }
 
-    string BarTrackStyle() => "height:14px;border-radius:999px;background:#e2e8f0;overflow:hidden;";
+    string BarTrackStyle() => "height:14px;border-radius:999px;background:var(--track);overflow:hidden;";
 }
 
 <div class="page-head">
