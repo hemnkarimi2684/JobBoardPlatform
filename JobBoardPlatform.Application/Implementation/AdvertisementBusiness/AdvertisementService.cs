@@ -157,7 +157,7 @@ public class AdvertisementService : IAdvertisementService
         PagingRequestDto pagingCommand,
         CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.AdvertisementRepository.QueryAsync(a => new AdvertisementDetailResponseDto
+        return await _unitOfWork.AdvertisementRepository.GetAdvertisementsAsync(a => new AdvertisementDetailResponseDto
         {
             Description = a.Description,
             JobId = a.JobId,
@@ -194,7 +194,7 @@ public class AdvertisementService : IAdvertisementService
     {
         _accessControlService.EnsureAdmin(_currentUser);
 
-        return await _unitOfWork.AdvertisementRepository.QueryAsync(a => new AdvertisementDetailResponseDto
+        return await _unitOfWork.AdvertisementRepository.GetAdvertisementsAsync(a => new AdvertisementDetailResponseDto
         {
             Description = a.Description,
             JobId = a.JobId,
@@ -219,6 +219,7 @@ public class AdvertisementService : IAdvertisementService
             IsActive = a.IsActive,
             SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
         },
+        null,
         cancellationToken,
         pagingCommand.PageNumber,
         pagingCommand.PageSize);
@@ -282,7 +283,7 @@ public class AdvertisementService : IAdvertisementService
     {
         var predicate = QueryFilterHelper.BuildSearchFilterPredicate(searchDto, filterDto);
 
-        return await _unitOfWork.AdvertisementRepository.QueryAsync(
+        return await _unitOfWork.AdvertisementRepository.GetAdvertisementsAsync(
             a => new AdvertisementDetailResponseDto
             {
                 Description = a.Description,

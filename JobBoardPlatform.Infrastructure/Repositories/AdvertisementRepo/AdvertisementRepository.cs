@@ -2,6 +2,7 @@
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
+using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,37 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 {
     public AdvertisementRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
+    }
+
+    public async Task<Pagination<TResult>> GetAdvertisementsAsync<TResult>(
+        Expression<Func<Advertisement, TResult>> selector,
+        Expression<Func<Advertisement, bool>>? filter,
+        CancellationToken cancellationToken,
+        int page = 1, int pageSize = 10,
+        bool tracking = false)
+    {
+        page = page <= 0 ? 1 : page;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
+        var query = Entities.AsQueryable();
+
+        if (!tracking)
+            query = query.AsNoTracking();
+
+        if (filter is not null)
+            query = query.Where(filter);
+
+        var totalDataCount = await query.CountAsync(cancellationToken);
+
+        var result = await query
+            .OrderByDescending(a => a.IsFeatured && a.FeaturedUntil > DateTime.UtcNow)
+            .ThenByDescending(a => a.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(selector)
+            .ToListAsync(cancellationToken);
+
+        return Pagination<TResult>.GetPagination(result, page, pageSize, totalDataCount);
     }
 
     public async Task<TResult?> GetAdvertisementProjectionAsync<TResult>(
@@ -242,7 +274,8 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
         var totalDataCount = await query.CountAsync(cancellationToken);
 
         var result = await query
-                             .OrderByDescending(b => b.CreatedAt)
+                             .OrderByDescending(a => a.IsFeatured && a.FeaturedUntil > DateTime.UtcNow)
+                             .ThenByDescending(a => a.CreatedAt)
                              .Skip((pageNumber - 1) * pageSize)
                              .Take(pageSize)
                              .Select(projection)

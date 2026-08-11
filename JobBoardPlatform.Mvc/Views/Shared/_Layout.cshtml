@@ -149,21 +149,6 @@
         </div>
     </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-inner">
-                <a class="footer-brand" asp-controller="Home" asp-action="Index">JobBoard</a>
-                <div class="footer-links">
-                    <a asp-controller="Advertisement" asp-action="Index">Browse Jobs</a>
-                    <a asp-controller="Company" asp-action="Index">Companies</a>
-                    <a asp-controller="Job" asp-action="Index">Jobs</a>
-                    <a asp-controller="JobCategory" asp-action="Index">Categories</a>
-                </div>
-                <p>&copy; @DateTime.UtcNow.Year JobBoard. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
     <script>
         function toggleNav() {
             var el = document.getElementById('navCollapse');
