@@ -113,7 +113,7 @@ using (var scope = app.Services.CreateScope())
     recurringJobManager.AddOrUpdate<ReportJobService>(
         "demote-expired-advertisements",
         service => service.DemoteAdvertisementsAsync(CancellationToken.None),
-        Cron.Daily
+        Cron.Daily(0, 0)
     );
 }
 app.Run();
