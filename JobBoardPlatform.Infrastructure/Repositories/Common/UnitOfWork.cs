@@ -9,6 +9,7 @@ using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Data;
 using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Data;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Data;
+using JobBoardPlatform.Core.Entities.FeaturedPackageEntity.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
 using JobBoardPlatform.Core.Entities.JobCategoryEntity.Data;
 using JobBoardPlatform.Core.Entities.JobEntity.Data;
@@ -32,6 +33,7 @@ using JobBoardPlatform.Infrastructure.Repositories.CompanyRepo;
 using JobBoardPlatform.Infrastructure.Repositories.EducationDetailRepo;
 using JobBoardPlatform.Infrastructure.Repositories.EmailTemplateRepo;
 using JobBoardPlatform.Infrastructure.Repositories.ExperienceDetailRepo;
+using JobBoardPlatform.Infrastructure.Repositories.FeaturedPackageRepo;
 using JobBoardPlatform.Infrastructure.Repositories.JobApplicationRepo;
 using JobBoardPlatform.Infrastructure.Repositories.JobCategoryRepo;
 using JobBoardPlatform.Infrastructure.Repositories.JobRepo;
@@ -76,6 +78,7 @@ public class UnitOfWork : IUnitOfWork
         JobCategoryRepository = new JobCategoryRepository(_context);
         RefreshTokenRepository = new RefreshTokenRepository(_context);
         EmailTemplateRepository = new EmailTemplateRepository(_context);
+        FeaturedPackageRepository = new FeaturedPackageRepository(_context);
     }
 
     private IDbContextTransaction? _transaction;
@@ -119,6 +122,8 @@ public class UnitOfWork : IUnitOfWork
     public IRefreshTokenRepository RefreshTokenRepository { get; }
 
     public IEmailTemplateRepository EmailTemplateRepository { get; }
+
+    public IFeaturedPackageRepository FeaturedPackageRepository { get; }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {

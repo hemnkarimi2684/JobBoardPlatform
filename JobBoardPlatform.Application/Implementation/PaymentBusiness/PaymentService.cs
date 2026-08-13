@@ -13,14 +13,9 @@ namespace JobBoardPlatform.Application.Implementation.PaymentBusiness;
 public class PaymentService : IPaymentService
 {
     /// <summary>
-    /// قیمت هر روز ویژه بودن اگهی به تومان (مقدار از سمت سرور محاسبه میشود و به کلاینت اعتماد نمیشود)
+    /// مدت زمان های مجاز برای ویژه بودن اگهی (قیمت هر بسته از جدول FeaturedPackages خوانده میشود)
     /// </summary>
-    private static readonly IReadOnlyDictionary<int, decimal> FeaturedPricing = new Dictionary<int, decimal>
-    {
-        { 7, 50_000 },
-        { 15, 90_000 },
-        { 30, 150_000 }
-    };
+    private static readonly int[] AllowedFeaturedDurations = { 7, 15, 30 };
 
     private readonly IUnitOfWork _unitOfWork;
 
@@ -35,16 +30,18 @@ public class PaymentService : IPaymentService
         _accessControlService = accessControlService;
     }
 
-    public List<FeaturedOptionResponseDto> GetFeaturedOptions()
+    public async Task<List<FeaturedOptionResponseDto>> GetFeaturedOptionsAsync(
+        CancellationToken cancellationToken)
     {
-        return FeaturedPricing
-               .OrderBy(p => p.Key)
-               .Select(p => new FeaturedOptionResponseDto
-               {
-                   DurationInDays = p.Key,
-                   Price = p.Value
-               })
-               .ToList();
+        var packages = await _unitOfWork.FeaturedPackageRepository.GetAllPackagesAsync(
+            package => new FeaturedOptionResponseDto
+            {
+                DurationInDays = package.DurationInDays,
+                Price = package.Price
+            },
+            cancellationToken);
+
+        return packages;
     }
 
     public async Task<Guid> CreateFeaturedPaymentAsync(
@@ -58,10 +55,15 @@ public class PaymentService : IPaymentService
 
         _accessControlService.EnsureOwnerEmployer(advertisementOwnerId.Value, _currentUser);
 
-        if (!FeaturedPricing.TryGetValue(createCommand.DurationInDays, out var price))
+        if (!AllowedFeaturedDurations.Contains(createCommand.DurationInDays))
             throw new ValidationException("Allowed featured durations are 7, 15 or 30 days.");
 
-        var payment = new Payment(price, createCommand.DurationInDays, PaymentStatus.Pending, createCommand.AdvertisementId, _currentUser.UserId, _currentUser.UserId);
+        var package = await _unitOfWork.FeaturedPackageRepository.GetByDurationAsync(createCommand.DurationInDays, cancellationToken);
+
+        if (package is null)
+            throw new ValidationException("The price for this featured duration has not been set yet.");
+
+        var payment = new Payment(package.Price, createCommand.DurationInDays, PaymentStatus.Pending, createCommand.AdvertisementId, _currentUser.UserId, _currentUser.UserId);
 
         await _unitOfWork.PaymentRepository.AddAsync(payment, cancellationToken);
 

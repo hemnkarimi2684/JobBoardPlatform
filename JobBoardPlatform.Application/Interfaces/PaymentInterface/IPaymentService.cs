@@ -29,7 +29,8 @@ public interface IPaymentService
     /// دریافت گزینه های خرید اگهی ویژه با قیمت محاسبه شده سمت سرور
     /// </summary>
     /// <returns></returns>
-    List<FeaturedOptionResponseDto> GetFeaturedOptions();
+    Task<List<FeaturedOptionResponseDto>> GetFeaturedOptionsAsync(
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// تایید موفقیت آمیز بودن پرداخت و ویژه کردن اگهی
