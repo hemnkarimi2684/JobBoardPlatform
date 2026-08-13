@@ -19,6 +19,10 @@ public class PaymentModelBuilderConfiguration : BaseModelBuilderConfiguration<Pa
             .HasConversion<string>()
             .HasMaxLength(25);
 
+        builder.Property(p => p.DurationInDays)
+            .IsRequired()
+            .HasDefaultValue(0);
+
         builder.HasOne(p => p.Advertisement)
             .WithMany(a => a.Payments)
             .HasForeignKey(p => p.AdvertisementId)

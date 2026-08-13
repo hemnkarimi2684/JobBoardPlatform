@@ -1,0 +1,79 @@
+@model FeaturedPaymentViewModel
+
+@{
+    ViewData["Title"] = "Feature Advertisement";
+}
+
+<div class="page-head">
+    <div>
+        <h2>Feature Advertisement</h2>
+        <p style="color: var(--muted); margin-top: 4px;">Choose a featured duration for your advertisement.</p>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn btn-ghost" asp-controller="Advertisement" asp-action="Details" asp-route-id="@Model.AdvertisementId">Back to Advertisement</a>
+    </div>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form asp-action="Feature" method="post" style="max-width: 640px;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="AdvertisementId" />
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Featured Packages</h3>
+        </div>
+        <div style="display:grid; gap:12px; padding:16px;">
+            @foreach (var option in Model.Options)
+            {
+                <label class="feature-option">
+                    <input type="radio" asp-for="DurationInDays" value="@option.DurationInDays" />
+                    <span>
+                        <strong>@option.DurationInDays days</strong>
+                        <small>@option.Price.ToString("N0") Tomans</small>
+                    </span>
+                </label>
+            }
+            <span asp-validation-for="DurationInDays" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div style="margin-top:16px; display:flex; gap:10px;">
+        <button type="submit" class="btn btn-primary">Continue to Payment</button>
+        <a class="btn btn-ghost" asp-controller="Advertisement" asp-action="Details" asp-route-id="@Model.AdvertisementId">Cancel</a>
+    </div>
+</form>
+
+<style>
+    .feature-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid var(--border, #e2e8f0);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .feature-option:hover {
+        border-color: var(--primary, #2563eb);
+    }
+    .feature-option:has(input:checked) {
+        border-color: var(--primary, #2563eb);
+        box-shadow: 0 0 0 1px var(--primary, #2563eb);
+    }
+    .feature-option span {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .feature-option small {
+        color: var(--muted, #64748b);
+    }
+</style>

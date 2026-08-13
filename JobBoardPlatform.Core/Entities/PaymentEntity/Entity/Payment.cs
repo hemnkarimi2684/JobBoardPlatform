@@ -24,10 +24,27 @@ public class Payment : BaseEntity
         Validate();
     }
 
+    public Payment(decimal amount, int durationInDays, PaymentStatus status, Guid advertisementId, Guid userId, Guid? createdById = null)
+    {
+        Amount = amount;
+        DurationInDays = durationInDays;
+        Status = status;
+        AdvertisementId = advertisementId;
+        UserId = userId;
+        CreatedById = createdById;
+
+        Validate();
+    }
+
     /// <summary>
     /// مقداری که باید پرداخت شود 
     /// </summary>
     public decimal Amount { get; private set; }
+
+    /// <summary>
+    /// تعداد روزهای ویژه بودن اگهی خریداری شده
+    /// </summary>
+    public int DurationInDays { get; private set; }
 
     /// <summary>
     /// وضعیت پرداخت 
@@ -72,5 +89,12 @@ public class Payment : BaseEntity
 
         if (AdvertisementId == Guid.Empty)
             throw new DomainException(DomainErrors.PaymentAdvertisementIdIsRequired);
+    }
+
+    public void UpdatePaymentStatus(PaymentStatus status, Guid? modifiedById)
+    {
+        Status = status;
+
+        Update(modifiedById);
     }
 }

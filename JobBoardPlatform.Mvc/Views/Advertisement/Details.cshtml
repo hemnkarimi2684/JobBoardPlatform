@@ -52,6 +52,20 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m-6-8h6m-9 12h12a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 21Z" /></svg>
                 View Applications
             </a>
+            <a class="btn btn-ghost"
+               asp-controller="Payment"
+               asp-action="Feature"
+               asp-route-advertisementId="@Model.AdvertisementId">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17m0 0c-1.5 0-4-2-4-4h8c0 2-2.5 4-4 4Zm-7-9h14" /></svg>
+                @if (Model.IsFeatured)
+                {
+                    <text>Extend Featured</text>
+                }
+                else
+                {
+                    <text>Feature This Advertisement</text>
+                }
+            </a>
         }
         <a class="btn btn-ghost" asp-action="Index">&#8592; Back to List</a>
     </div>

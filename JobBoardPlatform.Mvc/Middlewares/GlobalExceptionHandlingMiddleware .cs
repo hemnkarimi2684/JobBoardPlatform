@@ -67,52 +67,57 @@ public sealed class GlobalExceptionHandlingMiddleware : IMiddleware
         {
             NotFoundException ex => new ExceptionHandlingResult(
                 StatusCodes.Status404NotFound,
-                Routes.NotFound,
+                GetBackRedirectPath(context, Routes.NotFound),
                 GetMessageOrDefault(ex.Message, "The requested resource was not found.")),
 
             ForbiddenException ex => new ExceptionHandlingResult(
                 StatusCodes.Status403Forbidden,
-                Routes.AccessDenied,
+                GetBackRedirectPath(context, Routes.AccessDenied),
                 GetMessageOrDefault(ex.Message, "You do not have permission to access this resource.")),
+
+            UnauthorizedException ex when context.User.Identity?.IsAuthenticated == false => new ExceptionHandlingResult(
+                StatusCodes.Status401Unauthorized,
+                Routes.Login,
+                GetMessageOrDefault(ex.Message, "Please log in to continue.")),
 
             UnauthorizedException ex => new ExceptionHandlingResult(
                 StatusCodes.Status401Unauthorized,
-                GetUnauthorizedRedirectPath(context),
-                GetUnauthorizedMessage(context, ex.Message)),
+                GetBackRedirectPath(context, Routes.AccessDenied),
+                GetMessageOrDefault(ex.Message, "You do not have permission to access this resource.")),
 
             ConflictException ex => new ExceptionHandlingResult(
                 StatusCodes.Status409Conflict,
-                GetBackRedirectPath(context),
+                GetBackRedirectPath(context, Routes.Error),
                 GetMessageOrDefault(ex.Message, "A conflict occurred while processing your request.")),
 
             ValidationException ex => new ExceptionHandlingResult(
                 StatusCodes.Status400BadRequest,
-                GetBackRedirectPath(context),
+                GetBackRedirectPath(context, Routes.Error),
                 GetMessageOrDefault(ex.Message, "The submitted data is invalid.")),
 
             DomainException ex => new ExceptionHandlingResult(
                 StatusCodes.Status400BadRequest,
-                GetBackRedirectPath(context),
+                GetBackRedirectPath(context, Routes.Error),
                 GetMessageOrDefault(ex.Message, "A business rule violation occurred.")),
 
             EmailSendingException ex => new ExceptionHandlingResult(
                 StatusCodes.Status500InternalServerError,
-                Routes.Error,
+                GetBackRedirectPath(context, Routes.Error),
                 GetMessageOrDefault(ex.Message, "An error occurred while sending email.")),
 
             BadHttpRequestException ex => new ExceptionHandlingResult(
                 StatusCodes.Status400BadRequest,
-                GetBackRedirectPath(context),
+                GetBackRedirectPath(context, Routes.Error),
                 GetMessageOrDefault(ex.Message, "The request is invalid.")),
 
             OperationCanceledException => new ExceptionHandlingResult(
                 499,
-                Routes.Error,
+                GetBackRedirectPath(context, Routes.Error),
                 "The request was canceled."),
 
             _ => new ExceptionHandlingResult(
                 StatusCodes.Status500InternalServerError,
-                Routes.Error,
+                GetBackRedirectPath(context, Routes.Error),
                 "Something went wrong. Please contact the administrator.")
         };
     }
@@ -143,34 +148,20 @@ public sealed class GlobalExceptionHandlingMiddleware : IMiddleware
         context.Response.Headers.Expires = "0";
     }
 
-    private static string GetUnauthorizedRedirectPath(HttpContext context)
-    {
-        return context.User.Identity?.IsAuthenticated == true
-            ? Routes.AccessDenied
-            : Routes.Login;
-    }
-
-    private static string GetBackRedirectPath(HttpContext context)
+    private static string GetBackRedirectPath(HttpContext context, string fallbackRoute)
     {
         var referer = context.Request.Headers.Referer.ToString();
 
         if (string.IsNullOrWhiteSpace(referer))
-            return Routes.Error;
+            return fallbackRoute;
 
         var refererUri = Uri.TryCreate(referer, UriKind.Absolute, out var uri) ? uri : null;
 
         if (refererUri == null ||
             !string.Equals(context.Request.Scheme + "://" + context.Request.Host.Value, refererUri.GetLeftPart(UriPartial.Authority), StringComparison.OrdinalIgnoreCase))
-            return Routes.Error;
+            return fallbackRoute;
 
         return refererUri.AbsolutePath + refererUri.Query;
-    }
-
-    private static string GetUnauthorizedMessage(HttpContext context, string? message)
-    {
-        return context.User.Identity?.IsAuthenticated == true
-            ? "You do not have permission to access this resource."
-            : GetMessageOrDefault(message, "Please log in to continue.");
     }
 
     private static string GetMessageOrDefault(string? message, string defaultMessage)
