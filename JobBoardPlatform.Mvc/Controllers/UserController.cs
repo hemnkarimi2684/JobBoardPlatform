@@ -1,6 +1,7 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.UserDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
+using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
 using JobBoardPlatform.Application.Interfaces.CityInterface;
 using JobBoardPlatform.Application.Interfaces.UserInterface;
 using JobBoardPlatform.Core.Entities.UserProfileEntity.Enums;
@@ -26,9 +27,19 @@ public class UserController : Controller
 
     public async Task<IActionResult> Profile(CancellationToken cancellationToken = default)
     {
-        var profile = await _userService.GetUserProfileByUserIdAsync(CurrentUserId(), cancellationToken);
+        UserProfileViewModel model;
 
-        return View(UserProfileViewModel.FromResponseDto(profile));
+        try
+        {
+            var profile = await _userService.GetUserProfileByUserIdAsync(CurrentUserId(), cancellationToken);
+            model = UserProfileViewModel.FromResponseDto(profile);
+        }
+        catch (NotFoundException)
+        {
+            model = new UserProfileViewModel();
+        }
+
+        return View(model);
     }
 
     [HttpGet]
