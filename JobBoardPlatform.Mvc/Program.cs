@@ -7,6 +7,7 @@ using JobBoardPlatform.Infrastructure.Dapper.Common.Extensions;
 using JobBoardPlatform.Mvc.Filters;
 using JobBoardPlatform.Mvc.Middlewares;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,9 +51,27 @@ builder.Services.AddAuthentication(options =>
 {
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Home/Error";
+    options.AccessDeniedPath = "/Home/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
     options.SlidingExpiration = true;
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        var returnUrl = context.HttpContext.Request.Headers.Referer.ToString();
+
+        if (string.IsNullOrWhiteSpace(returnUrl))
+            returnUrl = context.RedirectUri;
+
+        var tempData = context.HttpContext.RequestServices
+            .GetRequiredService<ITempDataDictionaryFactory>()
+            .GetTempData(context.HttpContext);
+
+        tempData["Error"] = "You do not have permission to access this page. Please log in with an approved account.";
+        tempData["StatusCode"] = StatusCodes.Status403Forbidden;
+        tempData.Save();
+
+        context.Response.Redirect(returnUrl);
+        return Task.CompletedTask;
+    };
 });
 
 var app = builder.Build();
