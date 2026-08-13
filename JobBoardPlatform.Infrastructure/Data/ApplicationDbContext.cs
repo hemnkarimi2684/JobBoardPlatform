@@ -7,6 +7,7 @@ using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Entity;
 using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Entity;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Entity;
+using JobBoardPlatform.Core.Entities.FeaturedPackageEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
 using JobBoardPlatform.Core.Entities.JobEntity.Entity;
@@ -54,6 +55,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
     public DbSet<Notifier> Notifiers => Set<Notifier>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<FeaturedPackage> FeaturedPackages => Set<FeaturedPackage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

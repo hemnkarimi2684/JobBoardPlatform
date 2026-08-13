@@ -13,6 +13,7 @@ using JobBoardPlatform.Application.Implementation.CompanyBusiness;
 using JobBoardPlatform.Application.Implementation.EducationDetailBusiness;
 using JobBoardPlatform.Application.Implementation.EmailBusiness;
 using JobBoardPlatform.Application.Implementation.ExperienceDetailBusiness;
+using JobBoardPlatform.Application.Implementation.FeaturedPackageBusiness;
 using JobBoardPlatform.Application.Implementation.JobApplicationBusiness;
 using JobBoardPlatform.Application.Implementation.JobBusiness;
 using JobBoardPlatform.Application.Implementation.JobCategoryBusiness;
@@ -35,6 +36,7 @@ using JobBoardPlatform.Application.Interfaces.CompanyInterface;
 using JobBoardPlatform.Application.Interfaces.EducationDetailInterface;
 using JobBoardPlatform.Application.Interfaces.EmailInterface;
 using JobBoardPlatform.Application.Interfaces.ExperienceDetailInterface;
+using JobBoardPlatform.Application.Interfaces.FeaturedPackageInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
 using JobBoardPlatform.Application.Interfaces.JobInterface;
@@ -160,6 +162,7 @@ public static class ApplicationExtensions
 
         services.Configure<SmtpSettings>(configuration.GetSection(nameof(SmtpSettings)));
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IFeaturedPackageService, FeaturedPackageService>();
 
 
         services.AddStackExchangeRedisCache(options =>

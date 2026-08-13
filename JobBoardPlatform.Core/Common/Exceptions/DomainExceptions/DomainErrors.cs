@@ -138,6 +138,12 @@ public static class DomainErrors
 
     #endregion
 
+    #region FeaturedPackage Errors
+    public static Error FeaturedPackageDurationNotAllowed => new Error("Featured package duration must be 7, 15 or 30 days.", "FeaturedPackage_Duration_Not_Allowed");
+    public static Error FeaturedPackagePriceOutOfRange => new Error("Featured package price must be positive.", "FeaturedPackage_Price_Out_Of_Range");
+
+    #endregion
+
     #region Notifier Errors
     public static Error CodeIsRequired => new Error("phone number is required.", "Notifier_Code_Is_Required");
     public static Error PhoneNumberOrEmailIsRequired => new Error("phone number or email must have value", "Notifier_PhoneNumberOrEmail_Is_Required");

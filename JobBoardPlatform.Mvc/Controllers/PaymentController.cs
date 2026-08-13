@@ -17,9 +17,9 @@ public class PaymentController : Controller
     }
 
     [HttpGet]
-    public IActionResult Feature(Guid advertisementId)
+    public async Task<IActionResult> Feature(Guid advertisementId, CancellationToken cancellationToken)
     {
-        var options = _paymentService.GetFeaturedOptions();
+        var options = await _paymentService.GetFeaturedOptionsAsync(cancellationToken);
 
         return View(FeaturedPaymentViewModel.FromResponseDto(advertisementId, options));
     }
@@ -29,7 +29,7 @@ public class PaymentController : Controller
     {
         if (!ModelState.IsValid)
         {
-            model.Options = _paymentService.GetFeaturedOptions();
+            model.Options = await _paymentService.GetFeaturedOptionsAsync(cancellationToken);
             return View(model);
         }
 

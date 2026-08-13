@@ -7,6 +7,7 @@ using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 using JobBoardPlatform.Core.Entities.EducationDetailEntity.Data;
 using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Data;
 using JobBoardPlatform.Core.Entities.ExperienceDetailEntity.Data;
+using JobBoardPlatform.Core.Entities.FeaturedPackageEntity.Data;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Data;
 using JobBoardPlatform.Core.Entities.JobCategoryEntity.Data;
 using JobBoardPlatform.Core.Entities.JobEntity.Data;
@@ -43,6 +44,7 @@ public interface IUnitOfWork
     IJobCategoryRepository JobCategoryRepository { get; }
     IRefreshTokenRepository RefreshTokenRepository { get; }
     IEmailTemplateRepository EmailTemplateRepository { get; }
+    IFeaturedPackageRepository FeaturedPackageRepository { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 

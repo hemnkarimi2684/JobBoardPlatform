@@ -11,6 +11,7 @@ using JobBoardPlatform.Application.Interfaces.AdminDashboardInterface;
 using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.CityInterface;
 using JobBoardPlatform.Application.Interfaces.EmailInterface;
+using JobBoardPlatform.Application.Interfaces.FeaturedPackageInterface;
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
 using JobBoardPlatform.Application.Interfaces.JobInterface;
 using JobBoardPlatform.Application.Interfaces.ProvinceInterface;
@@ -35,6 +36,7 @@ public class AdminController : Controller
     private readonly ISkillService _skillService;
     private readonly IJobService _jobService;
     private readonly IEmailService _emailService;
+    private readonly IFeaturedPackageService _featuredPackageService;
 
     public AdminController(
         IAdminDashboardService adminDashboardService,
@@ -45,7 +47,8 @@ public class AdminController : Controller
         IJobCategoryService jobCategoryService,
         ISkillService skillService,
         IJobService jobService,
-        IEmailService emailService)
+        IEmailService emailService,
+        IFeaturedPackageService featuredPackageService)
     {
         _adminDashboardService = adminDashboardService;
         _userService = userService;
@@ -56,6 +59,7 @@ public class AdminController : Controller
         _skillService = skillService;
         _jobService = jobService;
         _emailService = emailService;
+        _featuredPackageService = featuredPackageService;
     }
 
     public async Task<IActionResult> Dashboard()
@@ -244,6 +248,28 @@ public class AdminController : Controller
         TempData["Success"] = "Advertisement was removed from featured successfully.";
 
         return RedirectToAction(nameof(Advertisements));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> FeaturedPackages(CancellationToken cancellationToken)
+    {
+        var packages = await _featuredPackageService.GetFeaturedPackagesAsync(cancellationToken);
+
+        return View(FeaturedPackagesViewModel.FromResponseDto(packages));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateFeaturedPackagePrice(
+        Guid packageId,
+        decimal price,
+        CancellationToken cancellationToken)
+    {
+        await _featuredPackageService.UpdateFeaturedPackagePriceAsync(packageId, price, cancellationToken);
+
+        TempData["Success"] = "Featured package price was updated successfully.";
+
+        return RedirectToAction(nameof(FeaturedPackages));
     }
 
     [HttpGet]

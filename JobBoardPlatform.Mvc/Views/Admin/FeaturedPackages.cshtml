@@ -1,0 +1,65 @@
+@model FeaturedPackagesViewModel
+
+@{
+    ViewData["Title"] = "Featured Packages";
+}
+
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Featured Packages Pricing</h1>
+        <p class="subtitle">Set the price for each featured duration. Employers will see these prices when featuring their advertisements.</p>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (Model.Packages == null || Model.Packages.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">&#128176;</div>
+        <h3>No featured packages found</h3>
+        <p>No featured packages are registered yet.</p>
+    </div>
+}
+else
+{
+    <div class="job-list">
+        @foreach (var item in Model.Packages)
+        {
+            <div class="card">
+                <h3 style="margin-bottom: 0;">@item.DurationInDays Days</h3>
+                <div class="meta" style="margin-top: 4px;">Featured duration package</div>
+
+                <form asp-action="UpdateFeaturedPackagePrice"
+                      asp-route-packageId="@item.PackageId"
+                      method="post"
+                      style="margin-top: 12px;">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label>Price (Tomans)</label>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="number"
+                                   name="price"
+                                   value="@item.Price.ToString("0")"
+                                   min="1"
+                                   step="1"
+                                   class="form-control"
+                                   style="max-width:200px;"
+                                   required />
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        }
+    </div>
+}
