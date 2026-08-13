@@ -1,0 +1,60 @@
+@model PaymentProcessingViewModel
+
+@{
+    ViewData["Title"] = "Payment Gateway";
+}
+
+<div class="page-head">
+    <div>
+        <h2>Payment Gateway</h2>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn btn-ghost" asp-controller="Advertisement" asp-action="Details" asp-route-id="@Model.AdvertisementId">Back to Advertisement</a>
+    </div>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="panel" style="max-width: 520px;">
+    <div class="panel-head">
+        <h3>Order Summary</h3>
+    </div>
+    <div style="padding:16px; display:grid; gap:14px;">
+        <div class="detail-item" style="display:flex; justify-content:space-between;">
+            <span class="detail-label">Advertisement</span>
+            <span class="detail-value">@Model.AdvertisementTitle</span>
+        </div>
+        <div class="detail-item" style="display:flex; justify-content:space-between;">
+            <span class="detail-label">Company</span>
+            <span class="detail-value">@Model.CompanyName</span>
+        </div>
+        <div class="detail-item" style="display:flex; justify-content:space-between;">
+            <span class="detail-label">Featured Duration</span>
+            <span class="detail-value">@Model.DurationInDays days</span>
+        </div>
+        <div class="detail-item" style="display:flex; justify-content:space-between; border-top:1px solid var(--border, #e2e8f0); padding-top:12px;">
+            <span class="detail-label">Amount</span>
+            <span class="detail-value" style="font-size:1.1rem; font-weight:700;">@Model.Amount.ToString("N0") Tomans</span>
+        </div>
+    </div>
+</div>
+
+@if (Model.IsPending)
+{
+    <div class="panel" style="max-width: 520px; margin-top:16px;">
+        <div class="panel-head">
+            <h3>Simulated Gateway</h3>
+        </div>
+        <div style="padding:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn btn-primary" asp-action="Success" asp-route-id="@Model.PaymentId">&#10004; Confirm &amp; Pay</a>
+            <a class="btn btn-ghost" asp-action="Cancel" asp-route-id="@Model.PaymentId">Cancel Payment</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info" style="max-width: 520px; margin-top:16px;">This payment has already been processed.</div>
+}
