@@ -4,8 +4,10 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CompanyDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.RedisKeys;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.CityInterface;
+using JobBoardPlatform.Application.Interfaces.RedisInterface;
 using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -20,11 +22,14 @@ public class CityService : ICityService
 
     private readonly IAccessControlService _accessControlService;
 
-    public CityService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
+    private readonly IRedisService _redisService;
+
+    public CityService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IRedisService redisService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _accessControlService = accessControlService;
+        _redisService = redisService;
     }
 
     #region Create Methods
@@ -51,6 +56,8 @@ public class CityService : ICityService
         await _unitOfWork.CityRepository.AddAsync(city, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _redisService.RemoveAsync(RedisCacheKeys.CitiesSelect);
     }
 
     #endregion
@@ -156,7 +163,12 @@ public class CityService : ICityService
 
     public async Task<List<CityDetailResponseDto>> GetAllForSelectAsync(CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.CityRepository.GetAllForSelectAsync(c => new CityDetailResponseDto
+        var cached = await _redisService.GetAsync<List<CityDetailResponseDto>>(RedisCacheKeys.CitiesSelect);
+
+        if (cached is not null)
+            return cached;
+
+        var result = await _unitOfWork.CityRepository.GetAllForSelectAsync(c => new CityDetailResponseDto
         {
             CityCode = c.CityCode,
             CityId = c.Id,
@@ -165,6 +177,10 @@ public class CityService : ICityService
             ProvinceId = c.ProvinceId,
             ProvinceName = c.Province.Name
         }, cancellationToken);
+
+        await _redisService.SetAsync(RedisCacheKeys.CitiesSelect, result);
+
+        return result;
     }
 
     #endregion
@@ -181,6 +197,8 @@ public class CityService : ICityService
             throw new ValidationException($"Could not delete city");
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _redisService.RemoveAsync(RedisCacheKeys.CitiesSelect);
     }
 
     #endregion

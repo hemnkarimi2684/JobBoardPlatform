@@ -4,8 +4,10 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.ProvinceDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.CityDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ProvinceDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.RedisKeys;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.ProvinceInterface;
+using JobBoardPlatform.Application.Interfaces.RedisInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
@@ -20,11 +22,14 @@ public class ProvinceService : IProvinceService
 
     private readonly IAccessControlService _accessControlService;
 
-    public ProvinceService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
+    private readonly IRedisService _redisService;
+
+    public ProvinceService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IRedisService redisService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _accessControlService = accessControlService;
+        _redisService = redisService;
     }
 
     #region Create Methods 
@@ -45,6 +50,8 @@ public class ProvinceService : IProvinceService
 
         await _unitOfWork.ProvinceRepository.AddAsync(province, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _redisService.RemoveAsync(RedisCacheKeys.ProvincesSelect);
     }
 
     #endregion
@@ -72,12 +79,21 @@ public class ProvinceService : IProvinceService
 
     public async Task<List<ProvinceResponseDto>> GetAllForSelectAsync(CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.ProvinceRepository.GetAllForSelectAsync(p => new ProvinceResponseDto
+        var cached = await _redisService.GetAsync<List<ProvinceResponseDto>>(RedisCacheKeys.ProvincesSelect);
+
+        if (cached is not null)
+            return cached;
+
+        var result = await _unitOfWork.ProvinceRepository.GetAllForSelectAsync(p => new ProvinceResponseDto
         {
             Code = p.ProvinceCode,
             Name = p.Name,
             ProvinceId = p.Id
         }, cancellationToken);
+
+        await _redisService.SetAsync(RedisCacheKeys.ProvincesSelect, result);
+
+        return result;
     }
 
     #endregion
@@ -96,6 +112,8 @@ public class ProvinceService : IProvinceService
             throw new ValidationException("Could not delete province");
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _redisService.RemoveAsync(RedisCacheKeys.ProvincesSelect);
     }
 
     #endregion

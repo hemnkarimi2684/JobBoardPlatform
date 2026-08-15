@@ -3,7 +3,9 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.SkillDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.SkillDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.RedisKeys;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
+using JobBoardPlatform.Application.Interfaces.RedisInterface;
 using JobBoardPlatform.Application.Interfaces.SkillInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
@@ -20,11 +22,14 @@ public class SkillService : ISkillService
 
     private readonly IAccessControlService _accessControlService;
 
-    public SkillService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
+    private readonly IRedisService _redisService;
+
+    public SkillService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IRedisService redisService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _accessControlService = accessControlService;
+        _redisService = redisService;
     }
 
     #region Create Methods
@@ -74,7 +79,11 @@ public class SkillService : ISkillService
 
         await _unitOfWork.SkillRepository.AddAsync(skill, cancellationToken);
 
-        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+        var created = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+
+        await _redisService.RemoveAsync(RedisCacheKeys.SkillsSelect);
+
+        return created;
     }
 
     #endregion
@@ -106,11 +115,20 @@ public class SkillService : ISkillService
 
     public async Task<List<SkillDetailResponseDto>> GetAllForSelectAsync(CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.SkillRepository.GetAllForSelectAsync(s => new SkillDetailResponseDto
+        var cached = await _redisService.GetAsync<List<SkillDetailResponseDto>>(RedisCacheKeys.SkillsSelect);
+
+        if (cached is not null)
+            return cached;
+
+        var result = await _unitOfWork.SkillRepository.GetAllForSelectAsync(s => new SkillDetailResponseDto
         {
             SkillId = s.Id,
             SkillName = s.Name
         }, cancellationToken);
+
+        await _redisService.SetAsync(RedisCacheKeys.SkillsSelect, result);
+
+        return result;
     }
 
     public async Task<SkillDetailResponseDto> GetSkillByIdAsync(
@@ -206,6 +224,8 @@ public class SkillService : ISkillService
             throw new ValidationException("Could not delete skill");
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _redisService.RemoveAsync(RedisCacheKeys.SkillsSelect);
     }
 
     #endregion

@@ -58,6 +58,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Redis = StackExchange.Redis;
 using System.Security.Claims;
 using System.Text;
 
@@ -167,7 +168,15 @@ public static class ApplicationExtensions
 
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration.GetConnectionString("Redis");
+            options.ConfigurationOptions = new Redis.ConfigurationOptions
+            {
+                AbortOnConnectFail = false,
+                ConnectTimeout = 500,
+                ConnectRetry = 1,
+                SyncTimeout = 500
+            };
+
+            options.ConfigurationOptions.EndPoints.Add(configuration.GetConnectionString("Redis")!);
             options.InstanceName = "JobBoardPlatform:";
         });
 

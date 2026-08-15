@@ -4,8 +4,10 @@ using JobBoardPlatform.Application.Common.Dto.RequestDto.JobCategoryDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobCategoryDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobDto;
 using JobBoardPlatform.Application.Common.Exceptions.ApplicationExceptions;
+using JobBoardPlatform.Application.Common.RedisKeys;
 using JobBoardPlatform.Application.Interfaces.AccessControlInterface;
 using JobBoardPlatform.Application.Interfaces.JobCategoryInterface;
+using JobBoardPlatform.Application.Interfaces.RedisInterface;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
@@ -20,11 +22,14 @@ public class JobCategoryService : IJobCategoryService
 
     private readonly IAccessControlService _accessControlService;
 
-    public JobCategoryService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
+    private readonly IRedisService _redisService;
+
+    public JobCategoryService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IRedisService redisService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _accessControlService = accessControlService;
+        _redisService = redisService;
     }
 
     #region Create Methods
@@ -43,6 +48,8 @@ public class JobCategoryService : IJobCategoryService
         await _unitOfWork.JobCategoryRepository.AddAsync(jobCategory, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _redisService.RemoveAsync(RedisCacheKeys.JobCategoriesSelect);
     }
 
     #endregion
@@ -92,11 +99,20 @@ public class JobCategoryService : IJobCategoryService
 
     public async Task<List<JobCategoryResponseDto>> GetAllForSelectAsync(CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.JobCategoryRepository.GetAllForSelectAsync(jc => new JobCategoryResponseDto
+        var cached = await _redisService.GetAsync<List<JobCategoryResponseDto>>(RedisCacheKeys.JobCategoriesSelect);
+
+        if (cached is not null)
+            return cached;
+
+        var result = await _unitOfWork.JobCategoryRepository.GetAllForSelectAsync(jc => new JobCategoryResponseDto
         {
             JobCategoryId = jc.Id,
             Name = jc.Name
         }, cancellationToken);
+
+        await _redisService.SetAsync(RedisCacheKeys.JobCategoriesSelect, result);
+
+        return result;
     }
 
     #endregion
@@ -115,6 +131,8 @@ public class JobCategoryService : IJobCategoryService
             throw new ValidationException("Could not delete job category");
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _redisService.RemoveAsync(RedisCacheKeys.JobCategoriesSelect);
     }
 
     #endregion
