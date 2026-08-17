@@ -19,7 +19,10 @@ public class JobService : IJobService
 
     private readonly IAccessControlService _accessControlService;
 
-    public JobService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
+    public JobService(
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser,
+        IAccessControlService accessControlService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
@@ -120,6 +123,10 @@ public class JobService : IJobService
         return Pagination<JobAdvertisementListItemResponseDto>.GetPagination(result, pagingCommand.PageNumber, pagingCommand.PageSize, totalDataCount);
     }
 
+    #endregion
+
+    #region Delete Methods 
+
     public async Task SoftDeleteAsync(
         Guid jobId,
         CancellationToken cancellationToken = default)
@@ -135,6 +142,4 @@ public class JobService : IJobService
     }
 
     #endregion
-
-
 }

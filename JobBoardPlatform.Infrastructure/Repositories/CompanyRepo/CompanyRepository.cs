@@ -1,12 +1,9 @@
-﻿using JobBoardPlatform.Core.Entities.CityEntity.Entity;
-using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
+﻿using JobBoardPlatform.Core.Entities.CompanyEntity.Data;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
-using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using JobBoardPlatform.Infrastructure.Data;
 using JobBoardPlatform.Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.Design;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Infrastructure.Repositories.CompanyRepo;

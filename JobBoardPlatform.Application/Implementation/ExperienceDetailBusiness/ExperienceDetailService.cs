@@ -23,7 +23,10 @@ public class ExperienceDetailService : IExperienceDetailService
 
     private readonly IAccessControlService _accessControlService;
 
-    public ExperienceDetailService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
+    public ExperienceDetailService(
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser, 
+        IAccessControlService accessControlService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

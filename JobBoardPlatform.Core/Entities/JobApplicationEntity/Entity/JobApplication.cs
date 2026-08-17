@@ -5,7 +5,6 @@ using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
 using JobBoardPlatform.Core.Entities.ResumeEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
-using System.Xml.Linq;
 
 namespace JobBoardPlatform.Core.Entities.JobApplicationEntity.Entity;
 
@@ -28,8 +27,6 @@ public class JobApplication : BaseEntity
         CreatedById = createdById;
         Validate();
     }
-
-
 
     /// <summary>
     /// وضعیت درخواست کاری

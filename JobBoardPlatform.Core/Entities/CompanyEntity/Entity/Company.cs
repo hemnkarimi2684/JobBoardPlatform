@@ -1,13 +1,11 @@
 ﻿using JobBoardPlatform.Core.Common.Exceptions.DomainExceptions;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
 using JobBoardPlatform.Core.Entities.AttachmentEntity.Entity;
-using JobBoardPlatform.Core.Entities.CityEntity.Entity;
 using JobBoardPlatform.Core.Entities.Common.Entity;
 using JobBoardPlatform.Core.Entities.CompanyCityEntity.Entity;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Dto;
 using JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 using JobBoardPlatform.Core.Entities.JobCategoryEntity.Entity;
-using JobBoardPlatform.Core.Entities.ProvinceEntity.Entity;
 using JobBoardPlatform.Core.Entities.UserEntity.Entity;
 
 namespace JobBoardPlatform.Core.Entities.CompanyEntity.Entity;
@@ -180,9 +178,10 @@ public class Company : BaseEntity
         Validate();
     }
 
-    public void UpdateImage(Guid? newImageId)
+    public void UpdateImage(Guid? newImageId, Guid? modifiedById)
     {
         CompanyImageFileId = newImageId;
-    }
 
+        Update(modifiedById);
+    }
 }

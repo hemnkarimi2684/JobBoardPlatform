@@ -24,7 +24,11 @@ public class CityService : ICityService
 
     private readonly IRedisService _redisService;
 
-    public CityService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IRedisService redisService)
+    public CityService(
+        IUnitOfWork unitOfWork, 
+        ICurrentUser currentUser,
+        IAccessControlService accessControlService,
+        IRedisService redisService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

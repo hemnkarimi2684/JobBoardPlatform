@@ -24,7 +24,11 @@ public class JobCategoryService : IJobCategoryService
 
     private readonly IRedisService _redisService;
 
-    public JobCategoryService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IRedisService redisService)
+    public JobCategoryService(
+        IUnitOfWork unitOfWork, 
+        ICurrentUser currentUser, 
+        IAccessControlService accessControlService,
+        IRedisService redisService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

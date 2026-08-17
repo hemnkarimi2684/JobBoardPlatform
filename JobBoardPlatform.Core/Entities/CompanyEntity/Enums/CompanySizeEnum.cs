@@ -1,7 +1,7 @@
 ﻿namespace JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 
 /// <summary>
-/// اینام اندازه سازمان
+/// ا اندازه سازمان
 /// </summary>
 public enum CompanySizeEnum
 {

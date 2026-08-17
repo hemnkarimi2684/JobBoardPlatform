@@ -37,7 +37,14 @@ public class JobApplicationService : IJobApplicationService
 
     private readonly ILogger<JobApplication> _logger;
 
-    public JobApplicationService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAdvertisementService advertisementService, IAccessControlService accessControlService, IEmailService emailService, IResumeService resumeService, ILogger<JobApplication> logger)
+    public JobApplicationService(
+        IUnitOfWork unitOfWork, 
+        ICurrentUser currentUser,
+        IAdvertisementService advertisementService,
+        IAccessControlService accessControlService,
+        IEmailService emailService,
+        IResumeService resumeService,
+        ILogger<JobApplication> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

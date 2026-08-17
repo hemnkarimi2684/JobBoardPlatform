@@ -20,11 +20,11 @@ public interface IExperienceDetailRepository : IGenericRepository<ExperienceDeta
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<(List<TResult> Items, int TotalDataCount)> GetUserExperienceDetailsAsync<TResult>(
-                             Expression<Func<ExperienceDetail, TResult>> projection,
-                             Guid userId,
-                             CancellationToken cancellationToken,
-                             int pageNumber = 1,
-                             int pageSize = 10);
+        Expression<Func<ExperienceDetail, TResult>> projection,
+        Guid userId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10);
 
     /// <summary>
     /// ویرایش اطلاعات تجربه کاری ثبت شده

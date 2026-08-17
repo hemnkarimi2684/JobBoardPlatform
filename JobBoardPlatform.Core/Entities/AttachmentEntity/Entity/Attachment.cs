@@ -9,6 +9,8 @@ namespace JobBoardPlatform.Core.Entities.AttachmentEntity.Entity;
 /// </summary>
 public class Attachment : BaseEntity
 {
+    private Attachment() { }
+
     public Attachment(string fileName, AttachmentType attachmentType, string contentType, byte[] data, Guid? createdById = null)
     {
         FileName = fileName;
@@ -19,8 +21,6 @@ public class Attachment : BaseEntity
 
         Validate();
     }
-
-    private Attachment() { }
 
     /// <summary>
     /// اسم فایل اپلود شده 

@@ -180,7 +180,7 @@ public class Advertisement : BaseEntity
     }
 
     /// <summary>
-    /// اپدیت وضعیت فعال یا غیرذفعال بودن اگهی
+    /// اپدیت وضعیت فعال یا غیرفعال بودن اگهی
     /// </summary>
     /// <param name="modifierId"></param>
     /// <param name="isActive"></param>

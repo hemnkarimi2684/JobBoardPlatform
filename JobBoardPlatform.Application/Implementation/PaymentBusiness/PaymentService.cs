@@ -13,7 +13,7 @@ namespace JobBoardPlatform.Application.Implementation.PaymentBusiness;
 public class PaymentService : IPaymentService
 {
     /// <summary>
-    /// مدت زمان های مجاز برای ویژه بودن اگهی (قیمت هر بسته از جدول FeaturedPackages خوانده میشود)
+    /// مدت زمان های مجاز برای ویژه بودن اگهی قیمت هر بسته از جدول FeaturedPackages خوانده میشود
     /// </summary>
     private static readonly int[] AllowedFeaturedDurations = { 7, 15, 30 };
 
@@ -23,25 +23,14 @@ public class PaymentService : IPaymentService
 
     private readonly IAccessControlService _accessControlService;
 
-    public PaymentService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
+    public PaymentService(
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser,
+        IAccessControlService accessControlService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
         _accessControlService = accessControlService;
-    }
-
-    public async Task<List<FeaturedOptionResponseDto>> GetFeaturedOptionsAsync(
-        CancellationToken cancellationToken)
-    {
-        var packages = await _unitOfWork.FeaturedPackageRepository.GetAllPackagesAsync(
-            package => new FeaturedOptionResponseDto
-            {
-                DurationInDays = package.DurationInDays,
-                Price = package.Price
-            },
-            cancellationToken);
-
-        return packages;
     }
 
     public async Task<Guid> CreateFeaturedPaymentAsync(
@@ -72,6 +61,22 @@ public class PaymentService : IPaymentService
         return payment.Id;
     }
 
+    #region Get Methods 
+
+    public async Task<List<FeaturedOptionResponseDto>> GetFeaturedOptionsAsync(
+    CancellationToken cancellationToken)
+    {
+        var packages = await _unitOfWork.FeaturedPackageRepository.GetAllPackagesAsync(
+            package => new FeaturedOptionResponseDto
+            {
+                DurationInDays = package.DurationInDays,
+                Price = package.Price
+            },
+            cancellationToken);
+
+        return packages;
+    }
+
     public async Task<PaymentResponseDto> GetPaymentAsync(
         Guid paymentId,
         CancellationToken cancellationToken = default)
@@ -85,6 +90,10 @@ public class PaymentService : IPaymentService
 
         return PaymentResponseDto.MapToResponseDto(paymentDetail);
     }
+
+    #endregion
+
+    #region Update Methods
 
     public async Task ConfirmSuccessfulPaymentAsync(
         Guid paymentId,
@@ -147,6 +156,10 @@ public class PaymentService : IPaymentService
         await UpdatePaymentStatusAsync(paymentId, PaymentStatus.Cancelled, cancellationToken);
     }
 
+    #endregion
+
+    #region Private Methods
+
     private async Task UpdatePaymentStatusAsync(Guid paymentId, PaymentStatus status, CancellationToken cancellationToken)
     {
         var payment = await _unitOfWork.PaymentRepository.GetByIdAsync(paymentId, cancellationToken, true);
@@ -163,4 +176,6 @@ public class PaymentService : IPaymentService
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
+
+    #endregion
 }

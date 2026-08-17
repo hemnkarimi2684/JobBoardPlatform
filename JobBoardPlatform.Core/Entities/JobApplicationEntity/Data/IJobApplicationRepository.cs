@@ -79,7 +79,7 @@ public interface IJobApplicationRepository : IGenericRepository<JobApplication>
         int pageSize = 10);
 
     /// <summary>
-    /// بررسی اینکه کافرمایی که برای دیدن درخوسات کاری دروسات داده ایا کاربر لاگین شده اس یا یکی دیگه اس میخواد یه چیز دیگه ای ببینه
+    /// بررسی اینکه کافرمایی که برای دیدن درخواست کاری درخواست داده ایا کاربر لاگین شده اس یا یکی دیگه اس میخواد یه چیز دیگه ای ببینه
     /// </summary>
     /// <param name="jobApplicationId"></param>
     /// <param name="employerUserId"></param>

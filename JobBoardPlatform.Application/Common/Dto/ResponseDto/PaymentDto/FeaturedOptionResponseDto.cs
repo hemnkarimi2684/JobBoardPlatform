@@ -1,7 +1,7 @@
 namespace JobBoardPlatform.Application.Common.Dto.ResponseDto.PaymentDto;
 
 /// <summary>
-/// گزینه های خرید اگهی ویژه (مدت زمان و قیمت محاسبه شده سمت سرور)
+/// گزینه های خرید اگهی ویژه مدت زمان و قیمت محاسبه شده سمت سرور
 /// </summary>
 public class FeaturedOptionResponseDto
 {

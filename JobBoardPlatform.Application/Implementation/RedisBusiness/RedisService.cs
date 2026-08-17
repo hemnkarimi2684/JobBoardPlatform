@@ -15,7 +15,9 @@ public class RedisService : IRedisService
 
     private readonly ILogger<RedisService> _logger;
 
-    public RedisService(IDistributedCache cache, ILogger<RedisService> logger)
+    public RedisService(
+        IDistributedCache cache, 
+        ILogger<RedisService> logger)
     {
         _cache = cache;
         _logger = logger;

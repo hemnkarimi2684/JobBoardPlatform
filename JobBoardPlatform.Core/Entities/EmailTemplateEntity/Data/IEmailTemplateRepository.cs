@@ -11,5 +11,7 @@ public interface IEmailTemplateRepository : IGenericRepository<EmailTemplate>
     /// <param name="templateKey"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<EmailTemplate?> GetByKeyAsync(string templateKey, CancellationToken cancellationToken);
+    Task<EmailTemplate?> GetByKeyAsync(
+        string templateKey,
+        CancellationToken cancellationToken);
 }

@@ -24,7 +24,11 @@ public class SkillService : ISkillService
 
     private readonly IRedisService _redisService;
 
-    public SkillService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IRedisService redisService)
+    public SkillService(
+        IUnitOfWork unitOfWork, 
+        ICurrentUser currentUser,
+        IAccessControlService accessControlService, 
+        IRedisService redisService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

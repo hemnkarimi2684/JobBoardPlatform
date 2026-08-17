@@ -24,7 +24,11 @@ public class JwtService : IJwtService
 
     private readonly UserManager<User> _userManager;
 
-    public JwtService(IOptions<JwtSettings> options, IRefreshTokenService refreshTokenService, RoleManager<Role> roleManager, UserManager<User> userManager)
+    public JwtService(
+        IOptions<JwtSettings> options,
+        IRefreshTokenService refreshTokenService,
+        RoleManager<Role> roleManager,
+        UserManager<User> userManager)
     {
         _jwtSettings = options.Value;
         _refreshTokenService = refreshTokenService;

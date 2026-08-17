@@ -34,7 +34,12 @@ public class CompanyService : ICompanyService
 
     private readonly ILogger<CompanyService> _logger;
 
-    public CompanyService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAttachmentService attachmentService, IAccessControlService accessControlService, ILogger<CompanyService> logger)
+    public CompanyService(
+        IUnitOfWork unitOfWork, 
+        ICurrentUser currentUser,
+        IAttachmentService attachmentService,
+        IAccessControlService accessControlService,
+        ILogger<CompanyService> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
@@ -162,7 +167,7 @@ public class CompanyService : ICompanyService
 
     #region Update Methods
 
-    public async Task<bool> UpdateCompanyIdAsync(
+    public async Task<bool> UpdateCompanyAsync(
         Guid companyId,
         UpdateCompanyInfoRequestDto updateCommand,
         CancellationToken cancellationToken = default)
@@ -205,7 +210,7 @@ public class CompanyService : ICompanyService
 
         var attachmentId = company.CompanyImageFileId.Value;
 
-        company.UpdateImage(null);
+        company.UpdateImage(null, _currentUser.UserId);
 
         try
         {
@@ -293,7 +298,7 @@ public class CompanyService : ICompanyService
     }
 
     private async Task UploadImageAsync(
-        Company company, 
+        Company company,
         IFormFile image,
         CancellationToken cancellationToken)
     {
@@ -307,7 +312,7 @@ public class CompanyService : ICompanyService
 
             newImageId = await _attachmentService.UploadAsync(image, AttachmentType.Image, cancellationToken);
 
-            company.UpdateImage(newImageId);
+            company.UpdateImage(newImageId, _currentUser.UserId);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
@@ -348,9 +353,9 @@ public class CompanyService : ICompanyService
 
     private async Task ValidateForCreateAsync(
         Guid cityId,
-        Guid jobCategoryId, 
+        Guid jobCategoryId,
         string companyName,
-        Guid ownedByUserId, 
+        Guid ownedByUserId,
         CancellationToken cancellationToken)
     {
         var doesCityExist = await _unitOfWork.CityRepository.IsCityExistAsync(cityId, cancellationToken);

@@ -12,5 +12,7 @@ public interface IPaymentRepository : IGenericRepository<Payment>
     /// <param name="paymentId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<PaymentDetail?> GetPaymentDetailAsync(Guid paymentId, CancellationToken cancellationToken);
+    Task<PaymentDetail?> GetPaymentDetailAsync(
+        Guid paymentId,
+        CancellationToken cancellationToken);
 }

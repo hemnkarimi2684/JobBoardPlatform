@@ -24,7 +24,10 @@ public class EducationDetailService : IEducationDetailService
 
     private readonly IAccessControlService _accessControlService;
 
-    public EducationDetailService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
+    public EducationDetailService(
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser, 
+        IAccessControlService accessControlService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

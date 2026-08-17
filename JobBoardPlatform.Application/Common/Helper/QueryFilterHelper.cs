@@ -7,8 +7,8 @@ namespace JobBoardPlatform.Application.Common.Helper;
 public static class QueryFilterHelper
 {
     public static Expression<Func<Advertisement, bool>> BuildSearchFilterPredicate(
-    AdvertisementSearchRequestDto searchDto,
-    AdvertisementFilterRequestDto filterDto)
+        AdvertisementSearchRequestDto searchDto,
+        AdvertisementFilterRequestDto filterDto)
     {
         // اینجا داره میگه پارمتر رو از نوع a  بخون 
         var parameter = Expression.Parameter(typeof(Advertisement), "a");

@@ -27,7 +27,7 @@ public interface ICompanyService
     /// <param name="updateCommand"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> UpdateCompanyIdAsync(
+    Task<bool> UpdateCompanyAsync(
         Guid companyId,
         UpdateCompanyInfoRequestDto updateCommand,
         CancellationToken cancellationToken = default);

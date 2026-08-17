@@ -28,7 +28,13 @@ public class AuthenticationService : IAuthenticationService
 
     private readonly SignInManager<User> _signInManager;
 
-    public AuthenticationService(IUnitOfWork unitOfWork, ICompanyService companyService, IJwtService jwtService, IRefreshTokenService refreshTokenService, UserManager<User> userManager, SignInManager<User> signInManager)
+    public AuthenticationService(
+        IUnitOfWork unitOfWork,
+        ICompanyService companyService,
+        IJwtService jwtService,
+        IRefreshTokenService refreshTokenService, 
+        UserManager<User> userManager, 
+        SignInManager<User> signInManager)
     {
         _unitOfWork = unitOfWork;
         _companyService = companyService;
@@ -90,7 +96,7 @@ public class AuthenticationService : IAuthenticationService
         // بررسی فعال بودن توکن
         if (!refreshToken.IsActive)
         {
-            // تشخیص اینکه ایای استافده مجدد داره میشه و همینوطر برای تشخیص اتک 
+            // تشخیص اینکه ایا استفاده مجدد داره میشه و همینطور برای تشخیص اتک 
             if (refreshToken.IsRevoked && refreshToken.RevokedAt is not null)
                 await _refreshTokenService.RevokeAllActiveTokensAsync(refreshToken.UserId, cancellationToken);
 

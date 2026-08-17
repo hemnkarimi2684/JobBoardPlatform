@@ -41,33 +41,45 @@ public interface IGenericRepository<T> where T : BaseEntity
     /// </summary>
     /// <param name="predicate"></param>
     /// <returns></returns>
-    Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken);
+    Task<bool> AnyAsync(
+        Expression<Func<T, bool>> predicate,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// دریافت یک موجودیت با ایدی 
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken, bool tracking = false);
+    Task<T?> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken,
+        bool tracking = false);
 
     /// <summary>
     /// اضافه کردن موجودیت 
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    Task AddAsync(T entity, CancellationToken cancellationToken);
+    Task AddAsync(
+        T entity,
+        CancellationToken cancellationToken);
 
     /// <summary>
     /// اپدیت موجودیت
     /// </summary>
     /// <param name="entity"></param>
     /// <returns></returns>
-    bool Update(T entity, Guid? modifiedById);
+    bool Update(
+        T entity,
+        Guid? modifiedById);
 
     /// <summary>
     /// حذف نرم موجودیت 
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<bool> SoftDeleteAsync(Guid id, Guid? deletedById, CancellationToken cancellationToken);
+    Task<bool> SoftDeleteAsync(
+        Guid id,
+        Guid? deletedById,
+        CancellationToken cancellationToken);
 }

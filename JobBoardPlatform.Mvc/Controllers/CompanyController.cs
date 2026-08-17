@@ -74,7 +74,7 @@ public class CompanyController : Controller
             return View(model);
         }
 
-        await _companyService.UpdateCompanyIdAsync(id, model, cancellationToken);
+        await _companyService.UpdateCompanyAsync(id, model, cancellationToken);
 
         TempData["Success"] = "Company information was updated successfully.";
 

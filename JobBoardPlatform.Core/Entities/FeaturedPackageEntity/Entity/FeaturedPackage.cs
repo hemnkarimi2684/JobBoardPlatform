@@ -4,7 +4,7 @@ using JobBoardPlatform.Core.Entities.Common.Entity;
 namespace JobBoardPlatform.Core.Entities.FeaturedPackageEntity.Entity;
 
 /// <summary>
-/// بسته های ویژه اگهی (مدت زمان و قیمت قابل تنظیم توسط ادمین)
+/// بسته های ویژه اگهی مدت زمان و قیمت قابل تنظیم توسط ادمین
 /// </summary>
 public class FeaturedPackage : BaseEntity
 {

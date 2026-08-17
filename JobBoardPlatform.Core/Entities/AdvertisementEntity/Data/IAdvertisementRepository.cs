@@ -1,18 +1,15 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Dto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
-using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
-using JobBoardPlatform.Core.Entities.JobEntity.Entity;
 using System.Linq.Expressions;
-using System.Numerics;
 
 namespace JobBoardPlatform.Core.Entities.AdvertisementEntity.Data;
 
 public interface IAdvertisementRepository : IGenericRepository<Advertisement>
 {
     /// <summary>
-    /// دریافت اگهی ها (اگهی های ویژه در ابتدا و سپس جدیدترین ها)
+    /// دریافت اگهی ها اگهی های ویژه در ابتدا و سپس جدیدترین ها
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="selector"></param>

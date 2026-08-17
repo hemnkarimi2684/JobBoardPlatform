@@ -28,7 +28,12 @@ public class EmailService : IEmailService
 
     private readonly ILogger<EmailService> _logger;
 
-    public EmailService(IOptions<SmtpSettings> options, IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, ILogger<EmailService> logger)
+    public EmailService(
+        IOptions<SmtpSettings> options, 
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser, 
+        IAccessControlService accessControlService,
+        ILogger<EmailService> logger)
     {
         _smtpSettings = options.Value;
         _unitOfWork = unitOfWork;
@@ -131,23 +136,39 @@ public class EmailService : IEmailService
         bool isHtml,
         CancellationToken cancellationToken = default)
     {
+        // این نماینده کل ایمیله یعنی شامل
+        // فرستنده | گیرنده | سابجکت | بادی ......
         var message = new MimeMessage();
 
+        // مشخص کردن اینکه فرستنده کیه 
+        // MailBoxAddress چیه؟
+        // Name + Email
         message.From.Add(new MailboxAddress(_smtpSettings.SenderName, _smtpSettings.SenderEmail));
 
+        // مشخص کردن اینکه گیرنده کیه
         message.To.Add(MailboxAddress.Parse(to));
 
+        //مقدار دهی سابجکت یا همون مثل عنوان 
         message.Subject = subject;
 
+        // مشخص کردن تاریخ ایمیل 
+        // این قسمت بیشتر برای هدر ایمیله 
         message.Date = DateTimeOffset.UtcNow;
 
+        // ساخت بادی ایمیل 
+        // اینجا گفته میشه که ایا بادی اچ تی ام ال باشه یا پلین تکست
         message.Body = new TextPart(isHtml ? TextFormat.Html : TextFormat.Plain)
         {
             Text = body
         };
 
+        // ساخت یک smtpClient 
         using var client = new MailKit.Net.Smtp.SmtpClient();
 
+        // انتخاب نوع 
+        // Ssl | Tls
+        // Ssl : یعنی از همان ابتدای Connection ارتباط رمزنگاری‌شده برقرار می‌شود
+        // Tls : ابتدا Connection برقرار می‌شود و سپس با STARTTLS ارتباط به TLS ارتقا پیدا می‌کند.
         var secureOption = _smtpSettings.UseSsl
             ? SecureSocketOptions.SslOnConnect
             : SecureSocketOptions.StartTls;
@@ -156,17 +177,20 @@ public class EmailService : IEmailService
         {
             _logger.LogInformation("Connecting to SMTP server {Server}:{Port}", _smtpSettings.Server, _smtpSettings.Port);
 
+            // وصل شدن به Smtp Server
             await client.ConnectAsync(
                 _smtpSettings.Server,
                 _smtpSettings.Port,
                 secureOption,
                 cancellationToken);
 
+            // احراز هویت سرور بررسی میکنه ببینه معتبر هستی یا نه
             await client.AuthenticateAsync(
                 _smtpSettings.UserName,
                 _smtpSettings.Password,
                 cancellationToken);
 
+            // ارسال ایمیل 
             await client.SendAsync(message, cancellationToken);
 
             _logger.LogInformation("Email sent successfully to {To} with subject {Subject}", to, subject);
@@ -261,20 +285,20 @@ public class EmailService : IEmailService
         var body = template.Body;
 
         // این palceHolder چیه؟
-        // این برای موافعیه که توی متن موردنظرم من از مواردی مثل {UserName} یا {FullName} استفاده میکنم
+        // این برای مواقعیه که توی متن موردنظرم من از مواردی مثل {UserName} یا {FullName} استفاده میکنم
         // خب اصلا اینا به چه دردی میخورن ؟ برای اینه که پیام من خوانا تر و واضح تر و حرفه ای تر باشه به عنوان مثال فرض کن قراره هر سال یه پیام ارسال کنی مثلا
-        // سلام علی توادت مبارک یا سلام کریم تولد مبارک خب اگه من پلیس هلدر نداشته باشم مجبورم یا شخصی سازی انجام ندم مثلا فقط بنویسم تولدت مبارک 
-        // یا اینکه یه پلیس هلدر مثل سلام {Name} تولدت مبارک بزارم که به ازازی هر نفر ضخصی سازی انجام بدم
+        // سلام علی تولدت مبارک یا سلام کریم تولدت مبارک خب اگه من پلیس هلدر نداشته باشم مجبورم یا شخصی سازی انجام ندم مثلا فقط بنویسم تولدت مبارک 
+        // یا اینکه یه پلیس هلدر مثل سلام {Name} تولدت مبارک بزارم که به ازای هر نفر شخصی سازی انجام بدم
 
         // حالا این فور ایچه سبکش اینه اون دیکشنری از مقادیری که اومده رو بیاد داخل متن و موضوع مون جاگذاری کنه به عنوان مثال 
         // فرض کن من یه قالب به این شکل دارم سلام {{UserName}} به شرکت {{CompanyName}}  خوش اومدید 
         //حالا برای اینکه بیام مقادیر داخل یوزر نیم و کمپانی نیم رو پر کنم از پلیس هلدر استفاده میکنم چجوری ؟
         //فرض کن دیکشنری تو ولیو کریم و کلید UserName 
-        // و ولیو اریا و کلیو CompanyName اومده توی ورودی 
+        // و ولیو اریا و کلید CompanyName اومده توی ورودی 
         // حالا برای اینکه بیای این مقادیر رو توی اون قالب بزاری
         // میای اون کلید هاشون رو به شکلی که توی قالب نگه داشتی نگه میداری 
         // بعدش میری توی متن و موضوع قالبه  میگردی هر کجا که این کلید رو پیدا کردیی اون رو با مقدار ولیو همون کلیده پر میکنی
-        // مثلا میری توی موضوع ها دمیگردی با کلید {{UserName}} 
+        // مثلا میری توی موضوع ها میگردی با کلید {{UserName}} 
         // فرض کن پیداش میکنی حالا که پیداش کردی میای این کلید رو با مقدار ولیو توی دیکشنری جایگزین میکنی یعنی الان مقدار توی متن شده کریم
 
         if (placeholders is not null && placeholders.Count > 0)

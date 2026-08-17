@@ -62,7 +62,7 @@ public class CompanyController : ControllerBase
         [FromBody] UpdateCompanyInfoRequestDto update,
         CancellationToken cancellationToken)
     {
-        await _companyService.UpdateCompanyIdAsync(companyId, update, cancellationToken);
+        await _companyService.UpdateCompanyAsync(companyId, update, cancellationToken);
 
         return Ok(Result.Success());
     }

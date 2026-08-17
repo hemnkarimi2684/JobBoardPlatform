@@ -24,7 +24,11 @@ public class AdminDashboardService : IAdminDashboardService
 
     private readonly IRedisService _redisService;
 
-    public AdminDashboardService(IDbConnectionFactory connection, IAccessControlService accessControlService, ICurrentUser currentUser, IRedisService redisService)
+    public AdminDashboardService(
+        IDbConnectionFactory connection,
+        IAccessControlService accessControlService,
+        ICurrentUser currentUser,
+        IRedisService redisService)
     {
         _connection = connection;
         _accessControlService = accessControlService;

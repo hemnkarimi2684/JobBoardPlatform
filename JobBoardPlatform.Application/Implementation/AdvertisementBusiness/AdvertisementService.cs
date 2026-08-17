@@ -25,7 +25,10 @@ public class AdvertisementService : IAdvertisementService
 
     private readonly IAccessControlService _accessControlService;
 
-    public AdvertisementService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService)
+    public AdvertisementService(
+        IUnitOfWork unitOfWork, 
+        ICurrentUser currentUser,
+        IAccessControlService accessControlService)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

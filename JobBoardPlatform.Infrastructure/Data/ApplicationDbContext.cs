@@ -66,7 +66,6 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
 
     private void ApplyIdentityEntitiesConfiguration(ModelBuilder modelBuilder)
     {
-
         modelBuilder.Entity<IdentityRoleClaim<Guid>>(entity =>
         {
             entity.ToTable("RoleClaims");

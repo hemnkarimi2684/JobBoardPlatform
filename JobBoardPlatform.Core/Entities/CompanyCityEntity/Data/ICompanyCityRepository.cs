@@ -16,12 +16,13 @@ public interface ICompanyCityRepository : IGenericRepository<CompanyCity>
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <returns></returns>
-    Task<(List<TResult> Items, int TotalDataCount)> GetCityCompaniesAsync<TResult>(Expression<Func<CompanyCity, TResult>> projection,
-                                                              Guid cityId,
-                                                              CancellationToken cancellationToken,
-                                                              int pageNumber = 1,
-                                                              int pageSize = 10);
-    
+    Task<(List<TResult> Items, int TotalDataCount)> GetCityCompaniesAsync<TResult>(
+        Expression<Func<CompanyCity, TResult>> projection,
+        Guid cityId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10);
+
     /// <summary>
     /// ایا این شرکت در این شهر مورد نظر وجود دارد یا نه 
     /// </summary>

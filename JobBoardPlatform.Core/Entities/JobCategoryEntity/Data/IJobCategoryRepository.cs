@@ -58,7 +58,7 @@ public interface IJobCategoryRepository : IGenericRepository<JobCategory>
         CancellationToken cancellationToken);
 
     /// <summary>
-    /// دریافت تمام دسته بندی های شغلی برای دراپ داون توی یو ای 
+    /// دریافت تمام دسته بندی های شغلی برای دراپ داون توی یوای 
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="projection"></param>

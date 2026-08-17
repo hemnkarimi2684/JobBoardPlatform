@@ -12,7 +12,9 @@ public class FeaturedPackageService : IFeaturedPackageService
 
     private readonly ICurrentUser _currentUser;
 
-    public FeaturedPackageService(IUnitOfWork unitOfWork, ICurrentUser currentUser)
+    public FeaturedPackageService(
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

@@ -1,5 +1,8 @@
 ﻿namespace JobBoardPlatform.Core.Entities.CompanyEntity.Enums;
 
+/// <summary>
+/// نوع مالکیت شرکت
+/// </summary>
 public enum OwnershipType
 {
     /// <summary>

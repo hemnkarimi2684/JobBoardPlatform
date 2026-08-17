@@ -17,7 +17,9 @@ public class AttachmentService : IAttachmentService
 
     private readonly ICurrentUser _currentUser;
 
-    public AttachmentService(IUnitOfWork unitOfWork, ICurrentUser currentUser)
+    public AttachmentService(
+        IUnitOfWork unitOfWork, 
+        ICurrentUser currentUser)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

@@ -19,11 +19,11 @@ public interface IEducationDetailRepository : IGenericRepository<EducationDetail
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<(List<TResult> Items, int TotalDataCount)> GetUserEducationDetailsAsync<TResult>(
-                                            Expression<Func<EducationDetail, TResult>> projection,
-                                            Guid userId,
-                                            CancellationToken cancellationToken,
-                                            int pageNumber = 1,
-                                            int pageSize = 10);
+        Expression<Func<EducationDetail, TResult>> projection,
+        Guid userId,
+        CancellationToken cancellationToken,
+        int pageNumber = 1,
+        int pageSize = 10);
 
     /// <summary>
     /// ویرایش اطلاعات مدرک تحصیلی موجود

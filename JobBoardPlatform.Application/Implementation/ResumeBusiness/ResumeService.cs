@@ -29,7 +29,12 @@ public class ResumeService : IResumeService
 
     private readonly ILogger<ResumeService> _logger;
 
-    public ResumeService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAttachmentService attachmentService, IAccessControlService accessControlService, ILogger<ResumeService> logger)
+    public ResumeService(
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser, 
+        IAttachmentService attachmentService, 
+        IAccessControlService accessControlService,
+        ILogger<ResumeService> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;

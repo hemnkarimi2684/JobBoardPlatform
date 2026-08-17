@@ -33,8 +33,6 @@ public static class InfrastructureDependencyInjection
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-
-
         return services;
     }
 }

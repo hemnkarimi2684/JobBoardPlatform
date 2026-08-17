@@ -46,7 +46,15 @@ public class UserService : IUserService
 
     private readonly ILogger<UserService> _logger;
 
-    public UserService(IUnitOfWork unitOfWork, ICurrentUser currentUser, IAccessControlService accessControlService, IAttachmentService attachmentService, IUserDapperRepository userDapperRepository, IEmailService emailService, UserManager<User> userManager, ILogger<UserService> logger)
+    public UserService(
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser,
+        IAccessControlService accessControlService, 
+        IAttachmentService attachmentService,
+        IUserDapperRepository userDapperRepository, 
+        IEmailService emailService, 
+        UserManager<User> userManager, 
+        ILogger<UserService> logger)
     {
         _unitOfWork = unitOfWork;
         _currentUser = currentUser;
