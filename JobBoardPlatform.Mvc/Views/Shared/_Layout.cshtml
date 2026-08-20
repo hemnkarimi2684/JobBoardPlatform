@@ -150,6 +150,26 @@
         </div>
     </main>
 
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <a class="footer-brand" asp-controller="Home" asp-action="Index">JobBoard</a>
+                <p>&copy; @DateTime.Now.Year JobBoard. All rights reserved.</p>
+                <div class="footer-links">
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                    <a asp-controller="Advertisement" asp-action="Index">Jobs</a>
+                    <a asp-controller="Company" asp-action="Index">Companies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top" title="Back to top">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+        </svg>
+    </button>
+
     <script>
         function toggleNav() {
             var el = document.getElementById('navCollapse');
@@ -168,6 +188,21 @@
                     try { localStorage.setItem('jobboard-theme', next); } catch (e) { }
                 });
             }
+        })();
+
+        (function () {
+            var scrollBtn = document.getElementById('scrollTopBtn');
+            if (!scrollBtn) return;
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 400) {
+                    scrollBtn.classList.add('visible');
+                } else {
+                    scrollBtn.classList.remove('visible');
+                }
+            }, { passive: true });
+            scrollBtn.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
         })();
     </script>
 
@@ -209,6 +244,30 @@
                     noResultsText: 'No matching options'
                 });
             });
+        })();
+    </script>
+    <script>
+        (function () {
+            var alerts = document.querySelectorAll('.container > .alert');
+            if (!alerts.length) return;
+
+            var container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+
+            alerts.forEach(function (alert) {
+                var close = document.createElement('button');
+                close.type = 'button';
+                close.className = 'toast-close';
+                close.innerHTML = '&times;';
+                close.onclick = function () { alert.remove(); };
+                alert.appendChild(close);
+                container.appendChild(alert);
+            });
+
+            setTimeout(function () {
+                alerts.forEach(function (a) { if (a.parentNode) a.remove(); });
+            }, 4200);
         })();
     </script>
 </body>

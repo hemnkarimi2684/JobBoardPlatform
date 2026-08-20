@@ -62,7 +62,8 @@ else
                         <form asp-action="DeactivateJobSeeker"
                               asp-route-userId="@item.Id"
                               method="post"
-                              style="display:inline;">
+                              style="display:inline;"
+                              onsubmit="return confirm('Are you sure you want to deactivate this job seeker?');">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
                             <button type="submit" class="btn btn-danger">Deactivate</button>
@@ -73,7 +74,8 @@ else
                         <form asp-action="ActivateJobSeeker"
                               asp-route-userId="@item.Id"
                               method="post"
-                              style="display:inline;">
+                              style="display:inline;"
+                              onsubmit="return confirm('Are you sure you want to activate this job seeker?');">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
                             <button type="submit" class="btn btn-success">Activate</button>

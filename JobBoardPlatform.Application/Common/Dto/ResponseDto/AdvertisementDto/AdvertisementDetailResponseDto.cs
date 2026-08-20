@@ -51,6 +51,8 @@ public class AdvertisementDetailResponseDto
 
     public bool IsOwner { get; set; }
 
+    public Guid? CompanyImageFileId { get; set; }
+
     public List<string> SkillNames { get; set; } = new();
 
     public static AdvertisementDetailResponseDto MapToResponseDto(AdvertisementDetail advertisementDetail, Guid currentUserId)
@@ -79,7 +81,8 @@ public class AdvertisementDetailResponseDto
             FeaturedUntil = advertisementDetail.FeaturedUntil,
             IsFeatured = advertisementDetail.IsFeatured,
             IsActive = advertisementDetail.IsActive,
-            IsOwner = advertisementDetail.EmployerUserId == currentUserId
+            IsOwner = advertisementDetail.EmployerUserId == currentUserId,
+            CompanyImageFileId = advertisementDetail.CompanyImageFileId
         };
     }
 }

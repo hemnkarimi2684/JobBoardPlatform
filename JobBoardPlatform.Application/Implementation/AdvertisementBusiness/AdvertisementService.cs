@@ -110,7 +110,8 @@ public class AdvertisementService : IAdvertisementService
                                                         FeaturedUntil = a.FeaturedUntil,
                                                         IsFeatured = a.IsFeatured,
                                                         IsActive = a.IsActive,
-                                                        SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+                                                        SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
+                                                        CompanyImageFileId = a.Company.CompanyImageFileId
                                                     },
                                                     companyId,
                                                     cancellationToken,
@@ -183,7 +184,8 @@ public class AdvertisementService : IAdvertisementService
             FeaturedUntil = a.FeaturedUntil,
             IsFeatured = a.IsFeatured,
             IsActive = a.IsActive,
-            SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+            SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
+            CompanyImageFileId = a.Company.CompanyImageFileId
         },
         a => a.IsActive,
         cancellationToken,
@@ -220,7 +222,8 @@ public class AdvertisementService : IAdvertisementService
             FeaturedUntil = a.FeaturedUntil,
             IsFeatured = a.IsFeatured,
             IsActive = a.IsActive,
-            SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+            SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
+            CompanyImageFileId = a.Company.CompanyImageFileId
         },
         null,
         cancellationToken,
@@ -267,7 +270,8 @@ public class AdvertisementService : IAdvertisementService
                 FeaturedUntil = a.FeaturedUntil,
                 IsFeatured = a.IsFeatured,
                 IsActive = a.IsActive,
-                SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+                SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
+                CompanyImageFileId = a.Company.CompanyImageFileId
             },
               cancellationToken, pagingCommand.PageNumber, pagingCommand.PageSize);
 
@@ -310,7 +314,8 @@ public class AdvertisementService : IAdvertisementService
                 FeaturedUntil = a.FeaturedUntil,
                 IsFeatured = a.IsFeatured,
                 IsActive = a.IsActive,
-                SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+                SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
+                CompanyImageFileId = a.Company.CompanyImageFileId
             },
             predicate,
             cancellationToken,
@@ -348,7 +353,8 @@ public class AdvertisementService : IAdvertisementService
                 FeaturedUntil = a.FeaturedUntil,
                 IsFeatured = a.IsFeatured,
                 IsActive = a.IsActive,
-                SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList()
+                SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
+                CompanyImageFileId = a.Company.CompanyImageFileId
             },
               cancellationToken, pagingCommand.PageNumber, pagingCommand.PageSize);
 
