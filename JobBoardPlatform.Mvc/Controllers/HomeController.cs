@@ -88,16 +88,22 @@ public class HomeController : Controller
 
     public IActionResult Error()
     {
+        Response.StatusCode = StatusCodes.Status500InternalServerError;
+
         return View();
     }
 
     public IActionResult NotFoundPage()
     {
+        Response.StatusCode = StatusCodes.Status404NotFound;
+
         return View("NotFound");
     }
 
     public IActionResult AccessDenied()
     {
+        Response.StatusCode = StatusCodes.Status403Forbidden;
+
         return View();
     }
 }

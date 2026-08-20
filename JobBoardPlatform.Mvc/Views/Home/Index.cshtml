@@ -113,9 +113,18 @@ else
         {
             <article class="job-card">
                 <div class="job-card-top">
-                    <div class="job-logo">
-                        @(string.IsNullOrEmpty(item.CompanyName) ? "?" : item.CompanyName.Substring(0, 1))
-                    </div>
+                    @if (item.CompanyImageFileId.HasValue)
+                    {
+                        <div class="job-logo" style="overflow:hidden;">
+                            <img src="@Url.Action("DownloadImage", "Company", new { id = item.CompanyId })" alt="@item.CompanyName" style="width:100%; height:100%; object-fit:cover;" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="job-logo">
+                            @(string.IsNullOrEmpty(item.CompanyName) ? "?" : item.CompanyName.Substring(0, 1))
+                        </div>
+                    }
                     <div class="job-heading">
                         <h3 class="job-title">
                             <a asp-controller="Advertisement" asp-action="Details" asp-route-id="@item.AdvertisementId">

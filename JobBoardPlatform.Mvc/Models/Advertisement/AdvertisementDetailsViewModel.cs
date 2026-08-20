@@ -29,6 +29,7 @@ public class AdvertisementDetailsViewModel : AdvertisementDetailResponseDto
             FeaturedUntil = source.FeaturedUntil,
             IsActive = source.IsActive,
             IsOwner = source.IsOwner,
-            SkillNames = source.SkillNames
+            SkillNames = source.SkillNames,
+            CompanyImageFileId = source.CompanyImageFileId
         };
 }

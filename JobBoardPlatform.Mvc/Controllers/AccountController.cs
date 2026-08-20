@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -256,7 +257,10 @@ public class AccountController : Controller
             .Select(value => new SelectListItem
             {
                 Value = ((int)value).ToString(),
-                Text = value.ToString()
+                Text = value.GetType().GetMember(value.ToString())!.First()
+                    .GetCustomAttributes(typeof(DisplayAttribute), false)
+                    .OfType<DisplayAttribute>()
+                    .FirstOrDefault()?.Name ?? value.ToString()
             })
             .ToList();
     }

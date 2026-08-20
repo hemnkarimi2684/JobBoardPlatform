@@ -30,6 +30,7 @@ public class AdvertisementDetail
     public Guid CityId { get; init; }
     public Guid CompanyId { get; init; }
     public Guid EmployerUserId { get; init; }
+    public Guid? CompanyImageFileId { get; init; }
 
     public CollaborationType CollaborationType { get; init; }
 

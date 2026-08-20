@@ -99,14 +99,19 @@ else
         </div>
         <form asp-action="UploadImage" method="post" enctype="multipart/form-data" style="margin-bottom: 12px;">
             <div class="form-group">
-                <input type="file" name="Image" class="form-control" />
+                <label class="btn btn-outline" style="cursor: pointer; display: inline-flex; gap: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
+                    Choose Photo
+                    <input type="file" name="Image" accept="image/*" style="display:none;" onchange="this.closest('.form-group').querySelector('.file-name-display').textContent = this.files[0]?.name || ''" />
+                </label>
+                <span class="file-name-display" style="margin-left: 10px; color: var(--muted); font-size: .9rem;"></span>
             </div>
             <button type="submit" class="btn btn-primary">Upload Photo</button>
         </form>
         @if (Model.UserImageFileId != null)
         {
-            <form asp-action="DeleteImage" method="post">
-                <button type="submit" class="btn btn-danger">Delete Photo</button>
+            <form asp-action="DeleteImage" method="post" onsubmit="return confirm('Are you sure you want to delete your profile photo?');">
+                <button type="submit" class="btn btn-danger btn-sm">Delete Photo</button>
             </form>
         }
     </section>
