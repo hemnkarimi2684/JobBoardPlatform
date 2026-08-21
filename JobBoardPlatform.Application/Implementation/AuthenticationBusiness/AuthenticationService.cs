@@ -56,6 +56,12 @@ public class AuthenticationService : IAuthenticationService
         if (user == null)
             throw new ValidationException("Email/phone number or password is incorrect.");
 
+        if (user.IsApproved == false)
+            throw new ForbiddenException("“Your account is pending administrator approval.”");
+
+        if (user.IsActive == false)
+            throw new ForbiddenException("Your account is deactivated. Please contact support.");
+
         var result = await _signInManager.PasswordSignInAsync(user, loginCommand.Password, false, true);
 
         if (result.IsLockedOut)
@@ -66,12 +72,6 @@ public class AuthenticationService : IAuthenticationService
 
         if (!result.Succeeded)
             throw new ValidationException("Email/phone number or password is incorrect.");
-
-        if (user.IsApproved == false)
-            throw new ForbiddenException("“Your account is pending administrator approval.”");
-
-        if (user.IsActive == false)
-            throw new ForbiddenException("Your account is deactivated. Please contact support.");
 
         return await _jwtService.GenerateTokenAsync(user);
     }
