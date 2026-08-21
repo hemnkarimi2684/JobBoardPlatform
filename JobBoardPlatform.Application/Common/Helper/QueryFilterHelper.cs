@@ -1,5 +1,6 @@
 ﻿using JobBoardPlatform.Application.Common.Dto.RequestDto.AdvertisementDto;
 using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using System.Linq.Expressions;
 
 namespace JobBoardPlatform.Application.Common.Helper;
@@ -107,6 +108,11 @@ public static class QueryFilterHelper
         var isActiveEqual = Expression.Equal(isActiveProperty, Expression.Constant(true));
 
         combined = combined is null ? isActiveEqual : Expression.AndAlso(combined, isActiveEqual);
+
+        var statusProperty = Expression.Property(parameter, nameof(Advertisement.Status));
+        var statusOpen = Expression.Equal(statusProperty, Expression.Constant(AdvertisementStatus.Open));
+
+        combined = combined is null ? statusOpen : Expression.AndAlso(combined, statusOpen);
 
         //آخرین قطعه از پازل ساختن Expression Tree داینامیک
         // اینجا lamba کارش اینه که 

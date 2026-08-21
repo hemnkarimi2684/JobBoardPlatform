@@ -1,4 +1,5 @@
 ﻿using JobBoardPlatform.Core.Entities.AdvertisementEntity.Entity;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Infrastructure.Configurations.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -35,6 +36,13 @@ public class AdvertisementModelBuilderConfiguration : BaseModelBuilderConfigurat
             .HasDefaultValue(false);
 
         builder.HasIndex(a => a.FeaturedUntil);
+
+        builder.Property(a => a.Status)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(25);
+
+        builder.HasIndex(a => a.Status);
 
         builder.HasMany(a => a.AdvertisementSkills)
             .WithOne(x => x.Advertisement)

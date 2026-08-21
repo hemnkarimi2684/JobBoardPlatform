@@ -33,6 +33,7 @@ public class Advertisement : BaseEntity
         CreatedById = createdById;
         IsActive = true;
         IsFeatured = false;
+        Status = AdvertisementStatus.Open;
 
         Validate();
     }
@@ -86,6 +87,11 @@ public class Advertisement : BaseEntity
     /// تاریخ انقضا اگهی ویژه
     /// </summary>
     public DateTime? FeaturedUntil { get; private set; }
+
+    /// <summary>
+    /// وضعیت آگهی باز، بسته، منقضی
+    /// </summary>
+    public AdvertisementStatus Status { get; private set; }
 
     #region Foreign Keys
 
@@ -197,6 +203,13 @@ public class Advertisement : BaseEntity
         FeaturedUntil = featuredUntil;
 
         Update(modifiedById);
+    }
+
+    public void UpdateStatus(AdvertisementStatus status, Guid? modifierId)
+    {
+        Status = status;
+
+        Update(modifierId);
     }
 
     public void UpdateAdvertisementInfo(UpdateAdvertisementInfo updateAdvertisement)

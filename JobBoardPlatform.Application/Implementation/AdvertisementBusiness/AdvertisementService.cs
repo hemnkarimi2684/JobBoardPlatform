@@ -111,9 +111,10 @@ public class AdvertisementService : IAdvertisementService
                                                         IsFeatured = a.IsFeatured,
                                                         IsActive = a.IsActive,
                                                         SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
-                                                        CompanyImageFileId = a.Company.CompanyImageFileId
-                                                    },
-                                                    companyId,
+                                                         CompanyImageFileId = a.Company.CompanyImageFileId,
+                                                         Status = a.Status
+                                                     },
+                                                     companyId,
                                                     cancellationToken,
                                                     pagingCommand.PageNumber,
                                                     pagingCommand.PageSize);
@@ -136,7 +137,8 @@ public class AdvertisementService : IAdvertisementService
             CollaborationType = a.CollaborationType,
             CompanyName = a.Company.Name,
             ExperienceLevel = a.ExperienceLevel,
-            JobTitle = a.Job.Name
+            JobTitle = a.Job.Name,
+            Status = a.Status
         }, advertisementId, cancellationToken);
 
         if (result == null)
@@ -185,9 +187,10 @@ public class AdvertisementService : IAdvertisementService
             IsFeatured = a.IsFeatured,
             IsActive = a.IsActive,
             SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
-            CompanyImageFileId = a.Company.CompanyImageFileId
+            CompanyImageFileId = a.Company.CompanyImageFileId,
+            Status = a.Status
         },
-        a => a.IsActive,
+        a => a.IsActive && a.Status == AdvertisementStatus.Open,
         cancellationToken,
         pagingCommand.PageNumber,
         pagingCommand.PageSize);
@@ -223,7 +226,8 @@ public class AdvertisementService : IAdvertisementService
             IsFeatured = a.IsFeatured,
             IsActive = a.IsActive,
             SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
-            CompanyImageFileId = a.Company.CompanyImageFileId
+            CompanyImageFileId = a.Company.CompanyImageFileId,
+            Status = a.Status
         },
         null,
         cancellationToken,
@@ -271,7 +275,8 @@ public class AdvertisementService : IAdvertisementService
                 IsFeatured = a.IsFeatured,
                 IsActive = a.IsActive,
                 SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
-                CompanyImageFileId = a.Company.CompanyImageFileId
+                CompanyImageFileId = a.Company.CompanyImageFileId,
+                Status = a.Status
             },
               cancellationToken, pagingCommand.PageNumber, pagingCommand.PageSize);
 
@@ -315,7 +320,8 @@ public class AdvertisementService : IAdvertisementService
                 IsFeatured = a.IsFeatured,
                 IsActive = a.IsActive,
                 SkillNames = a.AdvertisementSkills.Select(s => s.Skill.Name).ToList(),
-                CompanyImageFileId = a.Company.CompanyImageFileId
+                CompanyImageFileId = a.Company.CompanyImageFileId,
+                Status = a.Status
             },
             predicate,
             cancellationToken,
@@ -462,6 +468,30 @@ public class AdvertisementService : IAdvertisementService
             throw new ValidationException("The advertisement is already active.");
 
         advertisement.UpdateActiveStatus(_currentUser.UserId, true);
+
+        return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+    }
+
+    public async Task<bool> CloseAdvertisementAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default)
+    {
+        var advertisementOwnerId = await _unitOfWork.AdvertisementRepository.GetAdvertisementOwnerIdByIdAsync(advertisementId, cancellationToken);
+
+        if (advertisementOwnerId == null)
+            throw new NotFoundException("Advertisement was not found.");
+
+        _accessControlService.EnsureOwnerEmployerOrAdmin(advertisementOwnerId.Value, _currentUser);
+
+        var advertisement = await _unitOfWork.AdvertisementRepository.GetByIdAsync(advertisementId, cancellationToken, true);
+
+        if (advertisement is null)
+            throw new NotFoundException("Advertisement was not found.");
+
+        if (advertisement.Status == AdvertisementStatus.Closed)
+            throw new ValidationException("The advertisement is already closed.");
+
+        advertisement.UpdateStatus(AdvertisementStatus.Closed, _currentUser.UserId);
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
     }

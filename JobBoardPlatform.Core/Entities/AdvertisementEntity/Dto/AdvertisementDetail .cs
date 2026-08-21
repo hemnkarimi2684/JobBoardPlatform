@@ -34,5 +34,7 @@ public class AdvertisementDetail
 
     public CollaborationType CollaborationType { get; init; }
 
+    public AdvertisementStatus Status { get; init; }
+
     public List<string> Skills { get; init; } = new List<string>();
 }

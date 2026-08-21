@@ -52,6 +52,10 @@ else
                     {
                         <span class="badge badge-featured">Featured</span>
                     }
+                    @if (item.Status == JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums.AdvertisementStatus.Closed)
+                    {
+                        <span class="badge badge-danger">Closed</span>
+                    }
                 </div>
 
                 <div class="job-meta">
