@@ -48,7 +48,11 @@ public class JobApplicationController : Controller
             new PagingRequestDto { PageNumber = pageNumber, PageSize = 10 },
             cancellationToken);
 
-        return View(JobApplicationByAdvertisementViewModel.FromResponseDto(result, advertisementId));
+        var advertisement = await _advertisementService.GetAdvertisementProjectionAsync(advertisementId, cancellationToken);
+
+        var status = advertisement?.Status ?? Core.Entities.AdvertisementEntity.Enums.AdvertisementStatus.Open;
+
+        return View(JobApplicationByAdvertisementViewModel.FromResponseDto(result, advertisementId, status));
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
@@ -102,18 +106,12 @@ public class JobApplicationController : Controller
     Guid id,
     JobApplicationStatus status,
     Guid advertisementId,
-    bool closeAdvertisement = false,
     CancellationToken cancellationToken = default)
     {
         await _jobApplicationService.UpdateJobApplicationStatusAsync(
             id,
             status,
             cancellationToken);
-
-        if (status == JobApplicationStatus.Accepted && closeAdvertisement)
-        {
-            await _advertisementService.CloseAdvertisementAsync(advertisementId, cancellationToken);
-        }
 
         TempData["Success"] = "Application status was updated successfully.";
 

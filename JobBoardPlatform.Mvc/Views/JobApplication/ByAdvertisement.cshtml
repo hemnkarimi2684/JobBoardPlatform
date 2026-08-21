@@ -12,6 +12,7 @@
         .ToList();
 
     var advertisementId = Model.AdvertisementId;
+    var isClosed = Model.AdvertisementStatus == JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums.AdvertisementStatus.Closed;
 }
 
 <div class="page-head">
@@ -28,6 +29,11 @@
 @if (TempData["Error"] is not null)
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (isClosed)
+{
+    <div class="alert alert-info">This advertisement is closed. New applications are no longer accepted.</div>
 }
 
 @if (Model.Data.Count == 0)
@@ -63,11 +69,8 @@ else
                           asp-route-id="@item.JobApplicationId"
                           asp-route-advertisementId="@advertisementId"
                           method="post"
-                          class="application-form"
-                          onsubmit="return handleStatusSubmit(this);">
+                          class="application-form">
                         @Html.AntiForgeryToken()
-
-                        <input type="hidden" name="closeAdvertisement" value="false" />
 
                         <select name="status" class="form-control">
                             @foreach (var status in statuses)
@@ -93,24 +96,4 @@ else
     </div>
 
     <partial name="_Pager" model="@Model" />
-}
-
-@section Scripts {
-    <script>
-        function handleStatusSubmit(form) {
-            var select = form.querySelector('select[name="status"]');
-            var hidden = form.querySelector('input[name="closeAdvertisement"]');
-            var selectedValue = select.value;
-
-            // 4 = Accepted
-            if (selectedValue === '4') {
-                var confirmed = confirm('This candidate will be accepted. Do you also want to close this ad to new applications?');
-                hidden.value = confirmed ? 'true' : 'false';
-            } else {
-                hidden.value = 'false';
-            }
-
-            return true;
-        }
-    </script>
 }

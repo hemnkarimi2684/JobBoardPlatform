@@ -115,6 +115,25 @@ public class AdvertisementController : Controller
     }
 
     [Authorize(Policy = "ApprovedEmployerOnly")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CloseAdvertisement(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _advertisementService.CloseAdvertisementAsync(id, cancellationToken);
+
+            TempData["Success"] = "Advertisement was closed successfully.";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+
+        return RedirectToAction(nameof(MyAds));
+    }
+
+    [Authorize(Policy = "ApprovedEmployerOnly")]
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {

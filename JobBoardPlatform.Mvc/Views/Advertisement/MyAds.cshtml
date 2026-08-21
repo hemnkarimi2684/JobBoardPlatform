@@ -85,6 +85,13 @@ else
                     <a class="btn btn-outline" asp-action="Details" asp-route-id="@item.AdvertisementId">Details</a>
                     <a class="btn btn-ghost" asp-action="Edit" asp-route-id="@item.AdvertisementId">Edit</a>
                     <a class="btn btn-outline" asp-controller="JobApplication" asp-action="ByAdvertisement" asp-route-advertisementId="@item.AdvertisementId">Applications</a>
+                    @if (item.Status == JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums.AdvertisementStatus.Open)
+                    {
+                        <form asp-action="CloseAdvertisement" asp-route-id="@item.AdvertisementId" method="post" onsubmit="return confirm('Are you sure you want to close this advertisement? No new applications will be accepted.');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger">Close Ad</button>
+                        </form>
+                    }
                 </div>
             </article>
         }
