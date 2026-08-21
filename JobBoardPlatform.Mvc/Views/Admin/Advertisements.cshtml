@@ -55,6 +55,15 @@ else
                         <span class="badge badge-danger">Inactive</span>
                     }
 
+                    @if (item.Status == JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums.AdvertisementStatus.Closed)
+                    {
+                        <span class="badge badge-danger">Closed</span>
+                    }
+                    else if (item.Status == JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums.AdvertisementStatus.Expired)
+                    {
+                        <span class="badge badge-warning">Expired</span>
+                    }
+
                     @if (item.IsFeatured)
                     {
                         <span class="badge badge-warning">Featured</span>

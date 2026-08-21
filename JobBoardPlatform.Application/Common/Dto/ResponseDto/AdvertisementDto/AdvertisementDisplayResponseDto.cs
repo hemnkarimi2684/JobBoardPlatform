@@ -15,4 +15,7 @@ public class AdvertisementDisplayResponseDto
     public CollaborationType CollaborationType { get; init; }
 
     public int ExperienceLevel { get; init; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public AdvertisementStatus Status { get; init; }
 }

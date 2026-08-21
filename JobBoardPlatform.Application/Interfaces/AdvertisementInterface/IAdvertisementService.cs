@@ -177,4 +177,14 @@ public interface IAdvertisementService
     /// </summary>
     /// <returns></returns>
     List<EnumResponseDto> GetCollaborationTypes();
+
+    /// <summary>
+    /// بستن آگی توسط کارفرما پوزیشن پر شده
+    /// </summary>
+    /// <param name="advertisementId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<bool> CloseAdvertisementAsync(
+        Guid advertisementId,
+        CancellationToken cancellationToken = default);
 }

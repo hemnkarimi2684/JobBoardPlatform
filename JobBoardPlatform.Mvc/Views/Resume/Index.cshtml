@@ -9,7 +9,7 @@
         <h1 class="page-title">My Resume</h1>
         <p class="subtitle">Manage your resume and supporting details.</p>
     </div>
-    @if (Model.ResumeId is not null)
+    @if (Model.ResumeId is null)
     {
         <a class="btn btn-primary" asp-action="Create">Create Resume</a>
     }

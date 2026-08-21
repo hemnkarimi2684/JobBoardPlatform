@@ -91,8 +91,9 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
                               IsFeatured = a.IsFeatured,
                               IsActive = a.IsActive,
                               EmployerUserId = a.Company.OwnedByUserId,
-                              CompanyImageFileId = a.Company.CompanyImageFileId
-                         })
+                              CompanyImageFileId = a.Company.CompanyImageFileId,
+                              Status = a.Status
+                          })
                          .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -182,7 +183,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
         var query = Entities
                         .AsNoTracking()
-                        .Where(a => a.IsActive);
+                        .Where(a => a.IsActive && a.Status == AdvertisementStatus.Open);
 
         if (filter.JobCategoryId.HasValue)
         {
@@ -234,7 +235,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
         var query = Entities
                         .AsNoTracking()
-                        .Where(a => a.IsActive);
+                        .Where(a => a.IsActive && a.Status == AdvertisementStatus.Open);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
@@ -270,7 +271,7 @@ public class AdvertisementRepository : GenericRepository<Advertisement>, IAdvert
 
         var query = Entities
                          .AsNoTracking()
-                         .Where(a => a.JobId == jobId);
+                         .Where(a => a.JobId == jobId && a.IsActive && a.Status == AdvertisementStatus.Open);
 
         var totalDataCount = await query.CountAsync(cancellationToken);
 

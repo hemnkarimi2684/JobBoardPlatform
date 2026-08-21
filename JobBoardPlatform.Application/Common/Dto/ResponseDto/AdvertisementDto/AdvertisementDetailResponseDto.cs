@@ -49,6 +49,9 @@ public class AdvertisementDetailResponseDto
 
     public bool IsActive { get; set; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public AdvertisementStatus Status { get; set; }
+
     public bool IsOwner { get; set; }
 
     public Guid? CompanyImageFileId { get; set; }
@@ -81,6 +84,7 @@ public class AdvertisementDetailResponseDto
             FeaturedUntil = advertisementDetail.FeaturedUntil,
             IsFeatured = advertisementDetail.IsFeatured,
             IsActive = advertisementDetail.IsActive,
+            Status = advertisementDetail.Status,
             IsOwner = advertisementDetail.EmployerUserId == currentUserId,
             CompanyImageFileId = advertisementDetail.CompanyImageFileId
         };

@@ -4,6 +4,16 @@
     ViewData["Title"] = Model.JobName;
 }
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger" style="margin:1rem 1.5rem;">@TempData["Error"]</div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" style="margin:1rem 1.5rem;">@TempData["Success"]</div>
+}
+
 <div class="detail-hero">
     <div class="detail-hero-main">
         @if (Model.CompanyImageFileId.HasValue)
@@ -43,14 +53,21 @@
     <div class="detail-hero-actions">
         @if (User.IsInRole("JobSeeker"))
         {
-            <form asp-controller="JobApplication" asp-action="Apply" method="post" onsubmit="return confirm('Are you sure you want to apply for this job?');">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="advertisementId" value="@Model.AdvertisementId" />
-                <button type="submit" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                    Apply for this Job
-                </button>
-            </form>
+            @if (Model.Status == JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums.AdvertisementStatus.Open)
+            {
+                <form asp-controller="JobApplication" asp-action="Apply" method="post" onsubmit="return confirm('Are you sure you want to apply for this job?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="advertisementId" value="@Model.AdvertisementId" />
+                    <button type="submit" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                        Apply for this Job
+                    </button>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-danger" style="margin-bottom:0;">This position has been filled and is no longer accepting applications.</div>
+            }
         }
         @if (User.IsInRole("Employer") && Model.IsOwner)
         {
@@ -89,6 +106,10 @@
     @if (Model.IsFeatured)
     {
         <span class="badge badge-featured">Featured</span>
+    }
+    @if (Model.Status == JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums.AdvertisementStatus.Closed)
+    {
+        <span class="badge badge-danger">Closed</span>
     }
 </div>
 

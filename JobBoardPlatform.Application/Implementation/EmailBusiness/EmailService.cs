@@ -166,12 +166,11 @@ public class EmailService : IEmailService
         using var client = new MailKit.Net.Smtp.SmtpClient();
 
         // انتخاب نوع 
-        // Ssl | Tls
-        // Ssl : یعنی از همان ابتدای Connection ارتباط رمزنگاری‌شده برقرار می‌شود
+        // Ssl | None
         // Tls : ابتدا Connection برقرار می‌شود و سپس با STARTTLS ارتباط به TLS ارتقا پیدا می‌کند.
         var secureOption = _smtpSettings.UseSsl
-            ? SecureSocketOptions.SslOnConnect
-            : SecureSocketOptions.StartTls;
+            ? SecureSocketOptions.StartTls
+            : SecureSocketOptions.None;
 
         try
         {

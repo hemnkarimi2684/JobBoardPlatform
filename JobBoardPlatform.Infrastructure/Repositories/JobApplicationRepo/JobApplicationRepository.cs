@@ -119,7 +119,7 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
         Guid userId,
         CancellationToken cancellationToken)
                                 => await AnyAsync(ja =>
-                                    ja.AdvertisementId == advertisementId && ja.UserId == userId,
+                                    ja.AdvertisementId == advertisementId && ja.UserId == userId && ja.Status != JobApplicationStatus.Cancelled,
                                     cancellationToken);
 
 }

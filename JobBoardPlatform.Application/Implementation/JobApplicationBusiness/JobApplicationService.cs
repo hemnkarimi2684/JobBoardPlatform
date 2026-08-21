@@ -1,6 +1,7 @@
 ﻿using JobBoardPlatform.Application.Common.CurrentUser.Interface;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
+using JobBoardPlatform.Application.Common.Dto.ResponseDto.AdvertisementDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.Common;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.JobApplicationDto;
 using JobBoardPlatform.Application.Common.Dto.ResponseDto.ResumeDto;
@@ -11,6 +12,7 @@ using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.EmailInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
+using JobBoardPlatform.Core.Entities.AdvertisementEntity.Enums;
 using JobBoardPlatform.Core.Entities.Common.Data;
 using JobBoardPlatform.Core.Entities.Common.Dto;
 using JobBoardPlatform.Core.Entities.EmailTemplateEntity.Constants;
@@ -61,14 +63,12 @@ public class JobApplicationService : IJobApplicationService
         CreateJobApplicationRequestDto createCommand,
         CancellationToken cancellationToken = default)
     {
-        await ValidationForCreateMethod(createCommand.ResumeId, createCommand.AdvertisementId, createCommand.UserId, cancellationToken);
-
-        var advInformation = await _advertisementService.GetAdvertisementProjectionAsync(createCommand.AdvertisementId, cancellationToken);
+        var advertisementDetail = await ValidationForCreateMethod(createCommand.ResumeId, createCommand.AdvertisementId, createCommand.UserId, cancellationToken);
 
         var userFullName = await _unitOfWork.UserProfileRepository.GetUserFullNameByUserIdAsync(createCommand.UserId, cancellationToken);
 
-        var jobApplication = new JobApplication(JobApplicationStatus.Pending, advInformation.JobTitle, advInformation.CompanyName,
-                                               advInformation.CityName, advInformation.CollaborationType, userFullName!, advInformation.ExperienceLevel,
+        var jobApplication = new JobApplication(JobApplicationStatus.Pending, advertisementDetail.JobTitle, advertisementDetail.CompanyName,
+                                               advertisementDetail.CityName, advertisementDetail.CollaborationType, userFullName!, advertisementDetail.ExperienceLevel,
                                                createCommand.ResumeId, createCommand.AdvertisementId, createCommand.UserId, _currentUser.UserId);
 
         await _unitOfWork.JobApplicationRepository.AddAsync(jobApplication, cancellationToken);
@@ -307,7 +307,7 @@ public class JobApplicationService : IJobApplicationService
 
     #region Private Methods
 
-    private async Task ValidationForCreateMethod(Guid resumeId, Guid advertisementId, Guid userId, CancellationToken cancellationToken)
+    private async Task<AdvertisementDisplayResponseDto> ValidationForCreateMethod(Guid resumeId, Guid advertisementId, Guid userId, CancellationToken cancellationToken)
     {
         _accessControlService.EnsureApplicant(userId, _currentUser);
 
@@ -316,10 +316,10 @@ public class JobApplicationService : IJobApplicationService
         if (!isResumeExist)
             throw new NotFoundException("Resume was not found.");
 
-        var isAdvertisementExist = await _unitOfWork.AdvertisementRepository.IsAdvertisementExistAsync(advertisementId, cancellationToken);
+        var advertisementProjection = await _advertisementService.GetAdvertisementProjectionAsync(advertisementId, cancellationToken);
 
-        if (!isAdvertisementExist)
-            throw new NotFoundException("Advertisement was not found.");
+        if (advertisementProjection.Status != AdvertisementStatus.Open)
+            throw new ValidationException("This position has been filled and is no longer accepting applications.");
 
         var isUserExist = await _unitOfWork.UserRepository.IsUserExistAsync(userId, cancellationToken);
 
@@ -330,11 +330,13 @@ public class JobApplicationService : IJobApplicationService
 
         if (isDuplicateJobApplication)
             throw new ConflictException("You have already applied for this job.");
+
+        return advertisementProjection;
     }
 
     private void ValidateJobApplicationStatus(
-    JobApplication jobApplication,
-    JobApplicationStatus newStatus)
+        JobApplication jobApplication,
+        JobApplicationStatus newStatus)
     {
         var currentStatus = jobApplication.Status;
 

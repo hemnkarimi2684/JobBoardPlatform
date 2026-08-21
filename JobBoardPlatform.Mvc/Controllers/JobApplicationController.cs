@@ -1,5 +1,6 @@
 using JobBoardPlatform.Application.Common.Dto.RequestDto.Common;
 using JobBoardPlatform.Application.Common.Dto.RequestDto.JobApplicationDto;
+using JobBoardPlatform.Application.Interfaces.AdvertisementInterface;
 using JobBoardPlatform.Application.Interfaces.JobApplicationInterface;
 using JobBoardPlatform.Application.Interfaces.ResumeInterface;
 using JobBoardPlatform.Core.Entities.JobApplicationEntity.Enums;
@@ -16,11 +17,16 @@ public class JobApplicationController : Controller
 {
     private readonly IJobApplicationService _jobApplicationService;
     private readonly IResumeService _resumeService;
+    private readonly IAdvertisementService _advertisementService;
 
-    public JobApplicationController(IJobApplicationService jobApplicationService, IResumeService resumeService)
+    public JobApplicationController(
+        IJobApplicationService jobApplicationService,
+        IResumeService resumeService,
+        IAdvertisementService advertisementService)
     {
         _jobApplicationService = jobApplicationService;
         _resumeService = resumeService;
+        _advertisementService = advertisementService;
     }
 
     [Authorize(Policy = "ActiveJobSeekerOnly")]
@@ -96,12 +102,18 @@ public class JobApplicationController : Controller
     Guid id,
     JobApplicationStatus status,
     Guid advertisementId,
-    CancellationToken cancellationToken)
+    bool closeAdvertisement = false,
+    CancellationToken cancellationToken = default)
     {
         await _jobApplicationService.UpdateJobApplicationStatusAsync(
             id,
             status,
             cancellationToken);
+
+        if (status == JobApplicationStatus.Accepted && closeAdvertisement)
+        {
+            await _advertisementService.CloseAdvertisementAsync(advertisementId, cancellationToken);
+        }
 
         TempData["Success"] = "Application status was updated successfully.";
 

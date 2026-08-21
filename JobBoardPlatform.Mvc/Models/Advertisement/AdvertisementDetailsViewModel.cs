@@ -28,6 +28,7 @@ public class AdvertisementDetailsViewModel : AdvertisementDetailResponseDto
             IsFeatured = source.IsFeatured,
             FeaturedUntil = source.FeaturedUntil,
             IsActive = source.IsActive,
+            Status = source.Status,
             IsOwner = source.IsOwner,
             SkillNames = source.SkillNames,
             CompanyImageFileId = source.CompanyImageFileId
