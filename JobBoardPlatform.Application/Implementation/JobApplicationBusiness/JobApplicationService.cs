@@ -332,23 +332,45 @@ public class JobApplicationService : IJobApplicationService
             throw new ConflictException("You have already applied for this job.");
     }
 
-    private void ValidateJobApplicationStatus(JobApplication jobApplication, JobApplicationStatus jobApplicationStatus)
+    private void ValidateJobApplicationStatus(
+    JobApplication jobApplication,
+    JobApplicationStatus newStatus)
     {
-        if (jobApplicationStatus == JobApplicationStatus.Pending)
-            throw new ValidationException("A job application cannot be moved back to pending status.");
+        var currentStatus = jobApplication.Status;
 
-        if (jobApplication.Status == JobApplicationStatus.Accepted)
+        if (currentStatus == newStatus)
+            throw new ValidationException("The application is already in the requested status.");
+
+        if (currentStatus == JobApplicationStatus.Accepted)
             throw new ValidationException("The status of an accepted application cannot be changed.");
 
-        if (jobApplication.Status == JobApplicationStatus.Rejected)
+        if (currentStatus == JobApplicationStatus.Rejected)
             throw new ValidationException("The status of a rejected application cannot be changed.");
 
-        if (jobApplication.Status == JobApplicationStatus.Reviewing && jobApplicationStatus == JobApplicationStatus.Accepted)
-            throw new ValidationException("An application under review cannot be accepted directly. An interview stage is required first.");
+        // اگه وضعین پندینگ بود نتونه وضعیتی به جز در حال ریویو وارد کنه ُ 
+        if (currentStatus == JobApplicationStatus.Pending &&
+            newStatus != JobApplicationStatus.Reviewing)
+        {
+            throw new ValidationException("A pending application can only be moved to the reviewing stage.");
+        }
 
-        if (jobApplication.Status == JobApplicationStatus.Interview && jobApplicationStatus == JobApplicationStatus.Reviewing)
-            throw new ValidationException("An application cannot be moved back to the review stage after the interview stage has started.");
+        // اینجام چک کردم که اگه وضعیت در حال ریویو بود نتونه وضعیتی به جز در حال مصاحبه یا رد شده رو وارد کنه 
+        if (currentStatus == JobApplicationStatus.Reviewing &&
+            newStatus != JobApplicationStatus.Interview &&
+            newStatus != JobApplicationStatus.Rejected)
+        {
+            throw new ValidationException("A reviewing application can only be moved to interview or rejected.");
+        }
+
+        // اینجام چک کردم که اگه وضعیت در حال مصاحبه بود نتونه وضعیتی به جز قبول شدن یا رد شدن رو وارد کنه 
+        if (currentStatus == JobApplicationStatus.Interview &&
+            newStatus != JobApplicationStatus.Accepted &&
+            newStatus != JobApplicationStatus.Rejected)
+        {
+            throw new ValidationException("An interview application can only be moved to accepted or rejected.");
+        }
     }
+
 
     private async Task HandelEmailSendingForJobApplicationStatusAsync(
         JobApplication jobApplication,
